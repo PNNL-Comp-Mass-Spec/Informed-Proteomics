@@ -496,7 +496,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     newModSequence = modificationName + " " + modPos + ",";
                 }
                 return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>
-                    ((double)curNodeScore + bestPrevNodeScore, newModSequence+bestPrevSequence);
+                    ((double)curNodeScore + bestPrevNodeScore, newModSequence + bestPrevSequence);
             }
 
             return maxScoreAndMods[seqIndex][modIndex] = new Tuple<double, string>
@@ -658,7 +658,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             SequenceLocation? location = null;
 
-            if(_index == 1) // C-term residue
+            if (_index == 1) // C-term residue
             {
                 if (residue == AminoAcid.PeptideCTerm.Residue)
                 {
@@ -680,7 +680,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     location = SequenceLocation.ProteinNTerm;
                 }
             }
-            else if(_index == 2) // Amino acid at the C-term
+            else if (_index == 2) // Amino acid at the C-term
             {
                 if (_aminoAcidSequence[1] == AminoAcid.PeptideCTerm)
                 {
@@ -712,7 +712,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 return false;
             }
 
-            var loc = (SequenceLocation) location;
+            var loc = (SequenceLocation)location;
             var aminoAcid = AminoAcidSet.GetAminoAcid(residue, loc);
             if (aminoAcid == null) // residue is not valid
             {
@@ -812,7 +812,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     return false;
                 }
             }
-            if(_count >= _prevNodeIndices.Length)
+            if (_count >= _prevNodeIndices.Length)
             {
                 Array.Resize(ref _prevNodeIndices, _prevNodeIndices.Length * 2);
             }

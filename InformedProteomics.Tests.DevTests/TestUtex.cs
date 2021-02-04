@@ -94,7 +94,7 @@ namespace InformedProteomics.Tests.DevTests
                 var featureFinder = new LcMsPeakMatrix(run, new LcMsFeatureLikelihood());
                 var featureList = new List<LcMsPeakCluster>();
                 var featureId = 0;
-                for(var j = 0; j < prsmList.Count; j++)
+                for (var j = 0; j < prsmList.Count; j++)
                 {
                     if (prsmToFeatureIdMap[j] >= 0)
                     {
@@ -119,7 +119,7 @@ namespace InformedProteomics.Tests.DevTests
                     else
                     {
                         prsmToFeatureIdMap[j] = featureId;
-                        var etTol = Math.Max(run.GetElutionTime(run.MaxLcScan)*0.005, feature.ElutionLength*0.2);
+                        var etTol = Math.Max(run.GetElutionTime(run.MaxLcScan) * 0.005, feature.ElutionLength * 0.2);
 
                         for (var k = j + 1; k < prsmList.Count; k++)
                         {
@@ -154,7 +154,7 @@ namespace InformedProteomics.Tests.DevTests
 
                     var prsm1 = featureToPrsm[j];
 
-                    for (var k = j+1; k < featureList.Count; k++)
+                    for (var k = j + 1; k < featureList.Count; k++)
                     {
                         var f2 = featureList[k];
                         if (f2.Flag < 1)
@@ -213,13 +213,12 @@ namespace InformedProteomics.Tests.DevTests
                     var maxScanNum = run.GetNextScanNum(prsm1.MaxScanNum, 1);
                     f1.ExpandScanRange(minScanNum, maxScanNum);
 
-                    writer.Write("{0}\t", j+1);
+                    writer.Write("{0}\t", j + 1);
                     writer.WriteLine(LcMsFeatureFinderLauncher.GetString(f1));
                 }
                 writer.Close();
 
                 Console.WriteLine(ms1ftFilePath);
-
             }
 
             if (filesProcessed == 0)
@@ -244,7 +243,7 @@ namespace InformedProteomics.Tests.DevTests
                 Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, rawFolder);
             }
 
-            const int nDataset =32;
+            const int nDataset = 32;
             var dataset = new string[nDataset];
             for (var i = 0; i < nDataset; i++)
             {
@@ -299,7 +298,7 @@ namespace InformedProteomics.Tests.DevTests
                 var features = LcMsFeatureAlignment.LoadProMexResult(i, ms1ftPath, run);
 
                 // tag features by PrSMs
-                for(var j = 0; j < features.Count; j++)
+                for (var j = 0; j < features.Count; j++)
                 {
                     //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
                     var massTol = tolerance.GetToleranceAsMz(features[j].Mass);
@@ -696,22 +695,26 @@ namespace InformedProteomics.Tests.DevTests
 
             var writer = new StreamWriter(resultFile);
 
-            writer.Write("AlignedFeatureID"); writer.Write("\t");
+            writer.Write("AlignedFeatureID");
+            writer.Write("\t");
             writer.Write(string.Join("\t", headers));
             for (var i = 0; i < 32; i++)
             {
-                writer.Write("\t");  writer.Write("{0}", i);
+                writer.Write("\t");
+                writer.Write("{0}", i);
             }
             writer.Write("\n");
 
             var id = 1;
             foreach (var key in featureIdMap.Keys)
             {
-                writer.Write(id); writer.Write("\t");
+                writer.Write(id);
+                writer.Write("\t");
                 writer.Write(featureIdMap[key]);
                 for (var i = 0; i < 32; i++)
                 {
-                    writer.Write("\t"); writer.Write("{0}", tsvParser.GetData(string.Format("{0}", i))[key]);
+                    writer.Write("\t");
+                    writer.Write("{0}", tsvParser.GetData(string.Format("{0}", i))[key]);
                 }
                 writer.Write("\n");
                 id++;

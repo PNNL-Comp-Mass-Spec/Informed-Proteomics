@@ -5,7 +5,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// A peak in an XIC
     /// </summary>
-    public class XicPoint: IComparable<XicPoint>
+    public class XicPoint : IComparable<XicPoint>
     {
         // Ignore Spelling: Xic
 

@@ -78,7 +78,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 Peaks[i] = dPeaks[i];
             }
-
         }
     }
 }

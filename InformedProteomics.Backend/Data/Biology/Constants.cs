@@ -40,7 +40,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <returns></returns>
         public static int GetBinNum(double m)
         {
-            return (int) Math.Round(m * RescalingConstant);
+            return (int)Math.Round(m * RescalingConstant);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <returns></returns>
         public static int GetBinNumHighPrecision(double m)
         {
-            return (int) Math.Round(m * RescalingConstantHighPrecision);
+            return (int)Math.Round(m * RescalingConstantHighPrecision);
         }
     }
 }

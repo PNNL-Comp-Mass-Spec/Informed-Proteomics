@@ -52,7 +52,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 var dataname = Path.GetFileNameWithoutExtension(dataset);
                 var idFile = string.Format(@"{0}\{1}_IcTda.tsv", idFileFolder, dataname);
                 var decoyFile = string.Format(@"{0}\{1}_IcDecoy.tsv", idFileFolder, dataname);
-               //  var targetFile = string.Format(@"{0}\{1}_IcTarget.tsv", idFileFolder, dataname);
+                //  var targetFile = string.Format(@"{0}\{1}_IcTarget.tsv", idFileFolder, dataname);
 
                 if (!File.Exists(idFile))
                 {
@@ -88,7 +88,6 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     GetMatchStatistics(spec, sequence, match.Charge, writer);
                 }
                 writer.Close();
-
             }
         }
 
@@ -117,7 +116,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
             var tolerance = new Tolerance(12);
             const int MinProductCharge = 1;
-            var MaxProductCharge = Math.Min(parentIonCharge+2, 20);
+            var MaxProductCharge = Math.Min(parentIonCharge + 2, 20);
 
             var baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
             var refIntensity = CompositeScorer.GetRefIntensity(ms2Spec.Peaks);
@@ -362,7 +361,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         var mostAbuPeak = isotopePeaks[mostAbundantIsotopeIndex];
 
                         var summedIntensity = isotopePeaks.Where(p => p != null).Sum(p => p.Intensity);
-                        var intScore = summedIntensity/refIntensity;
+                        var intScore = summedIntensity / refIntensity;
                         //var intScore = mostAbuPeak.Intensity / medIntensity;
                         //var intScore = summedIntensity / refIntensity;
 
@@ -404,7 +403,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     writer.Write("{0:0.000}", curObsIonIntensity);
                     writer.Write("\t");
 
-                    writer.Write("{0:0.000}", (Math.Abs(curFragMass - curObsIonMass)/curFragMass)*1e6);
+                    writer.Write("{0:0.000}", (Math.Abs(curFragMass - curObsIonMass) / curFragMass) * 1e6);
                     writer.Write("\n");
 
                     // mz error output

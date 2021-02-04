@@ -9,7 +9,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 {
     public class MassErrorTable
     {
-        public MassErrorTable(IonType[] ionTypes, Tolerance tolerance, double width=0.2, double binWidth=0.01, double offset=0.0)
+        public MassErrorTable(IonType[] ionTypes, Tolerance tolerance, double width = 0.2, double binWidth = 0.01, double offset = 0.0)
         {
             _ionTypes = ionTypes;
             _totalPairs = 0;

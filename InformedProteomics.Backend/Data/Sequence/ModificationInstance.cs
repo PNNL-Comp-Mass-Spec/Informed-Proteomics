@@ -29,7 +29,7 @@
         /// <inheritdoc />
         public override string ToString()
         {
-            return Modification.Name + " " + (Index+1);
+            return Modification.Name + " " + (Index + 1);
         }
 
         /// <summary>

@@ -121,7 +121,7 @@ namespace InformedProteomics.Tests.UnitTests
             {
                 if (numPeptides < 20)
                 {
-                    Console.WriteLine("{0}\t{1}",peptide.Annotation, peptide.Offset);
+                    Console.WriteLine("{0}\t{1}", peptide.Annotation, peptide.Offset);
                 }
 
                 numPeptides++;
@@ -263,7 +263,7 @@ namespace InformedProteomics.Tests.UnitTests
                     offset,
                     db.GetProteinName(offset),
                     db.GetProteinLength(db.GetProteinName(offset)),
-                    db.GetOneBasedPositionInProtein(offset)+1);
+                    db.GetOneBasedPositionInProtein(offset) + 1);
             }
         }
 

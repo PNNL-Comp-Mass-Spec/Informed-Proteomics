@@ -19,7 +19,7 @@ namespace InformedProteomics.TopDown.Execution
             Ms2ScanVector = ms2ScanVector;
             _ms2ScanToIndexMap = new int[ms2ScanVector.Last() + 1];
 
-            for(var i = 0; i < ms2ScanVector.Length; i++)
+            for (var i = 0; i < ms2ScanVector.Length; i++)
             {
                 var scanNum = ms2ScanVector[i];
                 _ms2ScanToIndexMap[scanNum] = i;
@@ -30,7 +30,6 @@ namespace InformedProteomics.TopDown.Execution
             {
                 _matchedSet[i] = new SortedSet<DatabaseSequenceSpectrumMatch>[ms2ScanVector.Length];
             }
-
         }
 
         public void AddMatch(DatabaseSequenceSpectrumMatch newMatch)

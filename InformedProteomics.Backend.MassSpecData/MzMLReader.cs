@@ -15,7 +15,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// <summary>
     /// Reader for mzML files. Can handle gzipped mzML files, and read in a forward-only fashion or in a random-access fashion.
     /// </summary>
-    public sealed class MzMLReader: IMassSpecDataReader
+    public sealed class MzMLReader : IMassSpecDataReader
     {
         #region Private Members
 
@@ -30,7 +30,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private bool _reduceMemoryUsage;
         private long _artificialScanNum = 1;
         private long _numSpectra = -1;
-        private readonly IndexList _spectrumOffsets = new IndexList() {IndexType = IndexList.IndexListType.Spectrum};
+        private readonly IndexList _spectrumOffsets = new IndexList() { IndexType = IndexList.IndexListType.Spectrum };
         private readonly IndexList _chromatogramOffsets = new IndexList() { IndexType = IndexList.IndexListType.Chromatogram };
         private long _indexListOffset;
         private bool _haveIndex;
@@ -265,7 +265,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             private static Dictionary<string, string> ParseNativeId(string nativeId)
             {
-                var tokens = nativeId.Split(new[] {'\t', ' ', '\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
+                var tokens = nativeId.Split(new[] { '\t', ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
                 var map = new Dictionary<string, string>();
                 foreach (var token in tokens)
                 {
@@ -1966,7 +1966,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // If a random access reader, there is already a scan number stored, based on the order of the index. Use it instead.
             if (_randomAccess)
             {
-                scanNum = (int) (_spectrumOffsets.NativeToIdMap[nativeId]);
+                scanNum = (int)(_spectrumOffsets.NativeToIdMap[nativeId]);
             }
             else
             {
@@ -2176,7 +2176,8 @@ namespace InformedProteomics.Backend.MassSpecData
                     ion = precursor.Ions[0];
                 }
 
-                var productSpectrum = new ProductSpectrum(mzs.Data, intensities.Data, scanNum) {
+                var productSpectrum = new ProductSpectrum(mzs.Data, intensities.Data, scanNum)
+                {
                     ActivationMethod = precursor.Activation
                 };
 
@@ -2780,7 +2781,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                     // Schema requirements: zero to many instances of this element
                                     if (innerReader.GetAttribute("name") == "old charge state")
                                     {
-                                        ion.OldCharge = (int) Convert.ToDouble(innerReader.GetAttribute("value"));
+                                        ion.OldCharge = (int)Convert.ToDouble(innerReader.GetAttribute("value"));
                                     }
                                     innerReader.Read();
                                     break;
@@ -2851,7 +2852,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private BinaryDataArray ReadBinaryDataArray(XmlReader reader, int defaultLength)
         {
             reader.MoveToContent();
-            var bda = new BinaryDataArray {ArrayLength = defaultLength};
+            var bda = new BinaryDataArray { ArrayLength = defaultLength };
             // var encLength = Convert.ToInt32(reader.GetAttribute("encodedLength"));
             var arrLength = Convert.ToInt32(reader.GetAttribute("arrayLength")); // Override the default; if non-existent, should get 0
             if (arrLength > 0)
@@ -2923,7 +2924,7 @@ namespace InformedProteomics.Backend.MassSpecData
                              */
                             switch (param.Accession)
                             {
-                                    // MUST supply a *child* term of MS:1000572 (binary data compression type) only once
+                                // MUST supply a *child* term of MS:1000572 (binary data compression type) only once
                                 case "MS:1000574":
                                     //   e.g.: MS:1000574 (zlib compression)
                                     compressed = true;
@@ -2932,7 +2933,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                     //   e.g.: MS:1000576 (no compression)
                                     compressed = false;
                                     break;
-                                    // MUST supply a *child* term of MS:1000513 (binary data array) only once
+                                // MUST supply a *child* term of MS:1000513 (binary data array) only once
                                 case "MS:1000514":
                                     //   e.g.: MS:1000514 (m/z array)
                                     bda.ArrayType = ArrayType.m_z_array;
@@ -2973,7 +2974,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                     //   e.g.: MS:1000822 (temperature array)
                                     bda.ArrayType = ArrayType.temperature_array;
                                     break;
-                                    // MUST supply a *child* term of MS:1000518 (binary data type) only once
+                                // MUST supply a *child* term of MS:1000518 (binary data type) only once
                                 case "MS:1000521":
                                     //   e.g.: MS:1000521 (32-bit float)
                                     bda.Precision = Precision.Precision32;

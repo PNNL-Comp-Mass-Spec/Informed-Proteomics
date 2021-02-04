@@ -120,7 +120,7 @@ namespace InformedProteomics.Test
                         }
 
                         finalOutputFile.WriteLine();
-                        for (var j=0;j<ionFrequencies.Length;j++)
+                        for (var j = 0; j < ionFrequencies.Length; j++)
                         {
                             finalOutputFile.Write("{0}\t{1}", ionFrequencies[j].Label.Name, ionFrequencies[j].Prob);
                             if (_useDecoy)

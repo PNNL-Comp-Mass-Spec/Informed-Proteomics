@@ -270,7 +270,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 // Output indices, as unsigned shorts
                 foreach (var index in isotopePeaksInRange)
                 {
-                    writer.Write((ushort) index);
+                    writer.Write((ushort)index);
                 }
             }
         }

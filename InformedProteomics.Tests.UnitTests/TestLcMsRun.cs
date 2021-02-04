@@ -76,7 +76,7 @@ namespace InformedProteomics.Tests.UnitTests
                     }
                     Assert.True(run.GetPrecursorScanNum(scanNum) == precursorScanNum);
 
-                    var nextScanNum = run.MaxLcScan+1;
+                    var nextScanNum = run.MaxLcScan + 1;
                     //for (var nextScan = scanNum + 1; nextScan <= run.MaxLcScan; nextScan++)
                     foreach (var nextScan in run.AllScanNumbers.Where(x => x > scanNum))
                     {
@@ -142,7 +142,7 @@ namespace InformedProteomics.Tests.UnitTests
             Utils.ShowStarting(methodName);
 
             var xcaliburReader = new XcaliburReader(FilePaths.TestTopDownRawFilePathCid);
-            var scans = new[] {423, 425};
+            var scans = new[] { 423, 425 };
             foreach (var scan in scans)
             {
                 var spec = xcaliburReader.ReadMassSpectrum(scan) as ProductSpectrum;
@@ -244,8 +244,8 @@ namespace InformedProteomics.Tests.UnitTests
             var rnd = new Random();
             for (var i = 0; i < mzArr.Length; i++)
             {
-                mzArr[i] = rnd.NextDouble()*1450.0 + 50.0;
-                precursorMzArr[i] = rnd.NextDouble()*(810.0-390.0) + 390.0;
+                mzArr[i] = rnd.NextDouble() * 1450.0 + 50.0;
+                precursorMzArr[i] = rnd.NextDouble() * (810.0 - 390.0) + 390.0;
             }
 
             var sw = new System.Diagnostics.Stopwatch();
@@ -391,8 +391,8 @@ namespace InformedProteomics.Tests.UnitTests
                 Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
-//            var run = (InMemoryLcMsRun) InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
-//            run.WriteAsPbf(Path.ChangeExtension(specFilePath, ".pbf"));
+            //            var run = (InMemoryLcMsRun) InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);
+            //            run.WriteAsPbf(Path.ChangeExtension(specFilePath, ".pbf"));
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);
         }
     }

@@ -128,7 +128,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 _sequenceMassBinToScanNumsMap[binNum] = ms2ScanNums.ToArray();
                 sumScanNums += ms2ScanNums.Count;
             }
-            Console.WriteLine("#MS/MS matches per sequence: {0}", sumScanNums / (float)(maxBinNum-minBinNum+1));
+            Console.WriteLine("#MS/MS matches per sequence: {0}", sumScanNums / (float)(maxBinNum - minBinNum + 1));
             _map = null;
         }
 
@@ -163,7 +163,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
             else
             {
-                _map[binNum] = new List<IntRange> {range};
+                _map[binNum] = new List<IntRange> { range };
             }
         }
 

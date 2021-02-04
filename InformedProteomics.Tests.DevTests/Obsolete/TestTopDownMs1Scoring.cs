@@ -70,8 +70,8 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             var targetDb = new FastaDatabase(dbFilePath);
-         //   targetDb.CreateDecoyDatabase(Enzyme.Trypsin);
-         //   System.Environment.Exit(1);
+            //   targetDb.CreateDecoyDatabase(Enzyme.Trypsin);
+            //   System.Environment.Exit(1);
             var indexedDb = new IndexedDatabase(targetDb);
 
             var numProteins = 0;
@@ -107,7 +107,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
                 for (var nTermCleavages = 0; nTermCleavages <= numNTermCleavages; nTermCleavages++)
                 {
-                    if(nTermCleavages > 0)
+                    if (nTermCleavages > 0)
                     {
                         seqGraph.CleaveNTerm();
                     }
@@ -116,7 +116,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                     foreach (var protComposition in protCompositions)
                     {
                         totalProtCompositions++;
-                       // Console.WriteLine(protComposition);
+                        // Console.WriteLine(protComposition);
                         var scorer = new TopDownScorer(protComposition, run, precursorTolerance);
                         var score = scorer.GetScore();
 
@@ -161,25 +161,25 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             var aaSet = new AminoAcidSet(searchModifications, 0);
             var precursorTolerance = new Tolerance(10);
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
-            var writer = new StreamWriter(msAlignPlusResultPath+ ".txt");
+            var writer = new StreamWriter(msAlignPlusResultPath + ".txt");
             var reader = new StreamReader(msAlignPlusResultPath);
 
             string s;
 
-            while ((s=reader.ReadLine())!=null)
+            while ((s = reader.ReadLine()) != null)
             {
                 if (s.StartsWith("Data_file_name\t"))
                 {
-                    writer.WriteLine(s+"\tScore");
+                    writer.WriteLine(s + "\tScore");
                     continue;
                 }
                 var token = s.Split('\t');
                 var annotation = token[13];
-              //  Console.WriteLine("***\t" + annotation);
+                //  Console.WriteLine("***\t" + annotation);
                 var seqGraph = SequenceGraph.CreateGraph(aaSet, annotation);
                 if (seqGraph == null)
                 {
-                    writer.WriteLine(s+"\tN/A");
+                    writer.WriteLine(s + "\tN/A");
                     continue;
                 }
 
@@ -188,7 +188,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                 var scorer = new TopDownScorer(protCompositions[0], run, precursorTolerance);
                 var score = scorer.GetScore();
 
-                writer.WriteLine(s+"\t"+score);
+                writer.WriteLine(s + "\t" + score);
                 Console.WriteLine(score);
             }
 
@@ -231,8 +231,8 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
             var seqGraph = SequenceGraph.CreateGraph(aaSet, protAnnotation);
 
-          //  TopDownScorer.MaxCharge = 60;
-          //  TopDownScorer.MinCharge = 3;
+            //  TopDownScorer.MaxCharge = 60;
+            //  TopDownScorer.MinCharge = 3;
             var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
 
             foreach (var protComposition in seqGraph.GetSequenceCompositions())

@@ -86,7 +86,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
         {
             Console.WriteLine("Scan\tSequence\tModifications\tMass\tCharge\tScore\tNTermScore\tCTermScore\tProteinName\tStart\tEnd\tProteinLength");
 
-            foreach(var ms2ScanNum in _run.GetScanNumbers(2))
+            foreach (var ms2ScanNum in _run.GetScanNumbers(2))
             {
                 if (ms2ScanNum >= MinScan && ms2ScanNum <= MaxScan)
                 {
@@ -142,7 +142,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                     var matches = tagFinder.FindMatches(matchedTag).ToArray();
                     //var prevScore = double.NegativeInfinity;
                     //foreach (var match in matches.OrderByDescending(m => m.Score))
-                    foreach(var match in matches)
+                    foreach (var match in matches)
                     {
                         var sequence = proteinSequence.Substring(match.StartIndex, match.EndIndex - match.StartIndex);
                         //re-scoring
@@ -152,8 +152,8 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         //var numMatches = matchedTag.Length * 2 + match.NTermScore + match.CTermScore;
                         //var score = match.NTermScore + match.CTermScore;
                         //score += (matchedTag.NumReliableNTermFlankingMasses > 0)
-                          //  ? matchedTag.Length*CompositeScorer.ScoreParam.Prefix.ConsecutiveMatch
-                            //: matchedTag.Length*CompositeScorer.ScoreParam.Suffix.ConsecutiveMatch;
+                        //  ? matchedTag.Length*CompositeScorer.ScoreParam.Prefix.ConsecutiveMatch
+                        //: matchedTag.Length*CompositeScorer.ScoreParam.Suffix.ConsecutiveMatch;
 
                         // Poisson p-value score
                         //var n = (match.EndIndex - match.StartIndex - 1)*2;

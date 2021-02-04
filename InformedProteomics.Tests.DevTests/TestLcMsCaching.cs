@@ -656,7 +656,6 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Long_Running")]
         public void TestNominalMassErrors()
         {
-
             const int MAX_RUNTIME_SECONDS = 60;
 
             var methodName = MethodBase.GetCurrentMethod().Name;

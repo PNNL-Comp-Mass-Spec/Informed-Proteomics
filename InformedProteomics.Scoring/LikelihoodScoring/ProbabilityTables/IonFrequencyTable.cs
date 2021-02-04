@@ -8,7 +8,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 {
     public class IonFrequencyTable
     {
-        public IonFrequencyTable(IEnumerable<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold, bool combineCharges=false)
+        public IonFrequencyTable(IEnumerable<IonType> ionTypes, Tolerance tolerance, double relativeIntensityThreshold, bool combineCharges = false)
         {
             _ionFrequencies = new Dictionary<IonType, Probability<IonType>>();
             _combineCharges = combineCharges;
@@ -107,7 +107,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             var probabilities = GetProbabilities();
             foreach (var probability in probabilities)
             {
-                file.WriteLine(probability.Label.Name+"\t"+probability.Prob);
+                file.WriteLine(probability.Label.Name + "\t" + probability.Prob);
             }
         }
 

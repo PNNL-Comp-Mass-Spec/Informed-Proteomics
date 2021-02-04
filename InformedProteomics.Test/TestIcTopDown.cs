@@ -425,22 +425,22 @@ namespace InformedProteomics.Test
                     dbFilePath,
                     outputDir,
                     aaSet, "")
-                    {
-                    MinSequenceLength = minSequenceLength,
-                    MaxSequenceLength = maxSequenceLength,
-                    MaxNumNTermCleavages = maxNumNTermCleavages,
-                    MaxNumCTermCleavages = maxNumCTermCleavages,
-                    MinPrecursorIonCharge = minPrecursorIonCharge,
-                    MaxPrecursorIonCharge = maxPrecursorIonCharge,
-                    MinProductIonCharge = minProductIonCharge,
-                    MaxProductIonCharge = maxProductIonCharge,
-                    MinSequenceMass = minSequenceMass,
-                    MaxSequenceMass = maxSequenceMass,
-                    PrecursorIonTolerancePpm = precursorIonTolerancePpm,
-                    ProductIonTolerancePpm = productIonTolerancePpm,
-                    TargetDecoySearchMode = tda,
-                    InternalCleavageMode = searchMode,
-                    };
+            {
+                MinSequenceLength = minSequenceLength,
+                MaxSequenceLength = maxSequenceLength,
+                MaxNumNTermCleavages = maxNumNTermCleavages,
+                MaxNumCTermCleavages = maxNumCTermCleavages,
+                MinPrecursorIonCharge = minPrecursorIonCharge,
+                MaxPrecursorIonCharge = maxPrecursorIonCharge,
+                MinProductIonCharge = minProductIonCharge,
+                MaxProductIonCharge = maxProductIonCharge,
+                MinSequenceMass = minSequenceMass,
+                MaxSequenceMass = maxSequenceMass,
+                PrecursorIonTolerancePpm = precursorIonTolerancePpm,
+                ProductIonTolerancePpm = productIonTolerancePpm,
+                TargetDecoySearchMode = tda,
+                InternalCleavageMode = searchMode,
+            };
 
             var topDownLauncher = new IcTopDownLauncher(topDownOptions);
             //topDownLauncher.ForceParallel = true;

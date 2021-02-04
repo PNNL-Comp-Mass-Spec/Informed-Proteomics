@@ -122,7 +122,7 @@ namespace InformedProteomics.Backend.MathAndStats
 
             var ranking = 1;
             var rankingList = new int[i];
-            var medianRanking = (int)Math.Max(Math.Round(0.5*i), 1);
+            var medianRanking = (int)Math.Max(Math.Round(0.5 * i), 1);
             median = 0;
             foreach (var t in temp.OrderByDescending(x => x.Key))
             {

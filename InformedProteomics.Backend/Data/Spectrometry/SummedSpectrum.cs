@@ -5,7 +5,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// Summd spectrum
     /// </summary>
-    public class SummedSpectrum: Spectrum
+    public class SummedSpectrum : Spectrum
     {
         /// <summary>
         /// Constructor

@@ -67,7 +67,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
         public void Add(IEnumerable<LcMsPeakCluster> features)
         {
-            foreach(var f in features)
+            foreach (var f in features)
             {
                 Add(f);
             }

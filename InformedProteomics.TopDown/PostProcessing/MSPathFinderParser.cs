@@ -80,7 +80,7 @@ namespace InformedProteomics.TopDown.PostProcessing
                 ;
                 _idList.Add(id);
 
-                if(!_scanNumToPrSm.ContainsKey(scan[i]))
+                if (!_scanNumToPrSm.ContainsKey(scan[i]))
                 {
                     _scanNumToPrSm.Add(scan[i], id);
                 }

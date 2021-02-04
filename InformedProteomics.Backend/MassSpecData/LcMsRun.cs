@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// <summary>
     /// Base class for objects that provide access to LCMS run data
     /// </summary>
-    public abstract class LcMsRun: ILcMsRun, IMassSpecDataReader
+    public abstract class LcMsRun : ILcMsRun, IMassSpecDataReader
     {
         /// <summary>
         /// Number of unique isolation windows kept for DIA data

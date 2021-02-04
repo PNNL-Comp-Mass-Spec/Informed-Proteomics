@@ -5,7 +5,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// Peak data
     /// </summary>
-    public class Peak: IComparable<Peak>
+    public class Peak : IComparable<Peak>
     {
         /// <summary>
         /// Constructor
@@ -84,12 +84,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 return true;
             }
 
-            if (obj.GetType() != typeof (Peak))
+            if (obj.GetType() != typeof(Peak))
             {
                 return false;
             }
 
-            return Equals((Peak) obj);
+            return Equals((Peak)obj);
         }
 
         /// <inheritdoc />

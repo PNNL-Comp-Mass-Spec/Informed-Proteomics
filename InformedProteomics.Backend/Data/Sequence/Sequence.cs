@@ -27,7 +27,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 var aa = aminoAcids[i] ?? AminoAcid.Empty;
                 Add(aa);
-                PrefixComposition[i+1] = PrefixComposition[i] + aa.Composition;
+                PrefixComposition[i + 1] = PrefixComposition[i] + aa.Composition;
             }
 
             Composition = PrefixComposition[aminoAcids.Count];
@@ -39,7 +39,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="sequence"></param>
         /// <param name="aminoAcidSet"></param>
-        public Sequence(string sequence, AminoAcidSet aminoAcidSet): this(sequence.Select(aminoAcidSet.GetAminoAcid))
+        public Sequence(string sequence, AminoAcidSet aminoAcidSet) : this(sequence.Select(aminoAcidSet.GetAminoAcid))
         {
         }
 
@@ -76,7 +76,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public static Sequence CreateSequence(string sequence, string modStr, AminoAcidSet aminoAcidSet)
         {
-            if(string.IsNullOrEmpty(modStr))
+            if (string.IsNullOrEmpty(modStr))
             {
                 return new Sequence(sequence, aminoAcidSet);
             }
@@ -96,13 +96,13 @@ namespace InformedProteomics.Backend.Data.Sequence
                     return null;
                 }
 
-                var index = Convert.ToInt32(token[1])-1;
+                var index = Convert.ToInt32(token[1]) - 1;
                 indexModMap.Add(index, mod);
             }
 
             var aaList = new List<AminoAcid>();
 
-            for (var i=0; i<sequence.Length; i++)
+            for (var i = 0; i < sequence.Length; i++)
             {
                 var residue = sequence[i];
                 var aa = aminoAcidSet.GetAminoAcid(residue);
@@ -171,10 +171,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public IEnumerable<Cleavage> GetInternalCleavages()
         {
-            var cleavages = new Cleavage[Count-1];
+            var cleavages = new Cleavage[Count - 1];
             var prefixComposition = Data.Composition.Composition.Zero;
             var suffixComposition = Data.Composition.Composition.Zero;
-            for(var index = 0; index < Count-1; ++index)
+            for (var index = 0; index < Count - 1; ++index)
             {
                 cleavages[index] = new Cleavage(
                     prefixComposition += this[index].Composition,   // prefix
@@ -234,7 +234,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="ionTypes"></param>
         /// <returns></returns>
-        public Dictionary<Tuple<IonType,int>, Ion> GetProductIons(IEnumerable<IonType> ionTypes)
+        public Dictionary<Tuple<IonType, int>, Ion> GetProductIons(IEnumerable<IonType> ionTypes)
         {
             var ionTypeArr = ionTypes as IonType[] ?? ionTypes.ToArray();
 
@@ -247,7 +247,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                 foreach (var prefixComposition in GetPrefixCompositions())
                 {
                     ++index;
-                    productIonMap.Add(new Tuple<IonType,int> (ionType, index), ionType.GetIon(prefixComposition));
+                    productIonMap.Add(new Tuple<IonType, int>(ionType, index), ionType.GetIon(prefixComposition));
                 }
             }
 
@@ -283,7 +283,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             var stdAaSet = AminoAcidSet.GetStandardAminoAcidSet();
             var aaList = new List<AminoAcid>();
 
-            var matches = Regex.Matches(msgfPlusPeptideStr, "("+aminoAcidRegex+"|"+massRegex+")");
+            var matches = Regex.Matches(msgfPlusPeptideStr, "(" + aminoAcidRegex + "|" + massRegex + ")");
             AminoAcid aa = null;
             var mods = new List<Modification>();
             foreach (Match match in matches)
@@ -303,7 +303,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                         mods = new List<Modification>();
                     }
                     aa = stdAaSet.GetAminoAcid(element[0]);
-                    if(aa == null)
+                    if (aa == null)
                     {
                         throw new Exception("Unrecognized amino acid character: " + element[0]);
                     }
@@ -319,7 +319,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
                     var mod = modList[0];
                     mods.Add(mod);
-//                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.AveragineMass);
+                    //                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.AveragineMass);
                 }
             }
 

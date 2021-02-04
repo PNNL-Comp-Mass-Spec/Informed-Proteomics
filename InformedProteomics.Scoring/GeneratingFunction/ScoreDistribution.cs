@@ -30,7 +30,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
             for (var index = Math.Max(otherDistribution.MinScore, MinScore - deltaScore); index < otherDistribution.MaxScore; index++)
             {
-                var delEValue = otherDistribution._eValueDistribution[index - otherDistribution.MinScore]*weight;
+                var delEValue = otherDistribution._eValueDistribution[index - otherDistribution.MinScore] * weight;
                 _eValueDistribution[index + deltaScore - MinScore] += delEValue;
                 _scoreTotal += delEValue;
             }

@@ -8,7 +8,7 @@ namespace InformedProteomics.TopDown.Execution
     /// <summary>
     /// This class tracks a single proteoform match to a mass spectrum
     /// </summary>
-    public class DatabaseSequenceSpectrumMatch: IComparable<DatabaseSequenceSpectrumMatch>
+    public class DatabaseSequenceSpectrumMatch : IComparable<DatabaseSequenceSpectrumMatch>
     {
         public DatabaseSequenceSpectrumMatch(string sequence, char pre, char post, int scanNum, long offset,
             int numNTermCleavages, ModificationCombination modifications, Ion ion, double score,

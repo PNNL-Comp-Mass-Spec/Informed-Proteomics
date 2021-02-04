@@ -7,7 +7,7 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class CorrMatchedPeakCounter : AbstractFragmentScorer
     {
-        public CorrMatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge, double corrScoreThreshold = 0.7):
+        public CorrMatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge, double corrScoreThreshold = 0.7) :
             base(ms2Spec, tolerance, minCharge, maxCharge, 0.1)
         {
             _corrScoreThreshold = corrScoreThreshold;

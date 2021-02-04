@@ -160,7 +160,8 @@ namespace InformedProteomics.Backend.SearchResults
                 resultsToWrite = resultsToUse.Where(x => !x.ProteinName.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix));
             }
 
-            if (!_multiplePeptidesPerScan) {
+            if (!_multiplePeptidesPerScan)
+            {
                 DatabaseSearchResultData.WriteResultsToFile(outputFilePath, resultsToWrite, true);
                 return;
             }

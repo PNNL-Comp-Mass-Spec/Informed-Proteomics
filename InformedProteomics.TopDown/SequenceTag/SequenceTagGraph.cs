@@ -74,7 +74,7 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public void RemoveEdge(int node1, int node2)
         {
-            for(var i = 0; i < _adjList[node1].Count; i++)
+            for (var i = 0; i < _adjList[node1].Count; i++)
             {
                 if (_adjList[node1][i].Node2 == node2)
                 {
@@ -211,7 +211,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             NodeVisitFlag[node] = true;
 
             var flag = false;
-            foreach(var edge in OutEdges(node))
+            foreach (var edge in OutEdges(node))
             {
                 //if (!NodeVisitFlag[edge.Node2] && !AlreadyUsedPeak(edge.Node2))
                 if (!NodeVisitFlag[edge.Node2])
@@ -221,7 +221,7 @@ namespace InformedProteomics.TopDown.SequenceTag
                 }
             }
 
-            if(!flag)
+            if (!flag)
             {
                 var t = ProcessPath(EdgeList.Reverse());
                 if (t == false)

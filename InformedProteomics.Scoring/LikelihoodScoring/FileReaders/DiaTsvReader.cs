@@ -6,7 +6,7 @@ using InformedProteomics.Scoring.LikelihoodScoring.Data;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 {
-    internal class DiaTsvReader: IDataFileReader
+    internal class DiaTsvReader : IDataFileReader
     {
         public DiaTsvReader(string fileName, LazyLcMsRun lcms, bool decoy)
         {

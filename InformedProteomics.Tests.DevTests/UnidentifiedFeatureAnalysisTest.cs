@@ -38,7 +38,7 @@ namespace InformedProteomics.Tests.DevTests
             };
             const string databaseFile = @"\\protoapps\UserData\Jungkap\CompRef\db\H_sapiens_M_musculus_Trypsin_NCBI_Build37_2011-12-02.fasta";
 
-            var unFeatureAnalyzer = new UnidentifiedFeatureAnalysis(rawFiles,crossTabFile,databaseFile);
+            var unFeatureAnalyzer = new UnidentifiedFeatureAnalysis(rawFiles, crossTabFile, databaseFile);
             Console.WriteLine("Filtering Features.............");
             unFeatureAnalyzer.FilterFeatures(outputFolder);
             unFeatureAnalyzer.DoAnalysis();

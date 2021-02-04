@@ -38,7 +38,6 @@ namespace InformedProteomics.TopDown.Scoring
 
             if (!InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
             {
-
                 foreach (var baseIonType in BaseIonTypes)
                 {
                     var fragmentComposition = baseIonType.IsPrefix

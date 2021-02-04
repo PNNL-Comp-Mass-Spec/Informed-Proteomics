@@ -2,7 +2,7 @@
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
-    public class Probability <T1>
+    public class Probability<T1>
     {
         public T1 Label { get; }
         public double Found { get; set; }
@@ -10,7 +10,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 
         public double Prob => Found / Total;
 
-        public Probability(T1 label, double found=0, double total=0)
+        public Probability(T1 label, double found = 0, double total = 0)
         {
             Label = label;
             Found = found;

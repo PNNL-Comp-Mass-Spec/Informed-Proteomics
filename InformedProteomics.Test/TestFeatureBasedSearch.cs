@@ -46,9 +46,9 @@ namespace InformedProteomics.Test
             //const int maxScanNum = 7326;
             //const double featureMass = 32347.18;
 
-//            const int minScanNum = 4451;
-//            const int maxScanNum = 4541;
-//            const double featureMass = 31267.95;
+            //            const int minScanNum = 4451;
+            //            const int maxScanNum = 4541;
+            //            const double featureMass = 31267.95;
 
             var tolerance = new Tolerance(10);
             var relaxedTolerance = new Tolerance(20);
@@ -316,7 +316,7 @@ namespace InformedProteomics.Test
             var tagFileName = MassSpecDataReaderFactory.ChangeExtension(dataSet, ".seqtag");
             const int minTagLength = 6;
             const int numProtMatches = 4;
-//            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
+            //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
 
             if (!File.Exists(tagFileName))
@@ -411,7 +411,7 @@ namespace InformedProteomics.Test
                 }
 
                 // Find MS2 scans
-//                var numMs2Scans = 0;
+                //                var numMs2Scans = 0;
                 var tags = new List<SequenceTag>();
                 var hasMs2 = false;
                 for (var scanNum = minScan[i]; scanNum <= maxScan[i]; scanNum++)
@@ -433,7 +433,7 @@ namespace InformedProteomics.Test
                         Averagine.GetIsotopomerEnvelope(mass).MostAbundantIsotopeIndex);
                     if (isolationWindow.Contains(mz))
                     {
-//                        ++numMs2Scans;
+                        //                        ++numMs2Scans;
                         tags.AddRange(tagParser.GetSequenceTags(scanNum));
                         hasMs2 = true;
                     }
@@ -504,9 +504,9 @@ namespace InformedProteomics.Test
                 }
             }
 
-//            Console.WriteLine(string.Join(",", filter.GetMatchingMs2ScanNums(8115.973001)));
-//
-//            Console.WriteLine(featureFileName);
+            //            Console.WriteLine(string.Join(",", filter.GetMatchingMs2ScanNums(8115.973001)));
+            //
+            //            Console.WriteLine(featureFileName);
         }
 
         [Test]
@@ -560,7 +560,7 @@ namespace InformedProteomics.Test
                 Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
-//            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
+            //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
             var fastaDb = new FastaDatabase(fastaFilePath);
             var searchableDb = new SearchableDatabase(fastaDb);
 
@@ -593,8 +593,8 @@ namespace InformedProteomics.Test
             }
             Console.WriteLine("Tag length: {0}", minTagLength);
             Console.WriteLine("NumMs2Spectra: {0}", numMs2Spectra);
-            Console.WriteLine("NumMs2SpectraWithTags: {0} ({1})", numSpectraWithTag, numSpectraWithTag/(float)numMs2Spectra);
-            Console.WriteLine("NumMs2SpectraWithMatchingTags: {0} ({1})", numSpectraWithMatchingTag, numSpectraWithMatchingTag/(float)numMs2Spectra);
+            Console.WriteLine("NumMs2SpectraWithTags: {0} ({1})", numSpectraWithTag, numSpectraWithTag / (float)numMs2Spectra);
+            Console.WriteLine("NumMs2SpectraWithMatchingTags: {0} ({1})", numSpectraWithMatchingTag, numSpectraWithMatchingTag / (float)numMs2Spectra);
             Console.WriteLine("NumMs2SpectraWithMatchingTagsWithNoId: {0} ({1})", numSpectraWithMatchedTagNoId, numSpectraWithMatchedTagNoId / (float)numMs2Spectra);
         }
     }

@@ -430,7 +430,6 @@ namespace InformedProteomics.Backend.Data.Sequence
                     }
                 }
             };
-
         }
     }
 }

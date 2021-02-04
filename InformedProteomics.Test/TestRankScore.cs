@@ -121,7 +121,7 @@ namespace InformedProteomics.Test
                     var decoySeq = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceStr);
                     decoySeq.Reverse();
                     var decoyStr = decoySeq.Aggregate("", (current, aa) => current + aa);
-                    decoyStr = SimpleStringProcessing.Mutate(decoyStr, sequence.Count/2);
+                    decoyStr = SimpleStringProcessing.Mutate(decoyStr, sequence.Count / 2);
                     decoySeq = Sequence.GetSequenceFromMsGfPlusPeptideStr(decoyStr);
 
                     var sequenceScore = rankScorer.GetScore(sequence, charge, scan, lcms);

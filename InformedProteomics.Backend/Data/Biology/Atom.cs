@@ -148,7 +148,7 @@ namespace InformedProteomics.Backend.Data.Biology
             AtomMap = new Dictionary<string, Atom>();
             foreach (var atom in AtomArr)
             {
-                AtomMap.Add(atom.Code,atom);
+                AtomMap.Add(atom.Code, atom);
             }
         }
 
@@ -180,7 +180,8 @@ namespace InformedProteomics.Backend.Data.Biology
             {
                 var symbol = element.Element("Symbol")?.Value;
                 var name = element.Element("Name")?.Value;
-                if (int.TryParse(element.Element("NumIsotopes")?.Value, out _)) {
+                if (int.TryParse(element.Element("NumIsotopes")?.Value, out _))
+                {
                 }
             }
         }
@@ -202,12 +203,14 @@ namespace InformedProteomics.Backend.Data.Biology
         }
 
         /// <inheritdoc />
-        public override bool Equals(object other) {
+        public override bool Equals(object other)
+        {
             return Equals(other as Atom);
         }
 
         /// <inheritdoc />
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             var result = 29;
             result = result * 13 + ((Name?.GetHashCode()) ?? 0);
             result = result * 13 + ((Code?.GetHashCode()) ?? 0);

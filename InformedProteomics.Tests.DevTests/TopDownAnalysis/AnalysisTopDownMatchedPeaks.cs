@@ -54,8 +54,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                         // mz error
                         var mostAbundantIsotopeMz = ion.GetIsotopeMz(mostAbundantIsotopeIndex);
-                        var errorPpm = ((observedPeaks[mostAbundantIsotopeIndex].Mz - mostAbundantIsotopeMz)/
-                                        mostAbundantIsotopeMz)*1e6;
+                        var errorPpm = ((observedPeaks[mostAbundantIsotopeIndex].Mz - mostAbundantIsotopeMz) /
+                                        mostAbundantIsotopeMz) * 1e6;
                     }
                 }
             }

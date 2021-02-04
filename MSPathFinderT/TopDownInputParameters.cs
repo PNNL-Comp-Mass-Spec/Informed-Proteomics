@@ -485,7 +485,6 @@ namespace MSPathFinderT
         {
             try
             {
-
                 if (Directory.Exists(fileOrDirectoryPath) &&
                     !MassSpecDataReaderFactory.IsADirectoryDataset(fileOrDirectoryPath))
                 {
@@ -635,7 +634,6 @@ namespace MSPathFinderT
                             dynamicMods.Add(paramValue);
                         }
                     }
-
                 }
 
                 var modsValidated = StoreMSPathFinderModifications(numMods, staticMods, dynamicMods);

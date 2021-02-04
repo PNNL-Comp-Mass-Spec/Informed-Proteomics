@@ -201,8 +201,8 @@ namespace InformedProteomics.Test
                         {
                             //var scans2 = Enumerable.Range(feature.MinScanNum, feature.MaxScanNum - feature.MinScanNum + 1);
                             //var hitScans = scans.Intersect(scans2).Count();
-                            if (feature.MinScanNum < 0.5*(minScan + maxScan) &&
-                                0.5*(minScan + maxScan) < feature.MaxScanNum)
+                            if (feature.MinScanNum < 0.5 * (minScan + maxScan) &&
+                                0.5 * (minScan + maxScan) < feature.MaxScanNum)
                             {
                                 if (feature.Abundance > highestAbu)
                                 {
@@ -400,7 +400,7 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet();
             var ptmList = new List<Tuple<int, double, double>>();
 
-            var trimChars = new[] {'"', ' '};
+            var trimChars = new[] { '"', ' ' };
             var filterPassingResults = 0;
 
             for (var i = 0; i < parser.NumData; i++)
@@ -714,7 +714,7 @@ namespace InformedProteomics.Test
             foreach (var env in feature.EnumerateEnvelopes())
             {
                 var corr = env.PearsonCorrelation;
-                for(var i = 0; i < envelope.Size; i++)
+                for (var i = 0; i < envelope.Size; i++)
                 {
                     var peak = env.Peaks[i];
                     if (peak == null)

@@ -5,7 +5,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// Isotope
     /// </summary>
-    public class Isotope: IComparable<Isotope>
+    public class Isotope : IComparable<Isotope>
     {
         /// <summary>
         /// Constructor

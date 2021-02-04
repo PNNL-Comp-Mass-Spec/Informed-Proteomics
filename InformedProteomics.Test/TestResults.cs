@@ -222,7 +222,7 @@ namespace InformedProteomics.Test
                 ++numTotal;
                 compSet.Add(compositions[i]);
             }
-            Console.WriteLine("PrSMs: {0} / {1} = {2}", numMatch, numTotal, numMatch/(float)numTotal);
+            Console.WriteLine("PrSMs: {0} / {1} = {2}", numMatch, numTotal, numMatch / (float)numTotal);
             Console.WriteLine("Compositions: {0} / {1} = {2}", matchedCompSet.Count, compSet.Count, matchedCompSet.Count / (float)compSet.Count);
         }
     }

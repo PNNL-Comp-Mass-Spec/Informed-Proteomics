@@ -82,9 +82,9 @@ namespace InformedProteomics.TopDown.PostProcessing
             double? adjustedCTermFlankingMass = null;
             if (existingTag.CTermFlankingMass != null && newTag.CTermFlankingMass != null)
             {
-                var newCTermFlankingMassFromExistingTag = (double) existingTag.CTermFlankingMass -
+                var newCTermFlankingMassFromExistingTag = (double)existingTag.CTermFlankingMass -
                                                           GetSequenceMass(existingTag.EndIndex, newTag.EndIndex);
-                var newCTermFlankingMassFromNewTag = (double) newTag.CTermFlankingMass -
+                var newCTermFlankingMassFromNewTag = (double)newTag.CTermFlankingMass -
                                                      GetSequenceMass(newTag.EndIndex, existingTag.EndIndex);
 
                 var toleranceCTerm = existingTag.IsCTermFlankingMassReliable == newTag.IsCTermFlankingMassReliable
@@ -146,7 +146,7 @@ namespace InformedProteomics.TopDown.PostProcessing
 
     public class MatchedTag
     {
-        public MatchedTag(SequenceTag.SequenceTag tag, int startIndex): this(tag, startIndex, null)
+        public MatchedTag(SequenceTag.SequenceTag tag, int startIndex) : this(tag, startIndex, null)
         {
         }
 

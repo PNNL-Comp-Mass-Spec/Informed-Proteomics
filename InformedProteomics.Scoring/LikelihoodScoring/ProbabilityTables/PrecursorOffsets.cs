@@ -9,7 +9,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
     {
         public int Charge { get; }
 
-        public PrecursorOffsets(int charge, double searchWidth=100, double probabilityThreshold=0.0, double binWidth=1.005)
+        public PrecursorOffsets(int charge, double searchWidth = 100, double probabilityThreshold = 0.0, double binWidth = 1.005)
         {
             Charge = charge;
             _offsets = new Dictionary<int, PrecursorOffsetFrequencyTable>();
@@ -17,7 +17,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
             for (var i = 1; i <= charge; i++)
             {
-                _offsets.Add(i, new PrecursorOffsetFrequencyTable(searchWidth/(2*i), i, binWidth/i));
+                _offsets.Add(i, new PrecursorOffsetFrequencyTable(searchWidth / (2 * i), i, binWidth / i));
             }
         }
 
@@ -31,7 +31,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
             for (var i = charge; i > 0; i--)
             {
-                _offsets[i].AddMatches(new List<SpectrumMatch>{match});
+                _offsets[i].AddMatches(new List<SpectrumMatch> { match });
             }
         }
 
@@ -47,7 +47,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             if (charge > Charge || charge < 1)
             {
-                throw new Exception("Charge must be between 1 and "+Charge);
+                throw new Exception("Charge must be between 1 and " + Charge);
             }
 
             var bins = _offsets[charge].GetProbabilities();

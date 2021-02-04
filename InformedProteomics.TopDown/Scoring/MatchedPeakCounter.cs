@@ -5,7 +5,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    public class MatchedPeakCounter: AbstractFragmentScorer
+    public class MatchedPeakCounter : AbstractFragmentScorer
     {
         public MatchedPeakCounter(ProductSpectrum ms2Spec, Tolerance tolerance, int minCharge, int maxCharge)
             : base(ms2Spec, tolerance, minCharge, maxCharge)

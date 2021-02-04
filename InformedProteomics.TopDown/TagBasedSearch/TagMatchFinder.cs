@@ -39,7 +39,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
         public IEnumerable<TagMatch> FindMatches(MatchedTag matchedTag)
         {
-            if(matchedTag.NTermFlankingMass != null && matchedTag.CTermFlankingMass != null)
+            if (matchedTag.NTermFlankingMass != null && matchedTag.CTermFlankingMass != null)
             {
                 return FindMatchesWithFeatureMass(matchedTag);
             }
@@ -64,7 +64,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 yield break;
             }
 
-            var featureMass = (double) matchedTag.NTermFlankingMass + matchedTag.Mass +
+            var featureMass = (double)matchedTag.NTermFlankingMass + matchedTag.Mass +
                               (double)matchedTag.CTermFlankingMass + Composition.H2O.Mass;
             var shiftMass = matchedTag.Mass + (double)matchedTag.NTermFlankingMass;
 
@@ -287,7 +287,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             {
                 var residue = j >= 0 ? _proteinSequence[j] : AminoAcid.ProteinNTerm.Residue;
                 var location = j > 0 ? SequenceLocation.Everywhere : SequenceLocation.ProteinNTerm;
-                if(!backwardGraph.AddAminoAcid(residue, location))
+                if (!backwardGraph.AddAminoAcid(residue, location))
                 {
                     yield break;
                 }
@@ -347,7 +347,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
                 var curScoreAndModifications = seqGraph.GetScoreAndModifications(_ms2Scorer);
                 var curScore = curScoreAndModifications.Item1;
-//                var curScore = seqGraph.GetFragmentScore(_ms2Scorer);
+                //                var curScore = seqGraph.GetFragmentScore(_ms2Scorer);
                 if (curScore > bestScore)
                 {
                     match = new FlankingMassMatch(curScore,

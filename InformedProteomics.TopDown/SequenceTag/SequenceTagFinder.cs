@@ -166,16 +166,16 @@ namespace InformedProteomics.TopDown.SequenceTag
                 }
             }
         }
-       /*
-        protected override bool AlreadyUsedPeak(int node)
-        {
-            foreach (var e in EdgeList)
-            {
-                if (_deconvolutedPeaks[e.Node1].PeakShare(_deconvolutedPeaks[node])) return true;
-                if (_deconvolutedPeaks[e.Node2].PeakShare(_deconvolutedPeaks[node])) return true;
-            }
-            return false;
-        }*/
+        /*
+         protected override bool AlreadyUsedPeak(int node)
+         {
+             foreach (var e in EdgeList)
+             {
+                 if (_deconvolutedPeaks[e.Node1].PeakShare(_deconvolutedPeaks[node])) return true;
+                 if (_deconvolutedPeaks[e.Node2].PeakShare(_deconvolutedPeaks[node])) return true;
+             }
+             return false;
+         }*/
 
         protected int NumberOfAddedPaths;
         protected int MaxNumberOfProcessedPaths;

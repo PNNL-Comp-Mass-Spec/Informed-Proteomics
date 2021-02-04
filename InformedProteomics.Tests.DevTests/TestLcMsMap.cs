@@ -23,7 +23,7 @@ namespace InformedProteomics.Tests.DevTests
             // QC_Shew
             const string specFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
             const string ms1FtFileName = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.ms1ft";
-            const string idFilePath =  @"D:\MassSpecFiles\training\IcTda\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
+            const string idFilePath = @"D:\MassSpecFiles\training\IcTda\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
 
             if (!File.Exists(specFilePath))
             {

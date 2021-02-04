@@ -5,7 +5,7 @@ using InformedProteomics.Backend.Data.Spectrometry;
 
 namespace InformedProteomics.Scoring.BottomUp
 {
-    public class DummyScorer: IScorer
+    public class DummyScorer : IScorer
     {
         public double GetPrecursorIonScore(Ion precursorIon)
         {

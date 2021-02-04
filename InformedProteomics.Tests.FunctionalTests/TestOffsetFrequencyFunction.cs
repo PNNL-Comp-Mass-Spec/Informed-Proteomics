@@ -33,13 +33,13 @@ namespace InformedProteomics.Tests.FunctionalTests
                 foreach (var spectrumMatch in spectrumMatches)
                 {
                     var offsetFrequencyTable = new PrecursorOffsetFrequencyTable(100, spectrumMatch.PrecursorCharge,
-                        1.005/spectrumMatch.PrecursorCharge);
+                        1.005 / spectrumMatch.PrecursorCharge);
 
                     var ionType = _ionTypes[spectrumMatch.PrecursorCharge - 1];
                     var ion = ionType.GetIon(spectrumMatch.PeptideComposition);
                     var mz = ion.GetMonoIsotopicMz();
 
-                    offsetFrequencyTable.AddMatches(new List<SpectrumMatch> {spectrumMatch});
+                    offsetFrequencyTable.AddMatches(new List<SpectrumMatch> { spectrumMatch });
                     var offsetFrequencies = offsetFrequencyTable.GetProbabilities();
 
                     debugFile.WriteLine("ScanNum\tM/Z\tPrecursor Charge\tIon Type\tPeptide");
@@ -50,7 +50,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                     {
                         if (offsetFrequency.Found > 0)
                         {
-                            debugFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Label+mz);
+                            debugFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Label + mz);
                         }
                     }
                 }
@@ -58,7 +58,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         // Configuration
-//        private const int ScanNum = 30623;
+        //        private const int ScanNum = 30623;
         private const double NoiseFiltration = 0;
         private const ActivationMethod Act = ActivationMethod.HCD;
         private const int MaxCharge = 10;
@@ -69,7 +69,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         private const string TsvFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\tsv\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.tsv";
         private const string RawFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\raw\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
         private const string OutputFileName = @"C:\Users\wilk011\Documents\DataFiles\TestFolder\ouput_HCD_QCShew_Precursor.txt";
-//        private const string DebugFileName = @"C:\Users\wilk011\Documents\DataFiles\TestFolder\debug_HCD_QCShew_Precursor.txt";
+        //        private const string DebugFileName = @"C:\Users\wilk011\Documents\DataFiles\TestFolder\debug_HCD_QCShew_Precursor.txt";
         private IEnumerable<SpectrumMatch> InitTest()
         {
             var ionTypeFactory = new IonTypeFactory(_baseIons, _neutralLosses, MaxCharge);

@@ -102,7 +102,6 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
                     continue;
                 }
 
-
                 // key value pair
                 var key = parts[0].Trim().ToLower();
                 var value = parts[1].Trim();

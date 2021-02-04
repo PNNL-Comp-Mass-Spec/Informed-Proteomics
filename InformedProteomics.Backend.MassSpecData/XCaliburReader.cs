@@ -110,7 +110,8 @@ namespace InformedProteomics.Backend.MassSpecData
         /// It can take some time to compute this value for .raw files over 500 MB,
         /// particularly if they're located on a remote share
         /// </remarks>
-        public string SrcFileChecksum {
+        public string SrcFileChecksum
+        {
             get
             {
                 if (string.IsNullOrEmpty(_checkSum))
@@ -143,7 +144,6 @@ namespace InformedProteomics.Backend.MassSpecData
 
             if (includePeaks)
             {
-
                 var data = _rawFileReader.GetCentroidStream(scanNum, false);
                 if (data.Masses?.Length > 0)
                 {
@@ -198,7 +198,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             var productSpec = new ProductSpectrum(peaks, scanNum)
             {
-                MsLevel = (int) scanFilter.MSOrder, // MSOrder generally matches MSLevel
+                MsLevel = (int)scanFilter.MSOrder, // MSOrder generally matches MSLevel
                 ElutionTime = elutionTime,
                 TotalIonCurrent = scanStats.TIC,
                 NativeId = nativeId,
@@ -279,7 +279,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             var scanFilter = GetScanFilter(scanNum);
-            _msLevel[scanNum] = (int) scanFilter.MSOrder; // MSOrder generally matches MSLevel
+            _msLevel[scanNum] = (int)scanFilter.MSOrder; // MSOrder generally matches MSLevel
 
             return (int)scanFilter.MSOrder;
         }
@@ -310,7 +310,6 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         private void ComputeChecksum()
         {
-
             using (var fs = new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var sha1 = new SHA1Managed())
             {

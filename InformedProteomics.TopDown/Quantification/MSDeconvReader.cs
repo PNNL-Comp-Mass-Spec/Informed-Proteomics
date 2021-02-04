@@ -61,7 +61,7 @@ namespace InformedProteomics.TopDown.Quantification
                 {
                     splitString = line.Split('\t');
                     var infoLine = GetDeconvLineMsDeconv(splitString);
-                    if(infoLine != null)
+                    if (infoLine != null)
                     {
                         lineInfoList.Add(infoLine);
                     }
@@ -84,7 +84,7 @@ namespace InformedProteomics.TopDown.Quantification
 
             var lineList = File.ReadAllText(filePath).Split('\n');
             Console.WriteLine(lineList.Length);
-            for (var i = 1; i < lineList.Length-1; i++)
+            for (var i = 1; i < lineList.Length - 1; i++)
             {
                 var line = lineList[i].Split(',');
                 var node = GetDeconvLineDecon2Ls(line);
@@ -101,7 +101,7 @@ namespace InformedProteomics.TopDown.Quantification
         {
             var scanNum = int.Parse(line[0]);
             var charge = int.Parse(line[4]);
-            var mass =  double.Parse(line[11]);
+            var mass = double.Parse(line[11]);
             var intensity = double.Parse(line[13]);
 
             if (double.IsNaN(intensity))
@@ -124,7 +124,7 @@ namespace InformedProteomics.TopDown.Quantification
                 return null;
             }
 
-            return new MSDeconvNode(scanNum,mass,intensity,charge);
+            return new MSDeconvNode(scanNum, mass, intensity, charge);
         }
 
         private MSDeconvNode GetDeconvLineDecon2Ls(IReadOnlyList<string> line)
@@ -149,7 +149,7 @@ namespace InformedProteomics.TopDown.Quantification
                 return null;
             }
 
-            return new MSDeconvNode(scanNum,mass,intensity,charge);
+            return new MSDeconvNode(scanNum, mass, intensity, charge);
         }
 
         public double MinMass { get; set; }

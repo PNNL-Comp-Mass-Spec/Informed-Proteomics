@@ -279,7 +279,6 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                     writer.WriteLine(string.Join("\t", dataLine));
                 }
-
             }
 
             Console.WriteLine("Results written to " + outputFilePath);
@@ -427,7 +426,6 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 }
 
                 sourceFile.CopyTo(destFile.FullName, true);
-
             }
         }
         /*

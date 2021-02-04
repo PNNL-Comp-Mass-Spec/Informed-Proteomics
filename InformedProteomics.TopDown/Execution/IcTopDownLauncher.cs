@@ -651,7 +651,7 @@ namespace InformedProteomics.TopDown.Execution
             progData.StatusInternal = string.Format("Processing, {0} {1} done, {2:#0.0}% complete, {3:f1} sec elapsed",
                 tempNumProteins,
                 itemName,
-                tempNumProteins / (double) estimatedProteins * 100.0,
+                tempNumProteins / (double)estimatedProteins * 100.0,
                 sw.Elapsed.TotalSeconds);
             progData.Report(tempNumProteins, estimatedProteins);
 
@@ -1108,7 +1108,6 @@ namespace InformedProteomics.TopDown.Execution
                     var resultCount = 0;
                     while (!reader.EndOfStream)
                     {
-
                         var dataLine = reader.ReadLine();
                         if (string.IsNullOrWhiteSpace(dataLine))
                         {
@@ -1140,7 +1139,6 @@ namespace InformedProteomics.TopDown.Execution
                                   targetOutputFilePath, ex.Message));
                 return false;
             }
-
         }
 
         private List<DatabaseSearchResultData> WriteResultsToFile(

@@ -112,8 +112,8 @@ namespace InformedProteomics.Scoring.TopDown
         public static Modification[] GetTerminalModifications(AminoAcidSet aminoAcidSet)
         {
             var terminalModifications = new HashSet<Modification>();
-            var terminalLocations = new[] {SequenceLocation.ProteinNTerm, SequenceLocation.ProteinCTerm};
-            var terminalResidues = new[] {AminoAcid.ProteinNTerm.Residue, AminoAcid.ProteinCTerm.Residue};
+            var terminalLocations = new[] { SequenceLocation.ProteinNTerm, SequenceLocation.ProteinCTerm };
+            var terminalResidues = new[] { AminoAcid.ProteinNTerm.Residue, AminoAcid.ProteinCTerm.Residue };
             var modParam = aminoAcidSet.GetModificationParams();
 
             for (var i = 0; i < terminalLocations.Length; i++)

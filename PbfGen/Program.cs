@@ -84,7 +84,7 @@ namespace PbfGen
             try
 #endif
             {
-                var specFilePaths = new[] {options.SourcePath};
+                var specFilePaths = new[] { options.SourcePath };
                 if (Directory.Exists(options.SourcePath) && !MassSpecDataReaderFactory.IsADirectoryDataset(options.SourcePath))
                 {
                     specFilePaths = Directory.GetFiles(options.SourcePath, "*.raw"); // TODO: Support folders with other formats in them too...

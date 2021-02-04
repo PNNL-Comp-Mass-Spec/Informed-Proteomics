@@ -40,7 +40,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns></returns>
         public IsotopomerEnvelope GetIsotopomerEnvelopeInst(double monoIsotopeMass, IsoProfilePredictor isoProfilePredictor = null)
         {
-            var nominalMass = (int) Math.Round(monoIsotopeMass*Constants.RescalingConstant);
+            var nominalMass = (int)Math.Round(monoIsotopeMass * Constants.RescalingConstant);
             return GetIsotopomerEnvelopeFromNominalMassInst(nominalMass, isoProfilePredictor);
         }
 
@@ -106,7 +106,7 @@ namespace InformedProteomics.Backend.Data.Composition
                 return envelope;
             }
 
-            var mass = nominalMass/Constants.RescalingConstant;
+            var mass = nominalMass / Constants.RescalingConstant;
             envelope = ComputeIsotopomerEnvelope(mass, isoProfilePredictor);
             IsotopeEnvelopMap.AddOrUpdate(nominalMass, envelope, (key, value) => value);
 

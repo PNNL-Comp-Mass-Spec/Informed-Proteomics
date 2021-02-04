@@ -184,13 +184,13 @@ namespace InformedProteomics.TopDown.Scoring
 
         public static int GetBinNumber(double mass)
         {
-            return (int) Math.Round(mass*RescalingConstantHighPrecision);
+            return (int)Math.Round(mass * RescalingConstantHighPrecision);
             //return Comparer.GetBinNumber(mass);
         }
 
         public static double GetMz(int binNum)
         {
-            return binNum/RescalingConstantHighPrecision;
+            return binNum / RescalingConstantHighPrecision;
             //return Comparer.GetMzAverage(binNum);
         }
 

@@ -86,17 +86,17 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// GluC enzyme
         /// </summary>
-        public static readonly Enzyme GluC = new Enzyme("GluC","E",false, "Glu-C", "MS:1001917");
+        public static readonly Enzyme GluC = new Enzyme("GluC", "E", false, "Glu-C", "MS:1001917");
 
         /// <summary>
         /// ArgC enzyme
         /// </summary>
-        public static readonly Enzyme ArgC = new Enzyme("ArgC","R",false, "Arg-C", "MS:1001303");
+        public static readonly Enzyme ArgC = new Enzyme("ArgC", "R", false, "Arg-C", "MS:1001303");
 
         /// <summary>
         /// AspN enzyme
         /// </summary>
-        public static readonly Enzyme AspN = new Enzyme("AspN","D",true, "Asp-N", "MS:1001304");
+        public static readonly Enzyme AspN = new Enzyme("AspN", "D", true, "Asp-N", "MS:1001304");
 
         /// <summary>
         /// Alp enzyme

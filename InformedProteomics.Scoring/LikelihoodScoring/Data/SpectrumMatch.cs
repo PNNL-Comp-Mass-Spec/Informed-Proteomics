@@ -19,7 +19,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         public Composition PrecursorComposition => Sequence.Composition + Composition.H2O;
         public bool Decoy { get; }
 
-        public class MismatchException : Exception {
+        public class MismatchException : Exception
+        {
             public MismatchException() : base()
             {
             }
@@ -33,7 +34,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             }
         }
 
-        public SpectrumMatch(Sequence sequence, Spectrum spectrum, int scanNum=0, int precursorCharge=1, bool decoy=false)
+        public SpectrumMatch(Sequence sequence, Spectrum spectrum, int scanNum = 0, int precursorCharge = 1, bool decoy = false)
         {
             Peptide = string.Empty;
             foreach (var aa in sequence)
@@ -74,7 +75,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 
         public SpectrumMatch(string peptide, DataFileFormat sequenceFormat,
                              LazyLcMsRun lcms, int scanNum = 0, int precursorCharge = 1,
-                             bool decoy = false, string formula="")
+                             bool decoy = false, string formula = "")
         {
             Peptide = peptide;
             _spectrum = null;
@@ -99,7 +100,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         }
 
         public SpectrumMatch(string peptide, DataFileFormat sequenceFormat,
-                             Spectrum spectrum, int scanNum=0, int precursorCharge=1, bool decoy=false, string formula="")
+                             Spectrum spectrum, int scanNum = 0, int precursorCharge = 1, bool decoy = false, string formula = "")
         {
             Peptide = peptide;
             _spectrum = spectrum;

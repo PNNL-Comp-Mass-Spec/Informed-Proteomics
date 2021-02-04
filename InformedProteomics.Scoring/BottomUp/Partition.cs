@@ -2,7 +2,7 @@
 
 namespace InformedProteomics.Scoring.BottomUp
 {
-    public class Partition: IComparable<Partition>
+    public class Partition : IComparable<Partition>
     {
         protected bool Equals(Partition other)
         {
@@ -67,7 +67,7 @@ namespace InformedProteomics.Scoring.BottomUp
                 return false;
             }
 
-            return Equals((Partition) obj);
+            return Equals((Partition)obj);
         }
 
         public override int GetHashCode()

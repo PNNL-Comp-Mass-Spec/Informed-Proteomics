@@ -17,7 +17,7 @@ namespace InformedProteomics.Test
         public void TestId()
         {
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-//            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
+            //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
             //const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\Decoy_SO4280.fasta";
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\SO2312.fasta";
             const string modFilePath = @"H:\Research\QCShew_TopDown\Production\Mods.txt";
@@ -36,7 +36,7 @@ namespace InformedProteomics.Test
             var aminoAcidSet = new AminoAcidSet(modFilePath);
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
-//            var ms2ScanNumArr = run.GetScanNumbers(2).ToArray();
+            //            var ms2ScanNumArr = run.GetScanNumbers(2).ToArray();
             //var ms2ScanNumArr = new[] {4130};
             var ms2ScanNumArr = new[] { 5189 };
 

@@ -47,7 +47,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public override string ToString()
         {
             Debug.Assert(Modifications != null, "Modifications != null");
-            return string.Join(",",Modifications);
+            return string.Join(",", Modifications);
         }
     }
 }

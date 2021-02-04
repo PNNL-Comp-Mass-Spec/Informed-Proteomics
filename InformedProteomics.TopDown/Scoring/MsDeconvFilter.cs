@@ -43,7 +43,7 @@ namespace InformedProteomics.TopDown.Scoring
                     curScan = Convert.ToInt32(line.Substring(line.LastIndexOf('=') + 1));
                     isMs1 = _run.GetMsLevel(curScan) == 1;
                 }
-                else if(isMs1 && line.Length > 0)
+                else if (isMs1 && line.Length > 0)
                 {
                     var token = line.Split();
                     if (token.Length != 3)

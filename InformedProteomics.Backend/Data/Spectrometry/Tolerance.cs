@@ -100,7 +100,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 return _value;
             }
 
-            return GetToleranceAsMz(mz)*charge;
+            return GetToleranceAsMz(mz) * charge;
         }
 
         /// <summary>

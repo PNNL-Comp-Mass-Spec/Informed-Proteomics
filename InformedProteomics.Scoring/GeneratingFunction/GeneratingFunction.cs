@@ -67,8 +67,8 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             var curNodeScore = _graph.GetNodeScore(nodeIndex);
 
             // determine MinScore and MaxScore
-            var maxScore = (double) int.MinValue;
-            var minScore = (double) int.MaxValue;
+            var maxScore = (double)int.MinValue;
+            var minScore = (double)int.MaxValue;
 
             var hasValidEdge = false;
             foreach (var edge in _graph.GetEdges(nodeIndex))

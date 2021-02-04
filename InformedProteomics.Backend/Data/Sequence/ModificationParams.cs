@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// No modification
         /// </summary>
-        public ModificationParams(): this(new Modification[0], 0)
+        public ModificationParams() : this(new Modification[0], 0)
         {
         }
 
@@ -119,7 +119,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             _indexToHashValue = new Dictionary<int, long>();
             _hashValueToModCombIndex = new Dictionary<long, int>();
 
-            var combinations = SimpleMath.GetCombinationsWithRepetition(_modifications.Length+1, MaxNumDynModsPerSequence);
+            var combinations = SimpleMath.GetCombinationsWithRepetition(_modifications.Length + 1, MaxNumDynModsPerSequence);
             _modificationCombinations = new ModificationCombination[combinations.Length];
             var index = -1;
             foreach (var combination in combinations)
@@ -178,7 +178,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             var val = hashValue;
             for (var i = 0; i < MaxNumDynModsPerSequence; i++)
             {
-                arr[MaxNumDynModsPerSequence-1-i] = (int)(val % digit);
+                arr[MaxNumDynModsPerSequence - 1 - i] = (int)(val % digit);
                 val /= digit;
             }
             return arr;

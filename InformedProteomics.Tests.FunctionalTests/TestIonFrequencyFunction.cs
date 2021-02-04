@@ -35,7 +35,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             for (int i = 0; i < prefixes.Count; i++)
             {
-                var segment = spectrumMatch.Sequence.GetRange(0, i+1);
+                var segment = spectrumMatch.Sequence.GetRange(0, i + 1);
                 var segmentStr = segment.Aggregate("", (current, aa) => current + aa.Residue);
                 foreach (var ionType in prefixIonTypes)
                 {
@@ -62,7 +62,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             for (int i = 0; i < suffixes.Count; i++)
             {
-                var segment = spectrumMatch.Sequence.GetRange(i+1, sequence.Count-(i+1));
+                var segment = spectrumMatch.Sequence.GetRange(i + 1, sequence.Count - (i + 1));
                 var segmentStr = segment.Aggregate("", (current, aa) => current + aa.Residue);
                 foreach (var ionType in suffixIonTypes)
                 {
@@ -113,7 +113,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             {
                 var charge = spectrumMatch.PrecursorCharge - 1;
                 var offsetFrequencies = new IonFrequencyTable(_ionTypes, _tolerance, RelativeIntensityThreshold);
-                offsetFrequencies.AddMatches(new List<SpectrumMatch>{spectrumMatch});
+                offsetFrequencies.AddMatches(new List<SpectrumMatch> { spectrumMatch });
                 var probabilities = offsetFrequencies.GetProbabilities();
 
                 var testProbabilities = ComputeOffsetFrequencies(spectrumMatch);
@@ -150,7 +150,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             outputFile.Close();
             for (int i = 0; i < MaxPrecCharge; i++)
             {
-                var chargeOutName = IonProbabilityFileName + "_Charge" + (i + 1) +".txt";
+                var chargeOutName = IonProbabilityFileName + "_Charge" + (i + 1) + ".txt";
                 using (var ionProbOut = new StreamWriter(chargeOutName))
                 {
                     ionProbOut.WriteLine("Ion\tProbability");
@@ -162,33 +162,33 @@ namespace InformedProteomics.Tests.FunctionalTests
             }
         }
 
-/*        [Test]
-        public void TestSequence()
-        {
-            var matches = InitTest().ToList();
-            var match = matches[0];
-            var sequence = match.Sequence;
-            var prefixes = match.Prefixes;
-            var suffixes = match.Suffixes;
-            foreach (var aa in sequence)
-            {
-                Console.WriteLine(aa.Residue+"\t"+aa.GetMass());
-            }
+        /*        [Test]
+                public void TestSequence()
+                {
+                    var matches = InitTest().ToList();
+                    var match = matches[0];
+                    var sequence = match.Sequence;
+                    var prefixes = match.Prefixes;
+                    var suffixes = match.Suffixes;
+                    foreach (var aa in sequence)
+                    {
+                        Console.WriteLine(aa.Residue+"\t"+aa.GetMass());
+                    }
 
-            Console.WriteLine("Prefixes");
-            for (int i=0; i<prefixes.Count; i++)
-            {
-                Console.WriteLine((i+1)+"\t"+prefixes[i].GetIsotopeMass(0));
-            }
-            Console.WriteLine("Suffixes");
-            for (int i = 0; i < suffixes.Count; i++)
-            {
-                Console.WriteLine((i + 1) + "\t" + suffixes[i].GetIsotopeMass(0));
-            }
-        }*/
+                    Console.WriteLine("Prefixes");
+                    for (int i=0; i<prefixes.Count; i++)
+                    {
+                        Console.WriteLine((i+1)+"\t"+prefixes[i].GetIsotopeMass(0));
+                    }
+                    Console.WriteLine("Suffixes");
+                    for (int i = 0; i < suffixes.Count; i++)
+                    {
+                        Console.WriteLine((i + 1) + "\t" + suffixes[i].GetIsotopeMass(0));
+                    }
+                }*/
 
         // Configuration
-//        private const int ScanNum = 30623;
+        //        private const int ScanNum = 30623;
         private const double NoiseFiltration = 0;
         private const ActivationMethod Act = ActivationMethod.HCD;
         private const int MaxCharge = 1;
@@ -214,16 +214,16 @@ namespace InformedProteomics.Tests.FunctionalTests
         private IEnumerable<SpectrumMatch> InitTest()
         {
             var ionTypeFactory = new IonTypeFactory(_baseIons, _neutralLosses, MaxCharge);
-            _ionTypes = new List<IonType> {ionTypeFactory.GetIonType("b"), ionTypeFactory.GetIonType("y-H2O")};
+            _ionTypes = new List<IonType> { ionTypeFactory.GetIonType("b"), ionTypeFactory.GetIonType("y-H2O") };
 
-//            _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
+            //            _ionTypes = ionTypeFactory.GetAllKnownIonTypes().ToList();
 
-//            var lcms = InMemoryLcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
+            //            var lcms = InMemoryLcMsRun.GetLcMsRun(RawFile, MassSpecDataType.XCaliburRun, NoiseFiltration, NoiseFiltration);
 
-//            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act, false, MaxPrecCharge));
+            //            var spectrumMatches = (new SpectrumMatchList(lcms, new TsvFileParser(TsvFile), Act, false, MaxPrecCharge));
 
             var spectrumMatches = new SpectrumMatchList(RawFile, MaxPrecCharge);
-//            spectrumMatches.FilterSpectra();
+            //            spectrumMatches.FilterSpectra();
             return spectrumMatches;
         }
     }

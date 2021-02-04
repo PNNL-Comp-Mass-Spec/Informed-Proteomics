@@ -11,7 +11,6 @@ namespace InformedProteomics.TopDown.Execution
 {
     public class QuickProteinId
     {
-
         public void QuickId()
         {
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";

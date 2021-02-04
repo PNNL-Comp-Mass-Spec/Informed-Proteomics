@@ -5,7 +5,7 @@ using InformedProteomics.Scoring.LikelihoodScoring.Data;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 {
-    public class IcBottomUpTsvReader: IDataFileReader
+    public class IcBottomUpTsvReader : IDataFileReader
     {
         public IcBottomUpTsvReader(string fileName, LazyLcMsRun lcms, bool decoy)
         {
@@ -41,9 +41,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 
                 peptideSet.Add(peptides[i]);
                 var scanNum = Convert.ToInt32(scans[i]);
-//                    var spectrum = lcms.GetSpectrum(scanNum);
-//                    var spec = spectrum as ProductSpectrum;
-//                    if (spec == null || spec.ActivationMethod != Act) continue;
+                //                    var spectrum = lcms.GetSpectrum(scanNum);
+                //                    var spec = spectrum as ProductSpectrum;
+                //                    if (spec == null || spec.ActivationMethod != Act) continue;
                 var precursorCharge = Convert.ToInt32(precursorCharges[i]);
 
                 var formula = formulas?[i] != null ? formulas[i] : string.Empty;

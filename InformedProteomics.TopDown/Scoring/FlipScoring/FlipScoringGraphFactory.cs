@@ -121,7 +121,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
             var nTerminalFragScores = nodeScores[0] = new double?[numNodes];
             var cTerminalFragScores = nodeScores[1] = new double?[numNodes];
 
-            var deconvPeaks = (DeconvolutedPeak[]) scorer.ProductSpectrum.Peaks;
+            var deconvPeaks = (DeconvolutedPeak[])scorer.ProductSpectrum.Peaks;
 
             // transform all peaks into being N-terminal ions
             foreach (var peak in deconvPeaks)

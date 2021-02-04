@@ -112,7 +112,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             const string pepListFile = @"C:\cygwin\home\kims336\Data\DIA\SpikedPeptides.txt";
 
             var aaSet = new AminoAcidSet(Modification.Carbamidomethylation);
-            var charges = new[] {2};
+            var charges = new[] { 2 };
 
             var hist = new int[4];
 
@@ -139,7 +139,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                         continue;
                     }
 
-                    var histIndex = (int)((precursorIonMz - 400)/125);
+                    var histIndex = (int)((precursorIonMz - 400) / 125);
                     hist[histIndex]++;
 
                     Console.WriteLine("{0}\t{1}\t{2}\t{3}", peptide, charge, precursorIonMz, histIndex);
@@ -151,7 +151,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             Console.WriteLine("\nRange\tNum\tRatio");
             for (var i = 0; i < hist.Length; i++)
             {
-                Console.WriteLine("{0}-{1}\t{2}\t{3}", 400+i*125, 525+i*125, hist[i], hist[i] / (float)sum);
+                Console.WriteLine("{0}-{1}\t{2}\t{3}", 400 + i * 125, 525 + i * 125, hist[i], hist[i] / (float)sum);
             }
         }
     }

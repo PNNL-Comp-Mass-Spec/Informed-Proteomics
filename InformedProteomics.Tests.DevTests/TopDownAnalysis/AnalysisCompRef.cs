@@ -297,7 +297,6 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                                 dataLine.Add(PRISM.StringUtilities.DblToString(features[i].Score, 3));
                             }
                         }
-
                     }
 
                     var prsm = (from f in features
@@ -339,7 +338,6 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                     writer.WriteLine(string.Join("\t", dataLine));
                 }
-
             }
 
             Console.WriteLine("Results written to " + outputFilePath);

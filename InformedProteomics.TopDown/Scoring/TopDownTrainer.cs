@@ -53,7 +53,7 @@ namespace InformedProteomics.TopDown.Scoring
                     var scorer = new TopDownScorer(composition, _run, _tolerance);
                     var areXicMissing = scorer.AreXicMissing(charge, scanNumber);
                     var corrScores = scorer.GetIsotopeCorrelationIntensityRawScores(charge, scanNumber);
-                    for (var c = TopDownScorer.MinCharge; c <= TopDownScorer.MaxCharge;c++ )
+                    for (var c = TopDownScorer.MinCharge; c <= TopDownScorer.MaxCharge; c++)
                     {
                         if (areXicMissing[c - TopDownScorer.MinCharge])
                         {

@@ -63,11 +63,11 @@ namespace InformedProteomics.Test
                 {
                     if (_precursorCharge > 0)
                     {
-                        offsetFrequencyTables[i] = new PrecursorOffsetFrequencyTable(_searchWidth/(i+1), i+1, _binWidth/(i+1));
+                        offsetFrequencyTables[i] = new PrecursorOffsetFrequencyTable(_searchWidth / (i + 1), i + 1, _binWidth / (i + 1));
                     }
                     else
                     {
-                        offsetFrequencyTables[i] = new PrecursorOffsetFrequencyTable(_searchWidth, i+1, _binWidth);
+                        offsetFrequencyTables[i] = new PrecursorOffsetFrequencyTable(_searchWidth, i + 1, _binWidth);
                     }
                 }
 
@@ -101,7 +101,7 @@ namespace InformedProteomics.Test
                         outFile.WriteLine("Offset\tFound");
                         foreach (var offsetFrequency in offsetFrequencies[i])
                         {
-//                            int integerOffset = (int) Math.Round(offsetFrequency.Offset*_binWidth*(i + 1));
+                            //                            int integerOffset = (int) Math.Round(offsetFrequency.Offset*_binWidth*(i + 1));
                             outFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Prob);
                         }
                     }
@@ -141,7 +141,7 @@ namespace InformedProteomics.Test
                     offsetFrequencyTables[i] = new List<PrecursorOffsetFrequencyTable>();
                     for (int j = 1; j <= (i + 1); j++)
                     {
-                        offsetFrequencyTables[i].Add(new PrecursorOffsetFrequencyTable(_searchWidth/j, j, _binWidth/j));
+                        offsetFrequencyTables[i].Add(new PrecursorOffsetFrequencyTable(_searchWidth / j, j, _binWidth / j));
                     }
                 }
 
@@ -172,7 +172,7 @@ namespace InformedProteomics.Test
                     {
                         outFile.Write("Offset\t");
                         var offsetFrequencyList = new List<List<Probability<double>>>();
-                        for (int j = offsetFrequencyTables[i].Count-1; j >=0; j--)
+                        for (int j = offsetFrequencyTables[i].Count - 1; j >= 0; j--)
                         {
                             offsetFrequencyList.Add(offsetFrequencyTables[i][j].GetProbabilities().ToList());
                             outFile.Write("{0}", j + 1);
@@ -185,12 +185,12 @@ namespace InformedProteomics.Test
                         for (int j = 0; j < offsetFrequencyList.First().Count; j++)
                         {
                             var offset = offsetFrequencyList.First()[j].Label;
-                            var integerOffset = Math.Round(offset*(1/_binWidth), 2);
-                            outFile.Write(integerOffset+"\t");
+                            var integerOffset = Math.Round(offset * (1 / _binWidth), 2);
+                            outFile.Write(integerOffset + "\t");
                             for (int k = 0; k < offsetFrequencyList.Count; k++)
                             {
                                 outFile.Write(offsetFrequencyList[k][j].Prob);
-                                if (k != offsetFrequencyList.Count-1)
+                                if (k != offsetFrequencyList.Count - 1)
                                 {
                                     outFile.Write("\t");
                                 }

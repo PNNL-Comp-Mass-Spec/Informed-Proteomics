@@ -6,7 +6,7 @@ using InformedProteomics.Scoring.LikelihoodScoring.Data;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 {
-    public class MgfReader: IDataFileReader
+    public class MgfReader : IDataFileReader
     {
         public MgfReader(string fileName, bool decoy)
         {

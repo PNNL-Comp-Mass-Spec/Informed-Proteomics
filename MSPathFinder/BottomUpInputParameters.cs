@@ -66,7 +66,7 @@ namespace MSPathFinder
         public void Display()
         {
             Console.WriteLine("SpecFilePath: ");
-            foreach(var specFilePath in SpecFilePaths)
+            foreach (var specFilePath in SpecFilePaths)
             {
                 Console.WriteLine("\t{0}", specFilePath);
             }
@@ -137,7 +137,7 @@ namespace MSPathFinder
             }
             else
             {
-                SpecFilePaths = new[] {specFilePath};
+                SpecFilePaths = new[] { specFilePath };
             }
 
             DatabaseFilePath = parameters["-d"];

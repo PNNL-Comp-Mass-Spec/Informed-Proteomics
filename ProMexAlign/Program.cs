@@ -272,6 +272,5 @@ namespace PromexAlign
             Console.WriteLine();
             Console.WriteLine("The MsPathfinderIdFilePath column is optional");
         }
-
     }
 }

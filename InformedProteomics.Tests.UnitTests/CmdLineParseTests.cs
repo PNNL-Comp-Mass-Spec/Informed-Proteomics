@@ -215,7 +215,6 @@ namespace InformedProteomics.Tests.UnitTests
             Assert.AreEqual(fastaFilePath, options.DatabaseFilePath);
             Assert.AreEqual(featureFilePath, options.FeatureFilePath);
 
-
             Assert.AreEqual(InternalCleavageType.SingleInternalCleavage, options.InternalCleavageMode);
             Assert.AreEqual(true, options.TagBasedSearch, "Unexpected value for TagBasedSearch");
 
@@ -263,7 +262,6 @@ namespace InformedProteomics.Tests.UnitTests
             Assert.AreEqual(Modification.Acetylation, options.Modifications[2].Modification);
             Assert.AreEqual(42.0105647, options.Modifications[2].Mass, 0.0001);
         }
-
 
         [Test]
         [TestCase(@"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML", @"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.ms1ft", @"TEST_FOLDER\MSPathFinderT\ID_003962_71E1A1D4.fasta", @"TEST_FOLDER\MSPathFinderT\MSPF_UVPD_MetOx_STYPhos_LysMethDiMethTriMeth_NTermAcet_Formyl_Hydroxyl_Biotin_Crotonyl_NoInternalCleavage_10ppm.txt")]
@@ -398,6 +396,5 @@ namespace InformedProteomics.Tests.UnitTests
             Assert.AreEqual(Modification.Deamidation, options.Modifications[modIndex].Modification);
             Assert.AreEqual(0.984015595, options.Modifications[modIndex].Mass, 0.0001);
         }
-
     }
 }

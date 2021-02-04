@@ -9,7 +9,7 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
         public abstract Isotope GetMostAbundantIsotope();
         public abstract double[] Probability { get; }
 
-        public double MonoMass { get; protected set;  }
+        public double MonoMass { get; protected set; }
         public int Size => Probability.Length;
 
         public const double MaxBhattacharyyaDistance = 10.0d;
@@ -120,7 +120,7 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
 
         public double GetPearsonCorrelation(Ms1Peak[] isotopePeaks)
         {
-            var m1 = 1.0/Size;
+            var m1 = 1.0 / Size;
             var m2 = 0.0;
 
             for (var i = 0; i < Size; i++)

@@ -37,9 +37,9 @@ namespace MSPathFinderT
         {
             var errorCode = 0;
 
-// #if (!DEBUG)
+            // #if (!DEBUG)
             try
-// #endif
+            // #endif
             {
                 var osVersionInfo = new OSVersionInfo();
                 if (osVersionInfo.GetOSVersion().IndexOf("windows", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -146,7 +146,7 @@ namespace MSPathFinderT
                     }
                 }
             }
-// #if (!DEBUG)
+            // #if (!DEBUG)
             catch (Exception ex)
             {
                 // NOTE: The DMS Analysis Manager looks for this text; do not change it
@@ -165,7 +165,7 @@ namespace MSPathFinderT
                     return errorCode;
                 }
             }
-// #endif
+            // #endif
 
             return errorCode;
         }

@@ -80,7 +80,7 @@ namespace InformedProteomics.TopDown.Scoring
             if (precursorSpec != null)
             {
                 precursorPeakList = precursorSpec.GetPeakListWithin(minMz, maxMz);
-                precursorSpecWindow = precursorSpec.GetPeakListWithin(minMz-1.0, maxMz+1.0);
+                precursorSpecWindow = precursorSpec.GetPeakListWithin(minMz - 1.0, maxMz + 1.0);
             }
 
             List<Peak> nextMs1PeakList = null;
@@ -121,7 +121,7 @@ namespace InformedProteomics.TopDown.Scoring
         private void SetLcMsMatches(LinkedList<Peak> remainingPeakList, int scanNum, IList<Peak> precursorSpecWindow, IList<Peak> nextMs1SpecWindow, int numPeaksToConsider)
         {
             var numPeaksConsidered = 0;
-            while(remainingPeakList.Count > 0)
+            while (remainingPeakList.Count > 0)
             {
                 var peakWithHighestIntensity = remainingPeakList.First.Value;
                 var peakMz = peakWithHighestIntensity.Mz;
@@ -198,7 +198,7 @@ namespace InformedProteomics.TopDown.Scoring
                     }
                 }
 
-                _lcMsMatchMap.SetMatches(monoIsotopicMass, xicThisPeak[0].ScanNum, xicThisPeak[xicThisPeak.Count-1].ScanNum);
+                _lcMsMatchMap.SetMatches(monoIsotopicMass, xicThisPeak[0].ScanNum, xicThisPeak[xicThisPeak.Count - 1].ScanNum);
             }
         }
     }

@@ -204,7 +204,6 @@ namespace InformedProteomics.Backend.MassSpecData
             // ReSharper restore StringLiteralTypo
         };
 
-
         /// <summary>
         /// List of "folder extensions" that ProteoWizard can read. This does not include all folder type datasets - some require directory listings.
         /// </summary>

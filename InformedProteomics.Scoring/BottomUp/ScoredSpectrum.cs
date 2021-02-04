@@ -8,7 +8,7 @@ using InformedProteomics.Scoring.LikelihoodScoring.Scoring;
 
 namespace InformedProteomics.Scoring.BottomUp
 {
-    public class ScoredSpectrum: IScorer
+    public class ScoredSpectrum : IScorer
     {
         public ScoredSpectrum(Spectrum spec, RankScore scorer, int charge, double massWithH2O, Tolerance tolerance)
         {

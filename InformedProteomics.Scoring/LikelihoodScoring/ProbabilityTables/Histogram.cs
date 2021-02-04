@@ -4,7 +4,7 @@ using InformedProteomics.Scoring.LikelihoodScoring.Data;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 {
-    public class Histogram <T1>
+    public class Histogram<T1>
     {
         public List<List<T1>> Bins { get; private set; }
         public int Total { get; private set; }
@@ -15,7 +15,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// <param name="data">Data to insert into histogram when it is created.</param>
         /// <param name="binEdges">Array of minimum values for each histogram bin.</param>
         /// <param name="compare">Comparer to compare items in histogram.</param>
-        public Histogram(IReadOnlyCollection<T1> data, T1[] binEdges, IComparer<T1> compare=null)
+        public Histogram(IReadOnlyCollection<T1> data, T1[] binEdges, IComparer<T1> compare = null)
         {
             _compare = compare;
             if (compare == null)
@@ -71,7 +71,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             }
 
             Total = 0;
-            Bins = new List<List<T1>> {new List<T1>()};
+            Bins = new List<List<T1>> { new List<T1>() };
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 alignedEdges[i] = binEdges[i];
                 if (align == BinEdgeAlignment.Center)
                 {
-                    var offset = binWidth/2;
+                    var offset = binWidth / 2;
                     alignedEdges[i] += offset;
                 }
                 else if (align == BinEdgeAlignment.High)

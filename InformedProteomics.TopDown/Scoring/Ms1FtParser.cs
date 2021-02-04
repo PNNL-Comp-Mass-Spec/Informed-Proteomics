@@ -28,7 +28,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public string Ms1FtFileName { get; }
 
-        private static readonly string[] RequiredColumns = { "FeatureID" , "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "Abundance"};
+        private static readonly string[] RequiredColumns = { "FeatureID", "MinScan", "MaxScan", "MinCharge", "MaxCharge", "MonoMass", "Abundance" };
 
         private ProMexFeature[] _featureArr;
         private bool Read(string ms1FtFileName)

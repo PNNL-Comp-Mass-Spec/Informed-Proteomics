@@ -285,7 +285,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                 Assert.Ignore("Ignoring test since cannot determine the parent directory of " + pbfFile.FullName);
             }
 
-            var fileExt = new[] {"IcTarget", "IcDecoy"};
+            var fileExt = new[] { "IcTarget", "IcDecoy" };
             foreach (var ext in fileExt)
             {
                 var resultFileName = Path.Combine(pbfFile.DirectoryName, Path.GetFileNameWithoutExtension(pbfFile.Name)) + string.Format("_{0}.tsv", ext);

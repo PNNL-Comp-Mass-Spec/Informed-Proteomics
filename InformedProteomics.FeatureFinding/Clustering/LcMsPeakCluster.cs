@@ -55,7 +55,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
             MaxScanNum = maxScanNum;
 
             Envelopes = new ObservedIsotopeEnvelope[nRows][];
-            for(var i = 0; i < nRows; i++)
+            for (var i = 0; i < nRows; i++)
             {
                 Envelopes[i] = new ObservedIsotopeEnvelope[nCols];
             }
@@ -121,7 +121,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
                         var r = rnd.Next(0, numMzBins);
                         if (r < localWin.PeakCount)
                         {
-                            peakSet[k] = (Ms1Peak) ms1Spectra[col].Peaks[r + localWin.PeakStartIndex];
+                            peakSet[k] = (Ms1Peak)ms1Spectra[col].Peaks[r + localWin.PeakStartIndex];
                         }
                     }
 
@@ -163,7 +163,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
 
             ClearScore();
 
-            var bestChargeDist = new[]{10.0d, 10.0d};
+            var bestChargeDist = new[] { 10.0d, 10.0d };
             // sum envelopes at each charge
             var summedIntensity = new double[TheoreticalEnvelope.Size];
 
@@ -188,7 +188,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
             var repEnvelopeBcDist2 = 10.0d;
             ObservedIsotopeEnvelope repEnvelope2 = null;
 
-            var tempBestDistanceScoreAcrossCharge = new double[]{ 10, 10 };
+            var tempBestDistanceScoreAcrossCharge = new double[] { 10, 10 };
             var tempBestIntensityScoreAcrossCharge = new double[2];
             var tempBestCorrelationScoreAcrossCharge = new double[2];
 
@@ -312,7 +312,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
                     bestChargeDist[chargeIdx] = bcDist;
                     if (summedReferenceIntensity > 0)
                     {
-                        EnvelopeIntensityScoreAcrossCharge[chargeIdx] = summedMostAbuIsotopeIntensity/summedReferenceIntensity;
+                        EnvelopeIntensityScoreAcrossCharge[chargeIdx] = summedMostAbuIsotopeIntensity / summedReferenceIntensity;
                     }
                     //if (summedMedianIntensity > 0) EnvelopeIntensityScoreAcrossCharge[chargeIdx] = Math.Min(1.0, 0.1*(summedMostAbuIsotopeIntensity / summedMedianIntensity));
                 }
@@ -587,7 +587,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
 
         public override double MinElutionTime => _run.GetElutionTime(MinScanNum);
 
-        public override double MaxNet => MaxElutionTime/_run.GetElutionTime(_run.MaxLcScan);
+        public override double MaxNet => MaxElutionTime / _run.GetElutionTime(_run.MaxLcScan);
 
         public override double MinNet => MinElutionTime / _run.GetElutionTime(_run.MaxLcScan);
 

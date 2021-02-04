@@ -107,7 +107,7 @@ namespace InformedProteomics.TopDown.Execution
                     continue;
                 }
 
-                matchesByScan.Add(match.ScanNum, new List<DatabaseSearchResultData> {match});
+                matchesByScan.Add(match.ScanNum, new List<DatabaseSearchResultData> { match });
                 scanOrder.Add(match.ScanNum);
             }
 
@@ -187,20 +187,20 @@ namespace InformedProteomics.TopDown.Execution
 
                     var probability = match.Probability;
 
-                    specIdent.CVParams.Add(new CVParamObj() {Cvid = CV.CVID.MS_chemical_formula, Value = match.Composition,});
+                    specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_chemical_formula, Value = match.Composition, });
                     //specIdent.CVParams.Add(new CVParamObj() { Cvid = CV.CVID.MS_number_of_matched_peaks, Value = match.NumMatchedFragments.ToString(), });
                     specIdent.CVParams.Add(new CVParamObj()
-                        {Cvid = CV.CVID.MS_MSPathFinder_RawScore, Value = probability.ToString(CultureInfo.InvariantCulture),});
+                    { Cvid = CV.CVID.MS_MSPathFinder_RawScore, Value = probability.ToString(CultureInfo.InvariantCulture), });
                     specIdent.CVParams.Add(new CVParamObj()
-                        {Cvid = CV.CVID.MS_MSPathFinder_SpecEValue, Value = match.SpecEValue.ToString(CultureInfo.InvariantCulture),});
+                    { Cvid = CV.CVID.MS_MSPathFinder_SpecEValue, Value = match.SpecEValue.ToString(CultureInfo.InvariantCulture), });
                     specIdent.CVParams.Add(new CVParamObj()
-                        {Cvid = CV.CVID.MS_MSPathFinder_EValue, Value = match.EValue.ToString(CultureInfo.InvariantCulture),});
+                    { Cvid = CV.CVID.MS_MSPathFinder_EValue, Value = match.EValue.ToString(CultureInfo.InvariantCulture), });
                     if (match.HasTdaScores)
                     {
                         specIdent.CVParams.Add(new CVParamObj()
-                            {Cvid = CV.CVID.MS_MSPathFinder_QValue, Value = match.QValue.ToString(CultureInfo.InvariantCulture),});
+                        { Cvid = CV.CVID.MS_MSPathFinder_QValue, Value = match.QValue.ToString(CultureInfo.InvariantCulture), });
                         specIdent.CVParams.Add(new CVParamObj()
-                            {Cvid = CV.CVID.MS_MSPathFinder_PepQValue, Value = match.PepQValue.ToString(CultureInfo.InvariantCulture),});
+                        { Cvid = CV.CVID.MS_MSPathFinder_PepQValue, Value = match.PepQValue.ToString(CultureInfo.InvariantCulture), });
                     }
                     // MS-GF+ similarity: find/add isotope error?
                     // MS-GF+ similarity: find/add assumed dissociation method?

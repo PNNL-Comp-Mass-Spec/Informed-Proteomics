@@ -231,7 +231,7 @@ namespace InformedProteomics.Backend.MathAndStats
             for (var i = 0; i < length; i++)
             {
                 var diff = x[i] - m;
-                variance += diff*diff;
+                variance += diff * diff;
             }
             return variance / (length - 1);
         }
@@ -266,7 +266,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static double GetKLDivergence(double[] P, double[] Q)
         {
-            var ret = P.Select((t, i) => t*(Math.Log(t) - Math.Log(Q[i]))).Sum();
+            var ret = P.Select((t, i) => t * (Math.Log(t) - Math.Log(Q[i]))).Sum();
 
             return ret;
         }

@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="v1Index"></param>
         /// <param name="v2Index"></param>
         /// <returns></returns>
-        public static double GetBhattacharyyaDistance(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0 )
+        public static double GetBhattacharyyaDistance(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
             if (count == -1)
             {
@@ -191,7 +191,7 @@ namespace InformedProteomics.Backend.MathAndStats
             }
 
             var m1 = s1 / count;
-            var m2  = s2 / count;
+            var m2 = s2 / count;
 
             // compute Pearson correlation
             var cov = 0.0;

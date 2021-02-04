@@ -53,19 +53,19 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             //foreach (var aa in AminoAcid.StandardAminoAcidArr)
             //{
-                /*
-                var keys = _locationSpecificResidueMap[location].Keys.ToArray();
-                Array.Sort(keys);
-                foreach (var residue in keys)
+            /*
+            var keys = _locationSpecificResidueMap[location].Keys.ToArray();
+            Array.Sort(keys);
+            foreach (var residue in keys)
+            {
+                var aa = GetAminoAcid(residue, location);
+                Console.Write("{0}\t{1}\t{2}", residue, aa.Mass, aa.Composition);
+                foreach (var modIndex in GetModificationIndices(residue, location))
                 {
-                    var aa = GetAminoAcid(residue, location);
-                    Console.Write("{0}\t{1}\t{2}", residue, aa.Mass, aa.Composition);
-                    foreach (var modIndex in GetModificationIndices(residue, location))
-                    {
-                        Console.Write("\t" + _modificationParams.GetModification(modIndex));
-                    }
-                    Console.WriteLine();
-                }*/
+                    Console.Write("\t" + _modificationParams.GetModification(modIndex));
+                }
+                Console.WriteLine();
+            }*/
             //}
         }
 

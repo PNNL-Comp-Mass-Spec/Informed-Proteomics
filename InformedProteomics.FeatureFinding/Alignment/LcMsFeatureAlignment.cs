@@ -92,14 +92,14 @@ namespace InformedProteomics.FeatureFinding.Alignment
                 var maxScan = int.Parse(maxScans[i]);
                 var fid = int.Parse(featureIds[i]);
 
-                var repCharge = (repCharges != null) ? int.Parse(repCharges[i]) : (int)Math.Round(0.5*(minCharge + maxCharge));
+                var repCharge = (repCharges != null) ? int.Parse(repCharges[i]) : (int)Math.Round(0.5 * (minCharge + maxCharge));
                 var repMz = (repMzs != null) ? double.Parse(repMzs[i]) : (repMass / repCharge) + Constants.Proton;
                 var repScanNum = (repScans != null) ? int.Parse(repScans[i]) : minScan;
                 var score = (scores != null) ? double.Parse(scores[i]) : 0;
 
                 var minEt = double.Parse(minElutionTime[i]);
                 var maxEt = double.Parse(maxElutionTime[i]);
-                var minNet = minEt/run.GetElutionTime(run.MaxLcScan);
+                var minNet = minEt / run.GetElutionTime(run.MaxLcScan);
                 var maxNet = maxEt / run.GetElutionTime(run.MaxLcScan);
                 var feature = new LcMsFeature(repMass, repCharge, repMz, repScanNum, abundance, minCharge, maxCharge, minScan, maxScan, minEt, maxEt, minNet, maxNet)
                 {
@@ -207,7 +207,6 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
                 progressData.Report(j, CountAlignedFeatures);
             }
-
         }
 
         public void RefineAbundance(double scoreThreshold = -30, IProgress<ProgressData> progressReporter = null)
@@ -459,7 +458,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
             var linkedIdx = new int[nDataSet];
 
             // find a cluster center that minimizing the sum of distances to other members
-            foreach(var idx1 in component)
+            foreach (var idx1 in component)
             {
                 var f1 = _featureList[idx1];
 
@@ -472,7 +471,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
                 linkedIdx[f1.DataSetId] = idx1;
                 score[f1.DataSetId] = 0;
 
-                foreach(var idx2 in component)
+                foreach (var idx2 in component)
                 {
                     if (idx1 == idx2 || !adjList[idx1].Contains(idx2))
                     {
@@ -522,7 +521,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
                 foreach (var idx1 in nodeSet)
                 {
                     //var f1 = _featureList[idx1];
-                    foreach(var idx2 in component)
+                    foreach (var idx2 in component)
                     {
                         if (idx1 == idx2 || !adjList[idx1].Contains(idx2))
                         {

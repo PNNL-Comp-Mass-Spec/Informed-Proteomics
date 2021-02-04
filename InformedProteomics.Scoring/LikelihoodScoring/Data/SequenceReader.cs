@@ -3,7 +3,7 @@ using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
-    internal class SequenceReader: ISequenceReader
+    internal class SequenceReader : ISequenceReader
     {
         private readonly DataFileFormat _format;
         public SequenceReader(DataFileFormat format)

@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// A file-backed object for accessing mass spec data. Data is read from the vendor format
     /// to a binary PBF file, and that file is used for fast access to spectra and extracted ion chromatograms
     /// </summary>
-    public class PbfLcMsRun: LcMsRun, IPbfLcMsRun
+    public class PbfLcMsRun : LcMsRun, IPbfLcMsRun
     {
         // Ignore Spelling: Baf, LcMs, Nums, overridable, Pbf, struct, structs
 
@@ -943,7 +943,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Backup 10 bytes
-            _reader.BaseStream.Seek(-3 * sizeof (long) - 1 * sizeof (int), SeekOrigin.End);
+            _reader.BaseStream.Seek(-3 * sizeof(long) - 1 * sizeof(int), SeekOrigin.End);
 
             // Temporarily store position (used to read raw file name, if available)
             var offsetDataPos = _reader.BaseStream.Position;
@@ -1202,7 +1202,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     tic = calcTic;
                 }
-                spec =  new ProductSpectrum(peakList, scanNum)
+                spec = new ProductSpectrum(peakList, scanNum)
                 {
                     ActivationMethod = activationMethod,
                     IsolationWindow = new IsolationWindow(
@@ -1528,10 +1528,10 @@ namespace InformedProteomics.Backend.MassSpecData
                         {
                             if (!warnedNullScanToIsolationWindow)
                             {
-                            Console.WriteLine();
+                                Console.WriteLine();
                                 ConsoleMsgUtils.ShowWarning(string.Format(
                                     "WriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan {0}; " +
-                                    "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown" , scanNum));
+                                    "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown", scanNum));
                                 warnedNullScanToIsolationWindow = true;
                             }
                         }
@@ -1638,7 +1638,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     countTotal = msDataReader.NumSpectra - startScan + 1;
                 }
-            } else if (endScan > 0)
+            }
+            else if (endScan > 0)
             {
                 countTotal = endScan;
             }
@@ -2072,7 +2073,7 @@ namespace InformedProteomics.Backend.MassSpecData
                             }
                         }
                         writer.Write(peak.Mz);
-                        writer.Write((float) peak.Intensity);
+                        writer.Write((float)peak.Intensity);
                         writer.Write(peak.ScanNum);
 
                         var datum = metadata[peak.ScanNum];
@@ -2365,7 +2366,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 // binary search
                 while (minOffset <= maxOffset)
                 {
-                    curOffset = minOffset + (maxOffset - minOffset)/NumBytePeak/2*NumBytePeak;
+                    curOffset = minOffset + (maxOffset - minOffset) / NumBytePeak / 2 * NumBytePeak;
                     _reader.BaseStream.Seek(curOffset, SeekOrigin.Begin);
                     var curMz = _reader.ReadDouble();
                     if (curMz < minMz)
@@ -2520,7 +2521,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
 
-            _precursorChromatogramCache.Sort((x,y) => x.Mz.CompareTo(y.Mz));
+            _precursorChromatogramCache.Sort((x, y) => x.Mz.CompareTo(y.Mz));
 
             return xic;
         }

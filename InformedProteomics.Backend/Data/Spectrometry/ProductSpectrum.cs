@@ -5,7 +5,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// Class for hold MSn (product) spectrum information
     /// </summary>
-    public class ProductSpectrum: Spectrum
+    public class ProductSpectrum : Spectrum
     {
         /// <summary>
         /// Constructor
@@ -22,7 +22,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="peaks"></param>
         /// <param name="scanNum"></param>
-        public ProductSpectrum(ICollection<Peak> peaks, int scanNum): base(peaks, scanNum)
+        public ProductSpectrum(ICollection<Peak> peaks, int scanNum) : base(peaks, scanNum)
         {
         }
 

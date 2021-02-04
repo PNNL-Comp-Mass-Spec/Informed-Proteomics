@@ -75,23 +75,23 @@ namespace ProMex
             {
 #endif
 
-                // Example text:  ProMex version 1.0.6527 (November 14, 2017)
-                // (the build date is computed automatically)
-                Console.WriteLine("************ {0} {1} ************", Name, Version);
-                parameters.Display();
-                var launcher = new LcMsFeatureFinderLauncher(parameters);
-                int errorCode;
+            // Example text:  ProMex version 1.0.6527 (November 14, 2017)
+            // (the build date is computed automatically)
+            Console.WriteLine("************ {0} {1} ************", Name, Version);
+            parameters.Display();
+            var launcher = new LcMsFeatureFinderLauncher(parameters);
+            int errorCode;
 
-                if (string.IsNullOrWhiteSpace(parameters.ExistingFeaturesFilePath))
-                {
-                    errorCode = launcher.Run();
-                }
-                else
-                {
-                    errorCode = launcher.CreateFeatureMapImage(parameters.InputPath, parameters.ExistingFeaturesFilePath);
-                }
+            if (string.IsNullOrWhiteSpace(parameters.ExistingFeaturesFilePath))
+            {
+                errorCode = launcher.Run();
+            }
+            else
+            {
+                errorCode = launcher.CreateFeatureMapImage(parameters.InputPath, parameters.ExistingFeaturesFilePath);
+            }
 
-                return errorCode;
+            return errorCode;
 #if (!DEBUG)
             }
             catch (Exception ex)

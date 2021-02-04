@@ -53,7 +53,7 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             var jobParser = new TsvFileParser(jobFilePath);
-            var jobs = jobParser.GetData("Jobs").Select(j => Convert.ToInt32((string) j)).ToArray();
+            var jobs = jobParser.GetData("Jobs").Select(j => Convert.ToInt32((string)j)).ToArray();
             var experiments = jobParser.GetData("Experiments").Select(e => e.Split('_')[2]).ToArray();
 
             //const string resultFilePath = dir + @"\AMT_Proteins_NA.tsv";
@@ -235,7 +235,7 @@ namespace InformedProteomics.Tests.DevTests
                 //                Console.WriteLine(name + " -> " +accession);
                 Assert.IsTrue(uniProtPattern.IsMatch(proteinName));
                 nameToAccession.Add(name, proteinName);
-//                Console.WriteLine(name);
+                //                Console.WriteLine(name);
             }
 
             const string resultPath = @"H:\Research\IPRG2015\Henry_results\ProteinNames.txt";
@@ -252,9 +252,9 @@ namespace InformedProteomics.Tests.DevTests
                 }
 
                 var name = line;
-//                if (name.Contains(";"))
-//                {
-//                }
+                //                if (name.Contains(";"))
+                //                {
+                //                }
                 name = name.Split()[0];
                 if (name.Contains('|'))
                 {

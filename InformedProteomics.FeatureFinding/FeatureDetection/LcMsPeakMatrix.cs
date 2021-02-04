@@ -350,7 +350,6 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             }
 
             feature.SetAbundance(abundance, apexScanNum, apexIntensity, boundaryIntensity * 0.5);
-
         }
 
         public double GetMs1EvidenceScore(int ms2ScanNum, double targetMass, int charge)

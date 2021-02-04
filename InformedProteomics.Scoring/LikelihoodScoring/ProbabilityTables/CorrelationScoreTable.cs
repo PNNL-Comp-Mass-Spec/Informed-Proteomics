@@ -54,7 +54,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             }
         }
 
-        public void AddMatches(List<SpectrumMatch> matches, IonType[] ionTypes, Tolerance tolerance, double relativeIntensityThreshold, bool reduceCharges=true)
+        public void AddMatches(List<SpectrumMatch> matches, IonType[] ionTypes, Tolerance tolerance, double relativeIntensityThreshold, bool reduceCharges = true)
         {
             foreach (var match in matches)
             {

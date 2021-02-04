@@ -36,10 +36,10 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
                 throw new Exception("Abnormal Theoretical Envelope");
             }
 
-            _probability            = new double[Isotopes.Count];
-            Ranking                 = new int[Isotopes.Count];
-            IndexOrderByRanking     = new int[Isotopes.Count];
-            for(var i = 0; i < Isotopes.Count; i++)
+            _probability = new double[Isotopes.Count];
+            Ranking = new int[Isotopes.Count];
+            IndexOrderByRanking = new int[Isotopes.Count];
+            for (var i = 0; i < Isotopes.Count; i++)
             {
                 _probability[i] = Isotopes[i].Ratio / ratioSum;
                 Ranking[i] = isotopeRankings[Isotopes[i].Index];

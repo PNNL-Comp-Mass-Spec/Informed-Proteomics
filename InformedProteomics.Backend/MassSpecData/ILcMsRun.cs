@@ -7,7 +7,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// <summary>
     /// Interface for LcMsRun data objects
     /// </summary>
-    public interface ILcMsRun: IChromatogramExtractor, ISpectrumAccessor, ISpectrumExtractor
+    public interface ILcMsRun : IChromatogramExtractor, ISpectrumAccessor, ISpectrumExtractor
     {
         /// <summary>
         /// True if the dataset is DIA data

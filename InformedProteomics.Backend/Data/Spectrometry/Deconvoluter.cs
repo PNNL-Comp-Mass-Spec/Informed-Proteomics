@@ -446,7 +446,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             try
             {
-
                 var monoIsotopePeakList = new List<DeconvolutedPeak>();
                 for (var peakIndex = 0; peakIndex < peaks.Length; peakIndex++)
                 {
@@ -582,7 +581,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 for (var i = 0; i < observedPeaks.Length; i++)
                                 {
                                     var observedPeak = observedPeaks[i];
-                                    observedIntensities[i] = observedPeak != null ? (float) observedPeak.Intensity : 0.0;
+                                    observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
                                 }
 
                                 var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelop, observedIntensities);

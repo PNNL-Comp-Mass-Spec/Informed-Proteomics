@@ -13,11 +13,11 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestProteinMassComparerWithBinning()
         {
-            var comparer2 = new FilteredProteinMassBinning(new AminoAcidSet(),  50001);
+            var comparer2 = new FilteredProteinMassBinning(new AminoAcidSet(), 50001);
 
             for (var i = 9999d; i < 10010; i++)
             {
-                Console.WriteLine("{0}, {1}",i, comparer2.GetBinNumber(i));
+                Console.WriteLine("{0}, {1}", i, comparer2.GetBinNumber(i));
             }
 
             //var comparer = new ProteinMassBinning(50, 50001, true);

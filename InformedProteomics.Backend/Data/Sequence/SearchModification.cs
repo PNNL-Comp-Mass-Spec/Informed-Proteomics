@@ -84,6 +84,5 @@ namespace InformedProteomics.Backend.Data.Sequence
                 Modification.Name
             );
         }
-
     }
 }

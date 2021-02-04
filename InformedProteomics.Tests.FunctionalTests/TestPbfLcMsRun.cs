@@ -225,7 +225,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             foreach (var peptide in indexedDb.AnnotationsAndOffsets(6, 30, 2, 2, Enzyme.Trypsin))
             {
                 ++numPeptides;
-                var comp = new Sequence(peptide.Annotation.Substring(2, peptide.Annotation.Length-4), aaSet).Composition + Composition.H2O;
+                var comp = new Sequence(peptide.Annotation.Substring(2, peptide.Annotation.Length - 4), aaSet).Composition + Composition.H2O;
                 var mz = new Ion(comp, 2).GetMonoIsotopicMz();
                 //Console.WriteLine(peptide.Annotation + " " + mz);
                 rafRun.GetFullPrecursorIonExtractedIonChromatogram(mz, tolerance);
@@ -267,7 +267,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath);
 
-//            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
+            //            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             if (!File.Exists(rafFilePath))
             {
@@ -280,9 +280,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             const double productIonMz = 902.445;
             var tolerance = new Tolerance(10);
             var xic1 = run.GetFullProductExtractedIonChromatogram(productIonMz, tolerance, precursorIonMz);
-//            xic1.Display();
+            //            xic1.Display();
             var xic2 = rafRun.GetFullProductExtractedIonChromatogram(productIonMz, tolerance, precursorIonMz);
-//            xic2.Display();
+            //            xic2.Display();
             Assert.True(xic1.Equals(xic2));
             Console.WriteLine("Done");
         }
@@ -301,7 +301,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath);
 
-//            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
+            //            const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             if (!File.Exists(rafFilePath))
             {
@@ -496,7 +496,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             }
 
             var rafRun = new PbfLcMsRun(rafFilePath);
-           // var spec = rafRun.GetSpectrum(54531);
+            // var spec = rafRun.GetSpectrum(54531);
             var scanNum = rafRun.GetNextScanNum(54530, 1);
             Console.WriteLine(scanNum);
         }

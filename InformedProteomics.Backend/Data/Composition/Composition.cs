@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.Data.Composition
     /// <summary>
     /// Composition, consisting of elements C, H, N, O, S, or P, and optionally additional elements
     /// </summary>
-    public class Composition: AbstractComposition
+    public class Composition : AbstractComposition
     {
         // Ignore Spelling: readonly, UniMod
 

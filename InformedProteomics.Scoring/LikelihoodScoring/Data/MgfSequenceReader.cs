@@ -6,7 +6,7 @@ using InformedProteomics.Backend.Data.Sequence;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
-    public class MgfSequenceReader: ISequenceReader
+    public class MgfSequenceReader : ISequenceReader
     {
         private static readonly Dictionary<string, Tuple<AminoAcid, List<Modification>>> Modifications;
 
@@ -34,7 +34,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         private static void AddModification(string modMass, char residue, Modification modType)
         {
             var aminoAcid = StandardAminoAcidSet.GetAminoAcid(residue);
-            var modList = new Tuple<AminoAcid, List<Modification>>(aminoAcid, new List<Modification> {modType});
+            var modList = new Tuple<AminoAcid, List<Modification>>(aminoAcid, new List<Modification> { modType });
             Modifications.Add(modMass, modList);
         }
 
@@ -49,7 +49,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         {
             const string aminoAcidRegex = "[" + AminoAcid.StandardAminoAcidCharacters + "]";
             const string massRegex = @"\(\d+\.\d+\(";
-            char[] parens = {'(', ')'};
+            char[] parens = { '(', ')' };
 
             if (!Regex.IsMatch(sequence, "(" + aminoAcidRegex + "|" + massRegex + ")+"))
             {
@@ -100,7 +100,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
                         throw new Exception("Unrecognized modification mass: " + element);
                     }
 
-//                    if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modification mass: " + element);
+                    //                    if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modification mass: " + element);
                     aa = modAa;
                     mods.AddRange(modList);
                     //                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.AveragineMass);

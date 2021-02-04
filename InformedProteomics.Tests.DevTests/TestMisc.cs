@@ -41,7 +41,7 @@ namespace InformedProteomics.Tests.DevTests
                 var sample = fileName.Substring(0, 2);
                 Console.WriteLine("Processing {0}", sample);
 
-                var outputFilePath = Path.Combine(henryResultPath,  "ID_" + sample + ".tsv");
+                var outputFilePath = Path.Combine(henryResultPath, "ID_" + sample + ".tsv");
                 Console.WriteLine("Writing to {0}", outputFilePath);
                 using (var writer = new StreamWriter(outputFilePath))
                 {
@@ -122,12 +122,12 @@ namespace InformedProteomics.Tests.DevTests
                 var charges = skylineTable.GetData("Precursor Charge").Select(c => Convert.ToInt32(c)).ToArray();
                 var precursorMzs = skylineTable.GetData("Precursor Mz").Select(Convert.ToDouble).ToArray();
 
-                writer.WriteLine("{0}\tProbability\tQValue", string.Join("\t", skylineTable.GetHeaders().Take(skylineTable.GetHeaders().Count-2)));
+                writer.WriteLine("{0}\tProbability\tQValue", string.Join("\t", skylineTable.GetHeaders().Take(skylineTable.GetHeaders().Count - 2)));
                 for (var i = 0; i < skylineTable.NumData; i++)
                 {
                     var precursorMz = precursorMzs[i];
                     var charge = charges[i];
-                    var nominalMass = (int)Math.Round(((precursorMz - Constants.Proton)*charge - Composition.H2O.Mass)*
+                    var nominalMass = (int)Math.Round(((precursorMz - Constants.Proton) * charge - Composition.H2O.Mass) *
                                       Constants.RescalingConstant);
                     var pepKey = peptides[i] + ":" + nominalMass;
                     if (!pepKeySet.Contains(pepKey))
@@ -145,13 +145,13 @@ namespace InformedProteomics.Tests.DevTests
                     var skylineData = skylineTable.GetRows()[i].Split(',');
                     for (var j = 0; j < skylineData.Length - 2; j++)
                     {
-                        if(j != 2)
+                        if (j != 2)
                         {
-                            writer.Write(skylineData[j]+"\t");
+                            writer.Write(skylineData[j] + "\t");
                         }
                         else
                         {
-                            writer.Write("" + skylineData[j][0] + skylineData[j][2]+"\t");
+                            writer.Write("" + skylineData[j][0] + skylineData[j][2] + "\t");
                         }
                     }
                     writer.WriteLine("{0}\t{1}",
@@ -193,7 +193,7 @@ namespace InformedProteomics.Tests.DevTests
         private string GetPeptide(string henryPeptide)
         {
             var buf = new StringBuilder();
-            foreach(var c in henryPeptide)
+            foreach (var c in henryPeptide)
             {
                 if (char.IsUpper(c))
                 {

@@ -21,20 +21,20 @@ namespace InformedProteomics.FeatureFinding.Scoring
             _maxBinNum = _windowComparer.GetBinNumber(peaks[peaks.Length - 1].Mz);
             var numberOfBins = _maxBinNum - _minBinNum + 1;
 
-            _peakStartIndex     = new int[2][];
-            _peakRanking        = new int[2][][];
-            var intensities     = new List<double>[2][];
+            _peakStartIndex = new int[2][];
+            _peakRanking = new int[2][][];
+            var intensities = new List<double>[2][];
 
             for (var i = 0; i < 2; i++)
             {
-                _peakStartIndex[i]  = new int[numberOfBins];
-                _peakRanking[i]     = new int[numberOfBins][];
-                intensities[i]      = new List<double>[numberOfBins];
+                _peakStartIndex[i] = new int[numberOfBins];
+                _peakRanking[i] = new int[numberOfBins][];
+                intensities[i] = new List<double>[numberOfBins];
 
                 for (var j = 0; j < numberOfBins; j++)
                 {
-                    _peakStartIndex[i][j]   = peaks.Length - 1;
-                    intensities[i][j]       = new List<double>();
+                    _peakStartIndex[i][j] = peaks.Length - 1;
+                    intensities[i][j] = new List<double>();
                 }
             }
 
@@ -249,7 +249,7 @@ namespace InformedProteomics.FeatureFinding.Scoring
         {
             var index = Enumerable.Range(0, values.Length).ToArray();
             Array.Sort(values, index);
-            medianValue = values[values.Length/2];
+            medianValue = values[values.Length / 2];
 
             var ranking = 1;
             var rankingList = new int[index.Length];

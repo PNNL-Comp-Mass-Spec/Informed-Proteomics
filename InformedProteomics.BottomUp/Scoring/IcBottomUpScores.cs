@@ -14,7 +14,7 @@
         /// <inheritdoc />
         public override string ToString()
         {
-            return Score+"\t"+Modifications;
+            return Score + "\t" + Modifications;
         }
     }
 }

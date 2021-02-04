@@ -256,7 +256,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             var precursorIon = new Ion(aaSet.GetComposition(peptide) + Composition.H2O, charge);
 
             Console.WriteLine("Theoretical isotopomer profile:");
-            foreach(var p in precursorIon.GetIsotopes(0.1))
+            foreach (var p in precursorIon.GetIsotopes(0.1))
             {
                 Console.WriteLine("{0}\t{1}", precursorIon.GetIsotopeMz(p.Index), p.Ratio);
             }
@@ -273,7 +273,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                 Console.WriteLine("\nIndex: {0}", i);
                 Console.WriteLine("m/z: {0}", precursorIon.GetIsotopeMz(i));
                 Console.WriteLine("#XicPeaks: {0}", xicArr[i].Count);
-                Console.WriteLine("Intensity: {0}", xicArr[i].GetSumIntensities()/xicArr[basePeakIndex].GetSumIntensities());
+                Console.WriteLine("Intensity: {0}", xicArr[i].GetSumIntensities() / xicArr[basePeakIndex].GetSumIntensities());
                 Console.WriteLine("Correlation: {0}", xicArr[i].GetCorrelation(xicArr[basePeakIndex]));
             }
         }
@@ -308,7 +308,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             var numDecoys = 0;
             var numValidDecoys = 0;
 
-            foreach(var line in File.ReadLines(resultFilePath))
+            foreach (var line in File.ReadLines(resultFilePath))
             {
                 if (line.StartsWith("#"))
                 {
@@ -404,7 +404,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                 //Console.WriteLine("{0}\t{1}\t{2}", peptide, scanNum, charge);
             }
             Console.WriteLine("#Targets: {0}", numTargets);
-            Console.WriteLine("#ValidTargets: {0}\t{1}", numValidTargets, numValidTargets/(double)numTargets);
+            Console.WriteLine("#ValidTargets: {0}\t{1}", numValidTargets, numValidTargets / (double)numTargets);
             Console.WriteLine("#Decoys: {0}", numDecoys);
             Console.WriteLine("#ValidDecoys: {0}\t{1}", numValidDecoys, numValidDecoys / (double)numDecoys);
 
@@ -470,12 +470,12 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
                 Console.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", isDecoy ? 1 : 0, peptide, scanNum, charge, specEValue, qValue, precursorIon.GetMonoIsotopicMz());
 
-                var isotopeIndices = new double[] {0, 1, 2, 3, -1, 0.5};
+                var isotopeIndices = new double[] { 0, 1, 2, 3, -1, 0.5 };
                 var theoIsotopes = precursorIon.GetIsotopes(0.01);
                 var numIsotopes = 0;
                 foreach (var theoIsotope in theoIsotopes)
                 {
-                   Console.Write("\t"+theoIsotope.Ratio);
+                    Console.Write("\t" + theoIsotope.Ratio);
                     if (++numIsotopes == 4)
                     {
                         break;

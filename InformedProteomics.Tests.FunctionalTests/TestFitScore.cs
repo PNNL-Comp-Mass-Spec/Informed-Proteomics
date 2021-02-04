@@ -44,7 +44,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             Assert.True(proteinComp.NominalMass == 23461);
 
             var ion = new Ion(proteinComp, 20);
-//            ion.Composition.ComputeApproximateIsotopomerEnvelop();
+            //            ion.Composition.ComputeApproximateIsotopomerEnvelop();
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
             Console.WriteLine("MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
 

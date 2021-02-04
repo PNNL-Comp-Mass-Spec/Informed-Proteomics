@@ -110,7 +110,7 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public double CoElutionNetLength(LcMsFeature other)
         {
-            if (other.MaxNet >= MinNet && other.MaxNet<= MaxNet)
+            if (other.MaxNet >= MinNet && other.MaxNet <= MaxNet)
             {
                 return other.MaxNet - Math.Max(MinNet, other.MinNet);
             }

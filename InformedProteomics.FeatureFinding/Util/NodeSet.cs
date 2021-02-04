@@ -75,5 +75,5 @@ namespace InformedProteomics.FeatureFinding.Util
         }
 
         private LinkedList<int>[] _adjList;
-     }
+    }
 }

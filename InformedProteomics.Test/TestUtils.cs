@@ -731,9 +731,9 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [TestCase(149, 244, 44, 57, 0, 0, true, 14, 6, 262.99008,  0.74258)]
-        [TestCase(83, 136, 22, 24, 1, 0, false, 14, 4, 135.15031,  0.26262)]
-        [TestCase(210, 323, 54, 61, 0, 0, false, 14, 8, 329.46470 , 0.92816)]
+        [TestCase(149, 244, 44, 57, 0, 0, true, 14, 6, 262.99008, 0.74258)]
+        [TestCase(83, 136, 22, 24, 1, 0, false, 14, 4, 135.15031, 0.26262)]
+        [TestCase(210, 323, 54, 61, 0, 0, false, 14, 8, 329.46470, 0.92816)]
         [TestCase(419, 699, 119, 129, 1, 0, false, 8, 12, 1190.4038, 0.62797)]
         [TestCase(419, 699, 119, 129, 1, 0, false, 14, 12, 680.66243, 0.62797)]
         public void TestIsotopemerProfile(
@@ -839,7 +839,7 @@ namespace InformedProteomics.Test
             Array.Sort(index, (i, j) => isotopes[j].CompareTo(isotopes[i]));
 
             var lastIntensity = double.MaxValue;
-            var expectedIndexOrder = new List<int> {1, 0, 2, 3};
+            var expectedIndexOrder = new List<int> { 1, 0, 2, 3 };
 
             Console.WriteLine("{0}\t{1}", "#", "Intensity");
             for (var i = 0; i < isotopes.Length; i++)

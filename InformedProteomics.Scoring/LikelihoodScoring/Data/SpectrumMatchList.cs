@@ -4,15 +4,15 @@ using InformedProteomics.Scoring.LikelihoodScoring.FileReaders;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
-    public class SpectrumMatchList: List<SpectrumMatch>
+    public class SpectrumMatchList : List<SpectrumMatch>
     {
         public int MaxCharge { get; }
         public bool Decoy { get; }
-//        public ActivationMethod Act { get; private set; }
+        //        public ActivationMethod Act { get; private set; }
         public DataFileFormat SequenceFormat { get; }
 
         public SpectrumMatchList(LazyLcMsRun lcms, string tsvFile, DataFileFormat sequenceFormat,
-                                 int maxCharge=0, bool useDecoy=false)
+                                 int maxCharge = 0, bool useDecoy = false)
         {
             Decoy = useDecoy;
             MaxCharge = maxCharge;
@@ -57,7 +57,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             }
         }
 
-        public void FilterSpectra(double windowWidth=100, int retentionCount=6)
+        public void FilterSpectra(double windowWidth = 100, int retentionCount = 6)
         {
             var filteredList = new SpectrumMatchList();
             foreach (var match in this)
@@ -73,8 +73,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         {
             var chargeMatchList = new SpectrumMatchList();
             chargeMatchList.AddRange(from i in this
-                    where i.PrecursorCharge == charge
-                    select i);
+                                     where i.PrecursorCharge == charge
+                                     select i);
             return chargeMatchList;
         }
     }

@@ -92,7 +92,8 @@ namespace InformedProteomics.Tests.FunctionalTests
                     if (compIndex < 5 || compIndex >= compositions.Count - 5)
                     {
                         Console.WriteLine("  Seq: {0}, Frag: {1}", seqComposition, composition);
-                    } else if (compIndex == 5)
+                    }
+                    else if (compIndex == 5)
                     {
                         Console.WriteLine("  ...");
                     }
@@ -373,8 +374,8 @@ namespace InformedProteomics.Tests.FunctionalTests
                 "_.MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG._";
 
             // Histone H3.1
-//            const string annotation =
-//                "_.MARTKQTARKSTGGKAPRKQLATKAARKSAPATGGVKKPHRYRPGTVALREIRRYQKSTELLIRKLPFQRLVREIAQDFKTDLRFQSSAVMALQEACEAYLVGLFEDTNLCAIHAKRVTIMPKDIQLARRIRGERA._";
+            //            const string annotation =
+            //                "_.MARTKQTARKSTGGKAPRKQLATKAARKSAPATGGVKKPHRYRPGTVALREIRRYQKSTELLIRKLPFQRLVREIAQDFKTDLRFQSSAVMALQEACEAYLVGLFEDTNLCAIHAKRVTIMPKDIQLARRIRGERA._";
 
             var acetylR = new SearchModification(Modification.Acetylation, 'R', SequenceLocation.Everywhere, false);
             var acetylK = new SearchModification(Modification.Acetylation, 'K', SequenceLocation.Everywhere, false);

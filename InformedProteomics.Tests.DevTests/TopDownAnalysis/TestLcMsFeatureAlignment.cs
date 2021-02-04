@@ -353,7 +353,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         {
             var runList = new List<LcMsRun>();
 
-            foreach(var rawFile in rawFiles)
+            foreach (var rawFile in rawFiles)
             {
                 runList.Add(new PbfLcMsRun(rawFile));
             }
@@ -374,7 +374,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var minScanNum = -1;
             var maxScanNum = -1;
 
-            for(var i = 1; i < ms1ScanNums.Length; i++)
+            for (var i = 1; i < ms1ScanNums.Length; i++)
             {
                 var time = run.GetElutionTime(ms1ScanNums[i]);
                 if (minScanNum < 0 && time > minTime)

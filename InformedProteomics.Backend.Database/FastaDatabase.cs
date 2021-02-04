@@ -647,7 +647,7 @@ namespace InformedProteomics.Backend.Database
                 {
                     var name = reader.ProteinName;
                     var description = reader.ProteinDescription;
-                    var sequence = (char) FastaDatabaseConstants.Delimiter + reader.ProteinSequence;
+                    var sequence = (char)FastaDatabaseConstants.Delimiter + reader.ProteinSequence;
                     var length = sequence.Length;
 
                     var proteinInfoCurrent = new ProteinHashInfo(sequence);
@@ -679,7 +679,7 @@ namespace InformedProteomics.Backend.Database
                     offset += sequence.Length;
                 }
 
-                seqWriter.Write((char) FastaDatabaseConstants.Delimiter);
+                seqWriter.Write((char)FastaDatabaseConstants.Delimiter);
 
                 // write file format Id
                 seqWriter.Write(FileFormatId);
@@ -714,7 +714,7 @@ namespace InformedProteomics.Backend.Database
             _descriptions = new Dictionary<long, string>();
             _nameToOffset = new Dictionary<string, long>();
 
-            _duplicateNameCounts= new Dictionary<string, int>();
+            _duplicateNameCounts = new Dictionary<string, int>();
 
             using (var reader = new StreamReader(_annoFilePath))
             {

@@ -3,7 +3,7 @@ using InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 {
-    public class FitScoreList: List<FitScore>
+    public class FitScoreList : List<FitScore>
     {
         public FitScoreList(IList<double> intensities, IList<double> scores)
         {

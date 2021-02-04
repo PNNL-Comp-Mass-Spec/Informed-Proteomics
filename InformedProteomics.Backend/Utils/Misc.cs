@@ -58,7 +58,6 @@ namespace InformedProteomics.Backend.Utils
                 var version = new Version(1, 0);
                 return GetBuildDateTextFromVersion(version);
             }
-
         }
 
         /// <summary>

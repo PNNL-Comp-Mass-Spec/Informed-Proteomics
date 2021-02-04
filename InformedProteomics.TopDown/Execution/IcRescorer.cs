@@ -51,13 +51,13 @@ namespace InformedProteomics.TopDown.Execution
                     var token = row.Split('\t');
                     for (var j = 0; j < token.Length; j++)
                     {
-                        if(j != modIndex)
+                        if (j != modIndex)
                         {
-                            writer.Write(token[j]+"\t");
+                            writer.Write(token[j] + "\t");
                         }
                         else
                         {
-                            writer.Write("["+scores.Modifications+"]\t");
+                            writer.Write("[" + scores.Modifications + "]\t");
                         }
                     }
                     writer.WriteLine(scores);

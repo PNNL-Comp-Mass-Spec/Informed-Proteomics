@@ -114,7 +114,7 @@ namespace InformedProteomics.Test
             var scorer = new InformedBottomUpScorer(run, aaSet, 1, 2, new Tolerance(10));
             //var refinedScore = scorer.GetScores(AminoAcid.PeptideNTerm, seqStr, AminoAcid.PeptideCTerm, composition,
             //    charge, ms2ScanNum);
-//            Console.WriteLine("RefinedScores: {0}", refinedScore.Score);
+            //            Console.WriteLine("RefinedScores: {0}", refinedScore.Score);
         }
 
         [Test]
@@ -264,7 +264,7 @@ namespace InformedProteomics.Test
                 }
             }
 
-            Console.WriteLine("Both: {0}, IpaOnly: {1}, Sum: {2}", both, ipaOnly, both+ipaOnly);
+            Console.WriteLine("Both: {0}, IpaOnly: {1}, Sum: {2}", both, ipaOnly, both + ipaOnly);
         }
     }
 }

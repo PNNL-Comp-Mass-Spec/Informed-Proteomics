@@ -136,7 +136,7 @@ namespace InformedProteomics.TopDown.Scoring
 
                 r++;
             }
-            return new Tuple<int, int>(l,r);
+            return new Tuple<int, int>(l, r);
         }
 
         private bool FilterXic(IReadOnlyList<double[]> truncatedXics1, IReadOnlyList<double[]> truncatedXics2)
@@ -148,16 +148,16 @@ namespace InformedProteomics.TopDown.Scoring
 
             var corr = SimpleMath.GetCorrelation(abundantXic1, abundantXic2);
 
-/*            if (corr > 0)
-            {
-                    for (var i = 0; i < abundantXic1.Length; i++)
-                    {
-                        Console.WriteLine("\t" + i + "\t" + abundantXic1[i] + "\t" + abundantXic2[i]);
-                    }
+            /*            if (corr > 0)
+                        {
+                                for (var i = 0; i < abundantXic1.Length; i++)
+                                {
+                                    Console.WriteLine("\t" + i + "\t" + abundantXic1[i] + "\t" + abundantXic2[i]);
+                                }
 
-                    Console.WriteLine(" corr " + corr + "\n__________________\n");
-                }
-            */
+                                Console.WriteLine(" corr " + corr + "\n__________________\n");
+                            }
+                        */
             return corr < threshold;
         }
 
@@ -203,7 +203,7 @@ namespace InformedProteomics.TopDown.Scoring
             }
             //for (var k = 0; k < truncatedXics.Length; k++)
             //{
-             //   Console.WriteLine(k + "\t" + isotopePeaks[k] + "\t" + _isotopeEnvelope[k] + "\t" + apexIndex);
+            //   Console.WriteLine(k + "\t" + isotopePeaks[k] + "\t" + _isotopeEnvelope[k] + "\t" + apexIndex);
             //}
 
             var isotopeCorr = SimpleMath.GetCorrelation(isotopePeaks, _isotopeEnvelope);
@@ -218,7 +218,7 @@ namespace InformedProteomics.TopDown.Scoring
             var score = -2;
             for (; score < 10; score++)
             {
-                if (m <= - corr + 1)
+                if (m <= -corr + 1)
                 {
                     break;
                 }
@@ -248,8 +248,8 @@ namespace InformedProteomics.TopDown.Scoring
                             //.WriteLine(j + " " + truncatedXics[charge - MinCharge][charge2 - MinCharge][i].Length + " " + _smoothedXicArray[charge2 - MinCharge][i].Length);
                             truncatedXics[charge - MinCharge][charge2 - MinCharge][i][j - scanNumberRange.Item1] =
                                 _smoothedXicArray[charge2 - MinCharge][i][j];
-                          //  if(charge == 15 && i == _maxIntensityIsotopeIndex - _minIsotopeIndex)
-                          //      Console.WriteLine(charge2 + "\t" + i + "\t" + j + "\t" + _smoothedXicArray[charge2 - MinCharge][i][j]);
+                            //  if(charge == 15 && i == _maxIntensityIsotopeIndex - _minIsotopeIndex)
+                            //      Console.WriteLine(charge2 + "\t" + i + "\t" + j + "\t" + _smoothedXicArray[charge2 - MinCharge][i][j]);
                         }
                     }
                 }
@@ -386,11 +386,11 @@ namespace InformedProteomics.TopDown.Scoring
                     smoothedXicArray[i][j] = s;
                 }
             }
-           // System.Environment.Exit(1);
-           //  for (var i = 0; i < smoothedXicArray[15 - MinCharge][_maxIntensityIsotopeIndex-_minIsotopeIndex].Length; i++ )
-           // {
-           //    Console.WriteLine(i + "\t" + smoothedXicArray[15 - MinCharge][_maxIntensityIsotopeIndex - _minIsotopeIndex][i] + "\t" + _xicArray[15 - MinCharge][_maxIntensityIsotopeIndex - _minIsotopeIndex][i]);
-           // }
+            // System.Environment.Exit(1);
+            //  for (var i = 0; i < smoothedXicArray[15 - MinCharge][_maxIntensityIsotopeIndex-_minIsotopeIndex].Length; i++ )
+            // {
+            //    Console.WriteLine(i + "\t" + smoothedXicArray[15 - MinCharge][_maxIntensityIsotopeIndex - _minIsotopeIndex][i] + "\t" + _xicArray[15 - MinCharge][_maxIntensityIsotopeIndex - _minIsotopeIndex][i]);
+            // }
             return smoothedXicArray;
         }
 
@@ -400,12 +400,12 @@ namespace InformedProteomics.TopDown.Scoring
             var i = 0;
             foreach (var scanNumber in _run.GetScanNumbers(1))
             {
-               // Console.WriteLine(scanNumber + " " + i);
+                // Console.WriteLine(scanNumber + " " + i);
                 scanNumberIndex[scanNumber] = i++;
             }
 
             var xicArray = new double[MaxCharge - MinCharge + 1][][];
-           // Console.WriteLine("***");
+            // Console.WriteLine("***");
             for (var charge = MinCharge; charge <= MaxCharge; charge++)
             {
                 var xicArrayForThisCharge = new double[_isotopeEnvelope.Length][];
@@ -416,7 +416,7 @@ namespace InformedProteomics.TopDown.Scoring
 
                 var precursorIon = new Ion(_proteinCompositionPlusWater, charge);
 
-               // Console.Write("precursorCharge " + charge);
+                // Console.Write("precursorCharge " + charge);
 
                 for (var k = 0; k < xicArrayForThisCharge.Length; k++)
                 {
@@ -427,10 +427,10 @@ namespace InformedProteomics.TopDown.Scoring
 
                     foreach (var xicPeak in xic)
                     {
-                       // Console.WriteLine(xicPeak.MostAbundantIsotopeMz);
+                        // Console.WriteLine(xicPeak.MostAbundantIsotopeMz);
                         xicArrayForThisCharge[k][scanNumberIndex[xicPeak.ScanNum]] = xicPeak.Intensity;
-                       // if (k == _maxIntensityIsotopeIndex-_minIsotopeIndex)
-                     //       Console.WriteLine(charge + "\t" + xicPeak.MostAbundantIsotopeMz + "\t" + xicPeak.Intensity + "\t" + scanNumberIndex[xicPeak.MostAbundantIsotopeMz]);
+                        // if (k == _maxIntensityIsotopeIndex-_minIsotopeIndex)
+                        //       Console.WriteLine(charge + "\t" + xicPeak.MostAbundantIsotopeMz + "\t" + xicPeak.Intensity + "\t" + scanNumberIndex[xicPeak.MostAbundantIsotopeMz]);
                         //if(k == 0 && charge == 13) Console.WriteLine(xicPeak.MostAbundantIsotopeMz + " " + xicPeak.Intensity);
                     }
                     //  Console.WriteLine();

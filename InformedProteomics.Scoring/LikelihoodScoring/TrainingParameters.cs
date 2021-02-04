@@ -39,7 +39,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         /// </summary>
         /// <param name="fileName">Name of the training parameter file.</param>
         /// <param name="config">Configuration data read from configuration file. Optional.</param>
-        public TrainingParameters(string fileName, TrainerConfiguration config=null)
+        public TrainingParameters(string fileName, TrainerConfiguration config = null)
         {
             _charges = new HashSet<int>();
             _massSorter = new Dictionary<int, Histogram<double>>();
@@ -137,13 +137,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             {
                 foreach (var charge in _charges)
                 {
-                    file.WriteLine("Charge\t"+charge);
+                    file.WriteLine("Charge\t" + charge);
                     file.Write("BinSize\t");
                     var massBins = _massSorter[charge].Bins;
                     for (var i = 0; i < _massBins[charge]; i++)
                     {
                         file.Write(massBins[i].Count);
-                        if (i < _massBins[charge]-1)
+                        if (i < _massBins[charge] - 1)
                         {
                             file.Write("\t");
                         }
@@ -153,12 +153,12 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     {
                         file.Write("BinEdges\t{0}", _massSorter[charge].BinEdges[i]);
                         var max = double.PositiveInfinity;
-                        if (i < _massBins[charge]-1)
+                        if (i < _massBins[charge] - 1)
                         {
-                            max = _massSorter[charge].BinEdges[i+1];
+                            max = _massSorter[charge].BinEdges[i + 1];
                         }
 
-                        file.Write("\t"+max);
+                        file.Write("\t" + max);
                         file.WriteLine();
                         var ionTypes = _ionProbabilities[charge][i].SelectIonTypes(Config.SelectedIonThreshold);
                         file.WriteLine("RankProbabilities");
@@ -318,10 +318,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 if (chargeTableSize < Config.MassBinSize)
                 {
                     continue;
-//                    throw new Exception("Fewer than "+Config.MassBinSize+" items in charge "+charge+" data set.");
+                    //                    throw new Exception("Fewer than "+Config.MassBinSize+" items in charge "+charge+" data set.");
                 }
                 validCharges.Add(charge);
-                _massBins.Add(charge, chargeTableSize/Config.MassBinSize);
+                _massBins.Add(charge, chargeTableSize / Config.MassBinSize);
                 _massSorter[charge].Equalize(_massBins[charge], 0);
                 var binCount = _massSorter[charge].BinEdges.Length;
                 for (var i = 0; i < binCount; i++)

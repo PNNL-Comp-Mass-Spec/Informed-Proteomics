@@ -186,7 +186,7 @@ namespace InformedProteomics.Backend.MathAndStats
 
             for (var i = 1; i < n; i++)
             {
-                cPrime[i] = C[i] / (B[i] - cPrime[i-1] * A[i]);
+                cPrime[i] = C[i] / (B[i] - cPrime[i - 1] * A[i]);
             }
 
             // dPrime
@@ -195,14 +195,14 @@ namespace InformedProteomics.Backend.MathAndStats
 
             for (var i = 1; i < n; i++)
             {
-                dPrime[i] = (d[i] - dPrime[i-1]*A[i]) / (B[i] - cPrime[i - 1] * A[i]);
+                dPrime[i] = (d[i] - dPrime[i - 1] * A[i]) / (B[i] - cPrime[i - 1] * A[i]);
             }
 
             // Back substitution
             var x = new float[n];
             x[n - 1] = dPrime[n - 1];
 
-            for (var i = n-2; i >= 0; i--)
+            for (var i = n - 2; i >= 0; i--)
             {
                 x[i] = dPrime[i] - cPrime[i] * x[i + 1];
             }

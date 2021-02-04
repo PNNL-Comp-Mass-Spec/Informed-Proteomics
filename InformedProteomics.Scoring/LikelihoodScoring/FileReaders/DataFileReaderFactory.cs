@@ -10,7 +10,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
     };
     public static class DataFileReaderFactory
     {
-        public static IDataFileReader Create(DataFileFormat format, string annotations, bool decoy, LazyLcMsRun lcms=null)
+        public static IDataFileReader Create(DataFileFormat format, string annotations, bool decoy, LazyLcMsRun lcms = null)
         {
             IDataFileReader reader;
             switch (format)
