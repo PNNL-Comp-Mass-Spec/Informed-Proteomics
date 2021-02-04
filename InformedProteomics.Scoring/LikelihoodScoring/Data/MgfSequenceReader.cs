@@ -47,7 +47,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
 
         public Sequence GetSequence(string sequence)
         {
-            const string aminoAcidRegex = @"[" + AminoAcid.StandardAminoAcidCharacters + "]";
+            const string aminoAcidRegex = "[" + AminoAcid.StandardAminoAcidCharacters + "]";
             const string massRegex = @"\(\d+\.\d+\(";
             char[] parens = {'(', ')'};
 

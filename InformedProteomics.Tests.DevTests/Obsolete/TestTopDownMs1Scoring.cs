@@ -50,7 +50,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
             sw.Stop();
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             // Configure amino acid set
             //            var pyroGluQ = new SearchModification(Modification.PyroGluQ, 'Q', SequenceLocation.ProteinNTerm, false);
@@ -129,7 +129,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             Console.WriteLine("NumProteins: {0}", numProteins);
             Console.WriteLine("NumProteinCompositions: {0}", totalProtCompositions);
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Ignore("File Missing, test obsolete, or long test")]

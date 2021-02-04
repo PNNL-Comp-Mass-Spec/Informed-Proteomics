@@ -115,9 +115,9 @@ namespace MSPathFinder
         {
             if (!string.IsNullOrWhiteSpace(errorMessage))
             {
-                Console.WriteLine(@"----------------------------------------------------------");
-                Console.WriteLine(@"Error: " + errorMessage);
-                Console.WriteLine(@"----------------------------------------------------------");
+                Console.WriteLine("----------------------------------------------------------");
+                Console.WriteLine("Error: " + errorMessage);
+                Console.WriteLine("----------------------------------------------------------");
                 Console.WriteLine();
             }
 

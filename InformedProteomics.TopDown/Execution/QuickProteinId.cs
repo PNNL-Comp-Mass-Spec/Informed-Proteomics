@@ -77,7 +77,7 @@ namespace InformedProteomics.TopDown.Execution
                 }
             }
             sw.Stop();
-            Console.WriteLine(@"{0:f1} sec.", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f1} sec.", sw.Elapsed.TotalSeconds);
 
             sw.Reset();
             sw.Start();
@@ -94,7 +94,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 if (++numProteins % 10 == 0)
                 {
-                    Console.WriteLine(@"Processing, {0} proteins done, {1:f1} sec elapsed",
+                    Console.WriteLine("Processing, {0} proteins done, {1:f1} sec elapsed",
                         numProteins,
                         sw.Elapsed.TotalSeconds);
                 }

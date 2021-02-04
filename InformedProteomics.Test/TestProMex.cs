@@ -49,7 +49,7 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(idFileFolder))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
             }
 
             foreach (var dataset in TrainSetFileLists)
@@ -71,7 +71,7 @@ namespace InformedProteomics.Test
 
                     if (!File.Exists(idFile))
                     {
-                        Console.WriteLine(@"Skipping file since not found: " + idFile);
+                        Console.WriteLine("Skipping file since not found: " + idFile);
                         continue;
                     }
                 }
@@ -119,7 +119,7 @@ namespace InformedProteomics.Test
             const string idFileFolder = @"D:\MassSpecFiles\training\FilteredIdResult";
             if (!Directory.Exists(idFileFolder))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
             }
 
             var tolerance = new Tolerance(10);
@@ -134,12 +134,12 @@ namespace InformedProteomics.Test
 
                 if (!File.Exists(dataset))
                 {
-                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", dataset);
+                    Console.WriteLine("Warning: Skipping since file not found: {0}", dataset);
                     continue;
                 }
                 if (!File.Exists(filtedIdResultFile))
                 {
-                    Console.WriteLine(@"Warning: Skipping since file not found: {0}", filtedIdResultFile);
+                    Console.WriteLine("Warning: Skipping since file not found: {0}", filtedIdResultFile);
                     continue;
                 }
 
@@ -350,13 +350,13 @@ namespace InformedProteomics.Test
             var testRawFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\Lewy_intact_01.pbf");
             if (!File.Exists(testRawFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, testRawFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, testRawFile);
             }
 
             var testResultFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\TestOutput\Lewy_intact_01_IcTda.tsv");
             if (!File.Exists(testResultFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, testResultFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, testResultFile);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(testRawFile);
@@ -563,13 +563,13 @@ namespace InformedProteomics.Test
             const string specFilePath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\QC_ShewIntact_1_19Jun15_Bane_14-09-01RZ.pbf";
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             var outFolderPath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "Output");
             if (!Directory.Exists(outFolderPath))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, outFolderPath);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, outFolderPath);
             }
 
             //const string specFilePath = @"D:\MassSpecFiles\test\QC_Shew_Intact_4_01Jan15_Bane_C2-14-08-02RZ.raw";
@@ -692,7 +692,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFile);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFile);

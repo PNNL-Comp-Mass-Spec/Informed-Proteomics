@@ -263,11 +263,11 @@ namespace InformedProteomics.Tests.UnitTests
             double thresholdScientific = 0.001)
         {
             var result = StringUtilities.DblToString(value, digitsAfterDecimal, limitDecimalsForLargeValues, thresholdScientific);
-            Console.Write(@"{0,20}, digits={1,2}: {2,-8}", value, digitsAfterDecimal, result);
+            Console.Write("{0,20}, digits={1,2}: {2,-8}", value, digitsAfterDecimal, result);
 
             if (limitDecimalsForLargeValues)
             {
-                Console.WriteLine(@" (limitDecimals=True)");
+                Console.WriteLine(" (limitDecimals=True)");
             }
             else
             {

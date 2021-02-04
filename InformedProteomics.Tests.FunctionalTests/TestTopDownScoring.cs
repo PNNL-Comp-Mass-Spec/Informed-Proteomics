@@ -43,7 +43,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
@@ -146,7 +146,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             sw.Stop();
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -206,7 +206,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             sw.Stop();
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -228,7 +228,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath, 0, 0);
@@ -242,7 +242,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             sw.Stop();
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -381,7 +381,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var fdrCalculator = new FdrCalculator(targetResultPath, decoyResultPath);
             if (fdrCalculator.HasError())
             {
-                throw new Exception(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
+                throw new Exception("Error computing FDR: " + fdrCalculator.ErrorMessage);
             }
 
             fdrCalculator.WriteTo(tdaResultPath);

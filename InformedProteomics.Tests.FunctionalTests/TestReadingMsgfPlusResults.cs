@@ -22,7 +22,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var filePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "MSGFPlusResultTMT10.tsv");
             if (!File.Exists(filePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, filePath);
             }
 
             var parser = new TsvFileParser(filePath);

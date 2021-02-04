@@ -84,7 +84,7 @@ namespace InformedProteomics.Test
                 }
             }
             sw.Stop();
-            Console.WriteLine(@"{0:f4} sec.", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec.", sw.Elapsed.TotalSeconds);
 
             sw.Reset();
             sw.Start();

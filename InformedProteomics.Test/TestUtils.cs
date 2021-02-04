@@ -34,7 +34,7 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(rawFileDir))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since folder not found: " + rawFileDir);
+                Assert.Ignore("Skipping test " + methodName + " since folder not found: " + rawFileDir);
             }
 
             foreach (var rawFilePath in Directory.GetFiles(rawFileDir, "*.raw"))
@@ -935,7 +935,7 @@ namespace InformedProteomics.Test
             foreach (var match in matches)
             {
                 var element = match.ToString();
-                var atom = Regex.Match(element, @"[A-Z][a-z]?");
+                var atom = Regex.Match(element, "[A-Z][a-z]?");
                 var num = element.Substring(atom.Index + atom.Length);
                 if (num.Length == 0)
                 {
@@ -1067,7 +1067,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);
@@ -1091,7 +1091,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             // init

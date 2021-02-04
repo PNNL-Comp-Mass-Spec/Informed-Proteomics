@@ -45,13 +45,13 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                 if (!File.Exists(rawFile))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", rawFile);
                     continue;
                 }
 
                 if (!File.Exists(featureFilePath))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", featureFilePath);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", featureFilePath);
                     continue;
                 }
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
@@ -93,19 +93,19 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var dataNames = new string[10];
             for (var i = 0; i < 10; i++)
             {
-                dataNames[i] = string.Format(@"CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i+1);
+                dataNames[i] = string.Format("CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i+1);
                 var featureFilePath = string.Format(@"{0}\{1}_isos.tsv", featureFolder, dataNames[i]);
                 var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataNames[i]);
 
                 if (!File.Exists(rawFile))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", rawFile);
                     continue;
                 }
 
                 if (!File.Exists(featureFilePath))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", featureFilePath);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", featureFilePath);
                     continue;
                 }
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);

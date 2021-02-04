@@ -38,7 +38,7 @@ namespace InformedProteomics.Tests.DevTests
 
             if (!Directory.Exists(rawFolder))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, rawFolder);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, rawFolder);
             }
 
             const int nDataset = 32;
@@ -59,7 +59,7 @@ namespace InformedProteomics.Tests.DevTests
                 var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
                 if (!File.Exists(rawFile))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", rawFile);
                     continue;
                 }
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
@@ -67,7 +67,7 @@ namespace InformedProteomics.Tests.DevTests
                 var path = string.Format(@"{0}\{1}_MSAlign_ResultTable.txt", msAlignResultFolder, dataset[i]);
                 if (!File.Exists(path))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", path);
                     continue;
                 }
 
@@ -241,7 +241,7 @@ namespace InformedProteomics.Tests.DevTests
 
             if (!Directory.Exists(rawFolder))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, rawFolder);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, rawFolder);
             }
 
             const int nDataset =32;
@@ -263,7 +263,7 @@ namespace InformedProteomics.Tests.DevTests
                 var rawFile = string.Format(@"{0}\{1}.pbf", rawFolder, dataset[i]);
                 if (!File.Exists(rawFile))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", rawFile);
                     continue;
                 }
                 var run = PbfLcMsRun.GetLcMsRun(rawFile);
@@ -271,14 +271,14 @@ namespace InformedProteomics.Tests.DevTests
                 var path = string.Format(@"{0}\{1}_MSAlign_ResultTable.txt", msAlignResultFolder, dataset[i]);
                 if (!File.Exists(path))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", path);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", path);
                     continue;
                 }
 
                 var ms1ftPath = string.Format(@"{0}\{1}.ms1ft", promexOutFolder, dataset[i]);
                 if (!File.Exists(ms1ftPath))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1ftPath);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", ms1ftPath);
                     continue;
                 }
 
@@ -578,17 +578,17 @@ namespace InformedProteomics.Tests.DevTests
 
             if (!Directory.Exists(featureDir))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, featureDir);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, featureDir);
             }
 
             if (!Directory.Exists(mspDir))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, mspDir);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, mspDir);
             }
 
             if (!File.Exists(outFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, outFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, outFile);
             }
 
             var dataset = GetDataList(featureDir);
@@ -748,7 +748,7 @@ namespace InformedProteomics.Tests.DevTests
 
             if (!Directory.Exists(featureDir))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, featureDir);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, featureDir);
             }
 
             var fileEntries = Directory.GetFiles(featureDir);

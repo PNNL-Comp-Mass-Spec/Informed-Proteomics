@@ -30,7 +30,7 @@ namespace InformedProteomics.Test
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             const char pre = 'R';
@@ -70,12 +70,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(result1Path))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, result1Path);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, result1Path);
             }
 
             if (!File.Exists(result2Path))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, result2Path);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, result2Path);
             }
 
             const double pepQValueThreshold = 0.01;
@@ -100,7 +100,7 @@ namespace InformedProteomics.Test
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             //const string seqStr = "IAHESDDEKGHAAK";
@@ -128,7 +128,7 @@ namespace InformedProteomics.Test
             const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT1_Rescoring";
             if (!Directory.Exists(resultDir))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, resultDir);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, resultDir);
             }
 
             var concatenated = new List<string>();
@@ -228,7 +228,7 @@ namespace InformedProteomics.Test
             const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT2_03";
             if (!Directory.Exists(resultDir))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, resultDir);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, resultDir);
             }
 
             var targetPeptides = new HashSet<string>();
@@ -244,7 +244,7 @@ namespace InformedProteomics.Test
             const string ipaResultPath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
             if (!File.Exists(ipaResultPath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, methodName);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, methodName);
             }
 
             var parser = new TsvFileParser(ipaResultPath);

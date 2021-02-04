@@ -37,7 +37,7 @@ namespace InformedProteomics.Test
             const string configFilePath = @"C:\Users\wilk011\Documents\DataFiles\OffsetFreqConfig.ini";
             if (!File.Exists(configFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, configFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, configFilePath);
             }
 
             InitTest(new ConfigFileReader(configFilePath));
@@ -119,7 +119,7 @@ namespace InformedProteomics.Test
             const string configFilePath = @"C:\Users\wilk011\Documents\DataFiles\PrecursorOffsetFreqConfig.ini";
             if (!File.Exists(configFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, configFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, configFilePath);
             }
 
             InitTest(new ConfigFileReader(configFilePath));

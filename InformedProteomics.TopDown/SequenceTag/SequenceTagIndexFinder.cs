@@ -218,7 +218,7 @@ namespace InformedProteomics.TopDown.SequenceTag
         private string FindLongestSubstring(int[] booleanSequence)
         {
             var sequenceString = string.Concat(booleanSequence);
-            var regex = new Regex(@"[1]+");
+            var regex = new Regex("[1]+");
             var matches = regex.Matches(sequenceString);
             var largestSubstring = string.Empty;
             foreach (Match m in matches)

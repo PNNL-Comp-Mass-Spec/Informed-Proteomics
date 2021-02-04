@@ -34,7 +34,7 @@ namespace InformedProteomics.Tests.UnitTests
             Console.WriteLine("Protein indices: {0}", string.Join(",", searchableDb.FindAllMatchedSequenceIndices(pattern).Select(i => db.GetOneBasedPositionInProtein(i))));
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace InformedProteomics.Tests.UnitTests
 
             Console.WriteLine("Peptide count: {0}", numPeptides);
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace InformedProteomics.Tests.UnitTests
 
             Console.WriteLine("Peptide count: {0}", numPeptides);
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace InformedProteomics.Tests.UnitTests
             Console.WriteLine("NumPeptides: {0}", numPeptides);
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -240,7 +240,7 @@ namespace InformedProteomics.Tests.UnitTests
             Console.WriteLine("All: {0}", both + nTermOnly + cTermOnly);
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]

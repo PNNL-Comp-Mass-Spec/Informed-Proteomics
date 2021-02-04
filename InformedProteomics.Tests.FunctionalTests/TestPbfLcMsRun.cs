@@ -27,24 +27,24 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
             }
 
             var outputFilePath = PbfLcMsRun.GetPbfFileName(TestRawFilePath);
             if (File.Exists(outputFilePath))
             {
-                Console.WriteLine(@"Deleting existing file...");
+                Console.WriteLine("Deleting existing file...");
                 File.Delete(outputFilePath);
             }
 
-            Console.WriteLine(@"Writing...");
+            Console.WriteLine("Writing...");
             var sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
 
             var pbf = new PbfLcMsRun(TestRawFilePath, null, outputFilePath);
 
-            Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var pbfFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf");
             if (!File.Exists(pbfFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
             }
 
             var pbfRun = new PbfLcMsRun(pbfFilePath);
@@ -67,15 +67,15 @@ namespace InformedProteomics.Tests.FunctionalTests
             var specFilePath = Path.ChangeExtension(pbfFilePath, "raw");
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
-            Console.WriteLine(@"Loading .pbf into memory");
+            Console.WriteLine("Loading .pbf into memory");
 
             //var run = InMemoryLcMsRun.GetLcMsRun(specFilePath);
             var run = new InMemoryLcMsRun(MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath), 0, 0);
 
-            Console.WriteLine(@"Comparing spectra between .pbf and in-memory spectra");
+            Console.WriteLine("Comparing spectra between .pbf and in-memory spectra");
 
             // spectrum comparison
             //for (var scanNum = run.MinLcScan; scanNum <= run.MaxLcScan; scanNum++)
@@ -97,7 +97,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                 }
             }
 
-            Console.WriteLine(@"Comparing XICs");
+            Console.WriteLine("Comparing XICs");
             // chromatogram comparison
             const double targetMz = 655.01;
             var tolerance = new Tolerance(10);
@@ -109,11 +109,11 @@ namespace InformedProteomics.Tests.FunctionalTests
             {
                 if (!xic1[i].Equals(xic2[i]))
                 {
-                    Console.WriteLine(@"{0} {1} {2}", i, xic1[i], xic2[i]);
+                    Console.WriteLine("{0} {1} {2}", i, xic1[i], xic2[i]);
                 }
                 Assert.True(xic1[i].Equals(xic2[i]));
             }
-            Console.WriteLine(@"Done");
+            Console.WriteLine("Done");
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
                 if (!File.Exists(srcFile))
                 {
-                    Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, srcFile);
+                    Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, srcFile);
                 }
 
                 //var destFile = string.Format(@"D:\MassSpecFiles\Lewy\Lewy_intact_{0}.ms1ft", id);
@@ -175,12 +175,12 @@ namespace InformedProteomics.Tests.FunctionalTests
             var pbfFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf");
             if (!File.Exists(pbfFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, pbfFilePath);
             }
 
             var pbfRun = new PbfLcMsRun(pbfFilePath);
 
-            Console.WriteLine(@"Chromatogram");
+            Console.WriteLine("Chromatogram");
             // chromatogram comparison
             const double targetMz = 655.01;
             var tolerance = new Tolerance(10);
@@ -189,7 +189,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const int MAX_POINTS = 50;
             xic.Display(MAX_POINTS);
 
-            Console.WriteLine(@"Done");
+            Console.WriteLine("Done");
         }
 
         [Test]
@@ -202,7 +202,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
             if (!File.Exists(rafFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rafFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rafFilePath);
             }
 
             var rafRun = new PbfLcMsRun(rafFilePath);
@@ -212,7 +212,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const string dbFile = @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             if (!File.Exists(dbFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, dbFile);
             }
 
             var db = new FastaDatabase(dbFile);
@@ -250,7 +250,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             }
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -262,7 +262,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath);
@@ -271,7 +271,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             if (!File.Exists(rafFilePath))
             {
-                Assert.Ignore(@"Skipping raf portion of test {0} since file not found: {1}", methodName, rafFilePath);
+                Assert.Ignore("Skipping raf portion of test {0} since file not found: {1}", methodName, rafFilePath);
             }
 
             var rafRun = new PbfLcMsRun(rafFilePath);
@@ -284,7 +284,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var xic2 = rafRun.GetFullProductExtractedIonChromatogram(productIonMz, tolerance, precursorIonMz);
 //            xic2.Display();
             Assert.True(xic1.Equals(xic2));
-            Console.WriteLine(@"Done");
+            Console.WriteLine("Done");
         }
 
         [Test]
@@ -296,7 +296,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(TestRawFilePath);
@@ -305,7 +305,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             if (!File.Exists(rafFilePath))
             {
-                Assert.Ignore(@"Skipping raf portion of test {0} since file not found: {1}", methodName, rafFilePath);
+                Assert.Ignore("Skipping raf portion of test {0} since file not found: {1}", methodName, rafFilePath);
             }
 
             var rafRun = new PbfLcMsRun(rafFilePath);
@@ -338,7 +338,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             }
             sw.Stop();
 
-            Console.WriteLine(@"Method 1: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Method 1: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             sw.Reset();
             sw.Start();
@@ -352,9 +352,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             }
             sw.Stop();
 
-            Console.WriteLine(@"Method 2: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Method 2: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
-            Console.WriteLine(@"Done");
+            Console.WriteLine("Done");
         }
 
         [Test]
@@ -365,7 +365,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                Assert.Ignore("Skipping test " + methodName + " since file not found: " + TestRawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
@@ -394,13 +394,13 @@ namespace InformedProteomics.Tests.FunctionalTests
 
                 if (++numBinsProcessed % 2500 == 0)
                 {
-                    Console.WriteLine(@"{0,5} / {1,5}, {2:0.00} m/z", numBinsProcessed, maxBinNum - minBinNum + 1, mzStart);
+                    Console.WriteLine("{0,5} / {1,5}, {2:0.00} m/z", numBinsProcessed, maxBinNum - minBinNum + 1, mzStart);
                 }
                 Assert.IsTrue(vec1.Length == ms1Scans.Length);
             }
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -411,7 +411,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + TestRawFilePath);
+                Assert.Ignore("Skipping test " + methodName + " since file not found: " + TestRawFilePath);
             }
 
             var run1 = PbfLcMsRun.GetLcMsRun(TestRawFilePath, 0.0, 0.0);
@@ -423,7 +423,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const double maxMz = 2000.0;    // 2000.0
             var minBinNum = comparer.GetBinNumber(minMz);
             var maxBinNum = comparer.GetBinNumber(maxMz);
-            Console.WriteLine(@"NumBins: " + (maxBinNum - minBinNum));
+            Console.WriteLine("NumBins: " + (maxBinNum - minBinNum));
 
             var warnCount = 0;
 
@@ -470,14 +470,14 @@ namespace InformedProteomics.Tests.FunctionalTests
 
                 if (fractionAgreement < 0.80 && misMatchCount > 2)
                 {
-                    Console.WriteLine(@"{0}/{1} Xic values do not match for bin {2} ({3:0.00} m/z); {4:0.0}% agreement",
+                    Console.WriteLine("{0}/{1} Xic values do not match for bin {2} ({3:0.00} m/z); {4:0.0}% agreement",
                                       misMatchCount, positiveCount, binNum, mzStart, fractionAgreement * 100);
                     warnCount++;
                 }
             }
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
 
             Assert.IsTrue(warnCount < 10, "Too many Xic mismatch warnings: {0}", warnCount);
         }
@@ -492,7 +492,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
             if (!File.Exists(rafFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rafFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rafFilePath);
             }
 
             var rafRun = new PbfLcMsRun(rafFilePath);
@@ -509,7 +509,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(TestRawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, TestRawFilePath);
             }
 
             var args = new[] { "-s", TestRawFilePath };

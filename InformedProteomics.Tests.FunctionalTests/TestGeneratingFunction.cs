@@ -42,7 +42,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!pbfFile.Exists)
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, pbfFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, pbfFile);
             }
 
             const string modStr = "";
@@ -73,7 +73,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var stopwatch = Stopwatch.StartNew();
             var graphFactory = new ProteinScoringGraphFactory(comparer, aaSet);
             stopwatch.Stop();
-            Console.WriteLine(@"edge generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine("edge generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             var stopwatch2 = Stopwatch.StartNew();
 
@@ -91,7 +91,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var scorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, spectrum, tolerance, comparer);
             var graph = graphFactory.CreateScoringGraph(scorer, proteinMass);
             stopwatch.Stop();
-            Console.WriteLine(@"node generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine("node generation elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             stopwatch.Reset();
             stopwatch.Start();
@@ -99,7 +99,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             gf.ComputeGeneratingFunction();
             //gf.ComputeGeneratingFunction(graph);
             stopwatch.Stop();
-            Console.WriteLine(@"computing generation function = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine("computing generation function = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             var scoreDist = gf.GetScoreDistribution();
 
             Console.WriteLine("{0}-{1}", scoreDist.MinScore, scoreDist.MaxScore);
@@ -113,7 +113,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             }
 
             stopwatch2.Stop();
-            Console.WriteLine(@"TOTAL computing generation function = {0:0.000} sec", stopwatch2.ElapsedMilliseconds / 1000.0d);
+            Console.WriteLine("TOTAL computing generation function = {0:0.000} sec", stopwatch2.ElapsedMilliseconds / 1000.0d);
         }
 
         internal class TestMassBin : IMassBinning

@@ -60,12 +60,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // ReSharper disable IdentifierTypo
@@ -132,12 +132,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // ReSharper disable IdentifierTypo
@@ -202,17 +202,17 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             if (!Directory.Exists(outputDir))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, outputDir);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, outputDir);
             }
 
             // ReSharper disable IdentifierTypo
@@ -253,12 +253,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -303,12 +303,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -353,12 +353,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(dbFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dbFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, dbFilePath);
             }
 
             // Configure amino acid set
@@ -475,7 +475,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             const int ms2ScanNum = 19011;
@@ -527,12 +527,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(msAlignResultPath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, msAlignResultPath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, msAlignResultPath);
             }
 
             var tolerance = new Tolerance(10.0);
@@ -558,12 +558,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(icResultPath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, icResultPath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, icResultPath);
             }
 
             var oxM = new SearchModification(Modification.Oxidation, 'M', SequenceLocation.Everywhere, false);

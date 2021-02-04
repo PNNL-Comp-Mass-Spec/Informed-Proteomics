@@ -16,9 +16,9 @@ namespace InformedProteomics.Tests.Base
 
         public const string DEFAULT_SPEC_FILES_FOLDER = DEFAULT_TEST_FILE_FOLDER + @"\SpecFiles";
 
-        private const string MZML_TEST_FILE = @"QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML";
+        private const string MZML_TEST_FILE = "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML";
 
-        private const string PBF_TEST_FILE = @"QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf";
+        private const string PBF_TEST_FILE = "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.pbf";
 
         private const string DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss tt";
 
@@ -276,7 +276,7 @@ namespace InformedProteomics.Tests.Base
 
             if (assertIgnoreIfNotFound)
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", callingMethod, filePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", callingMethod, filePath);
             }
 
             return null;
@@ -310,7 +310,7 @@ namespace InformedProteomics.Tests.Base
 
         private static void ShowMessage(string methodName, string message)
         {
-            Console.WriteLine(DateTime.Now.ToString(DATE_TIME_FORMAT) + @", {0}, {1}", message, methodName);
+            Console.WriteLine(DateTime.Now.ToString(DATE_TIME_FORMAT) + ", {0}, {1}", message, methodName);
         }
     }
 }

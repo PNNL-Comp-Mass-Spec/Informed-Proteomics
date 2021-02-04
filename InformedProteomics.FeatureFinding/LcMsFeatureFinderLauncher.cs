@@ -60,7 +60,7 @@ namespace InformedProteomics.FeatureFinding
             {
                 if (!MsRawFile(Parameters.InputPath) && !MsPbfFile(Parameters.InputPath))
                 {
-                    ShowErrorMessage(@"File extension not supported, " + Parameters.InputPath);
+                    ShowErrorMessage("File extension not supported, " + Parameters.InputPath);
                     return -1;
                 }
 
@@ -183,13 +183,13 @@ namespace InformedProteomics.FeatureFinding
 
             if (run.GetMs1ScanVector().Length == 0)
             {
-                ShowErrorMessage(@"Data file has no MS1 spectra: " + Path.GetFileName(rawFile));
+                ShowErrorMessage("Data file has no MS1 spectra: " + Path.GetFileName(rawFile));
                 return -4;
             }
 
             if (featureFinder.Ms1PeakCount == 0)
             {
-                ShowErrorMessage(@"Data file has no MS1 peaks: " + Path.GetFileName(rawFile));
+                ShowErrorMessage("Data file has no MS1 peaks: " + Path.GetFileName(rawFile));
                 return -5;
             }
 

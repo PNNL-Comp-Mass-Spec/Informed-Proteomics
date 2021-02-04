@@ -23,7 +23,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static SequenceGraph CreateGraph(AminoAcidSet aaSet, string annotation)
         {
             const char delimiter = (char)FastaDatabaseConstants.Delimiter;
-            if (annotation == null || !Regex.IsMatch(annotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"]$"))
+            if (annotation == null || !Regex.IsMatch(annotation, "^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + "]$"))
             {
                 return null;
             }

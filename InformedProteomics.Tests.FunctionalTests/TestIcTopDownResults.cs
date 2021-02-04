@@ -24,7 +24,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(resultFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             var parser = new TsvFileParser(resultFilePath);

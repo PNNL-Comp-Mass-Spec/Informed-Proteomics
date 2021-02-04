@@ -23,7 +23,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(TsvFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TsvFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, TsvFile);
             }
 
             var spectrumMatches = InitTest();

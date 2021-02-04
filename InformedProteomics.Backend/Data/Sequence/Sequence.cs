@@ -272,7 +272,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public static Sequence GetSequenceFromMsGfPlusPeptideStr(string msgfPlusPeptideStr)
         {
-            const string aminoAcidRegex = @"[" + AminoAcid.StandardAminoAcidCharacters + "]";
+            const string aminoAcidRegex = "[" + AminoAcid.StandardAminoAcidCharacters + "]";
             const string massRegex = @"[+-]?\d+\.\d+";
 
             if (!Regex.IsMatch(msgfPlusPeptideStr, "(" + aminoAcidRegex + "|" + massRegex + ")+"))

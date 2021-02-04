@@ -36,7 +36,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
             if (!Directory.Exists(idFileFolder))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, idFileFolder);
             }
 
             Modification.RegisterAndGetModification(Modification.Cysteinyl.Name, Modification.Cysteinyl.Composition);

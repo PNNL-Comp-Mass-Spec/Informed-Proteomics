@@ -27,12 +27,12 @@ namespace InformedProteomics.Tests.DevTests
 
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
             if (!File.Exists(idFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, idFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, idFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);

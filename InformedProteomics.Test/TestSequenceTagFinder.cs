@@ -33,12 +33,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(TestRawFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestRawFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, TestRawFile);
             }
 
             if (!File.Exists(TestResultFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, TestResultFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, TestResultFile);
             }
 
             // Configure amino acid set
@@ -122,7 +122,7 @@ namespace InformedProteomics.Test
                     nHitSpec++;
                 }
 
-                Console.WriteLine(@"[{0}]seqLen = {1}: {2}/{3}", scanNum, seqStr.Length, nHit, nTags);
+                Console.WriteLine("[{0}]seqLen = {1}: {2}/{3}", scanNum, seqStr.Length, nHit, nTags);
             }
             //var existingTags = tagFinder.ExtractExistingSequneceTags(sequence);
             Console.Write("{0}/{1}", nHitSpec, nSpec);

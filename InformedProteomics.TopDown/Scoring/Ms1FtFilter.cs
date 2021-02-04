@@ -78,7 +78,7 @@ namespace InformedProteomics.TopDown.Scoring
             }
 
             // NOTE: The DMS Analysis Manager looks for this statistic; do not change it
-            Console.Write(@"{0}/{1} features loaded...", featureCountFiltered, monoMassArr.Length);
+            Console.Write("{0}/{1} features loaded...", featureCountFiltered, monoMassArr.Length);
             _lcMsChargeMap.CreateMassToScanNumMap();
         }
 
@@ -102,7 +102,7 @@ namespace InformedProteomics.TopDown.Scoring
             }
 
             // NOTE: The DMS Analysis Manager looks for this statistic; do not change it
-            Console.Write(@"{0}/{1} features loaded...", featureCountFiltered, totalFeatureCount);
+            Console.Write("{0}/{1} features loaded...", featureCountFiltered, totalFeatureCount);
             _lcMsChargeMap.CreateMassToScanNumMap();
         }
 

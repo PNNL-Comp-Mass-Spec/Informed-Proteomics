@@ -79,7 +79,7 @@ namespace InformedProteomics.TopDown.Scoring
                 }
             }
 
-            Console.Write(@"{0}/{1} features loaded...", featureCountFiltered, featureCountUnfiltered);
+            Console.Write("{0}/{1} features loaded...", featureCountFiltered, featureCountUnfiltered);
 
             _lcMsMatchMap.CreateSequenceMassToMs2ScansMap(_run, _massTolerance, minMass, maxMass);
         }

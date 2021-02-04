@@ -18,12 +18,12 @@ namespace InformedProteomics.TopDown.Quantification
 
         public List<MSDeconvNode> GetDeconvNodesForMsDeconv(string filePath)
         {
-            var txtFile = string.Format(@"{0}", filePath);
+            var txtFile = string.Format("{0}", filePath);
             var lineInfoList = new List<MSDeconvNode>();
 
             if (!File.Exists(txtFile))
             {
-                Console.WriteLine(@"Error: {0} not found", txtFile);
+                Console.WriteLine("Error: {0} not found", txtFile);
                 return lineInfoList;
             }
 
@@ -78,7 +78,7 @@ namespace InformedProteomics.TopDown.Quantification
 
             if (!File.Exists(filePath))
             {
-                Console.WriteLine(@"Error: {0} not found", filePath);
+                Console.WriteLine("Error: {0} not found", filePath);
                 return nodeList;
             }
 

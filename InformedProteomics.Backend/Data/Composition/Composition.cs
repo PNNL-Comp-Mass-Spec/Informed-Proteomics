@@ -553,7 +553,7 @@ namespace InformedProteomics.Backend.Data.Composition
             foreach (Match match in matches)
             {
                 var element = match.Value;
-                var atom = Regex.Match(element, @"[A-Z][a-z]?");
+                var atom = Regex.Match(element, "[A-Z][a-z]?");
                 var num = element.Substring(atom.Index + atom.Length);
                 if (num.Length == 0)
                 {

@@ -35,7 +35,7 @@ namespace InformedProteomics.Test
                     {
                         if (r < 4 || r > ranks - 4)
                         {
-                            Console.WriteLine(@"Charge: {0}, Ion Type: {1}, Rank: {2}, Score: {3:F4}",
+                            Console.WriteLine("Charge: {0}, Ion Type: {1}, Rank: {2}, Score: {3:F4}",
                                 charge, ionType.Name, r, rankScorer.GetScore(ionType, r, charge, 0.0));
                         }
                         else if (r == 4)
@@ -61,7 +61,7 @@ namespace InformedProteomics.Test
             const string filePath = @"\\protoapps\UserData\Wilkins\DIA\DIA.txt";
             if (!File.Exists(filePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, filePath);
             }
 
             var rankScorer = new RankScore(filePath);
@@ -92,12 +92,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(dataFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dataFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, dataFile);
             }
 
             if (!File.Exists(tsvFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, tsvFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, tsvFile);
             }
 
             var parser = new TsvFileParser(tsvFile);

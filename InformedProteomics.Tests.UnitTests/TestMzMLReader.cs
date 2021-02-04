@@ -50,11 +50,11 @@ namespace InformedProteomics.Tests.UnitTests
 
             var reader = new MzMLReader(mzMLFile.FullName);
             var constTime = timer.Elapsed;
-            Console.WriteLine(@"Constructor time: " + constTime);
+            Console.WriteLine("Constructor time: " + constTime);
 
             var numSpectra = reader.NumSpectra;
             var metaTime = timer.Elapsed - constTime;
-            Console.WriteLine(@"Metadata read time: " + metaTime);
+            Console.WriteLine("Metadata read time: " + metaTime);
 
             var spectra = reader.ReadAllSpectra();
             var spectraCount = spectra.Count();
@@ -62,8 +62,8 @@ namespace InformedProteomics.Tests.UnitTests
 
             reader.Close();
 
-            Console.WriteLine(@"Spectra Read time: " + (timer.Elapsed - metaTime));
-            Console.WriteLine(@"Time: " + timer.Elapsed);
+            Console.WriteLine("Spectra Read time: " + (timer.Elapsed - metaTime));
+            Console.WriteLine("Time: " + timer.Elapsed);
 
             Assert.AreEqual(expectedSpectra, numSpectra, "NumSpectra");
             Assert.AreEqual(expectedSpectra, spectraCount, "SpectraCount");

@@ -53,7 +53,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("NumPeptides: {0}", sum);
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -197,7 +197,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
 
             Assert.AreEqual(expectedPeptideCount, numSequences);
         }
@@ -254,7 +254,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
             //Assert.AreEqual(188961836, numSequences);
             Assert.AreEqual(expected, numSequences);
         }
@@ -316,7 +316,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
             //Assert.AreEqual(188961836, numSequences);
             Assert.AreEqual(expected, numSequences);
         }
@@ -373,7 +373,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("NumPeptides: {0}", numSequences);
             sw.Stop();
 
-            Console.WriteLine(@"{0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("{0:f4} sec", sw.Elapsed.TotalSeconds);
             //Assert.AreEqual(188961836, numSequences);
             Assert.AreEqual(expected, numSequences);
         }

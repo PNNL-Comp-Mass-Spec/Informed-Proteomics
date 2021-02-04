@@ -124,7 +124,7 @@ namespace InformedProteomics.TopDown.Scoring
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(@"Error in CompositeScorer GetFragmentScore: " + ex.Message);
+                        Console.WriteLine("Error in CompositeScorer GetFragmentScore: " + ex.Message);
                         throw;
                     }
                 }

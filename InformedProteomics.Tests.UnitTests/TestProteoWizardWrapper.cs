@@ -11,7 +11,7 @@ namespace InformedProteomics.Tests.UnitTests
     {
         // Ignore Spelling: mzs, centroider
 
-        public readonly string TestRawFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, @"QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw");
+        public readonly string TestRawFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_12_02_2_1Aug12_Cougar_12-06-11.raw");
 
         [Test]
         [Category("PNL_Domain")]

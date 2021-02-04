@@ -71,7 +71,7 @@ namespace InformedProteomics.Tests.DevTests
 
             if (!File.Exists(rawFile))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFile);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFile);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
@@ -140,11 +140,11 @@ namespace InformedProteomics.Tests.DevTests
             //var scoreDataPath = @"D:\MassSpecFiles\training";
             var scorer = new LcMsFeatureLikelihood();
             var stopwatch = Stopwatch.StartNew();
-            Console.WriteLine(@"Start loading MS1 data from {0}", pbfFile.FullName);
+            Console.WriteLine("Start loading MS1 data from {0}", pbfFile.FullName);
 
             var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
             var featureFinder = new LcMsPeakMatrix(run, scorer);
-            Console.WriteLine(@"Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
+            Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
                 (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, scorer, new LcMsFeatureMergeComparer(new Tolerance(10)));
@@ -152,7 +152,7 @@ namespace InformedProteomics.Tests.DevTests
             var maxSearchMassBin = featureFinder.Comparer.GetBinNumber(11180.33677);
             double totalMassBin = maxSearchMassBin - minSearchMassBin + 1;
 
-            Console.WriteLine(@"Start MS1 feature extraction.");
+            Console.WriteLine("Start MS1 feature extraction.");
 
             stopwatch.Restart();
             for (var binNum = minSearchMassBin; binNum <= maxSearchMassBin; binNum++)
@@ -166,18 +166,18 @@ namespace InformedProteomics.Tests.DevTests
                     var processedBins = binNum - minSearchMassBin;
                     var processedPercentage = processedBins / totalMassBin * 100;
                     Console.WriteLine(
-                        @"Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
+                        "Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
                         processedPercentage, featureFinder.Comparer.GetMzEnd(binNum), elapsed,
                         container.NumberOfFeatures);
                 }
             }
 
-            Console.WriteLine(@"Complete MS1 feature extraction.");
-            Console.WriteLine(@" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
-            Console.WriteLine(@" - Number of extracted features = {0}", container.NumberOfFeatures);
+            Console.WriteLine("Complete MS1 feature extraction.");
+            Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(" - Number of extracted features = {0}", container.NumberOfFeatures);
 
             // write result files
-            Console.WriteLine(@"Start selecting mutually independent features from feature network graph");
+            Console.WriteLine("Start selecting mutually independent features from feature network graph");
 
             stopwatch.Stop();
 

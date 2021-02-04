@@ -69,7 +69,7 @@ namespace InformedProteomics.TopDown.Scoring
                 _lcMsMatchMap.SetMatches(monoMass, minScan, maxScan);
             }
 
-            Console.Write(@"{0}/{1} features loaded...", featureCountFiltered, monoMassArr.Length);
+            Console.Write("{0}/{1} features loaded...", featureCountFiltered, monoMassArr.Length);
 
             _lcMsMatchMap.CreateSequenceMassToMs2ScansMap(_run, _massTolerance, minMass, maxMass);
         }

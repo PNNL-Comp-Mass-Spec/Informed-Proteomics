@@ -24,7 +24,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(FilePaths.TestTopDownRawFilePathCid))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + FilePaths.TestTopDownRawFilePathCid);
+                Assert.Ignore("Skipping test " + methodName + " since file not found: " + FilePaths.TestTopDownRawFilePathCid);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRunScanRange(FilePaths.TestTopDownRawFilePathCid, 5743, 5743);
@@ -46,21 +46,21 @@ namespace InformedProteomics.Tests.FunctionalTests
             var ion = new Ion(proteinComp, 20);
 //            ion.Composition.ComputeApproximateIsotopomerEnvelop();
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();
-            Console.WriteLine(@"MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
+            Console.WriteLine("MonoMz: {0}, MonoMass: {1}", ion.GetMonoIsotopicMz(), ion.Composition.Mass);
 
             var matchedPeaks = spec.GetAllIsotopePeaks(ion, new Tolerance(15), 0.1);
             for (var i = 0; i < matchedPeaks.Length; i++)
             {
                 var intensity = matchedPeaks[i] == null ? 0 : matchedPeaks[i].Intensity;
-                Console.WriteLine(@"{0,3}  {1,10:F4}  {2,10:F3}  {3,10:F3}", i, ion.GetIsotopeMz(i), isotopomerEnvelope[i], intensity);
+                Console.WriteLine("{0,3}  {1,10:F4}  {2,10:F3}  {3,10:F3}", i, ion.GetIsotopeMz(i), isotopomerEnvelope[i], intensity);
             }
             var fitScore = spec.GetFitScore(ion, new Tolerance(15), 0.1);
             var cosine = spec.GetCosineScore(ion, new Tolerance(15), 0.1);
             var corr = spec.GetCorrScore(ion, new Tolerance(15), 0.1);
 
-            Console.WriteLine(@"FitScore: {0}", fitScore);
-            Console.WriteLine(@"Cosine: {0}", cosine);
-            Console.WriteLine(@"Corr: {0}", corr);
+            Console.WriteLine("FitScore: {0}", fitScore);
+            Console.WriteLine("Cosine: {0}", cosine);
+            Console.WriteLine("Corr: {0}", corr);
 
             Assert.True(Math.Abs(fitScore - 0.181194589537041) < 0.0001);
             Assert.True(Math.Abs(cosine - 0.917609346566222) < 0.0001);
@@ -77,7 +77,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             if (!File.Exists(FilePaths.TestTopDownRawFilePathEtd))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + FilePaths.TestTopDownRawFilePathCid);
+                Assert.Ignore("Skipping test " + methodName + " since file not found: " + FilePaths.TestTopDownRawFilePathCid);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRunScanRange(FilePaths.TestTopDownRawFilePathEtd, 810, 810);
@@ -161,7 +161,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
                 if (iteration % threshold == 0)
                 {
-                    Console.WriteLine(@"Fit=" + result);
+                    Console.WriteLine("Fit=" + result);
                 }
 
                 if (result < smallestFit)
@@ -170,12 +170,12 @@ namespace InformedProteomics.Tests.FunctionalTests
                 }
             }
 
-            Console.WriteLine(@"SmallestFit=" + smallestFit);
+            Console.WriteLine("SmallestFit=" + smallestFit);
             Assert.IsTrue(smallestFit > 0.94, "Smallest fit ({0}) is not greater than 0.94; this is unexpected", smallestFit);
 
             sw.Stop();
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
     }
 }

@@ -21,8 +21,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var ret = new List<string>();
             for (var k = 1; k <= 5; k++)
             {
-                var dataName1 = string.Format(@"WHIM16_GFrep{0:D2}_GFfrac{1:D2}_inj{2:D2}", i, j, k); // Study-3
-                var dataName2 = string.Format(@"WHIM2_GFrep{0:D2}_GFfrac{1:D2}_inj{2:D2}", i, j, k);  // Study-3
+                var dataName1 = string.Format("WHIM16_GFrep{0:D2}_GFfrac{1:D2}_inj{2:D2}", i, j, k); // Study-3
+                var dataName2 = string.Format("WHIM2_GFrep{0:D2}_GFfrac{1:D2}_inj{2:D2}", i, j, k);  // Study-3
                 ret.Add(dataName1);
                 ret.Add(dataName2);
             }
@@ -59,7 +59,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     for (var k = 1; k <= 6; k++)
                     {
                         //var dataName = string.Format(@"WHIM16_GFrep{0}_GFfrac{1}_inj{2}", i.ToString("D2"), j.ToString("D2"), k.ToString("D2")); // Study-3
-                        var dataName = string.Format(@"RP4H_P33_WHIM16_biorep{0}_techrep{1}", j, k); // Study-2
+                        var dataName = string.Format("RP4H_P33_WHIM16_biorep{0}_techrep{1}", j, k); // Study-2
                         var dataDir = string.Format(@"{0}\{1}", DataPath, dataName);
 
                         if (!Directory.Exists(dataDir))
@@ -98,7 +98,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
             if (filesCopied == 0)
             {
-                Assert.Ignore(@"Skipping since data files were not found");
+                Assert.Ignore("Skipping since data files were not found");
             }
         }
 
@@ -133,25 +133,25 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                         if (!File.Exists(rawFile))
                         {
-                            Console.WriteLine(@"Skipping dataset since file not found: " + rawFile);
+                            Console.WriteLine("Skipping dataset since file not found: " + rawFile);
                             continue;
                         }
 
                         if (!File.Exists(ms1FtFile))
                         {
-                            Console.WriteLine(@"Skipping dataset since file not found: " + ms1FtFile);
+                            Console.WriteLine("Skipping dataset since file not found: " + ms1FtFile);
                             continue;
                         }
 
                         if (!File.Exists(mspFile))
                         {
-                            Console.WriteLine(@"Skipping dataset since file not found: " + mspFile);
+                            Console.WriteLine("Skipping dataset since file not found: " + mspFile);
                             continue;
                         }
 
                         if (File.Exists(outPath))
                         {
-                            Console.WriteLine(@"Skipping dataset since results file already exists: " + outPath);
+                            Console.WriteLine("Skipping dataset since results file already exists: " + outPath);
                             continue;
                         }
 
@@ -195,7 +195,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
             if (filesProcessed == 0)
             {
-                Assert.Ignore(@"Skipping since data files were not found");
+                Assert.Ignore("Skipping since data files were not found");
             }
         }
 

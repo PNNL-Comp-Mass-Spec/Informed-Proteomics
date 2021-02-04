@@ -107,13 +107,13 @@ namespace InformedProteomics.Tests.DevTests
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
             sw.Stop();
 
-            Console.WriteLine(@"Reading run: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Reading run: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             const int minPrecursorCharge = 3;
             const int maxPrecursorCharge = 30;
@@ -126,7 +126,7 @@ namespace InformedProteomics.Tests.DevTests
 
             sw.Stop();
 
-            Console.WriteLine(@"Ms1 filter: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Ms1 filter: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             ISequenceFilter ms1Filter = ms1BasedFilter;
 
@@ -144,7 +144,7 @@ namespace InformedProteomics.Tests.DevTests
             }
             sw.Stop();
 
-            Console.WriteLine(@"Calculating #matches per bin: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Calculating #matches per bin: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             //const string prot =
             //    "ADVFHLGLTKAMLDGATLAIVPGDPERVKRIAELMDNATFLASHREYTSYLAYADGKPVVICSTGIGGPSTSIAVEELAQLGVNTFLRVGTTGAIQPHVNVGDVIVTQASVRLDGASLHFAPMEFPAVANFECTTAMVAACRDAGVEPHIGVTASSDTFYPGQERYDTVTGRVTRRFAGSMKEWQDMGVLNYEMESATLFTMCATQGWRAACVAGVIVNRTQQEIPDEATMKKTEVSAVSIVVAAAKKLLA";
@@ -154,7 +154,7 @@ namespace InformedProteomics.Tests.DevTests
             const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\MSAlign\NoMod.tsv";
             if (!File.Exists(resultFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             var tsvReader = new TsvFileParser(resultFilePath);
@@ -231,7 +231,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs / (double)totalSpecs, numUnfilteredSpecs, totalSpecs);
             Console.WriteLine("NumUniqueSequences: {0:f2}, {1} / {2}", seqSet.Count / (double)allSeqSet.Count, seqSet.Count, allSeqSet.Count);
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -246,13 +246,13 @@ namespace InformedProteomics.Tests.DevTests
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
             sw.Stop();
 
-            Console.WriteLine(@"Reading run: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Reading run: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             const int minPrecursorCharge = 3;
             const int maxPrecursorCharge = 30;
@@ -273,7 +273,7 @@ namespace InformedProteomics.Tests.DevTests
 
             sw.Stop();
 
-            Console.WriteLine(@"Ms1 filter: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Ms1 filter: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             ISequenceFilter ms1Filter = ms1BasedFilter;
 
@@ -291,12 +291,12 @@ namespace InformedProteomics.Tests.DevTests
             }
             sw.Stop();
 
-            Console.WriteLine(@"Calculating #matches per bin: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Calculating #matches per bin: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             const string resultFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\SBEP_STM_001_02272012_Aragon_4PTMs.icresult";
             if (!File.Exists(resultFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             var tsvReader = new TsvFileParser(resultFilePath);
@@ -414,7 +414,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("SuccessRate: {0:f2} {1} / {2}", numUnfilteredSpecs / (double)totalSpecs, numUnfilteredSpecs, totalSpecs);
             Console.WriteLine("NumUniqueSequences: {0:f2}, {1} / {2}", seqSet.Count / (double)allSeqSet.Count, seqSet.Count, allSeqSet.Count);
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -446,7 +446,7 @@ namespace InformedProteomics.Tests.DevTests
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownQCShew\raw\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw";
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
@@ -466,7 +466,7 @@ namespace InformedProteomics.Tests.DevTests
             //}
             sw.Stop();
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -481,13 +481,13 @@ namespace InformedProteomics.Tests.DevTests
                 @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_N30\SBEP_STM_001_02272012_Aragon.decoy.icresult";
             if (!File.Exists(resultFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
@@ -590,7 +590,7 @@ namespace InformedProteomics.Tests.DevTests
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath, 1.4826, 1.4826);
@@ -606,7 +606,7 @@ namespace InformedProteomics.Tests.DevTests
             runCache.DeconvoluteAllProductSpectra();
             sw.Stop();
 
-            Console.WriteLine(@"Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -636,13 +636,13 @@ namespace InformedProteomics.Tests.DevTests
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles";
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             const string resultPath = @"C:\cygwin\home\kims336\Data\TopDown\raw\CorrMatches_N30";
             if (!File.Exists(resultPath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultPath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, resultPath);
             }
 
             foreach (var resultFilePath in Directory.GetFiles(resultPath, "*.tsv"))
@@ -714,7 +714,7 @@ namespace InformedProteomics.Tests.DevTests
 
             sw.Stop();
 
-            Console.WriteLine(@"Elapsed Time: {0:F1} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Elapsed Time: {0:F1} sec", sw.Elapsed.TotalSeconds);
         }
     }
 }

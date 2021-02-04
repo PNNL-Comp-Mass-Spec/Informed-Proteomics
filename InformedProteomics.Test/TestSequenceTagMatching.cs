@@ -32,7 +32,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
@@ -40,7 +40,7 @@ namespace InformedProteomics.Test
             //const string fastaFilePath = @"D:\MassSpecFiles\60k\ID_004973_9BA6912F.fasta";
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
@@ -49,7 +49,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(modsFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modsFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, modsFilePath);
             }
 
             var aaSet = new AminoAcidSet(modsFilePath);
@@ -75,7 +75,7 @@ namespace InformedProteomics.Test
             const string rawFilePath = @"D:\MassSpecFiles\Lewy\Lewy_AT_AD1_21May15_Bane_14-09-01RZ.pbf";
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
@@ -87,7 +87,7 @@ namespace InformedProteomics.Test
             const string fastaFilePath = @"D:\MassSpecFiles\Lewy\a4_human.fasta";
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
@@ -96,7 +96,7 @@ namespace InformedProteomics.Test
             const string modsFilePath = @"D:\MassSpecFiles\Lewy\Mods.txt";
             if (!File.Exists(modsFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modsFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, modsFilePath);
             }
 
             var aaSet = new AminoAcidSet(modsFilePath);
@@ -117,15 +117,15 @@ namespace InformedProteomics.Test
 
             if (!Directory.Exists(dataSetPath))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, dataSetPath);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, dataSetPath);
             }
             if (!File.Exists(modsFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modsFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, modsFilePath);
             }
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fileEntries = Directory.GetFiles(dataSetPath);
@@ -174,7 +174,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
@@ -187,7 +187,7 @@ namespace InformedProteomics.Test
             //const string fastaFilePath = @"D:\MassSpecFiles\60k\ID_004973_9BA6912F.fasta";
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
@@ -199,7 +199,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(modsFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modsFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, modsFilePath);
             }
 
             var aaSet = new AminoAcidSet(modsFilePath);
@@ -226,7 +226,7 @@ namespace InformedProteomics.Test
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
@@ -235,7 +235,7 @@ namespace InformedProteomics.Test
             const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_seqtag.tsv";
             if (!File.Exists(tagFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, tagFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, tagFilePath);
             }
 
             const string outputFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_matchedtag.tsv";
@@ -267,7 +267,7 @@ namespace InformedProteomics.Test
                     writer.WriteLine("{0}\t{1}\t{2}", line, matchedProteins.Length, matchedProteinStr);
                 }
             }
-            Console.WriteLine(@"Done");
+            Console.WriteLine("Done");
         }
 
         [Test]
@@ -284,7 +284,7 @@ namespace InformedProteomics.Test
             const string resultFilePath = @"H:\Research\ProMex\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
             if (!File.Exists(resultFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             var parser = new TsvFileParser(resultFilePath);
@@ -305,7 +305,7 @@ namespace InformedProteomics.Test
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFilePath);
@@ -313,7 +313,7 @@ namespace InformedProteomics.Test
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
@@ -326,7 +326,7 @@ namespace InformedProteomics.Test
             const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.seqtag";
             if (!File.Exists(tagFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, tagFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, tagFilePath);
             }
 
             var hist = new Dictionary<int, int>();
@@ -440,19 +440,19 @@ namespace InformedProteomics.Test
             const string fastaFilePath = @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
             var searchableDb = new SearchableDatabase(fastaDb);
-            Console.WriteLine(@"Sequence length: {0}", fastaDb.GetSequence().Length);
+            Console.WriteLine("Sequence length: {0}", fastaDb.GetSequence().Length);
 
             //const string tagFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_seqtag.tsv";
             //const string tagFilePath = @"\\protoapps\UserData\Jungkap\Co_culture\23B_pellet_TD_3Feb14_Bane_PL011402.seqtag";
             const string tagFilePath = @"D:\MassSpecFiles\co_culture\23A_pellet_TD_3Feb14_Bane_PL011402.seqtag";
             if (!File.Exists(tagFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, tagFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, tagFilePath);
             }
 
             var isHeader = true;
@@ -512,7 +512,7 @@ namespace InformedProteomics.Test
             const string folderPath = @"D:\MassSpecFiles\Glyco\";
             if (!Directory.Exists(folderPath))
             {
-                Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, folderPath);
+                Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, folderPath);
             }
 
             var fileSet = new string[]
@@ -543,7 +543,7 @@ namespace InformedProteomics.Test
                         "DeltaMass"
                     };
 
-                    Console.WriteLine(@"Reading {0} file", tagFilePath);
+                    Console.WriteLine("Reading {0} file", tagFilePath);
 
                     var nColumn = 0;
                     foreach (var line in File.ReadAllLines(tagFilePath))
@@ -635,9 +635,9 @@ namespace InformedProteomics.Test
                         //writer.WriteLine("{0}\t{1}\t{2}\t{3}", line, matchedProteins.Length, matchedProteinStr, massDiffStr);
                     }
 
-                    Console.WriteLine(@"{0} seq tags are processed", nReadSeqTag);
+                    Console.WriteLine("{0} seq tags are processed", nReadSeqTag);
                 }
-                Console.WriteLine(@"Done");
+                Console.WriteLine("Done");
             }
         }
     }

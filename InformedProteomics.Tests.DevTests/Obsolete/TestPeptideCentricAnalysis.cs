@@ -410,7 +410,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
             sw.Stop();
 
-            Console.WriteLine(@"TimeForPrecursorValidation {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("TimeForPrecursorValidation {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Ignore("File Missing, test obsolete, or long test")]

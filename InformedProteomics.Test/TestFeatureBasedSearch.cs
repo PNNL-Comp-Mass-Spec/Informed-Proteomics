@@ -34,7 +34,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(dataSet))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, dataSet);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, dataSet);
             }
 
             // Feature: 5236-5286	6-12	8480.3681	5
@@ -73,7 +73,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
@@ -174,12 +174,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
@@ -256,12 +256,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(tagFileName))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, tagFileName);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, tagFileName);
             }
 
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
@@ -291,7 +291,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(resultFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             var resultParser = new MsPathFinderParser(resultFilePath);
@@ -303,7 +303,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFileName))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFileName);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFileName);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFileName);
@@ -321,12 +321,12 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(tagFileName))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, tagFileName);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, tagFileName);
             }
 
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
             var fastaDb = new FastaDatabase(fastaFilePath);
@@ -523,7 +523,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(tagFileName))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, tagFileName);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, tagFileName);
             }
 
             var tagParser = new SequenceTagParser(tagFileName, minTagLength);
@@ -533,7 +533,7 @@ namespace InformedProteomics.Test
 
             if (!File.Exists(rawFileName))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFileName);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFileName);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(rawFileName);
@@ -542,7 +542,7 @@ namespace InformedProteomics.Test
             const string resultFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V092\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
             if (!File.Exists(resultFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, resultFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, resultFilePath);
             }
 
             var resultParser = new MsPathFinderParser(resultFilePath);
@@ -557,7 +557,7 @@ namespace InformedProteomics.Test
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
             if (!File.Exists(fastaFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
 //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";

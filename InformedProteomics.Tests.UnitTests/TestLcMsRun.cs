@@ -21,7 +21,7 @@ namespace InformedProteomics.Tests.UnitTests
 
             if (!File.Exists(FilePaths.TestRawFilePath))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + FilePaths.TestRawFilePath);
+                Assert.Ignore("Skipping test " + methodName + " since file not found: " + FilePaths.TestRawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRunScanRange(FilePaths.TestRawFilePath, 10000, 10100);
@@ -44,7 +44,7 @@ namespace InformedProteomics.Tests.UnitTests
 
             if (!File.Exists(FilePaths.TestRawFilePath))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + FilePaths.TestRawFilePath);
+                Assert.Ignore("Skipping test " + methodName + " since file not found: " + FilePaths.TestRawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRunScanRange(FilePaths.TestRawFilePath, 20000, 20100);
@@ -109,7 +109,7 @@ namespace InformedProteomics.Tests.UnitTests
 
             if (!File.Exists(FilePaths.TestTopDownRawFilePathCid))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, FilePaths.TestTopDownRawFilePathCid);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, FilePaths.TestTopDownRawFilePathCid);
             }
 
             const int SCAN = 425;
@@ -131,7 +131,7 @@ namespace InformedProteomics.Tests.UnitTests
                 Console.WriteLine("MsLevel: {0}", run.GetMsLevel(scanNum));
             }
 
-            Console.WriteLine(@"Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Done. {0:f4} sec", sw.Elapsed.TotalSeconds);
         }
 
         [Test]
@@ -169,7 +169,7 @@ namespace InformedProteomics.Tests.UnitTests
             var rawFilePath = FilePaths.TestRawFilePath;
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             const int SCAN = 100;
@@ -231,7 +231,7 @@ namespace InformedProteomics.Tests.UnitTests
             var rawFilePath = FilePaths.TestRawFilePath;
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var run = InMemoryLcMsRun.GetLcMsRun(rawFilePath);
@@ -265,7 +265,7 @@ namespace InformedProteomics.Tests.UnitTests
             }
             sw.Stop();
 
-            Console.WriteLine(@"Method 1: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Method 1: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             sw.Reset();
             sw.Start();
@@ -279,7 +279,7 @@ namespace InformedProteomics.Tests.UnitTests
             }
             sw.Stop();
 
-            Console.WriteLine(@"Method 2: {0:f4} sec", sw.Elapsed.TotalSeconds);
+            Console.WriteLine("Method 2: {0:f4} sec", sw.Elapsed.TotalSeconds);
 
             Console.WriteLine("Done");
         }
@@ -293,7 +293,7 @@ namespace InformedProteomics.Tests.UnitTests
 
             if (!File.Exists(FilePaths.TestQExactiveRawFilePath))
             {
-                Assert.Ignore(@"Skipping test " + methodName + @" since file not found: " + FilePaths.TestQExactiveRawFilePath);
+                Assert.Ignore("Skipping test " + methodName + " since file not found: " + FilePaths.TestQExactiveRawFilePath);
             }
 
             //var run = new PbfLcMsRun(TestQExactiveRawFilePath);
@@ -316,7 +316,7 @@ namespace InformedProteomics.Tests.UnitTests
             var rawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"Corrupted\YS_Shew_testHCD_CID.raw");
             if (!File.Exists(rawFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, rawFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, rawFilePath);
             }
 
             var reader = new XcaliburReader(rawFilePath);
@@ -343,7 +343,7 @@ namespace InformedProteomics.Tests.UnitTests
             const string filePath = @"D:\Research\Data\TRex\VNVADCGAEALAR.mzML";
             if (!File.Exists(filePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, filePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, filePath);
             }
 
             var run = PbfLcMsRun.GetLcMsRun(filePath);
@@ -360,10 +360,10 @@ namespace InformedProteomics.Tests.UnitTests
             const string specFilePath = @"D:\MassSpecFiles\ICR\20141212FGWT1_F5_1_01_3230.mzML";
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
-            Console.WriteLine(@"Test start");
+            Console.WriteLine("Test start");
 
             var pbf = new PbfLcMsRun(specFilePath, null, null, 1.4826, 1.4826);
             //var pbf = new PbfLcMsRun(specFilePath, null, null, 3, 1.4826);
@@ -375,7 +375,7 @@ namespace InformedProteomics.Tests.UnitTests
                     Console.WriteLine(spec.ScanNum);
                 }
             }*/
-            Console.WriteLine(@"Test end");
+            Console.WriteLine("Test end");
         }
 
         [Test]
@@ -388,7 +388,7 @@ namespace InformedProteomics.Tests.UnitTests
             var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "2015-05-06_Carbonic_HCD_854_50AVG.raw");
             if (!File.Exists(specFilePath))
             {
-                Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, specFilePath);
+                Assert.Ignore("Skipping test {0} since file not found: {1}", methodName, specFilePath);
             }
 
 //            var run = (InMemoryLcMsRun) InMemoryLcMsRun.GetLcMsRun(specFilePath, MassSpecDataType.XCaliburRun);

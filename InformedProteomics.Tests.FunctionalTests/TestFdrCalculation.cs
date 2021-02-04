@@ -34,7 +34,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var fdrCalculator = new FdrCalculator(targetResultPath.FullName, decoyResultPath.FullName);
             if (fdrCalculator.HasError())
             {
-                throw new Exception(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
+                throw new Exception("Error computing FDR: " + fdrCalculator.ErrorMessage);
             }
 
             fdrCalculator.WriteTo(tdaResultPath);
@@ -123,7 +123,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                 // VerifyQValue(tdaResultPath, qValueByScan, 3045, 0.010666);
                 // VerifyQValue(tdaResultPath, qValueByScan, 2668, 0.113394);
             }
-            Console.WriteLine(@"Done, see " + tdaResultPath);
+            Console.WriteLine("Done, see " + tdaResultPath);
         }
 
         private void VerifyQValue(string tdaResultPath, IReadOnlyDictionary<int, string> qValueByScan, int scanNumber, double expectedValue)
@@ -177,15 +177,15 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var decoyResultFilePath = rawFileName + ".decoy.icresult";
                 var mergedResultFilePath = rawFileName + ".tsv";
 
-                Console.Write(@"Creating {0}...", mergedResultFilePath);
+                Console.Write("Creating {0}...", mergedResultFilePath);
                 var fdrCalculator = new FdrCalculator(targetResultFilePath, decoyResultFilePath);
                 if (fdrCalculator.HasError())
                 {
-                    throw new Exception(@"Error computing FDR: " + fdrCalculator.ErrorMessage);
+                    throw new Exception("Error computing FDR: " + fdrCalculator.ErrorMessage);
                 }
 
                 fdrCalculator.WriteTo(mergedResultFilePath);
-                Console.WriteLine(@"Done");
+                Console.WriteLine("Done");
             }
         }
     }

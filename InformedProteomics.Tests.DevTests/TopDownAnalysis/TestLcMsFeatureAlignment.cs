@@ -54,13 +54,13 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                 if (!File.Exists(rawFile))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", rawFile);
                     continue;
                 }
 
                 if (!File.Exists(ms1File))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", ms1File);
                     continue;
                 }
 
@@ -90,7 +90,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var dataset = new List<string>();
             for (var i = 1; i <= 10; i++)
             {
-                dataset.Add(string.Format(@"CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i));
+                dataset.Add(string.Format("CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i));
             }
 
             var rawFiles = new List<string>();
@@ -103,13 +103,13 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                 if (!File.Exists(rawFile))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", rawFile);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", rawFile);
                     continue;
                 }
 
                 if (!File.Exists(ms1File))
                 {
-                    Console.WriteLine(@"Warning: Skipping file not found: {0}", ms1File);
+                    Console.WriteLine("Warning: Skipping file not found: {0}", ms1File);
                     continue;
                 }
 
