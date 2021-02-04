@@ -147,8 +147,8 @@ namespace InformedProteomics.FeatureFinding.Graphics
                 return OxyColor.FromHsv(0, 1, 1);
             }
 
-            var delta = 240.0 / (360.0 * (nColors));
-            var hue = (240.0 / 360.0) - (delta * (value));
+            var delta = 240.0 / (360.0 * nColors);
+            var hue = (240.0 / 360.0) - (delta * value);
             return OxyColor.FromHsv(hue, 1, 1);
         }
 

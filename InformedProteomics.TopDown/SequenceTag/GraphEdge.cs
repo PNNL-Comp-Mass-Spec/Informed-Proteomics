@@ -73,7 +73,7 @@ namespace InformedProteomics.TopDown.SequenceTag
                 return !object.Equals(edge1, edge2);
             }
 
-            return !(edge1.Equals(edge2));
+            return !edge1.Equals(edge2);
         }
     }
 }

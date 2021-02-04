@@ -1057,7 +1057,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         var pos = bufStart + _encoding.GetByteCount(stringBuffer.Substring(0, searchPoint));
                         var end = stringBuffer.IndexOf('>', searchPoint + 1);
                         // Grab everything between '<' and the next '>'
-                        var builder = stringBuffer.Substring(searchPoint + 1, (end - 1) - (searchPoint + 1));
+                        var builder = stringBuffer.Substring(searchPoint + 1, end - 1 - (searchPoint + 1));
                         // Get the ID of the tag
                         var attributeName = "id";
                         if (_version == MzML_Version.mzML1_0_0)

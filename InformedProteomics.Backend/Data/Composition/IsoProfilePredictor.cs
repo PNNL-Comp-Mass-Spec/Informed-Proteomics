@@ -209,7 +209,7 @@ namespace InformedProteomics.Backend.Data.Composition
         private static void ComputePossibleIsotopeCombinations(int max, int maxIsotopeNumberInElement = 3) // called just once.
         {
             var comb = new List<int[]>[max + 1];
-            comb[0] = new List<int[]> { (new int[maxIsotopeNumberInElement]) };
+            comb[0] = new List<int[]> { new int[maxIsotopeNumberInElement] };
 
             for (var n = 1; n <= max; n++)
             {

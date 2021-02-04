@@ -85,7 +85,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         {
             charge = GetCharge(charge);
             var index = _massSorter[charge].GetBinIndex(mass);
-            return (isDecoy ? _drankTables[charge][index] : _rankTables[charge][index]);
+            return isDecoy ? _drankTables[charge][index] : _rankTables[charge][index];
         }
 
         public IonFrequencyTable GetIonProbabilityTable(int charge, double mass)

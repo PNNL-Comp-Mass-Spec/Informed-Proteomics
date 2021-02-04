@@ -468,7 +468,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                 var baseXic = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
                 var baseIntensity = baseXic.GetSumIntensities();
 
-                Console.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", (isDecoy ? 1 : 0), peptide, scanNum, charge, specEValue, qValue, precursorIon.GetMonoIsotopicMz());
+                Console.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}", isDecoy ? 1 : 0, peptide, scanNum, charge, specEValue, qValue, precursorIon.GetMonoIsotopicMz());
 
                 var isotopeIndices = new double[] {0, 1, 2, 3, -1, 0.5};
                 var theoIsotopes = precursorIon.GetIsotopes(0.01);

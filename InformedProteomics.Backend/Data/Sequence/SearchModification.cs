@@ -79,7 +79,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             return string.Format(formatString,
                 Modification.Composition.ToString(spaceSeparated),
                 TargetResidue,
-                (IsFixedModification ? "fix" : "opt"),
+                IsFixedModification ? "fix" : "opt",
                 Location,
                 Modification.Name
             );

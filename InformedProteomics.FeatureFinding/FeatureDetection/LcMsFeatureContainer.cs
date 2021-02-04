@@ -337,7 +337,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                     return 1;
                 }
 
-                return (y.Score.CompareTo(x.Score));
+                return y.Score.CompareTo(x.Score);
             }
         }
     }

@@ -46,7 +46,7 @@ namespace PbfGen
             var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
             types.Remove(".pbf");
 
-            if (!specPathIsDirectory && !(types.Select(ext => SourcePath.ToLower().EndsWith(ext)).Any()))
+            if (!specPathIsDirectory && !types.Select(ext => SourcePath.ToLower().EndsWith(ext)).Any())
             {
                 PrintError("Invalid file extension: (" + Path.GetExtension(SourcePath) + ") " + SourcePath);
                 return false;

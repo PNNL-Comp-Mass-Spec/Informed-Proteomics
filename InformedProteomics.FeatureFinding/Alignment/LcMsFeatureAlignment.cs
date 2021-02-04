@@ -649,7 +649,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
                     return 1;
                 }
 
-                return (x.Mass.CompareTo(y.Mass));
+                return x.Mass.CompareTo(y.Mass);
             }
         }
     }

@@ -175,7 +175,7 @@ namespace InformedProteomics.Test
                         for (int j = offsetFrequencyTables[i].Count-1; j >=0; j--)
                         {
                             offsetFrequencyList.Add(offsetFrequencyTables[i][j].GetProbabilities().ToList());
-                            outFile.Write("{0}", (j+1));
+                            outFile.Write("{0}", j + 1);
                             if (j != 0)
                             {
                                 outFile.Write("\t");

@@ -56,12 +56,12 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
         private double GetMinMz(double mz)
         {
-            return (mz - _searchWidth);
+            return mz - _searchWidth;
         }
 
         private double GetMaxMz(double mz)
         {
-            return (mz + _searchWidth);
+            return mz + _searchWidth;
         }
 
         private void AddOffsets(List<double> offsets)

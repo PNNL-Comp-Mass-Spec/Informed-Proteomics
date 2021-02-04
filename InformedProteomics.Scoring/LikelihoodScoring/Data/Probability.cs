@@ -8,7 +8,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         public double Found { get; set; }
         public double Total { get; set; }
 
-        public double Prob => (Found / Total);
+        public double Prob => Found / Total;
 
         public Probability(T1 label, double found=0, double total=0)
         {

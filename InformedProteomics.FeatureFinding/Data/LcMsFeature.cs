@@ -97,12 +97,12 @@ namespace InformedProteomics.FeatureFinding.Data
         {
             if (other.MaxScanNum >= MinScanNum && other.MaxScanNum <= MaxScanNum)
             {
-                return (other.MaxElutionTime - Math.Max(MinElutionTime, other.MinElutionTime));
+                return other.MaxElutionTime - Math.Max(MinElutionTime, other.MinElutionTime);
             }
 
             if (MaxScanNum >= other.MinScanNum && MaxScanNum <= other.MaxScanNum)
             {
-                return (MaxElutionTime - Math.Max(other.MinElutionTime, MinElutionTime));
+                return MaxElutionTime - Math.Max(other.MinElutionTime, MinElutionTime);
             }
 
             return 0d;
@@ -112,12 +112,12 @@ namespace InformedProteomics.FeatureFinding.Data
         {
             if (other.MaxNet >= MinNet && other.MaxNet<= MaxNet)
             {
-                return (other.MaxNet - Math.Max(MinNet, other.MinNet));
+                return other.MaxNet - Math.Max(MinNet, other.MinNet);
             }
 
             if (MaxNet >= other.MinNet && MaxNet <= other.MaxNet)
             {
-                return (MaxNet - Math.Max(other.MinNet, MinNet));
+                return MaxNet - Math.Max(other.MinNet, MinNet);
             }
 
             return 0d;

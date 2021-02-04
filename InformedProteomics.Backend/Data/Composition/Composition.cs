@@ -307,7 +307,7 @@ namespace InformedProteomics.Backend.Data.Composition
             // Both have additional elements
             foreach (var entry in _additionalElements)
             {
-                if (!(other._additionalElements.TryGetValue(entry.Key, out var otherValue)))
+                if (!other._additionalElements.TryGetValue(entry.Key, out var otherValue))
                 {
                     return false;
                 }

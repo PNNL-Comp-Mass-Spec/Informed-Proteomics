@@ -1881,8 +1881,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             const double p2 = 0.00180628243605134;
             const double p3 = 9.35391578169730;
 
-            var chargeMin = (int)Math.Round((c1 * mass) * (c1 * mass) + c2 * mass + c3);
-            var chargeMax = (int)Math.Round((p1 * mass) * (p1 * mass) + p2 * mass + p3);
+            var chargeMin = (int)Math.Round(c1 * mass * (c1 * mass) + c2 * mass + c3);
+            var chargeMax = (int)Math.Round(p1 * mass * (p1 * mass) + p2 * mass + p3);
 
             var chargeUb = (int)Math.Min(Math.Floor(mass / minMs1Mz), MaxSearchCharge);
             var chargeLb = (int)Math.Max(Math.Ceiling(mass / maxMs1Mz), MinSearchCharge);
@@ -1925,7 +1925,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 CheckedOutFlag = false;
             }
 
-            internal bool Exist => (AccurateMass > 0d);
+            internal bool Exist => AccurateMass > 0d;
 
             internal int CountActivePeaks
             {

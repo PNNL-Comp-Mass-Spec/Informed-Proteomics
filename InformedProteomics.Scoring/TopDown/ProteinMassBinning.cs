@@ -19,7 +19,7 @@ namespace InformedProteomics.Scoring.TopDown
 
         public bool CheckMassRange(double mass)
         {
-            return (mass >= MinMass && mass <= MaxMass);
+            return mass >= MinMass && mass <= MaxMass;
         }
 
         public int GetBinNumber(double mass)

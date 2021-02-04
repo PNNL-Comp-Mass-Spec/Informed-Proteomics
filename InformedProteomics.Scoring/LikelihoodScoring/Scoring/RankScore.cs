@@ -50,7 +50,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Scoring
                 return 0;
             }
 
-            return (Math.Log(prob) - Math.Log(decoyProb));
+            return Math.Log(prob) - Math.Log(decoyProb);
         }
 
         public IonType[] GetIonTypes(int charge, double mass)

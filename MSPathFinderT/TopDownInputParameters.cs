@@ -231,7 +231,7 @@ namespace MSPathFinderT
             // The extensions in this variable start with a period
             var supportedFileExtensions = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
 
-            if (!specPathIsDirectory && !(supportedFileExtensions.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any()))
+            if (!specPathIsDirectory && !supportedFileExtensions.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any())
             {
                 PrintError("Invalid file extension for spectrum file (" + Path.GetExtension(SpecFilePath) + "): " + SpecFilePath);
                 return false;

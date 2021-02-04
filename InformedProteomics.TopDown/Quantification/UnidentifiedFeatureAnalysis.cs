@@ -36,7 +36,7 @@ namespace InformedProteomics.TopDown.Quantification
             var tsv = new StringBuilder();
             var featureFile = new StreamReader(_crossTabFile);
             featureFile.ReadLine();
-            while (((featureLine = featureFile.ReadLine()) != null))
+            while ((featureLine = featureFile.ReadLine()) != null)
             {
                 var featureElements = featureLine.Split('\t');
                 var sequence = featureElements[1];
@@ -239,7 +239,7 @@ namespace InformedProteomics.TopDown.Quantification
         {
             var filterReader = new StreamReader(filterFile);
             string filterLine;
-            while (((filterLine = filterReader.ReadLine()) != null))
+            while ((filterLine = filterReader.ReadLine()) != null)
             {
                 var filteredElements = filterLine.Split('\t');
                 var id = int.Parse(filteredElements[0]);
