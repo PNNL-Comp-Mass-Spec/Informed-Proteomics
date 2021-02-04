@@ -8,6 +8,8 @@ namespace InformedProteomics.Backend.Utils
     /// </summary>
     public static class Misc
     {
+        // Ignore Spelling: yyyy
+
         /// <summary>
         /// Parse the assembly's version to try to get a build date
         /// </summary>
@@ -67,7 +69,7 @@ namespace InformedProteomics.Backend.Utils
         /// <returns></returns>
         public static string GetBuildDateTextFromVersion(Version version)
         {
-            var buildDateTime = GetBuildDateFromVersion();
+            var buildDateTime = GetBuildDateFromVersion(version);
 
             // ReSharper disable once StringLiteralTypo
             return buildDateTime.ToString("MMMM d, yyyy");
