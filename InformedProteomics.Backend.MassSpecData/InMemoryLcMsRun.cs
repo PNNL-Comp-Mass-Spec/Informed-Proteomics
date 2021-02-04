@@ -117,44 +117,6 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Convert supplied file to pbf
-        /// </summary>
-        /// <param name="specFilePath"></param>
-        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
-        /// <param name="productSignalToNoiseRatioThreshold"></param>
-        /// <param name="pbfFilePath"></param>
-        /// <param name="progress"></param>
-        /// <returns></returns>
-        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
-        [Obsolete("Use PbfLcmsRun.ConvertToPbf() instead.", false)]
-        public static string ConvertToPbf(string specFilePath, double precursorSignalToNoiseRatioThreshold,
-            double productSignalToNoiseRatioThreshold, string pbfFilePath = null, IProgress<ProgressData> progress = null)
-        {
-            return PbfLcMsRun.ConvertToPbf(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath),
-                precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, pbfFilePath, progress);
-        }
-
-        /// <summary>
-        /// Convert supplied file to pbf
-        /// </summary>
-        /// <param name="specFilePath"></param>
-        /// <param name="specReader"></param>
-        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
-        /// <param name="productSignalToNoiseRatioThreshold"></param>
-        /// <param name="pbfFilePath">If supplied, file will be written to this path; otherwise the file will be written to the same directory as specFilePath, or to the temp directory if the user does not have write permissions</param>
-        /// <param name="progress">Progress data, as a percentage</param>
-        /// <returns></returns>
-        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
-        [Obsolete("Use PbfLcmsRun.ConvertToPbf() instead.", false)]
-        public static string ConvertToPbf(string specFilePath, IMassSpecDataReader specReader,
-            double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, string pbfFilePath = null,
-            IProgress<ProgressData> progress = null)
-        {
-            return PbfLcMsRun.ConvertToPbf(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath),
-                precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, pbfFilePath, progress);
-        }
-
-        /// <summary>
         /// Constructor - read the source file into memory
         /// </summary>
         /// <param name="massSpecDataReader">data reader; will be closed when reading is done unless otherwise specified</param>
@@ -617,18 +579,6 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 PbfLcMsRun.WriteAsPbf(this, writer, progress);
             }
-        }
-
-        /// <summary>
-        /// Old PBF creation workflow
-        /// </summary>
-        /// <param name="lcmsRun"></param>
-        /// <param name="writer"></param>
-        /// <param name="progress"></param>
-        [Obsolete("Use PbfLcMsRun.WriteAsPbf(InMemoryLcMsRun, BinaryWriter, IProgress<ProgressData> = null)", true)]
-        public void WriteAsPbf(InMemoryLcMsRun lcmsRun, BinaryWriter writer, IProgress<ProgressData> progress = null)
-        {
-            PbfLcMsRun.WriteAsPbf(this, writer, progress);
         }
 
         private static Xic GetXicPointsWithin(double minMz, double maxMz, List<LcMsPeak> peakList)

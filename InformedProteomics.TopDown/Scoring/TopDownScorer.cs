@@ -38,18 +38,6 @@ namespace InformedProteomics.TopDown.Scoring
         /// <param name="proteinComposition"></param>
         /// <param name="run"></param>
         /// <param name="tolerance"></param>
-        /// <param name="factory"></param>
-        [Obsolete("Use the version of TopDownScore that does not take factory")]
-        public TopDownScorer(Composition proteinComposition, LcMsRun run, Tolerance tolerance, SubScoreFactory factory) : this(proteinComposition, run, tolerance)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="proteinComposition"></param>
-        /// <param name="run"></param>
-        /// <param name="tolerance"></param>
         public TopDownScorer(Composition proteinComposition, LcMsRun run, Tolerance tolerance)
         {
             _run = run;

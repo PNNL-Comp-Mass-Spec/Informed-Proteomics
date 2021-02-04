@@ -243,57 +243,6 @@ namespace InformedProteomics.FeatureFinding
             return 0;
         }
 
-        [Obsolete("Unused")]
-        private int FilterAndOutputFeaturesOld(LcMsFeatureContainer container, LcMsPeakMatrix featureFinder, string outCsvFilePath, string ms1FeaturesFilePath)
-        {
-            var featureId = 0;
-
-            Stream csvStream = new MemoryStream();
-            if (Parameters.CsvOutput)
-            {
-                csvStream = new FileStream(outCsvFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
-            }
-            // write result files
-            using (var tsvWriter = new StreamWriter(ms1FeaturesFilePath))
-            using (var csvWriter = new StreamWriter(csvStream))
-            {
-                tsvWriter.WriteLine(GetHeaderString(Parameters.ScoreReport));
-
-                if (Parameters.CsvOutput)
-                {
-                    csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
-                }
-
-                var filteredFeatures = container.GetFilteredFeatures(featureFinder);
-                foreach (var feature in filteredFeatures)
-                {
-                    featureId++;
-                    tsvWriter.WriteLine("{0}\t{1}", featureId, GetString(feature, Parameters.ScoreReport));
-
-                    var mostAbuIdx = feature.TheoreticalEnvelope.IndexOrderByRanking[0];
-
-                    if (Parameters.CsvOutput)
-                    {
-                        foreach (var envelope in feature.EnumerateEnvelopes())
-                        {
-                            //var mostAbuIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
-                            var mostAbuPeak = envelope.Peaks[mostAbuIdx];
-                            if (mostAbuPeak == null || !mostAbuPeak.Active)
-                            {
-                                continue;
-                            }
-
-                            var fitScore = 1.0 - feature.BestCorrelationScore;
-                            csvWriter.WriteLine("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
-                                mostAbuPeak.Mz, fitScore, envelope.MonoMass, featureId);
-                        }
-                    }
-                }
-            }
-
-            return featureId;
-        }
-
         private int FilterAndOutputFeatures(LcMsFeatureContainer container, LcMsPeakMatrix featureFinder, string outCsvFilePath, string ms1FeaturesFilePath)
         {
             var featureCounter = new int[1];

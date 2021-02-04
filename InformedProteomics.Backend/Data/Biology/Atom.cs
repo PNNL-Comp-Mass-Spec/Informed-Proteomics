@@ -152,40 +152,6 @@ namespace InformedProteomics.Backend.Data.Biology
             }
         }
 
-        [Obsolete("Unused")]
-        private static void ReadFromPnnlOmicsElementDataXmlFile()
-        {
-            const string xmlFileName = @"..\..\..\PNNLOmicsElementData.xml";
-            var xDoc = XDocument.Load(xmlFileName);
-
-            var parameterBaseElement = xDoc.Element("parameters");
-            if (parameterBaseElement == null)
-            {
-                throw new IOException("Problem reading xml file " + xmlFileName + "; Expected element 'parameters' but it was not found");
-            }
-
-            var elementIsotopes = parameterBaseElement.Element("ElementIsotopes");
-            if (elementIsotopes == null)
-            {
-                throw new IOException("Problem reading xml file " + xmlFileName + "; Expected element 'ElementIsotopes' but it was not found");
-            }
-
-            var elements = elementIsotopes.Elements("Element");
-            if (elements == null)
-            {
-                throw new IOException("Problem reading xml file " + xmlFileName + "; Expected element 'Element' but it was not found");
-            }
-
-            foreach (var element in elements)
-            {
-                var symbol = element.Element("Symbol")?.Value;
-                var name = element.Element("Name")?.Value;
-                if (int.TryParse(element.Element("NumIsotopes")?.Value, out _))
-                {
-                }
-            }
-        }
-
         /// <inheritdoc />
         public bool Equals(Atom other)
         {

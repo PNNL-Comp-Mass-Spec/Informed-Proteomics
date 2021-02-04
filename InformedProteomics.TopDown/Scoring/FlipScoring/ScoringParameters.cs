@@ -22,17 +22,6 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ScoringParameters" /> class.
-        /// </summary>
-        /// <param name="mass">The mass</param>
-        /// <param name="tolerance"></param>
-        /// <param name="precursorPeakFilter"></param>
-        [Obsolete("Use the constructor that only takes mass")]
-        public ScoringParameters(double mass, Tolerance tolerance, PrecursorPeakFilter precursorPeakFilter) : this(mass)
-        {
-        }
-
-        /// <summary>
         /// Gets the peak tolerance value used during training.
         /// </summary>
         public Tolerance TrainerTolerance { get; }

@@ -121,24 +121,6 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Convert a spec file to pbf
         /// </summary>
         /// <param name="specFilePath"></param>
-        /// <param name="precursorSignalToNoiseRatioThreshold"></param>
-        /// <param name="productSignalToNoiseRatioThreshold"></param>
-        /// <param name="pbfFilePath"></param>
-        /// <param name="progress"></param>
-        /// <returns></returns>
-        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
-        [Obsolete("Use GetLcMsRun() for an optimized pbf creation process", false)]
-        public static string ConvertToPbf(string specFilePath, double precursorSignalToNoiseRatioThreshold,
-            double productSignalToNoiseRatioThreshold, string pbfFilePath = null, IProgress<ProgressData> progress = null)
-        {
-            return ConvertToPbf(specFilePath, MassSpecDataReaderFactory.GetMassSpecDataReader(specFilePath),
-                precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, pbfFilePath, progress);
-        }
-
-        /// <summary>
-        /// Convert a spec file to pbf
-        /// </summary>
-        /// <param name="specFilePath"></param>
         /// <param name="specReader"></param>
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
         /// <param name="productSignalToNoiseRatioThreshold"></param>
@@ -147,8 +129,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         [Obsolete("Use GetLcMsRun() for an optimized pbf creation process", false)]
-        public static string ConvertToPbf(string specFilePath, IMassSpecDataReader specReader,
-            double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold, string pbfFilePath = null,
+        public static string ConvertToPbf(string specFilePath, IMassSpecDataReader specReader, string pbfFilePath = null,
             IProgress<ProgressData> progress = null)
         {
             if (specFilePath.ToLower().EndsWith(FileExtensionConst, StringComparison.OrdinalIgnoreCase))

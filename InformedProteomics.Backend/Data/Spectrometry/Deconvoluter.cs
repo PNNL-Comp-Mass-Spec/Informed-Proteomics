@@ -50,26 +50,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="minCharge"></param>
-        /// <param name="maxCharge"></param>
-        /// <param name="isotopeOffsetTolerance"></param>
-        /// <param name="filteringWindowSize"></param>
-        /// <param name="tolerance"></param>
-        /// <param name="corrScoreThreshold"></param>
-        [Obsolete("Use the constructor without parameter filteringWindowSize")]
-        public Deconvoluter(
-            int minCharge,
-            int maxCharge,
-            int isotopeOffsetTolerance,
-            double filteringWindowSize,
-            Tolerance tolerance,
-            double corrScoreThreshold = 0.7) : this(minCharge, maxCharge, isotopeOffsetTolerance, tolerance, corrScoreThreshold)
-        {
-        }
-
-        /// <summary>
         /// Get a deconvoluted spectrum that combines multiple charge states
         /// </summary>
         /// <param name="spectrum"></param>
