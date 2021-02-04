@@ -283,7 +283,7 @@ namespace InformedProteomics.Backend.MassSpecData
             IDictionary<int, List<int>> isolationMzBinToScanNums,
             Spectrum spec)
         {
-            trackingInfo.SpecRead += 1;
+            trackingInfo.SpecRead++;
 
             //Console.WriteLine("Reading Scan {0}; {1} peaks", spec.ScanNum, spec.Peaks.Length);
             ScanNumToMsLevel[spec.ScanNum] = spec.MsLevel;
@@ -292,7 +292,9 @@ namespace InformedProteomics.Backend.MassSpecData
             if (spec.MsLevel == 1)
             {
                 if (trackingInfo.PrecursorSignalToNoiseRatioThreshold > 0.0)
+                {
                     spec.FilterNoise(trackingInfo.PrecursorSignalToNoiseRatioThreshold);
+                }
 
                 //foreach (var peak in spec.Peaks)
                 //{
@@ -306,7 +308,9 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (spec is ProductSpectrum productSpec)
                 {
                     if (trackingInfo.ProductSignalToNoiseRatioThreshold > 0.0)
+                    {
                         productSpec.FilterNoise(trackingInfo.ProductSignalToNoiseRatioThreshold);
+                    }
 
                     var isolationWindow = productSpec.IsolationWindow;
                     var minBinNum = (int)Math.Round(isolationWindow.MinMz * IsolationWindowBinningFactor);
@@ -324,11 +328,25 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
 
-            if (spec.ScanNum < trackingInfo.MinScanNum) trackingInfo.MinScanNum = spec.ScanNum;
-            if (spec.ScanNum > trackingInfo.MaxScanNum) trackingInfo.MaxScanNum = spec.ScanNum;
+            if (spec.ScanNum < trackingInfo.MinScanNum)
+            {
+                trackingInfo.MinScanNum = spec.ScanNum;
+            }
 
-            if (spec.MsLevel < trackingInfo.MinMsLevel) trackingInfo.MinMsLevel = spec.MsLevel;
-            if (spec.MsLevel > trackingInfo.MaxMsLevel) trackingInfo.MaxMsLevel = spec.MsLevel;
+            if (spec.ScanNum > trackingInfo.MaxScanNum)
+            {
+                trackingInfo.MaxScanNum = spec.ScanNum;
+            }
+
+            if (spec.MsLevel < trackingInfo.MinMsLevel)
+            {
+                trackingInfo.MinMsLevel = spec.MsLevel;
+            }
+
+            if (spec.MsLevel > trackingInfo.MaxMsLevel)
+            {
+                trackingInfo.MaxMsLevel = spec.MsLevel;
+            }
         }
 
         /// <summary>
@@ -436,7 +454,11 @@ namespace InformedProteomics.Backend.MassSpecData
             var spec = GetSpectrum(scanNum);
             var ms1ScanNums = GetMs1ScanVector();
             ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
-            if (ms1ScanIndex < 0) return null;
+            if (ms1ScanIndex < 0)
+            {
+                return null;
+            }
+
             return spec;
         }
 
@@ -448,10 +470,15 @@ namespace InformedProteomics.Backend.MassSpecData
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
             var spec = GetSpectrum(scanNum);
-            if (spec == null) return null;
+            if (spec == null)
+            {
+                return null;
+            }
 
             if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec))
+            {
                 return null;
+            }
 
             return productSpec.IsolationWindow;
         }
@@ -522,9 +549,15 @@ namespace InformedProteomics.Backend.MassSpecData
             //for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
             foreach (var scanNum in GetFragmentationSpectraScanNums(precursorIonMz))
             {
-                if (scanNum < minScanNum || scanNum > maxScanNum) continue;
-                var spec = GetSpectrum(scanNum) as ProductSpectrum;
-                if (spec == null) continue;
+                if (scanNum < minScanNum || scanNum > maxScanNum)
+                {
+                    continue;
+                }
+
+                if (!(GetSpectrum(scanNum) is ProductSpectrum spec))
+                {
+                    continue;
+                }
 
                 var peak = spec.FindPeak(minMz, maxMz);
                 xic.Add(peak != null ? new XicPoint(scanNum, peak.Mz, peak.Intensity) : new XicPoint(scanNum, 0, 0));
@@ -547,15 +580,26 @@ namespace InformedProteomics.Backend.MassSpecData
 
             for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
             {
-                if (GetMsLevel(scanNum) == 1) continue;
+                if (GetMsLevel(scanNum) == 1)
+                {
+                    continue;
+                }
 
-                var productSpec = _scanNumSpecMap[scanNum] as ProductSpectrum;
-                if (productSpec == null) continue;
+                if (!(_scanNumSpecMap[scanNum] is ProductSpectrum productSpec))
+                {
+                    continue;
+                }
 
-                if (!productSpec.IsolationWindow.Contains(precursorIonMz)) continue;
+                if (!productSpec.IsolationWindow.Contains(precursorIonMz))
+                {
+                    continue;
+                }
 
                 var peak = productSpec.FindPeak(productIonMz, tolerance);
-                if (peak != null) productXic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
+                if (peak != null)
+                {
+                    productXic.Add(new XicPoint(scanNum, peak.Mz, peak.Intensity));
+                }
             }
 
             return productXic;
@@ -592,14 +636,21 @@ namespace InformedProteomics.Backend.MassSpecData
             var xic = new Xic();
 
             var index = peakList.BinarySearch(new LcMsPeak((minMz + maxMz) / 2, 0, 0));
-            if (index < 0) index = ~index;
+            if (index < 0)
+            {
+                index = ~index;
+            }
 
             // go down
             var i = index - 1;
             while (i >= 0 && i < peakList.Count)
             {
                 var peak = peakList[i];
-                if (peak.Mz <= minMz) break;
+                if (peak.Mz <= minMz)
+                {
+                    break;
+                }
+
                 xic.Add(new XicPoint(peak));
                 --i;
             }
@@ -609,7 +660,11 @@ namespace InformedProteomics.Backend.MassSpecData
             while (i >= 0 && i < peakList.Count)
             {
                 var peak = peakList[i];
-                if (peak.Mz >= maxMz) break;
+                if (peak.Mz >= maxMz)
+                {
+                    break;
+                }
+
                 xic.Add(new XicPoint(peak));
                 ++i;
             }

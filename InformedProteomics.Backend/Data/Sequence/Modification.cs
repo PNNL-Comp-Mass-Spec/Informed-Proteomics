@@ -108,7 +108,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             var lowerPsiMsName = psiMsName.ToLower();
 
-            if (NameToModMap.TryGetValue(lowerPsiMsName, out var mod)) return mod;
+            if (NameToModMap.TryGetValue(lowerPsiMsName, out var mod))
+            {
+                return mod;
+            }
+
             return null;
         }
 
@@ -121,7 +125,9 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             var mod = Get(modName);
             if (mod != null)
+            {
                 return mod;
+            }
 
             var genericMod = new Modification(UNKNOWN_PSI_MOD_ACCESSION, deltaMass, modName);
 
@@ -146,10 +152,15 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public static IList<Modification> GetFromMass(string massStr)
         {
-            if (massStr.StartsWith("+")) massStr = massStr.Substring(1);
+            if (massStr.StartsWith("+"))
+            {
+                massStr = massStr.Substring(1);
+            }
 
             if (MassToModMap.TryGetValue(massStr, out var modList))
+            {
                 return modList;
+            }
 
             // Exact match not found; assure the mod mass is properly formatted
             if (double.TryParse(massStr, out var modMass))
@@ -157,7 +168,9 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var formattedMass = string.Format(MOD_MASS_FORMAT_STRING, modMass);
 
                 if (MassToModMap.TryGetValue(formattedMass, out var modList2))
+                {
                     return modList2;
+                }
             }
 
             return null;
@@ -393,7 +406,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             var lowerName = name.ToLower();
             var mod = Get(lowerName);
-            if (mod != null) return mod;
+            if (mod != null)
+            {
+                return mod;
+            }
 
             mod = new Modification(-1, composition, name);
             Register(mod);
@@ -410,10 +426,16 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             var lowerName = name.ToLower();
             var modList = GetFromMass(mass);
-            if (modList != null && modList.Any()) return modList[0];
+            if (modList?.Count > 0)
+            {
+                return modList[0];
+            }
 
             var mod = Get(lowerName);
-            if (mod != null) return mod;
+            if (mod != null)
+            {
+                return mod;
+            }
 
             mod = new Modification(-1, mass, name);
             Register(mod);
@@ -431,10 +453,16 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             // Names should be case-insensitive.
             var lowerName = name.ToLower();
-            if (NameToModMap.ContainsKey(lowerName)) NameToModMap.Remove(lowerName);
+            if (NameToModMap.ContainsKey(lowerName))
+            {
+                NameToModMap.Remove(lowerName);
+            }
 
             var massStr = string.Format(MOD_MASS_FORMAT_STRING, composition.Mass);
-            if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
+            if (MassToModMap.ContainsKey(massStr))
+            {
+                MassToModMap.Remove(massStr);
+            }
 
             // Use original-cased name in modification object.
             var modification = new Modification(-1, composition, name);
@@ -454,10 +482,16 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             // Names should be case-insensitive.
             var lowerName = name.ToLower();
-            if (NameToModMap.ContainsKey(lowerName)) NameToModMap.Remove(lowerName);
+            if (NameToModMap.ContainsKey(lowerName))
+            {
+                NameToModMap.Remove(lowerName);
+            }
 
             var massStr = string.Format(MOD_MASS_FORMAT_STRING, mass);
-            if (MassToModMap.ContainsKey(massStr)) MassToModMap.Remove(massStr);
+            if (MassToModMap.ContainsKey(massStr))
+            {
+                MassToModMap.Remove(massStr);
+            }
 
             var modification = new Modification(-1, mass, name);
             Register(modification);
@@ -474,11 +508,15 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             var lowerName = modification.Name.ToLower();
             if (NameToModMap.ContainsKey(lowerName))
+            {
                 NameToModMap.Remove(lowerName);
+            }
 
             var massStr = string.Format(MOD_MASS_FORMAT_STRING, modification.Mass);
             if (MassToModMap.ContainsKey(massStr))
+            {
                 MassToModMap.Remove(massStr);
+            }
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace InformedProteomics.TopDown.Quantification
             _rawFiles = rawFiles;
             _crossTabFile = crossTabFile;
             _searchableDB = new SearchableDatabase(new FastaDatabase(databaseFile));
-            _filteredFeatures = new List<Tuple<int,double, double, double, double, double>>();
+            _filteredFeatures = new List<Tuple<int, double, double, double, double, double>>();
         }
 
         /*
@@ -42,12 +42,16 @@ namespace InformedProteomics.TopDown.Quantification
                 var sequence = featureElements[1];
                 var pVal = double.Parse(featureElements[9]);
                 var logFc = double.Parse(featureElements[10]);
-                if (!(string.IsNullOrEmpty(sequence) && pVal > .01)) continue;
+                if (!(string.IsNullOrEmpty(sequence) && pVal > .01))
+                {
+                    continue;
+                }
+
                 var mass = featureElements[12];
                 var minElution = featureElements[13];
                 var maxElution = featureElements[14];
                 filteredCount++;
-                tsv.Append(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n", filteredCount,mass, minElution, maxElution, pVal,logFc));
+                tsv.AppendFormat("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n", filteredCount, mass, minElution, maxElution, pVal, logFc);
             }
 
             _filteredFile = outputFolder + "filteredFeatures.tsv";
@@ -78,10 +82,10 @@ namespace InformedProteomics.TopDown.Quantification
             var outputFile = outputFolder + "analysis.tsv";
             var tsv = new StringBuilder();
             const string headerString = "32A\t32B\t32C\t32D\t32E\t32F\t32G\t33A\t33B\t33C\t33D\t33E\t33F\t33G";
-            tsv.Append(string.Format("id\tmass\tminElutionTime\tmaxElutionTime\tpVal\tfold-change\t{0}\t{1}\t{2}\n",headerString,headerString,headerString));
+            tsv.AppendFormat("id\tmass\tminElutionTime\tmaxElutionTime\tpVal\tfold-change\t{0}\t{1}\t{2}\n", headerString, headerString, headerString);
             for (var i = 0; i < _filteredFeatures.Count; i++)
             {
-                var line = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t", _filteredFeatures[i].Item1,_filteredFeatures[i].Item2, _filteredFeatures[i].Item3, _filteredFeatures[i].Item4, _filteredFeatures[i].Item5,_filteredFeatures[i].Item6);
+                var line = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t", _filteredFeatures[i].Item1, _filteredFeatures[i].Item2, _filteredFeatures[i].Item3, _filteredFeatures[i].Item4, _filteredFeatures[i].Item5, _filteredFeatures[i].Item6);
                 _spectrumMatchesMatrix[i].ToList().ForEach(x => line += x.ToString() + "\t");
                 _tagsGeneratedMatrix[i].ToList().ForEach(x => line += x.ToString() + "\t");
                 _dataBaseHitMatrix[i].ToList().ForEach(x => line += x.ToString() + "\t");
@@ -93,15 +97,15 @@ namespace InformedProteomics.TopDown.Quantification
             const string head = "Scan#\tMz\tCharge";
             tsv.Clear();
             tsv.Append("feature\tMonoMass\t32A\t\t\t32B\t\t\t32C\t\t\t32D\t\t\t32E\t\t\t32F\t\t\t32G\t\t\t33A\t\t\t33B\t\t\t33C\t\t\t33D\t\t\t33E\t\t\t33F\t\t\t33G\n");
-            tsv.Append(string.Format("\t\t\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\n",head,head,head,head,head,head,head,head,head,head,head,head,head,head));
+            tsv.AppendFormat("\t\t\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\n", head, head, head, head, head, head, head, head, head, head, head, head, head, head);
             for (var i = 0; i < _identifiedFeatures.Length; i++)
             {
                 var line = string.Format("{0}\t{1}\t", i, _filteredFeatures[i].Item2);
-                _identifiedFeatures[i].ToList().ForEach(x => line += x.Item1 + "\t" + x.Item2 +"\t" + x.Item3 + "\t");
+                _identifiedFeatures[i].ToList().ForEach(x => line += x.Item1 + "\t" + x.Item2 + "\t" + x.Item3 + "\t");
                 line += "\n";
                 tsv.Append(line);
             }
-            File.WriteAllText(outputFolder + "featureDetails.tsv",tsv.ToString());
+            File.WriteAllText(outputFolder + "featureDetails.tsv", tsv.ToString());
         }
 
         public void DoAnalysis()
@@ -116,10 +120,10 @@ namespace InformedProteomics.TopDown.Quantification
                 Console.WriteLine("Processing File {0}...............", i);
                 var run = PbfLcMsRun.GetLcMsRun(_rawFiles[i]);
                 var ms2List = run.GetScanNumbers(2);
-                Console.WriteLine("# of scans {0}",ms2List.Count);
+                Console.WriteLine("# of scans {0}", ms2List.Count);
                 for (var j = 0; j < _filteredFeatures.Count; j++)
                 {
-                    var matchedSpecList = GetMatchedSpectra(run, ms2List, _filteredFeatures[j],i);
+                    var matchedSpecList = GetMatchedSpectra(run, ms2List, _filteredFeatures[j], i);
                     _spectrumMatchesMatrix[j][i] = matchedSpecList.Count;
 
                     var tags = GetTags(matchedSpecList);
@@ -131,7 +135,7 @@ namespace InformedProteomics.TopDown.Quantification
             }
         }
 
-        private List<ProductSpectrum> GetMatchedSpectra(ILcMsRun run, IList<int> ms2List ,Tuple<int,double, double, double, double,double> feature, int fileIndex)
+        private List<ProductSpectrum> GetMatchedSpectra(ILcMsRun run, IList<int> ms2List, Tuple<int, double, double, double, double, double> feature, int fileIndex)
         {
             var spectrumList = new List<ProductSpectrum>();
             var mass = feature.Item2;
@@ -142,7 +146,10 @@ namespace InformedProteomics.TopDown.Quantification
             foreach (var scanNum in ms2List)
             {
                 var scanElutionTime = run.GetElutionTime(scanNum);
-                if (scanElutionTime < minElution || scanElutionTime > maxElution) continue;
+                if (scanElutionTime < minElution || scanElutionTime > maxElution)
+                {
+                    continue;
+                }
 
                 if (!(run.GetSpectrum(scanNum) is ProductSpectrum spectrum))
                 {
@@ -158,9 +165,17 @@ namespace InformedProteomics.TopDown.Quantification
                 for (var j = 0; j < mzTable.Length; j++)
                 {
                     var mz = mzTable[j];
-                    if (mz < minMz || mz > maxMz) continue;
+                    if (mz < minMz || mz > maxMz)
+                    {
+                        continue;
+                    }
+
                     spectrumList.Add(spectrum);
-                    if(!(det.Item1 > -1)) det = new Tuple<int, double, int>(scanNum,mz,j+2);
+                    if (!(det.Item1 > -1))
+                    {
+                        det = new Tuple<int, double, int>(scanNum, mz, j + 2);
+                    }
+
                     break;
                 }
                 _identifiedFeatures[featureId][fileIndex] = det;
@@ -170,16 +185,24 @@ namespace InformedProteomics.TopDown.Quantification
 
         private List<SequenceTag.SequenceTag> GetTags(IReadOnlyCollection<ProductSpectrum> spectra)
         {
-            var tagDict = new Dictionary<string,SequenceTag.SequenceTag>();
-            if (spectra.Count == 0) return tagDict.Values.ToList();
+            var tagDict = new Dictionary<string, SequenceTag.SequenceTag>();
+            if (spectra.Count == 0)
+            {
+                return tagDict.Values.ToList();
+            }
+
             foreach (var spectrum in spectra)
             {
                 var tagFinder = new SequenceTagFinder(spectrum, new Tolerance(10), 4);
                 var tags = tagFinder.GetAllSequenceTagString();
                 foreach (var t in tags)
                 {
-                    if (tagDict.ContainsKey(t.Sequence)) continue;
-                    tagDict.Add(t.Sequence,t);
+                    if (tagDict.ContainsKey(t.Sequence))
+                    {
+                        continue;
+                    }
+
+                    tagDict.Add(t.Sequence, t);
                 }
             }
             return tagDict.Values.ToList();
@@ -188,11 +211,18 @@ namespace InformedProteomics.TopDown.Quantification
         private int TagsInDatabase(IReadOnlyCollection<SequenceTag.SequenceTag> tags)
         {
             var hits = 0;
-            if (tags.Count == 0) return hits;
+            if (tags.Count == 0)
+            {
+                return hits;
+            }
+
             foreach (var tag in tags)
             {
                 var index = _searchableDB.Search(tag.Sequence);
-                if (index >= 0) hits++;
+                if (index >= 0)
+                {
+                    hits++;
+                }
             }
             return hits;
         }
@@ -218,7 +248,7 @@ namespace InformedProteomics.TopDown.Quantification
                 var maxElution = double.Parse(filteredElements[3]);
                 var pVal = double.Parse(filteredElements[4]);
                 var fVal = double.Parse(filteredElements[5]);
-                _filteredFeatures.Add(new Tuple<int, double, double,double,double,double>(id, mass, minElution, maxElution,pVal,fVal));
+                _filteredFeatures.Add(new Tuple<int, double, double, double, double, double>(id, mass, minElution, maxElution, pVal, fVal));
             }
         }
 
@@ -231,7 +261,7 @@ namespace InformedProteomics.TopDown.Quantification
         private readonly string _crossTabFile;
         private string _filteredFile;
         private readonly SearchableDatabase _searchableDB;
-        private readonly List<Tuple<int,double, double, double,double,double>> _filteredFeatures;
+        private readonly List<Tuple<int, double, double, double, double, double>> _filteredFeatures;
         private Tuple<int, double, int>[][] _identifiedFeatures;
         private int[][] _spectrumMatchesMatrix;
         private int[][] _tagsGeneratedMatrix;

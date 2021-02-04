@@ -83,7 +83,7 @@ namespace InformedProteomics.TopDown.Scoring
             foreach (var specNum in _fullRun.AllScanNumbers.Where(x => _fullRun.GetMsLevel(x) > 1))
             {
                 var spec = _fullRun.GetSpectrum(specNum) as ProductSpectrum;
-                if (spec != null && spec.Peaks.Length > 0)
+                if (spec?.Peaks.Length > 0)
                 {
                     var refPeakInt = CompositeScorer.GetRefIntensity(spec.Peaks);
                     _referencePeakIntensities.Add(specNum, refPeakInt);
@@ -99,7 +99,10 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IScoringGraph GetMs2ScoringGraph(int scanNum, double precursorMass, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
-            if (precursorMass > _comparer.MaxMass || precursorMass < _comparer.MinMass) return null;
+            if (precursorMass > _comparer.MaxMass || precursorMass < _comparer.MinMass)
+            {
+                return null;
+            }
 
             CompositeScorerBasedOnDeconvolutedSpectrum deconvScorer;
             if (InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
@@ -124,15 +127,22 @@ namespace InformedProteomics.TopDown.Scoring
                 //if (spec == null || spec.Peaks.Length == 0)
                 //    return null;
                 if (!_referencePeakIntensities.TryGetValue(scanNum, out var refPeakInt))
+                {
                     return null;
-                var deconvolutedSpec = this._run.GetSpectrum(scanNum) as DeconvolutedSpectrum;
+                }
                 //var deconvolutedSpec = Deconvoluter.GetCombinedDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, IsotopeOffsetTolerance, _productTolerance, 0.7);
                 //var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge,  IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
                 //return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer, activationMethod) : null;
-                return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, refPeakInt, _productTolerance, _comparer, activationMethod) : null;
+
+                return this._run.GetSpectrum(scanNum) is DeconvolutedSpectrum deconvolutedSpec ?
+                    new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, refPeakInt, _productTolerance, _comparer, activationMethod) :
+                    null;
             }
 
-            if (_ms2Scorer.TryGetValue(scanNum, out var scorer)) return scorer;
+            if (_ms2Scorer.TryGetValue(scanNum, out var scorer))
+            {
+                return scorer;
+            }
 
             return null;
         }
@@ -142,7 +152,11 @@ namespace InformedProteomics.TopDown.Scoring
             try
             {
                 var scorer = GetScorer(scanNum);
-                if (scorer == null) return;
+                if (scorer == null)
+                {
+                    return;
+                }
+
                 _ms2Scorer.TryAdd(scanNum, scorer);
             }
             catch (Exception ex)
@@ -155,8 +169,7 @@ namespace InformedProteomics.TopDown.Scoring
         {
             if (InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
             {
-                IScorer scorer;
-                if (_ms2Scorer.TryGetValue(scanNum, out scorer))
+                if (_ms2Scorer.TryGetValue(scanNum, out var scorer))
                 {
                     return scorer;
                 }
@@ -168,7 +181,11 @@ namespace InformedProteomics.TopDown.Scoring
 
             try
             {
-                if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec)) return null;
+                if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec))
+                {
+                    return null;
+                }
+
                 var deconvolutedSpec = Deconvoluter.GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, IsotopeOffsetTolerance, FilteringWindowSize, _productTolerance);
                 return deconvolutedSpec != null ? new CompositeScorerBasedOnDeconvolutedSpectrum(deconvolutedSpec, spec, _productTolerance, _comparer) : null;
             }

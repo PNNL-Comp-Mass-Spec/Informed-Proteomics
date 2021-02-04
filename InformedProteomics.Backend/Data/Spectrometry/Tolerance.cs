@@ -63,9 +63,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public double GetToleranceAsMz(double mz)
         {
-            if (_unit == ToleranceUnit.Mz) return _value;
+            if (_unit == ToleranceUnit.Mz)
+            {
+                return _value;
+            }
+
             if (_unit == ToleranceUnit.Da)
+            {
                 throw new System.ArgumentException("This function cannot be called for Da unit");
+            }
+
             return mz * _value / 1E6;
         }
 
@@ -88,7 +95,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public double GetToleranceAsDa(double mz, int charge)
         {
-            if (_unit == ToleranceUnit.Da) return _value;
+            if (_unit == ToleranceUnit.Da)
+            {
+                return _value;
+            }
+
             return GetToleranceAsMz(mz)*charge;
         }
 
@@ -101,7 +112,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public bool IsWithin(double mz1, double mz2)
         {
             var tolTh = GetToleranceAsMz(mz1);
-            if (tolTh < 0) tolTh = -tolTh;
+            if (tolTh < 0)
+            {
+                tolTh = -tolTh;
+            }
+
             return mz2 > mz1 - tolTh && mz2 < mz1 + tolTh;
         }
 

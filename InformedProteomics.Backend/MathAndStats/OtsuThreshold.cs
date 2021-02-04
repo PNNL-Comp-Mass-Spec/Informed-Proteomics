@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.MathAndStats
     /// <summary>
     /// Class for calculating Otsu threshold
     /// </summary>
-    public class OtsuThreshold
+    public static class OtsuThreshold
     {
         /// <summary>
         /// Calculate the Otsu threshold for the provided data
@@ -25,11 +25,21 @@ namespace InformedProteomics.Backend.MathAndStats
 
             foreach (var x in data)
             {
-                if (x < xLb || x > xUb) continue;
+                if (x < xLb || x > xUb)
+                {
+                    continue;
+                }
 
                 var binIndex = (int)(Math.Ceiling((x - minX) / intervalX) - 1);
-                if (binIndex < 0) binIndex = 0;
-                else if (binIndex >= nBins) binIndex = nBins - 1;
+                if (binIndex < 0)
+                {
+                    binIndex = 0;
+                }
+                else if (binIndex >= nBins)
+                {
+                    binIndex = nBins - 1;
+                }
+
                 hist[binIndex]++;
             }
 
@@ -56,16 +66,25 @@ namespace InformedProteomics.Backend.MathAndStats
             var nBins = (int)Math.Ceiling((maxX - minX) / intervalX);
             var hist = new int[nBins];
 
-            for(var i = minRow; i < maxRow; i++)
+            for (var i = minRow; i < maxRow; i++)
             {
                 for (var j = minCol; j < maxCol; j++)
                 {
                     var x = data[i][j];
-                    if (x < xLb || x > xUb) continue;
+                    if (x < xLb || x > xUb)
+                    {
+                        continue;
+                    }
 
                     var binIndex = (int)(Math.Ceiling((x - minX) / intervalX) - 1);
-                    if (binIndex < 0) binIndex = 0;
-                    else if (binIndex >= nBins) binIndex = nBins - 1;
+                    if (binIndex < 0)
+                    {
+                        binIndex = 0;
+                    }
+                    else if (binIndex >= nBins)
+                    {
+                        binIndex = nBins - 1;
+                    }
 
                     hist[binIndex]++;
                 }
@@ -85,13 +104,16 @@ namespace InformedProteomics.Backend.MathAndStats
                 var p2 = Px(j + 1, nBins - 1, hist);
 
                 var p12 = p1 * p2;
-                if (p12 < double.Epsilon) p12 = 1;
+                if (p12 < double.Epsilon)
+                {
+                    p12 = 1;
+                }
 
                 var diff = (Mx(0, j, hist) * p2) - (Mx(j + 1, nBins - 1, hist) * p1);
                 vet[j] = diff * diff / p12;
             }
 
-            var thresholdIndex = findMax(vet);
+            var thresholdIndex = FindMax(vet);
             var threshold = minX + (thresholdIndex + 1) * intervalX;
 
             return threshold;
@@ -103,7 +125,9 @@ namespace InformedProteomics.Backend.MathAndStats
             var sum = 0d;
             int i;
             for (i = init; i <= end; i++)
+            {
                 sum += hist[i];
+            }
 
             return sum;
         }
@@ -114,13 +138,15 @@ namespace InformedProteomics.Backend.MathAndStats
             var sum = 0d;
             int i;
             for (i = init; i <= end; i++)
+            {
                 sum += i * hist[i];
+            }
 
             return sum;
         }
 
         // finds the maximum element in a vector
-        private static int findMax(IReadOnlyList<double> vec)
+        private static int FindMax(IReadOnlyList<double> vec)
         {
             double maxVec = 0;
             var idx = 0;

@@ -24,7 +24,10 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
                 bc += Math.Sqrt(p * q);
             }
 
-            if (!(bc > 0)) return MaxBhattacharyyaDistance;
+            if (!(bc > 0))
+            {
+                return MaxBhattacharyyaDistance;
+            }
 
             return -Math.Log(bc);
         }
@@ -35,21 +38,29 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
 
             for (var i = 0; i < Size; i++)
             {
-                if (isotopePeaks[i] != null && isotopePeaks[i].Active)
+                if (isotopePeaks[i]?.Active == true)
+                {
                     s2 += isotopePeaks[i].Intensity;
+                }
             }
 
-            if (!(s2 > 0)) return MaxBhattacharyyaDistance;
+            if (!(s2 > 0))
+            {
+                return MaxBhattacharyyaDistance;
+            }
 
             var bc = 0d;
             for (var i = 0; i < Size; i++)
             {
                 var p = Probability[i];
-                var q = (isotopePeaks[i] != null && isotopePeaks[i].Active) ? isotopePeaks[i].Intensity / s2 : 0;
+                var q = (isotopePeaks[i]?.Active == true) ? isotopePeaks[i].Intensity / s2 : 0;
                 bc += Math.Sqrt(p * q);
             }
 
-            if (!(bc > 0)) return MaxBhattacharyyaDistance;
+            if (!(bc > 0))
+            {
+                return MaxBhattacharyyaDistance;
+            }
 
             return -Math.Log(bc);
         }
@@ -63,7 +74,10 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
                 s2 += intensities[i];
             }
 
-            if (!(s2 > 0)) return MaxBhattacharyyaDistance;
+            if (!(s2 > 0))
+            {
+                return MaxBhattacharyyaDistance;
+            }
 
             var bc = 0d;
             for (var i = 0; i < Size; i++)
@@ -72,7 +86,10 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
                 var q = intensities[i] / s2;
                 bc += Math.Sqrt(p * q);
             }
-            if (!(bc > 0)) return MaxBhattacharyyaDistance;
+            if (!(bc > 0))
+            {
+                return MaxBhattacharyyaDistance;
+            }
 
             return -Math.Log(bc);
         }
@@ -93,7 +110,10 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
                 s2 += d2 * d2;
             }
 
-            if (s1 <= 0 || s2 <= 0) return 0;
+            if (s1 <= 0 || s2 <= 0)
+            {
+                return 0;
+            }
 
             return cov < 0 ? 0d : cov / Math.Sqrt(s1 * s2);
         }
@@ -105,7 +125,10 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
 
             for (var i = 0; i < Size; i++)
             {
-                if (isotopePeaks[i] != null && isotopePeaks[i].Active) m2 += isotopePeaks[i].Intensity;
+                if (isotopePeaks[i]?.Active == true)
+                {
+                    m2 += isotopePeaks[i].Intensity;
+                }
             }
             m2 /= Size;
 
@@ -117,13 +140,16 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             for (var i = 0; i < Size; i++)
             {
                 var d1 = Probability[i] - m1;
-                var d2 = (isotopePeaks[i] != null && isotopePeaks[i].Active) ? isotopePeaks[i].Intensity - m2 : -m2;
+                var d2 = (isotopePeaks[i]?.Active == true) ? isotopePeaks[i].Intensity - m2 : -m2;
                 cov += d1 * d2;
                 s1 += d1 * d1;
                 s2 += d2 * d2;
             }
 
-            if (s1 <= 0 || s2 <= 0) return 0;
+            if (s1 <= 0 || s2 <= 0)
+            {
+                return 0;
+            }
 
             return cov < 0 ? 0d : cov / Math.Sqrt(s1 * s2);
         }
@@ -153,7 +179,10 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
                 s2 += d2 * d2;
             }
 
-            if (s1 <= 0 || s2 <= 0) return 0;
+            if (s1 <= 0 || s2 <= 0)
+            {
+                return 0;
+            }
 
             return cov < 0 ? 0d : cov / Math.Sqrt(s1 * s2);
         }

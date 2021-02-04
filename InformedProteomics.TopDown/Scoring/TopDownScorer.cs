@@ -62,7 +62,11 @@ namespace InformedProteomics.TopDown.Scoring
             _minIsotopeIndex = 0;
             for (var i = 0; i < theoreticalIsotopeEnvelope.Length; i++)
             {
-                if (!(theoreticalIsotopeEnvelope[i] > MinIsotopeIntensity)) continue;
+                if (!(theoreticalIsotopeEnvelope[i] > MinIsotopeIntensity))
+                {
+                    continue;
+                }
+
                 _minIsotopeIndex = i;
                 break;
             }
@@ -106,19 +110,30 @@ namespace InformedProteomics.TopDown.Scoring
                     }
                 }
             }
-            else maxIndex = scanNumber;
+            else
+            {
+                maxIndex = scanNumber;
+            }
 
             var l = Math.Max(0, maxIndex - 1);
             while (l > Math.Max(maxIndex - 7, 0))
             {
-                if (l < maxIndex - 3 && s[l] < maxS * .3) break;
+                if (l < maxIndex - 3 && s[l] < maxS * .3)
+                {
+                    break;
+                }
+
                 l--;
             }
 
             var r = Math.Min(s.Length - 1, maxIndex + 1);
             while (r < Math.Min(maxIndex + 7, s.Length - 1))
             {
-                if (r > maxIndex + 3 && s[r] > maxS * .3) break;
+                if (r > maxIndex + 3 && s[r] > maxS * .3)
+                {
+                    break;
+                }
+
                 r++;
             }
             return new Tuple<int, int>(l,r);
@@ -156,7 +171,11 @@ namespace InformedProteomics.TopDown.Scoring
 
             for (var i = 0; i < abundantXic.Length; i++)
             {
-                if (!(max < abundantXic[i])) continue;
+                if (!(max < abundantXic[i]))
+                {
+                    continue;
+                }
+
                 max = abundantXic[i];
                 apexIndex = i;
             }
@@ -173,7 +192,10 @@ namespace InformedProteomics.TopDown.Scoring
                     //    Console.WriteLine(abundantXic[o] + "\t" + truncatedXics[k][o]);
 
                     //Console.WriteLine(corr);
-                    if (corr < threshold) continue;
+                    if (corr < threshold)
+                    {
+                        continue;
+                    }
                 }
 
                 isotopePeaks[k] = truncatedXics[k][apexIndex];
@@ -197,8 +219,11 @@ namespace InformedProteomics.TopDown.Scoring
             for (; score < 10; score++)
             {
                 if (m <= - corr + 1)
+                {
                     break;
-                m = m * 0.6; // the higher the higher the score
+                }
+
+                m *= 0.6; // the higher the higher the score
             }
             return score;
         }
@@ -270,7 +295,10 @@ namespace InformedProteomics.TopDown.Scoring
 
                     score += diff;
                 }
-                if (score > maxScore) maxScore = score;
+                if (score > maxScore)
+                {
+                    maxScore = score;
+                }
             }
             return (int)maxScore;
         }
@@ -333,7 +361,11 @@ namespace InformedProteomics.TopDown.Scoring
                     {
                         var r = k + smoothingWindowOneSideSize;
                         var l = k - smoothingWindowOneSideSize;
-                        if (r < x.Length) sum += x[r];
+                        if (r < x.Length)
+                        {
+                            sum += x[r];
+                        }
+
                         if (k >= 0 && k < x.Length)
                         {
                             s[k] = sum;
@@ -341,7 +373,10 @@ namespace InformedProteomics.TopDown.Scoring
 
                             //maxS = maxS < s[k] ? s[k] : maxS;
                         }
-                        if (l >= 0) sum -= x[l];
+                        if (l >= 0)
+                        {
+                            sum -= x[l];
+                        }
                     }
                     /*if (maxS > 0)
                     {
@@ -375,7 +410,10 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 var xicArrayForThisCharge = new double[_isotopeEnvelope.Length][];
                 for (var j = 0; j < xicArrayForThisCharge.Length; j++)
+                {
                     xicArrayForThisCharge[j] = new double[scanNumberIndex.Count];
+                }
+
                 var precursorIon = new Ion(_proteinCompositionPlusWater, charge);
 
                // Console.Write("precursorCharge " + charge);

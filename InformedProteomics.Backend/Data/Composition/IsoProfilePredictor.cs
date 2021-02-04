@@ -217,15 +217,25 @@ namespace InformedProteomics.Backend.Data.Composition
                 for (var j = 1; j <= maxIsotopeNumberInElement; j++)
                 {
                     var index = n - j;
-                    if (index < 0) continue;
+                    if (index < 0)
+                    {
+                        continue;
+                    }
+
                     foreach (var t in comb[index])
                     {
                         var add = new int[maxIsotopeNumberInElement];
                         add[j - 1]++;
                         for (var k = 0; k < t.Length; k++)
+                        {
                             add[k] += t[k];
+                        }
+
                         var toAdd = comb[n].Select(v => !v.Where((t1, p) => t1 != add[p]).Any()).All(equal => !equal);
-                        if (toAdd) comb[n].Add(add);
+                        if (toAdd)
+                        {
+                            comb[n].Add(add);
+                        }
                     }
                 }
             }
@@ -249,10 +259,15 @@ namespace InformedProteomics.Backend.Data.Composition
             {
                 var mean = means[i];
                 var exp = exponents[i];
-                if (number[i - 1] == 0) prob *= exp;
+                if (number[i - 1] == 0)
+                {
+                    prob *= exp;
+                }
                 else
+                {
                     prob *=
                         Math.Pow(mean, number[i - 1]) * exp / SpecialFunctions.Factorial(number[i - 1]);
+                }
             }
             return prob;
         }

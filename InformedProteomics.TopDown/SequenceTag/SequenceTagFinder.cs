@@ -23,17 +23,23 @@ namespace InformedProteomics.TopDown.SequenceTag
             _tolerance = tolerance;
 
             if (_aminoAcidsArray.Length - 1 > byte.MaxValue)
+            {
                 throw new Exception("Too many amino acid types");
+            }
 
             _maxAminoAcidMass = 0d;
             _minAminoAcidMass = 10E4;
             foreach (var aa in _aminoAcidsArray)
             {
                 if (aa.Composition.Mass > _maxAminoAcidMass)
+                {
                     _maxAminoAcidMass = aa.Composition.Mass;
+                }
 
                 if (aa.Composition.Mass < _minAminoAcidMass)
+                {
                     _minAminoAcidMass = aa.Composition.Mass;
+                }
             }
             _minTagLength = minTagLength;
 
@@ -60,7 +66,10 @@ namespace InformedProteomics.TopDown.SequenceTag
             var startNodeSet = new List<int>();
             foreach (var comp in componentSet)
             {
-                if (comp.Count < _minTagLength) continue;
+                if (comp.Count < _minTagLength)
+                {
+                    continue;
+                }
 
                 startNodeSet.AddRange(comp);
             }
@@ -72,11 +81,18 @@ namespace InformedProteomics.TopDown.SequenceTag
                 StopFindPath = false;
 
                 var edges = OutEdges(node);
-                if (edges.Count < 1) continue;
+                if (edges.Count < 1)
+                {
+                    continue;
+                }
+
                 FindPaths(node);
 
                 //if (_candidateSet.Count > 32767) break;
-                if (_seqTagSet.Count > 32767) break;
+                if (_seqTagSet.Count > 32767)
+                {
+                    break;
+                }
             }
 
             //var candidateList = _candidateSet.Values.ToList();
@@ -125,15 +141,28 @@ namespace InformedProteomics.TopDown.SequenceTag
                     var minMassGap = massGap - massTh;
 
                     var peakGap = new SequenceTagGraphEdge(i, j, massGap);
-                    if (minMassGap > _maxAminoAcidMass) break;
-                    if (maxMassGap < _minAminoAcidMass) continue;
+                    if (minMassGap > _maxAminoAcidMass)
+                    {
+                        break;
+                    }
+
+                    if (maxMassGap < _minAminoAcidMass)
+                    {
+                        continue;
+                    }
 
                     foreach (var aa in _aminoAcidsArray)
                     {
                         var massError = Math.Abs(peakGap.Mass - aa.Composition.Mass);
-                        if (minMassGap < aa.Composition.Mass && aa.Composition.Mass < maxMassGap) peakGap.AddMatchedAminoAcid(aa, massError);
+                        if (minMassGap < aa.Composition.Mass && aa.Composition.Mass < maxMassGap)
+                        {
+                            peakGap.AddMatchedAminoAcid(aa, massError);
+                        }
                     }
-                    if (peakGap.AminoAcidList.Count > 0) AddEdge(peakGap);
+                    if (peakGap.AminoAcidList.Count > 0)
+                    {
+                        AddEdge(peakGap);
+                    }
                 }
             }
         }
@@ -156,7 +185,9 @@ namespace InformedProteomics.TopDown.SequenceTag
         {
             var edgeList = edges.ToList();
             if (edgeList.Count < _minTagLength)
+            {
                 return true;
+            }
 
             NumberOfProcessedPaths++;
 
@@ -168,13 +199,21 @@ namespace InformedProteomics.TopDown.SequenceTag
             }*/
             foreach (var seqTag in EnumerateAllSequenceTags(edgeList))
             {
-                if (_seqTagSet.Add(seqTag)) added = true;
+                if (_seqTagSet.Add(seqTag))
+                {
+                    added = true;
+                }
             }
 
-            if (added) NumberOfAddedPaths++;
+            if (added)
+            {
+                NumberOfAddedPaths++;
+            }
 
             if (NumberOfProcessedPaths > MaxNumberOfProcessedPaths)
+            {
                 StopFindPath = true;
+            }
 
             return true;
         }

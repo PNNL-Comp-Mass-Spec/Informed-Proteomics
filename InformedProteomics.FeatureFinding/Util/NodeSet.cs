@@ -13,22 +13,38 @@ namespace InformedProteomics.FeatureFinding.Util
 
             for (var i = 0; i < Count; i++)
             {
-                if (visited[i]) continue;
+                if (visited[i])
+                {
+                    continue;
+                }
+
                 var component = new NodeSet<T>();
                 var neighbors = new Queue<int>();
                 neighbors.Enqueue(i);
 
                 while (true)
                 {
-                    if (neighbors.Count < 1) break;
+                    if (neighbors.Count < 1)
+                    {
+                        break;
+                    }
+
                     var j = neighbors.Dequeue();
-                    if (visited[j]) continue;
+                    if (visited[j])
+                    {
+                        continue;
+                    }
+
                     visited[j] = true;
 
                     component.Add(this[j]);
                     foreach (var nd in _adjList[j])
                     {
-                        if (visited[nd]) continue;
+                        if (visited[nd])
+                        {
+                            continue;
+                        }
+
                         neighbors.Enqueue(nd);
                     }
                 }

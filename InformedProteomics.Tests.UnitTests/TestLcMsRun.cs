@@ -118,8 +118,7 @@ namespace InformedProteomics.Tests.UnitTests
             var run = InMemoryLcMsRun.GetLcMsRunScanRange(FilePaths.TestTopDownRawFilePathCid, SCAN, SCAN);
 
             const int scanNum = SCAN;
-            var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
-            if (spec != null)
+            if (run.GetSpectrum(scanNum) is ProductSpectrum spec)
             {
                 spec.Display(MAX_POINTS);
                 var precursorInfo = spec.IsolationWindow;

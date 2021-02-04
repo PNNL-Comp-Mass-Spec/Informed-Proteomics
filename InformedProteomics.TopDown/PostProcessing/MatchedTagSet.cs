@@ -12,15 +12,15 @@ namespace InformedProteomics.TopDown.PostProcessing
         public MatchedTagSet(string sequence,
             AminoAcidSet aminoAcidSet, Tolerance tolerance, Tolerance relaxedTolerance)
         {
-            _sequence = sequence;
+            Sequence = sequence;
             _aminoAcidSet = aminoAcidSet;
             _tolerance = tolerance;
             _relaxedTolerance = relaxedTolerance;
-            _tags = new List<MatchedTag>();
+            Tags = new List<MatchedTag>();
         }
 
-        public string Sequence => _sequence;
-        public List<MatchedTag> Tags => _tags;
+        public string Sequence { get; }
+        public List<MatchedTag> Tags { get; }
 
         /// <summary>
         /// Adds a tag to this tag set.
@@ -29,11 +29,11 @@ namespace InformedProteomics.TopDown.PostProcessing
         /// <returns>true if tag is merged to an existingTag tag. false otherwise</returns>
         public bool Add(MatchedTag tag)
         {
-            if (_tags.Any(existingTag => TryMerge(existingTag, tag)))
+            if (Tags.Any(existingTag => TryMerge(existingTag, tag)))
             {
                 return true;
             }
-            _tags.Add(tag);
+            Tags.Add(tag);
             return false;
         }
 
@@ -52,7 +52,10 @@ namespace InformedProteomics.TopDown.PostProcessing
                 var toleranceNTerm = existingTag.IsNTermFlankingMassReliable == newTag.IsNTermFlankingMassReliable
                     ? _tolerance
                     : _relaxedTolerance;
-                if (!toleranceNTerm.IsWithin(newNTermFlankingMassFromExistingTag, newNTermFlankingMassFromNewTag)) return false;
+                if (!toleranceNTerm.IsWithin(newNTermFlankingMassFromExistingTag, newNTermFlankingMassFromNewTag))
+                {
+                    return false;
+                }
 
                 if (existingTag.IsNTermFlankingMassReliable || newTag.IsNTermFlankingMassReliable)    // flanking mass from this tag is reliable
                 {
@@ -69,7 +72,10 @@ namespace InformedProteomics.TopDown.PostProcessing
                         (existingTag.NumMergedSequenceTags + newTag.NumMergedSequenceTags);
                 }
             }
-            else if (!Nullable.Equals(existingTag.NTermFlankingMass, newTag.NTermFlankingMass)) return false;
+            else if (!Nullable.Equals(existingTag.NTermFlankingMass, newTag.NTermFlankingMass))
+            {
+                return false;
+            }
 
             // C-term
             var newEndIndex = Math.Max(existingTag.EndIndex, newTag.EndIndex);
@@ -84,7 +90,10 @@ namespace InformedProteomics.TopDown.PostProcessing
                 var toleranceCTerm = existingTag.IsCTermFlankingMassReliable == newTag.IsCTermFlankingMassReliable
                     ? _tolerance
                     : _relaxedTolerance;
-                if (!toleranceCTerm.IsWithin(newCTermFlankingMassFromExistingTag, newCTermFlankingMassFromNewTag)) return false;
+                if (!toleranceCTerm.IsWithin(newCTermFlankingMassFromExistingTag, newCTermFlankingMassFromNewTag))
+                {
+                    return false;
+                }
 
                 if (existingTag.IsCTermFlankingMassReliable || newTag.IsCTermFlankingMassReliable)    // flanking mass from this tag is reliable
                 {
@@ -101,7 +110,10 @@ namespace InformedProteomics.TopDown.PostProcessing
                         (existingTag.NumMergedSequenceTags + newTag.NumMergedSequenceTags);
                 }
             }
-            else if (!Nullable.Equals(existingTag.CTermFlankingMass, newTag.CTermFlankingMass)) return false;
+            else if (!Nullable.Equals(existingTag.CTermFlankingMass, newTag.CTermFlankingMass))
+            {
+                return false;
+            }
 
             existingTag.Mass += GetSequenceMass(newStartIndex, existingTag.StartIndex) + GetSequenceMass(existingTag.EndIndex, newEndIndex);
             existingTag.StartIndex = newStartIndex;
@@ -120,15 +132,16 @@ namespace InformedProteomics.TopDown.PostProcessing
         private double GetSequenceMass(int startIndex, int endIndex)
         {
             var mass = 0.0;
-            for (var i = startIndex; i < endIndex; i++) mass += (_aminoAcidSet.GetAminoAcid(_sequence[i]) ?? AminoAcid.Empty).Mass;
+            for (var i = startIndex; i < endIndex; i++)
+            {
+                mass += (_aminoAcidSet.GetAminoAcid(Sequence[i]) ?? AminoAcid.Empty).Mass;
+            }
+
             return mass;
         }
-
-        private readonly string _sequence;
         private readonly AminoAcidSet _aminoAcidSet;
         private readonly Tolerance _tolerance;
         private readonly Tolerance _relaxedTolerance;
-        private readonly List<MatchedTag> _tags;
     }
 
     public class MatchedTag

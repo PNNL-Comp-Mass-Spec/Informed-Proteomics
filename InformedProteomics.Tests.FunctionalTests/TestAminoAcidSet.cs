@@ -21,7 +21,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             var modFile = Utils.GetTestFile(methodName, modDefsFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
 
             if (!modFile.Exists)
+            {
                 Assert.Ignore("Ignoring test TestParsingManyMods since file not found: " + modFile.FullName);
+            }
 
             var aaSet = new AminoAcidSet(modFile.FullName);
             //aaSet.Display();

@@ -42,7 +42,11 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var mods = modsStr.Split(',');
                 foreach(var modStr in mods)
                 {
-                    if (modStr.Length == 0) continue;
+                    if (modStr.Length == 0)
+                    {
+                        continue;
+                    }
+
                     var modName = modStr.Split()[0];
                     var mod = Modification.Get(modName);
                     modComposition += mod.Composition;

@@ -79,7 +79,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             get
             {
                 if (MonoisotopicMz != null && Charge != null)
+                {
                     return (MonoisotopicMz - Constants.Proton) * Charge;
+                }
 
                 return null;
             }
@@ -102,7 +104,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         protected bool Equals(IsolationWindow other)
         {
-            if (Math.Abs(MinMz - other.MinMz) < 0.01 && Math.Abs(MaxMz - other.MaxMz) < 0.01) return true;
+            if (Math.Abs(MinMz - other.MinMz) < 0.01 && Math.Abs(MaxMz - other.MaxMz) < 0.01)
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -119,9 +125,21 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
             return Equals((IsolationWindow)obj);
         }
 

@@ -55,8 +55,15 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="v"></param>
         public void Add(int v)
         {
-            if (v < Min) Min = v;
-            if (v > Max) Max = v;
+            if (v < Min)
+            {
+                Min = v;
+            }
+
+            if (v > Max)
+            {
+                Max = v;
+            }
         }
 
         /// <summary>

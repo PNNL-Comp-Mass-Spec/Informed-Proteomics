@@ -188,8 +188,16 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <inheritdoc />
         public bool Equals(Atom other)
         {
-            if (other == null) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
             return Name.Equals(other.Name);
         }
 
@@ -201,8 +209,8 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <inheritdoc />
         public override int GetHashCode() {
             var result = 29;
-            result = result * 13 + (Name == null ? 0 : Name.GetHashCode());
-            result = result * 13 + (Code == null ? 0 : Code.GetHashCode());
+            result = result * 13 + ((Name?.GetHashCode()) ?? 0);
+            result = result * 13 + ((Code?.GetHashCode()) ?? 0);
             return result;
         }
     }

@@ -113,12 +113,21 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             SmoothingWindowSize = new int[smoothingWindowSizeStr.Length];
 
             if (SmoothingRanks.Length != SmoothingWindowSize.Length)
+            {
                 throw new ArgumentException("SmoothingRanks and SmoothingWindowSize unequal lengths.");
+            }
 
             for (var i = 0; i < SmoothingRanks.Length; i++)
             {
-                if (smoothingRanksStr[i] == "Max") SmoothingRanks[i] = int.MaxValue;
-                else SmoothingRanks[i] = Convert.ToInt32(smoothingRanksStr[i]);
+                if (smoothingRanksStr[i] == "Max")
+                {
+                    SmoothingRanks[i] = int.MaxValue;
+                }
+                else
+                {
+                    SmoothingRanks[i] = Convert.ToInt32(smoothingRanksStr[i]);
+                }
+
                 SmoothingWindowSize[i] = Convert.ToInt32(smoothingWindowSizeStr[i]);
             }
 

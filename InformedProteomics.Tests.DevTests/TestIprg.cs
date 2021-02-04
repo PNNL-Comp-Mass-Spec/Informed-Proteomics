@@ -92,7 +92,11 @@ namespace InformedProteomics.Tests.DevTests
                     abundances[i] = parser.GetData(headers[jobColNum[i]]).ToArray();
                 }
 
-                if (peptides != null) writer.Write("Peptide\t");
+                if (peptides != null)
+                {
+                    writer.Write("Peptide\t");
+                }
+
                 writer.Write("Protein\tLength");
                 for (var i = 0; i < jobs.Length; i++)
                 {
@@ -102,14 +106,22 @@ namespace InformedProteomics.Tests.DevTests
                 for (var i = 0; i < proteins.Count; i++)
                 {
                     var protein = proteins[i];
-                    if (protein.StartsWith("XXX") || protein.StartsWith("Contaminant")) continue;
+                    if (protein.StartsWith("XXX") || protein.StartsWith("Contaminant"))
+                    {
+                        continue;
+                    }
+
                     var length = database.GetProteinLength(protein);
                     //if (length <= 0)
                     //{
                     //    Console.WriteLine("Shit!");
                     //    return;
                     //}
-                    if (peptides != null) writer.Write(peptides[i] + "\t");
+                    if (peptides != null)
+                    {
+                        writer.Write(peptides[i] + "\t");
+                    }
+
                     writer.Write(protein + "\t" + length);
                     for (var j = 0; j < jobs.Length; j++)
                     {
@@ -141,8 +153,7 @@ namespace InformedProteomics.Tests.DevTests
                 foreach (var line in File.ReadLines(resultFilePath))
                 {
                     var token = line.Split('\t');
-                    double result;
-                    writer.WriteLine(string.Join("\t", token.Select(t => t.Length == 0 ? "NA" : (Double.TryParse(t, out result) ? (result * 1E6).ToString() : t))));
+                    writer.WriteLine(string.Join("\t", token.Select(t => t.Length == 0 ? "NA" : (Double.TryParse(t, out var result) ? (result * 1E6).ToString() : t))));
                 }
             }
         }
@@ -175,7 +186,11 @@ namespace InformedProteomics.Tests.DevTests
                 foreach (var line in File.ReadLines(resultPath))
                 {
                     var data = line.Split(null);
-                    if (data.Length != 14) continue;
+                    if (data.Length != 14)
+                    {
+                        continue;
+                    }
+
                     var peptide = data[0];
                     if (peptide.Equals("Peptide"))
                     {
@@ -213,8 +228,11 @@ namespace InformedProteomics.Tests.DevTests
                 var end = proteinName.LastIndexOf('|');
                 //var accession = proteinName.Substring(start + 1, end - start - 1);
                 var name = proteinName.Substring(end + 1);
-                if (proteinName.StartsWith("DECOY")) name = name + "-DECOY";
-//                Console.WriteLine(name + " -> " +accession);
+                if (proteinName.StartsWith("DECOY"))
+                {
+                    name += "-DECOY";
+                }
+                //                Console.WriteLine(name + " -> " +accession);
                 Assert.IsTrue(uniProtPattern.IsMatch(proteinName));
                 nameToAccession.Add(name, proteinName);
 //                Console.WriteLine(name);
@@ -228,15 +246,22 @@ namespace InformedProteomics.Tests.DevTests
 
             foreach (var line in File.ReadLines(resultPath))
             {
-                if (line.Length == 0) continue;
+                if (line.Length == 0)
+                {
+                    continue;
+                }
+
                 var name = line;
 //                if (name.Contains(";"))
 //                {
 //                }
                 name = name.Split()[0];
-                if (name.Contains('|')) name = name.Substring(name.LastIndexOf('|') + 1);
-                string proteinName;
-                if (nameToAccession.TryGetValue(name, out proteinName))
+                if (name.Contains('|'))
+                {
+                    name = name.Substring(name.LastIndexOf('|') + 1);
+                }
+
+                if (nameToAccession.TryGetValue(name, out var proteinName))
                 {
                     Console.WriteLine(proteinName);
                 }

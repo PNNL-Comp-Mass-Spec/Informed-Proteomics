@@ -32,7 +32,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             var massBinNum = GetBinNumber(sequenceMass);
 
-            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out var ms2ScanNums)) return ms2ScanNums;
+            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out var ms2ScanNums))
+            {
+                return ms2ScanNums;
+            }
+
             return new int[0];
         }
 
@@ -51,7 +55,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var maxBinNum = GetBinNumber(maxMass);
             for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
             {
-                if (!_map.TryGetValue(binNum, out var scanRanges)) continue;
+                if (!_map.TryGetValue(binNum, out var scanRanges))
+                {
+                    continue;
+                }
+
                 var sequenceMass = GetMass(binNum);
                 var ms2ScanNums = new List<int>();
 
@@ -59,17 +67,27 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     for (var scanNum = scanRange.Min; scanNum <= scanRange.Max; scanNum++)
                     {
-                        if (scanNum < run.MinLcScan || scanNum > run.MaxLcScan) continue;
+                        if (scanNum < run.MinLcScan || scanNum > run.MaxLcScan)
+                        {
+                            continue;
+                        }
+
                         if (run.GetMsLevel(scanNum) == 2)
                         {
-                            var productSpec = run.GetSpectrum(scanNum) as ProductSpectrum;
-                            if (productSpec == null) continue;
+                            if (!(run.GetSpectrum(scanNum) is ProductSpectrum productSpec))
+                            {
+                                continue;
+                            }
+
                             var isolationWindow = productSpec.IsolationWindow;
                             var isolationWindowTargetMz = isolationWindow.IsolationWindowTargetMz;
                             var charge = (int)Math.Round(sequenceMass / isolationWindowTargetMz);
                             var mz = Ion.GetIsotopeMz(sequenceMass, charge,
                                 Averagine.GetIsotopomerEnvelope(sequenceMass).MostAbundantIsotopeIndex);
-                            if (productSpec.IsolationWindow.Contains(mz)) ms2ScanNums.Add(scanNum);
+                            if (productSpec.IsolationWindow.Contains(mz))
+                            {
+                                ms2ScanNums.Add(scanNum);
+                            }
                         }
                     }
                 }
@@ -92,9 +110,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var ms2ScanNums = new HashSet<int>();
                 for (var curBinNum = curMinBinNum; curBinNum <= curMaxBinNum; curBinNum++)
                 {
-                    if (curBinNum < minBinNum || curBinNum > maxBinNum) continue;
+                    if (curBinNum < minBinNum || curBinNum > maxBinNum)
+                    {
+                        continue;
+                    }
 
-                    if (!massBinToScanNumsMapNoTolerance.TryGetValue(curBinNum, out var existingMs2ScanNums)) continue;
+                    if (!massBinToScanNumsMapNoTolerance.TryGetValue(curBinNum, out var existingMs2ScanNums))
+                    {
+                        continue;
+                    }
+
                     foreach (var ms2ScanNum in existingMs2ScanNums)
                     {
                         ms2ScanNums.Add(ms2ScanNum);

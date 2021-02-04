@@ -148,7 +148,10 @@ namespace InformedProteomics.Backend.MathAndStats
                     for (var c = 0; c < N; c++)
                     {
                         s.AppendFormat(formatString, this[r, c]);
-                        if (c < N - 1) s.Append(", ");
+                        if (c < N - 1)
+                        {
+                            s.Append(", ");
+                        }
                     }
 
                     s.AppendLine();

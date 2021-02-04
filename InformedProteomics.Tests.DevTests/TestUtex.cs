@@ -20,7 +20,7 @@ using NUnit.Framework;
 namespace InformedProteomics.Tests.DevTests
 {
     [TestFixture]
-    class TestUtex
+    internal class TestUtex
     {
         private const string ProteinNamePrefix = "M744_";
 
@@ -41,7 +41,7 @@ namespace InformedProteomics.Tests.DevTests
                 Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, rawFolder);
             }
 
-            var nDataset = 32;
+            const int nDataset = 32;
             var dataset = new string[nDataset];
             for (var i = 0; i < nDataset; i++)
             {
@@ -83,7 +83,10 @@ namespace InformedProteomics.Tests.DevTests
 
                 // PrSM To Feature
                 var prsmToFeatureIdMap = new int[prsmList.Count];
-                for (var k = 0; k < prsmToFeatureIdMap.Length; k++) prsmToFeatureIdMap[k] = -1;
+                for (var k = 0; k < prsmToFeatureIdMap.Length; k++)
+                {
+                    prsmToFeatureIdMap[k] = -1;
+                }
 
                 // Feature To PrSM
                 var featureToPrsm = new List<ProteinSpectrumMatchSet>();
@@ -93,7 +96,10 @@ namespace InformedProteomics.Tests.DevTests
                 var featureId = 0;
                 for(var j = 0; j < prsmList.Count; j++)
                 {
-                    if (prsmToFeatureIdMap[j] >= 0) continue;
+                    if (prsmToFeatureIdMap[j] >= 0)
+                    {
+                        continue;
+                    }
 
                     var match = prsmList[j];
                     var minScanNum = match.ScanNum;
@@ -141,18 +147,36 @@ namespace InformedProteomics.Tests.DevTests
                 for (var j = 0; j < featureList.Count; j++)
                 {
                     var f1 = featureList[j];
-                    if (f1.Flag < 1) continue;
+                    if (f1.Flag < 1)
+                    {
+                        continue;
+                    }
+
                     var prsm1 = featureToPrsm[j];
 
                     for (var k = j+1; k < featureList.Count; k++)
                     {
                         var f2 = featureList[k];
-                        if (f2.Flag < 1) continue;
+                        if (f2.Flag < 1)
+                        {
+                            continue;
+                        }
 
                         var prsm2 = featureToPrsm[k];
-                        if (Math.Abs(f1.Mass - f2.Mass) > tolerance.GetToleranceAsMz(f1.Mass)) continue;
-                        if (!f1.CoElutedByNet(f2, 0.005)) continue;
-                        if (!prsm1.ShareProteinId(prsm2)) continue;
+                        if (Math.Abs(f1.Mass - f2.Mass) > tolerance.GetToleranceAsMz(f1.Mass))
+                        {
+                            continue;
+                        }
+
+                        if (!f1.CoElutedByNet(f2, 0.005))
+                        {
+                            continue;
+                        }
+
+                        if (!prsm1.ShareProteinId(prsm2))
+                        {
+                            continue;
+                        }
 
                         // let us merge!!
                         if (f1.ScanLength > f2.ScanLength)
@@ -178,7 +202,11 @@ namespace InformedProteomics.Tests.DevTests
                 for (var j = 0; j < featureList.Count; j++)
                 {
                     var f1 = featureList[j];
-                    if (f1.Flag < 1) continue;
+                    if (f1.Flag < 1)
+                    {
+                        continue;
+                    }
+
                     var prsm1 = featureToPrsm[j];
 
                     var minScanNum = run.GetPrevScanNum(prsm1.MinScanNum, 1);
@@ -195,7 +223,9 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             if (filesProcessed == 0)
+            {
                 Assert.Ignore("Skipped since data files not found");
+            }
         }
 
         [Test]
@@ -214,7 +244,7 @@ namespace InformedProteomics.Tests.DevTests
                 Assert.Ignore(@"Skipping test {0} since folder not found: {1}", methodName, rawFolder);
             }
 
-            var nDataset =32;
+            const int nDataset =32;
             var dataset = new string[nDataset];
             for (var i = 0; i < nDataset; i++)
             {
@@ -309,7 +339,11 @@ namespace InformedProteomics.Tests.DevTests
 
                     if (alignedFeatureList[j][i] == null)
                     {
-                        for (var k = 0; k < 14; k++) writer.Write("0\t");
+                        for (var k = 0; k < 14; k++)
+                        {
+                            writer.Write("0\t");
+                        }
+
                         writer.Write("0\n");
                     }
                     else
@@ -343,19 +377,31 @@ namespace InformedProteomics.Tests.DevTests
 
             public bool SameCluster(LcMsFeature f1, LcMsFeature f2)
             {
-                if (f1.DataSetId == f2.DataSetId) return false;
+                if (f1.DataSetId == f2.DataSetId)
+                {
+                    return false;
+                }
                 // tolerant in mass dimension?
 
                 var massTol = Math.Min(_tolerance.GetToleranceAsMz(f1.Mass), _tolerance.GetToleranceAsMz(f2.Mass));
-                if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;
+                if (Math.Abs(f1.Mass - f2.Mass) > massTol)
+                {
+                    return false;
+                }
 
                 // tolerant in elution time dimension?
                 //var lenDiff = Math.Abs(f1.NetLength - f2.NetLength) / Math.Min(f1.NetLength, f2.NetLength);
                 //if (lenDiff > 0.5) return false;
 
-                if (!f1.CoElutedByNet(f2, 0.004)) return false; //e.g) 200*0.001 = 0.2 min = 30 sec
+                if (!f1.CoElutedByNet(f2, 0.004))
+                {
+                    return false; //e.g) 200*0.001 = 0.2 min = 30 sec
+                }
 
-                if (f1.ProteinSpectrumMatches.ShareProteinId(f2.ProteinSpectrumMatches)) return true;
+                if (f1.ProteinSpectrumMatches.ShareProteinId(f2.ProteinSpectrumMatches))
+                {
+                    return true;
+                }
 
                 return false;
             }
@@ -550,7 +596,9 @@ namespace InformedProteomics.Tests.DevTests
             var tsvParser = new TsvFileParser(outFile);
             var massList = new List<double>();
             for (var i = 0; i < tsvParser.NumData; i++)
+            {
                 massList.Add(Double.Parse(tsvParser.GetData("MonoMass")[i]));
+            }
 
             var featureIdMap = new Dictionary<int, string>();
             var tolerance = new Tolerance(12);
@@ -566,7 +614,10 @@ namespace InformedProteomics.Tests.DevTests
                 var fname = string.Format(@"{0}\{1}_IcTda.tsv", mspDir, data);
                 var idParser = new TsvFileParser(fname);
                 var idRows = idParser.GetRows();
-                if (headers.Count < 1) headers.AddRange(idParser.GetHeaders());
+                if (headers.Count < 1)
+                {
+                    headers.AddRange(idParser.GetHeaders());
+                }
 
                 for (var i = 0; i < idParser.NumData; i++)
                 {
@@ -574,37 +625,69 @@ namespace InformedProteomics.Tests.DevTests
                     var mass = Double.Parse(idParser.GetData("Mass")[i]);
                     var qvalue = Double.Parse(idParser.GetData("QValue")[i]);
 
-                    if (qvalue > 0.01) break;
+                    if (qvalue > 0.01)
+                    {
+                        break;
+                    }
 
                     var massTol = tolerance.GetToleranceAsMz(mass);
 
                     var idx = massList.BinarySearch(mass);
-                    if (idx < 0) idx = ~idx;
+                    if (idx < 0)
+                    {
+                        idx = ~idx;
+                    }
 
                     var found = false;
                     for (var j = idx; j >= 0; j--)
                     {
-                        if (Math.Abs(mass - massList[j]) > massTol) break;
+                        if (Math.Abs(mass - massList[j]) > massTol)
+                        {
+                            break;
+                        }
 
-                        if (tsvParser.GetData(minScanColName)[j].Length < 1) continue;
+                        if (tsvParser.GetData(minScanColName)[j].Length < 1)
+                        {
+                            continue;
+                        }
 
                         if (int.Parse(tsvParser.GetData(minScanColName)[j]) < scan && scan < int.Parse(tsvParser.GetData(maxScanColName)[j]))
                         {
                             found = true;
-                            if (!featureIdMap.ContainsKey(j)) featureIdMap.Add(j, idRows[i]);
+                            if (!featureIdMap.ContainsKey(j))
+                            {
+                                featureIdMap.Add(j, idRows[i]);
+                            }
+
                             break;
                         }
                     }
 
-                    if (found) continue;
+                    if (found)
+                    {
+                        continue;
+                    }
+
                     for (var j = idx + 1; j < massList.Count; j++)
                     {
-                        if (Math.Abs(mass - massList[j]) > massTol) break;
-                        if (tsvParser.GetData(minScanColName)[j].Length < 1) continue;
+                        if (Math.Abs(mass - massList[j]) > massTol)
+                        {
+                            break;
+                        }
+
+                        if (tsvParser.GetData(minScanColName)[j].Length < 1)
+                        {
+                            continue;
+                        }
+
                         if (int.Parse(tsvParser.GetData(minScanColName)[j]) < scan && scan < int.Parse(tsvParser.GetData(maxScanColName)[j]))
                         {
                             found = true;
-                            if (!featureIdMap.ContainsKey(j)) featureIdMap.Add(j, idRows[i]);
+                            if (!featureIdMap.ContainsKey(j))
+                            {
+                                featureIdMap.Add(j, idRows[i]);
+                            }
+
                             break;
                         }
                     }
@@ -691,14 +774,20 @@ namespace InformedProteomics.Tests.DevTests
                 {
                     var subDir = Path.GetFileName(dir);
 
-                    if (subDir == null || !subDir.StartsWith("MSP")) continue;
+                    if (subDir == null || !subDir.StartsWith("MSP"))
+                    {
+                        continue;
+                    }
 
                     //var dname2 = string.Format(@"{0}\{1}\{2}", dmsDir, data, dir);
                     var mspFiles = Directory.GetFiles(dir);
 
                     foreach (var sourceFilePath in mspFiles)
                     {
-                        if (!sourceFilePath.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) continue;
+                        if (!sourceFilePath.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
 
                         var sourceFile = new FileInfo(sourceFilePath);
 

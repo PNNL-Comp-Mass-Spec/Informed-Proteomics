@@ -45,7 +45,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Scoring
 
             //if (prob == 0) Console.WriteLine("*** Target: {0} {1}", ionType.Name, rankNum);
             //if (decoyProb == 0) Console.WriteLine("*** Decoy: {0} {1}", ionType.Name, rankNum);
-            if (Math.Abs(prob) < 1e-10 || Math.Abs(decoyProb) < 1e-10) return 0;
+            if (Math.Abs(prob) < 1e-10 || Math.Abs(decoyProb) < 1e-10)
+            {
+                return 0;
+            }
+
             return (Math.Log(prob) - Math.Log(decoyProb));
         }
 

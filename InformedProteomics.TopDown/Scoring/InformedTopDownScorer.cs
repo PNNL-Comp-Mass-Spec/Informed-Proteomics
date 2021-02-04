@@ -38,7 +38,9 @@ namespace InformedProteomics.TopDown.Scoring
         public IcScores GetScores(AminoAcid nTerm, string seqStr, AminoAcid cTerm, Composition composition, int charge, int ms2ScanNum)
         {
             if (!(Run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+            {
                 return null;
+            }
 
             return GetScores(spec, seqStr, composition, charge, ms2ScanNum);
         }
@@ -47,7 +49,9 @@ namespace InformedProteomics.TopDown.Scoring
         {
             var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm);
             if (seqGraph == null)
+            {
                 return null;
+            }
 
             var bestScore = double.NegativeInfinity;
             Tuple<double, string> bestScoreAndModifications = null;
@@ -58,18 +62,27 @@ namespace InformedProteomics.TopDown.Scoring
                 seqGraph.SetSink(modIndex);
                 var proteinCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
 
-                if (!proteinCompositionWithH2O.Equals(composition)) continue;
+                if (!proteinCompositionWithH2O.Equals(composition))
+                {
+                    continue;
+                }
 
                 var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(scorer);
                 var curScore = curScoreAndModifications.Item1;
 
-                if (!(curScore > bestScore)) continue;
+                if (!(curScore > bestScore))
+                {
+                    continue;
+                }
 
                 bestScoreAndModifications = curScoreAndModifications;
                 bestScore = curScore;
             }
 
-            if (bestScoreAndModifications == null) return null;
+            if (bestScoreAndModifications == null)
+            {
+                return null;
+            }
 
             var modifications = bestScoreAndModifications.Item2;
             var sequence = Sequence.CreateSequence(seqStr, modifications, AminoAcidSet);
@@ -81,10 +94,17 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IcScores GetScores(ProductSpectrum spec, string seqStr, Composition composition, int charge, int ms2ScanNum)
         {
-            if (spec == null) return null;
+            if (spec == null)
+            {
+                return null;
+            }
+
             var scorer = new CompositeScorer(spec, Tolerance, MinProductCharge, Math.Min(MaxProductCharge, charge));
             var seqGraph = SequenceGraph.CreateGraph(AminoAcidSet, AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm);
-            if (seqGraph == null) return null;
+            if (seqGraph == null)
+            {
+                return null;
+            }
 
             var bestScore = double.NegativeInfinity;
             Tuple<double, string> bestScoreAndModifications = null;
@@ -95,18 +115,27 @@ namespace InformedProteomics.TopDown.Scoring
                 seqGraph.SetSink(modIndex);
                 var proteinCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
 
-                if (!proteinCompositionWithH2O.Equals(composition)) continue;
+                if (!proteinCompositionWithH2O.Equals(composition))
+                {
+                    continue;
+                }
 
                 var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(scorer);
                 var curScore = curScoreAndModifications.Item1;
 
-                if (!(curScore > bestScore)) continue;
+                if (!(curScore > bestScore))
+                {
+                    continue;
+                }
 
                 bestScoreAndModifications = curScoreAndModifications;
                 bestScore = curScore;
             }
 
-            if (bestScoreAndModifications == null) return null;
+            if (bestScoreAndModifications == null)
+            {
+                return null;
+            }
 
             var modifications = bestScoreAndModifications.Item2;
             var seqObj = Sequence.CreateSequence(seqStr, modifications, AminoAcidSet);
@@ -121,7 +150,9 @@ namespace InformedProteomics.TopDown.Scoring
             nMatchedFragments = 0;
 
             if (!(Run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+            {
                 return;
+            }
 
             var preFixIonCheck = new bool[sequence.Count + 1];
             var sufFixIonCheck = new bool[sequence.Count + 1];
@@ -137,8 +168,15 @@ namespace InformedProteomics.TopDown.Scoring
                 nMatchedFragments += (prefixHit) ? 1 : 0;
                 nMatchedFragments += (suffixHit) ? 1 : 0;
 
-                if (prefixHit) preFixIonCheck[cleavageIndex] = true;
-                if (suffixHit) sufFixIonCheck[cleavageIndex] = true;
+                if (prefixHit)
+                {
+                    preFixIonCheck[cleavageIndex] = true;
+                }
+
+                if (suffixHit)
+                {
+                    sufFixIonCheck[cleavageIndex] = true;
+                }
 
                 cleavageIndex++;
             }
@@ -147,8 +185,15 @@ namespace InformedProteomics.TopDown.Scoring
             var sufContCount = 0;
             for (var i = 0; i < preFixIonCheck.Length - 1; i++)
             {
-                if (preFixIonCheck[i] && preFixIonCheck[i + 1]) preContCount++;
-                if (sufFixIonCheck[i] && sufFixIonCheck[i + 1]) sufContCount++;
+                if (preFixIonCheck[i] && preFixIonCheck[i + 1])
+                {
+                    preContCount++;
+                }
+
+                if (sufFixIonCheck[i] && sufFixIonCheck[i + 1])
+                {
+                    sufContCount++;
+                }
             }
             score += preContCount * CompositeScorer.ScoreParam.Prefix.ConsecutiveMatch;
             score += sufContCount * CompositeScorer.ScoreParam.Suffix.ConsecutiveMatch;

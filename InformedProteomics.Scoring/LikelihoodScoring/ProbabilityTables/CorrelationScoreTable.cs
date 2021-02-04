@@ -50,7 +50,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                     _intensityHistogram.BinEdges = new FitScoreList(IntensityBins, null).ToArray();
                 }
                 var bins = _intensityHistogram.Bins;
-                return bins.Select(bin => new Histogram<FitScore>(bin, (new FitScoreList(null, _binEdges)).ToArray(), new CompareFitScoreByScore())).ToList();
+                return bins.ConvertAll(bin => new Histogram<FitScore>(bin, (new FitScoreList(null, _binEdges)).ToArray(), new CompareFitScoreByScore()));
             }
         }
 
@@ -80,14 +80,20 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                         var intensity = -1.0;
 
                         if (mostIntensePeak != null)
+                        {
                             intensity = mostIntensePeak.Intensity;
+                        }
 
                         var name = ionType.Name;
                         if (reduceCharges)
+                        {
                             name = ReducedChargeName(ionType);
+                        }
 
                         if (!ionTypeScores.ContainsKey(name))
+                        {
                             ionTypeScores.Add(name, new FitScoreList());
+                        }
 
                         ionTypeScores[name].Add(new FitScore(intensity, score));
                     }
@@ -96,10 +102,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                     {
                         var score = bestScore.Score;
                         if (_method == ScoreMethod.FitScore)
+                        {
                             score = 1 - score;
+                        }
+
                         WorstScore.Total++;
                         if (score.Equals(0))
+                        {
                             WorstScore.Found++;
+                        }
 
                         debugFile.WriteLine("{0}\t{1}", bestScore.Intensity, score);
                     }
@@ -115,7 +126,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             Peak highestPeak = null;
             var highestIntensity = 0.0;
 
-            if (peaks == null) return null;
+            if (peaks == null)
+            {
+                return null;
+            }
 
             foreach (var peak in peaks)
             {
@@ -132,9 +146,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             var name = ionType.Name;
             if (ionType.Charge > 1 && ionType.Charge < 10)
+            {
                 name = name.Remove(1, 1);
+            }
+
             if (ionType.Charge >= 10)
+            {
                 name = name.Remove(1, 2);
+            }
+
             return name;
         }
 

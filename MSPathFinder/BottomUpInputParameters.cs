@@ -22,9 +22,14 @@ namespace MSPathFinder
             get
             {
                 if (Tda == DatabaseSearchMode.Both)
+                {
                     return true;
+                }
+
                 if (Tda == DatabaseSearchMode.Decoy)
+                {
                     return null;
+                }
                 //(Tda2 == DatabaseSearchMode.Target)
                 return false;
             }
@@ -61,7 +66,11 @@ namespace MSPathFinder
         public void Display()
         {
             Console.WriteLine("SpecFilePath: ");
-            foreach(var specFilePath in SpecFilePaths) Console.WriteLine("\t{0}", specFilePath);
+            foreach(var specFilePath in SpecFilePaths)
+            {
+                Console.WriteLine("\t{0}", specFilePath);
+            }
+
             Console.WriteLine("DatabaseFilePath: " + DatabaseFilePath);
             Console.WriteLine("OutputDir: " + OutputDir);
             Console.WriteLine("Enzyme: " + Enzyme.Name);
@@ -116,7 +125,10 @@ namespace MSPathFinder
         public string Parse(Dictionary<string, string> parameters)
         {
             var message = CheckIsValid(parameters);
-            if (message != null) return message;
+            if (message != null)
+            {
+                return message;
+            }
 
             var specFilePath = parameters["-s"];
             if (Directory.Exists(specFilePath)) // Directory
@@ -149,7 +161,10 @@ namespace MSPathFinder
                 _searchModifications = parser.SearchModifications;
                 _maxNumDynModsPerSequence = parser.MaxNumDynModsPerSequence;
 
-                if (_searchModifications == null) return "Error while parsing " + modFilePath + "!";
+                if (_searchModifications == null)
+                {
+                    return "Error while parsing " + modFilePath + "!";
+                }
 
                 AminoAcidSet = new AminoAcidSet(_searchModifications, _maxNumDynModsPerSequence);
             }
@@ -238,7 +253,7 @@ namespace MSPathFinder
             return null;
         }
 
-        static string CheckIsValid(Dictionary<string, string> parameters)
+        private static string CheckIsValid(Dictionary<string, string> parameters)
         {
             foreach (var keyValuePair in parameters)
             {
@@ -259,7 +274,11 @@ namespace MSPathFinder
                     {
                         return "File not found: " + value + "!";
                     }
-                    if (Directory.Exists(value)) continue;
+                    if (Directory.Exists(value))
+                    {
+                        continue;
+                    }
+
                     var extension = Path.GetExtension(value);
                     if (!Path.GetExtension(value).Equals(".raw", StringComparison.OrdinalIgnoreCase))
                     {

@@ -176,7 +176,7 @@ namespace InformedProteomics.Backend.MassSpecData
             public void Clear()
             {
                 _artificialScanNum = 1;
-                _offsets.Clear();
+                Offsets.Clear();
                 OffsetsMapInt.Clear();
                 // OffsetsMapNative.Clear();
                 // IdToNativeMap.Clear();
@@ -191,9 +191,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 Unknown,
             }
 
-            private readonly List<IndexItem> _offsets = new List<IndexItem>();
-
-            public List<IndexItem> Offsets => _offsets;
+            public List<IndexItem> Offsets { get; } = new List<IndexItem>();
 
             // Unused
             // private readonly Dictionary<string, long> OffsetsMapNative = new Dictionary<string, long>();
@@ -221,7 +219,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 var item = new IndexItem(idRef, offset, scanNum);
                 AddMapForOffset(item);
-                _offsets.Add(item);
+                Offsets.Add(item);
             }
 
             private void AddMapForOffset(IndexItem offset)
@@ -253,7 +251,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 OffsetsMapInt.Clear();
                 // IdToNativeMap.Clear();
                 NativeToIdMap.Clear();
-                foreach (var offset in _offsets)
+                foreach (var offset in Offsets)
                 {
                     AddMapForOffset(offset);
                 }
@@ -1289,7 +1287,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var schemaName = reader.GetAttribute("xsi:schemaLocation");
             // We automatically assume it uses the mzML_1.1.0 schema. Check for the old version.
             //if (!schemaName.Contains("mzML1.1.0.xsd"))
-            if (schemaName != null && schemaName.Contains("mzML1.0.0.xsd"))
+            if (schemaName?.Contains("mzML1.0.0.xsd") == true)
             {
                 _version = MzML_Version.mzML1_0_0;
             }

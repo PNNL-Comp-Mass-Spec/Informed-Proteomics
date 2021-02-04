@@ -66,7 +66,9 @@ namespace InformedProteomics.TopDown.Scoring
         private void SetLcMsMatches(int ms2ScanNumber)
         {
             if (!(_run.GetSpectrum(ms2ScanNumber) is ProductSpectrum productSpec))
+            {
                 return;
+            }
 
             var isolationWindow = productSpec.IsolationWindow;
             var minMz = isolationWindow.MinMz;
@@ -104,7 +106,10 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 peakList = nextMs1PeakList;
             }
-            else return;
+            else
+            {
+                return;
+            }
 
             // Sort by intensity
             peakList.Sort(new IntensityComparer());
@@ -116,12 +121,16 @@ namespace InformedProteomics.TopDown.Scoring
         private void SetLcMsMatches(LinkedList<Peak> remainingPeakList, int scanNum, IList<Peak> precursorSpecWindow, IList<Peak> nextMs1SpecWindow, int numPeaksToConsider)
         {
             var numPeaksConsidered = 0;
-            while(remainingPeakList.Any())
+            while(remainingPeakList.Count > 0)
             {
                 var peakWithHighestIntensity = remainingPeakList.First.Value;
                 var peakMz = peakWithHighestIntensity.Mz;
                 SetLcMsMatches(peakMz, scanNum, precursorSpecWindow, nextMs1SpecWindow);
-                if (++numPeaksConsidered >= numPeaksToConsider) break;
+                if (++numPeaksConsidered >= numPeaksToConsider)
+                {
+                    break;
+                }
+
                 remainingPeakList.RemoveFirst();
             }
         }
@@ -129,15 +138,25 @@ namespace InformedProteomics.TopDown.Scoring
         private void SetLcMsMatches(double peakMz, int scanNum, IList<Peak> precursorSpecWindow, IList<Peak> nextMs1SpecWindow)
         {
             var xicThisPeak = _run.GetPrecursorExtractedIonChromatogram(peakMz, _tolerance, scanNum);
-            if (xicThisPeak.Count < 2) return;
+            if (xicThisPeak.Count < 2)
+            {
+                return;
+            }
 
             for (var charge = _maxCharge; charge >= _minCharge; charge--)
             {
                 // check whether next isotope peak exists
                 var nextIsotopeMz = peakMz + Constants.C13MinusC12 / charge;
                 var xicNextIsotope = _run.GetPrecursorExtractedIonChromatogram(nextIsotopeMz, _tolerance, scanNum);
-                if (!xicNextIsotope.Any()) continue;
-                if (xicThisPeak.GetCorrelation(xicNextIsotope) < _mostAbundantPlusOneIsotopeCorrThreshold) continue;
+                if (!xicNextIsotope.Any())
+                {
+                    continue;
+                }
+
+                if (xicThisPeak.GetCorrelation(xicNextIsotope) < _mostAbundantPlusOneIsotopeCorrThreshold)
+                {
+                    continue;
+                }
 
                 var mostAbundantIsotopeMass = (peakMz - Constants.Proton) * charge;
                 var averagineIsoEnv = Averagine.GetIsotopomerEnvelope(mostAbundantIsotopeMass);
@@ -149,7 +168,10 @@ namespace InformedProteomics.TopDown.Scoring
                 var precursorIsotopeCorr = precursorSpecWindow != null ? PeakListUtils.GetPearsonCorrelation(precursorSpecWindow, averagineIsotopeProfile, _comparer) : 0;
                 var nextMs1IsotopeCorr = nextMs1SpecWindow != null ? PeakListUtils.GetPearsonCorrelation(nextMs1SpecWindow, averagineIsotopeProfile, _comparer) : 0;
                 var isotopeCorr = Math.Max(precursorIsotopeCorr, nextMs1IsotopeCorr);
-                if (isotopeCorr < _isotopeCorrThresholdThreshold) continue;
+                if (isotopeCorr < _isotopeCorrThresholdThreshold)
+                {
+                    continue;
+                }
 
                 if (_chargeCorrThresholdThreshold > 0.0)
                 {
@@ -170,7 +192,10 @@ namespace InformedProteomics.TopDown.Scoring
                     }
 
                     var chargeCorr = Math.Max(corrPlusOneCharge, corrMinusOneCharge);
-                    if (chargeCorr < _chargeCorrThresholdThreshold) continue;
+                    if (chargeCorr < _chargeCorrThresholdThreshold)
+                    {
+                        continue;
+                    }
                 }
 
                 _lcMsMatchMap.SetMatches(monoIsotopicMass, xicThisPeak[0].ScanNum, xicThisPeak[xicThisPeak.Count-1].ScanNum);

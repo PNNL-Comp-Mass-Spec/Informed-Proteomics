@@ -55,16 +55,26 @@ namespace InformedProteomics.FeatureFinding.Clustering
             MaxScanNum = maxScanNum;
 
             Envelopes = new ObservedIsotopeEnvelope[nRows][];
-            for(var i = 0; i < nRows; i++) Envelopes[i] = new ObservedIsotopeEnvelope[nCols];
+            for(var i = 0; i < nRows; i++)
+            {
+                Envelopes[i] = new ObservedIsotopeEnvelope[nCols];
+            }
 
-            if (envelopes == null) return;
+            if (envelopes == null)
+            {
+                return;
+            }
 
             foreach (var envelope in envelopes)
             {
                 var i = envelope.Charge - MinCharge;
                 var j = ms1ScanNumToIndex[envelope.ScanNum] - minCol;
 
-                if (i < 0 || i >= nRows || j < 0 || j >= nCols) continue;
+                if (i < 0 || i >= nRows || j < 0 || j >= nCols)
+                {
+                    continue;
+                }
+
                 Envelopes[i][j] = envelope;
             }
         }
@@ -86,12 +96,18 @@ namespace InformedProteomics.FeatureFinding.Clustering
             var nCols = maxCol - minCol + 1;
 
             Envelopes = new ObservedIsotopeEnvelope[nRows][];
-            for (var i = 0; i < nRows; i++) Envelopes[i] = new ObservedIsotopeEnvelope[nCols];
+            for (var i = 0; i < nRows; i++)
+            {
+                Envelopes[i] = new ObservedIsotopeEnvelope[nCols];
+            }
 
             for (var charge = targetMinCharge; charge <= targetMaxCharge; charge++)
             {
                 var mostAbuMz = TheoreticalEnvelope.GetIsotopeMz(charge, mostAbuInternalIndex);
-                if (_run.MaxMs1Mz < mostAbuMz || mostAbuMz < _run.MinMs1Mz) continue;
+                if (_run.MaxMs1Mz < mostAbuMz || mostAbuMz < _run.MinMs1Mz)
+                {
+                    continue;
+                }
 
                 for (var col = minCol; col <= maxCol; col++)
                 {
@@ -104,7 +120,9 @@ namespace InformedProteomics.FeatureFinding.Clustering
                     {
                         var r = rnd.Next(0, numMzBins);
                         if (r < localWin.PeakCount)
+                        {
                             peakSet[k] = (Ms1Peak) ms1Spectra[col].Peaks[r + localWin.PeakStartIndex];
+                        }
                     }
 
                     var env = new ObservedIsotopeEnvelope(Mass, charge, ms1ScanNums[col], peakSet, TheoreticalEnvelope);
@@ -193,12 +211,15 @@ namespace InformedProteomics.FeatureFinding.Clustering
 
                     var localWin = ms1Spectra[col].GetLocalMzWindow(mostAbuMz);
 
-                    if (envelope == null) continue;
+                    if (envelope == null)
+                    {
+                        continue;
+                    }
 
                     envelope.Peaks.SumEnvelopeTo(summedIntensity);
                     var mostAbuPeak = envelope.Peaks[mostAbuIdx];
 
-                    if (mostAbuPeak != null && mostAbuPeak.Active)
+                    if (mostAbuPeak?.Active == true)
                     {
                         summedMostAbuIsotopeIntensity += mostAbuPeak.Intensity;
                         summedReferenceIntensity += localWin.HighestIntensity;
@@ -233,8 +254,13 @@ namespace InformedProteomics.FeatureFinding.Clustering
                         {
                             BestDistanceScoreAcrossCharge[chargeIdx] = newBcDist;
                             if (localWin.MedianIntensity > 0)
+                            {
                                 BestIntensityScoreAcrossCharge[chargeIdx] = envelope.HighestIntensity / localWin.HighestIntensity;
-                            else BestIntensityScoreAcrossCharge[chargeIdx] = 1.0d;
+                            }
+                            else
+                            {
+                                BestIntensityScoreAcrossCharge[chargeIdx] = 1.0d;
+                            }
                         }
 
                         BestCorrelationScoreAcrossCharge[chargeIdx] = Math.Max(BestCorrelationScoreAcrossCharge[chargeIdx], newCorr);
@@ -246,7 +272,10 @@ namespace InformedProteomics.FeatureFinding.Clustering
                         }
 
                         // in the initial scoring, classify major and minor envelopes
-                        if (!_initScore && goodEnvelope) envelope.GoodEnough = true;
+                        if (!_initScore && goodEnvelope)
+                        {
+                            envelope.GoodEnough = true;
+                        }
                     }
 
                     if (levelTwoEnvelope)
@@ -255,8 +284,13 @@ namespace InformedProteomics.FeatureFinding.Clustering
                         {
                             tempBestDistanceScoreAcrossCharge[chargeIdx] = newBcDist;
                             if (localWin.MedianIntensity > 0)
+                            {
                                 tempBestIntensityScoreAcrossCharge[chargeIdx] = envelope.HighestIntensity / localWin.HighestIntensity;
-                            else tempBestIntensityScoreAcrossCharge[chargeIdx] = 1.0d;
+                            }
+                            else
+                            {
+                                tempBestIntensityScoreAcrossCharge[chargeIdx] = 1.0d;
+                            }
                         }
                         tempBestCorrelationScoreAcrossCharge[chargeIdx] = Math.Max(tempBestCorrelationScoreAcrossCharge[chargeIdx], newCorr);
 
@@ -277,7 +311,9 @@ namespace InformedProteomics.FeatureFinding.Clustering
                     BestCharge[chargeIdx] = charge;
                     bestChargeDist[chargeIdx] = bcDist;
                     if (summedReferenceIntensity > 0)
+                    {
                         EnvelopeIntensityScoreAcrossCharge[chargeIdx] = summedMostAbuIsotopeIntensity/summedReferenceIntensity;
+                    }
                     //if (summedMedianIntensity > 0) EnvelopeIntensityScoreAcrossCharge[chargeIdx] = Math.Min(1.0, 0.1*(summedMostAbuIsotopeIntensity / summedMedianIntensity));
                 }
 
@@ -323,7 +359,10 @@ namespace InformedProteomics.FeatureFinding.Clustering
                 XicCorrelationBetweenBestCharges[1] = FitScoreCalculator.GetPearsonCorrelation(Smoother.Smooth(xic2[EvenCharge]), Smoother.Smooth(xic2[OddCharge]));
             }
 
-            if (repEnvelope == null && repEnvelope2 != null) repEnvelope = repEnvelope2;
+            if (repEnvelope == null && repEnvelope2 != null)
+            {
+                repEnvelope = repEnvelope2;
+            }
 
             if (repEnvelope != null)
             {
@@ -381,7 +420,9 @@ namespace InformedProteomics.FeatureFinding.Clustering
         {
             // considering DDA instrument
             if (_run.MaxMsLevel <= 1 || NetLength >= 0.01)
+            {
                 return;
+            }
 
             var ms1ScanNums = _run.GetMs1ScanVector();
             var ms1ScanNumToIndex = _run.GetMs1ScanNumToIndex();
@@ -414,7 +455,10 @@ namespace InformedProteomics.FeatureFinding.Clustering
                 for (var i = 0; i < Envelopes[0].Length; i++)
                 {
                     var envelope = isotopeEnvelope[i];
-                    if (envelope != null) yield return envelope;
+                    if (envelope != null)
+                    {
+                        yield return envelope;
+                    }
                 }
             }
         }
@@ -423,14 +467,20 @@ namespace InformedProteomics.FeatureFinding.Clustering
         {
             foreach (var envelope in EnumerateEnvelopes())
             {
-                if (!envelope.GoodEnough) continue;
+                if (!envelope.GoodEnough)
+                {
+                    continue;
+                }
 
                 for (var i = 0; i < TheoreticalEnvelope.Size; i++)
                 {
                     if (TheoreticalEnvelope.Isotopes[i].Ratio > 0.3)
                     {
                         var peak = envelope.Peaks[i];
-                        if (peak != null && peak.Active) yield return peak;
+                        if (peak?.Active == true)
+                        {
+                            yield return peak;
+                        }
                     }
                 }
             }
@@ -440,14 +490,20 @@ namespace InformedProteomics.FeatureFinding.Clustering
         {
             foreach (var envelope in EnumerateEnvelopes())
             {
-                if (envelope.GoodEnough) continue;
+                if (envelope.GoodEnough)
+                {
+                    continue;
+                }
 
                 for (var i = 0; i < TheoreticalEnvelope.Size; i++)
                 {
                     if (TheoreticalEnvelope.Isotopes[i].Ratio <= 0.3)
                     {
                         var peak = envelope.Peaks[i];
-                        if (peak != null && peak.Active) yield return peak;
+                        if (peak?.Active == true)
+                        {
+                            yield return peak;
+                        }
                     }
                 }
             }
@@ -459,14 +515,17 @@ namespace InformedProteomics.FeatureFinding.Clustering
             {
                 foreach (var peak in env.Peaks)
                 {
-                    if (peak != null) peak.Activate();
+                    peak?.Activate();
                 }
             }
         }
 
         public void InActivateMajorPeaks()
         {
-            foreach (var peak in GetMajorPeaks()) peak.InActivate();
+            foreach (var peak in GetMajorPeaks())
+            {
+                peak.InActivate();
+            }
         }
 
         public HashSet<LcMsPeakCluster> OverlappedFeatures
@@ -480,11 +539,17 @@ namespace InformedProteomics.FeatureFinding.Clustering
                 var ret = new HashSet<LcMsPeakCluster>();
                 foreach (var peak in GetMajorPeaks())
                 {
-                    foreach (var f in peak.GetAllTaggedFeatures()) ret.Add(f);
+                    foreach (var f in peak.GetAllTaggedFeatures())
+                    {
+                        ret.Add(f);
+                    }
                 }
                 foreach (var peak in GetMinorPeaks())
                 {
-                    foreach (var f in peak.GetMajorTaggedFeatures()) ret.Add(f);
+                    foreach (var f in peak.GetMajorTaggedFeatures())
+                    {
+                        ret.Add(f);
+                    }
                 }
 
                 return ret;
@@ -495,9 +560,21 @@ namespace InformedProteomics.FeatureFinding.Clustering
         {
             get
             {
-                if (Mass > 35000) return BestCorrelationScore > 0.85;
-                if (Mass > 25000) return BestCorrelationScore > 0.8;
-                if (Mass > 15000) return BestCorrelationScore > 0.75;
+                if (Mass > 35000)
+                {
+                    return BestCorrelationScore > 0.85;
+                }
+
+                if (Mass > 25000)
+                {
+                    return BestCorrelationScore > 0.8;
+                }
+
+                if (Mass > 15000)
+                {
+                    return BestCorrelationScore > 0.75;
+                }
+
                 return BestCorrelationScore > 0.7;
             }
         }

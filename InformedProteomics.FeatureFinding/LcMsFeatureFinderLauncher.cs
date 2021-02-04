@@ -73,7 +73,11 @@ namespace InformedProteomics.FeatureFinding
         public static string GetHeaderString(bool scoreReport = false)
         {
             var header = string.Join("\t", TsvHeader);
-            if (scoreReport) header = header + "\t" + string.Join("\t", TsvExtraScoreHeader);
+            if (scoreReport)
+            {
+                header = header + "\t" + string.Join("\t", TsvExtraScoreHeader);
+            }
+
             return header;
         }
 
@@ -149,7 +153,9 @@ namespace InformedProteomics.FeatureFinding
         {
             var outDirectory = GetOutputDirectory(rawFile);
             if (string.IsNullOrEmpty(outDirectory))
+            {
                 return -1;
+            }
 
             var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(rawFile));
             var ms1FeaturesFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
@@ -272,7 +278,10 @@ namespace InformedProteomics.FeatureFinding
                         {
                             //var mostAbuIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
                             var mostAbuPeak = envelope.Peaks[mostAbuIdx];
-                            if (mostAbuPeak == null || !mostAbuPeak.Active) continue;
+                            if (mostAbuPeak == null || !mostAbuPeak.Active)
+                            {
+                                continue;
+                            }
 
                             var fitScore = 1.0 - feature.BestCorrelationScore;
                             csvWriter.WriteLine("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
@@ -335,7 +344,10 @@ namespace InformedProteomics.FeatureFinding
                         {
                             //var mostAbuIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
                             var mostAbuPeak = envelope.Peaks[mostAbuIdx];
-                            if (mostAbuPeak == null || !mostAbuPeak.Active) continue;
+                            if (mostAbuPeak == null || !mostAbuPeak.Active)
+                            {
+                                continue;
+                            }
 
                             var fitScore = 1.0 - feature.BestCorrelationScore;
                             csvWriter.WriteLine("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
@@ -368,12 +380,16 @@ namespace InformedProteomics.FeatureFinding
 
             var outDirectory = GetOutputDirectory(pbfFilePath);
             if (string.IsNullOrEmpty(outDirectory))
+            {
                 return -2;
+            }
 
             var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(pbfFilePath));
 
             if (string.IsNullOrEmpty(ms1FeaturesFilePath) || string.Equals(ms1FeaturesFilePath, "."))
+            {
                 ms1FeaturesFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
+            }
 
             var pngFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".png");
 
@@ -460,7 +476,11 @@ namespace InformedProteomics.FeatureFinding
             var maxIntensity = intensity.Max();
             for (var i = 0; i < intensity.Length; i++)
             {
-                if (i != 0) sb.Append(";");
+                if (i != 0)
+                {
+                    sb.Append(";");
+                }
+
                 sb.AppendFormat("{0},{1:0.000}", feature.TheoreticalEnvelope.Isotopes[i].Index, intensity[i] / maxIntensity);
             }
 

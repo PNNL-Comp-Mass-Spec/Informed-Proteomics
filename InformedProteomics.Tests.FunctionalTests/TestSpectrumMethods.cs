@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace InformedProteomics.Tests.FunctionalTests
 {
     [TestFixture]
-    class TestSpectrumMethods
+    internal class TestSpectrumMethods
     {
         [Test]
         [Category("Local_Testing")]
@@ -44,7 +44,11 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             for (var i = 0; i < isotopes.Length; i++)
             {
-                if (peaks[i] == null) continue;
+                if (peaks[i] == null)
+                {
+                    continue;
+                }
+
                 var isotopeIndex = isotopes[i].Index;
                 Console.WriteLine("{0}\t{1}\t{2}\t{3}", isotopeIndex, peaks[isotopeIndex].Mz, ion.GetIsotopeMz(isotopeIndex), GetPeakPpmError(peaks[isotopeIndex], ion.GetIsotopeMz(isotopeIndex)));
             }

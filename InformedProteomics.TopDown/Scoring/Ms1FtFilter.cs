@@ -52,7 +52,7 @@ namespace InformedProteomics.TopDown.Scoring
             var likelihoodRatioData = ftFileParser.GetData("LikelihoodRatio");
 
             double[] scoreArray;
-            if (likelihoodRatioData != null && likelihoodRatioData.Count > 0)
+            if (likelihoodRatioData?.Count > 0)
             {
                 scoreArray = likelihoodRatioData.Select(Convert.ToDouble).ToArray();
             }
@@ -66,7 +66,11 @@ namespace InformedProteomics.TopDown.Scoring
             for (var i = 0; i < monoMassArr.Length; i++)
             {
                 //if (flagArray[i] == 0 && probArray[i] < _minProbability)  continue;
-                if (scoreArray[i] < _minLikelihoodRatio) continue;
+                if (scoreArray[i] < _minLikelihoodRatio)
+                {
+                    continue;
+                }
+
                 featureCountFiltered++;
                 var monoMass = monoMassArr[i];
                 _lcMsChargeMap.SetMatches(featureIdArr[i], monoMass, minScanArray[i], maxScanArray[i], repScanArray[i], minChargeArray[i], maxChargeArray[i]);
@@ -88,7 +92,9 @@ namespace InformedProteomics.TopDown.Scoring
                 totalFeatureCount++;
 
                 if (entry.LikelihoodRatio < _minLikelihoodRatio)
+                {
                     continue;
+                }
 
                 featureCountFiltered++;
                 _lcMsChargeMap.SetMatches(entry.FeatureId, entry.MonoMass, entry.MinScan, entry.MaxScan, entry.RepresentativeScan, entry.MinCharge, entry.MaxCharge);

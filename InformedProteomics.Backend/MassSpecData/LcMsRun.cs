@@ -311,11 +311,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </remarks>
         public int[] GetMs1ScanNumToIndex()
         {
-            if (_ms1ScanNumToIndex != null) return _ms1ScanNumToIndex;
+            if (_ms1ScanNumToIndex != null)
+            {
+                return _ms1ScanNumToIndex;
+            }
+
             var ms1ScanNums = GetMs1ScanVector();
             _ms1ScanNumToIndex = new int[MaxLcScan + 1];
             for (var i = 0; i < ms1ScanNums.Length; i++)
+            {
                 _ms1ScanNumToIndex[ms1ScanNums[i]] = i;
+            }
 
             return _ms1ScanNumToIndex;
         }
@@ -365,11 +371,17 @@ namespace InformedProteomics.Backend.MassSpecData
             var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
 
             var hasXicPoint = new bool[MaxLcScan - MinLcScan + 1];
-            foreach (var xicPoint in xic) hasXicPoint[xicPoint.ScanNum - MinLcScan] = true;
+            foreach (var xicPoint in xic)
+            {
+                hasXicPoint[xicPoint.ScanNum - MinLcScan] = true;
+            }
 
             for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
             {
-                if (GetMsLevel(scanNum) == 1 && !hasXicPoint[scanNum - MinLcScan]) xic.Add(new XicPoint(scanNum, 0, 0));
+                if (GetMsLevel(scanNum) == 1 && !hasXicPoint[scanNum - MinLcScan])
+                {
+                    xic.Add(new XicPoint(scanNum, 0, 0));
+                }
             }
             xic.Sort();
             return xic;
@@ -386,7 +398,11 @@ namespace InformedProteomics.Backend.MassSpecData
             var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
 
             var xicIntensityVector = new double[MaxLcScan - MinLcScan + 1];
-            foreach (var xicPoint in xic) xicIntensityVector[xicPoint.ScanNum - MinLcScan] = xicPoint.Intensity;
+            foreach (var xicPoint in xic)
+            {
+                xicIntensityVector[xicPoint.ScanNum - MinLcScan] = xicPoint.Intensity;
+            }
+
             var intVector = GetMs1ScanVector().Select(s => xicIntensityVector[s - MinLcScan]).ToArray();
             return intVector;
         }
@@ -427,7 +443,11 @@ namespace InformedProteomics.Backend.MassSpecData
             var tolTh = tolerance.GetToleranceAsMz(mz);
             var minMz = mz - tolTh;
             var maxMz = mz + tolTh;
-            if (targetScanNum < 0) return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
+            if (targetScanNum < 0)
+            {
+                return GetPrecursorExtractedIonChromatogram(minMz, maxMz);
+            }
+
             return GetPrecursorExtractedIonChromatogram(minMz, maxMz, targetScanNum, maxNumConsecutiveScansWithoutPeak);
         }
 
@@ -443,7 +463,10 @@ namespace InformedProteomics.Backend.MassSpecData
         public Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz, int targetScanNum, int tolerance = 3)
         {
             if (GetMsLevel(targetScanNum) > 1)
+            {
                 targetScanNum = GetPrecursorScanNum(targetScanNum);
+            }
+
             var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
             return GetTrimmedXic(xic, targetScanNum, tolerance);
         }
@@ -498,7 +521,10 @@ namespace InformedProteomics.Backend.MassSpecData
         public Xic GetTrimmedXic(Xic xic, int targetScanNum, int tolerance = 3)
         {
             var index = xic.BinarySearch(new XicPoint(targetScanNum, 0, 0));
-            if (index < 0) index = ~index;
+            if (index < 0)
+            {
+                index = ~index;
+            }
 
             var xicSegment = new Xic();
 
@@ -514,15 +540,26 @@ namespace InformedProteomics.Backend.MassSpecData
                 var numMissingScans = 0;
                 for (var scanNum = xicPeak.ScanNum + 1; scanNum < curScanNum; scanNum++)
                 {
-                    if (GetMsLevel(scanNum) == 1) ++numMissingScans;
+                    if (GetMsLevel(scanNum) == 1)
+                    {
+                        ++numMissingScans;
+                    }
+
                     if (numMissingScans > tolerance)
                     {
                         isConsecutive = false;
                         break;
                     }
                 }
-                if (isConsecutive) xicSegment.Add(xicPeak);
-                else break;
+                if (isConsecutive)
+                {
+                    xicSegment.Add(xicPeak);
+                }
+                else
+                {
+                    break;
+                }
+
                 curScanNum = xicPeak.ScanNum;
                 --i;
             }
@@ -538,15 +575,26 @@ namespace InformedProteomics.Backend.MassSpecData
                 var isConsecutive = true;
                 for (var scanNum = curScanNum + 1; scanNum < xicPeak.ScanNum; scanNum++)
                 {
-                    if (GetMsLevel(scanNum) == 1) ++numMissingScans;
+                    if (GetMsLevel(scanNum) == 1)
+                    {
+                        ++numMissingScans;
+                    }
+
                     if (numMissingScans > tolerance)
                     {
                         isConsecutive = false;
                         break;
                     }
                 }
-                if (isConsecutive) xicSegment.Add(xicPeak);
-                else break;
+                if (isConsecutive)
+                {
+                    xicSegment.Add(xicPeak);
+                }
+                else
+                {
+                    break;
+                }
+
                 curScanNum = xicPeak.ScanNum;
                 ++i;
             }
@@ -568,7 +616,11 @@ namespace InformedProteomics.Backend.MassSpecData
             var isoWindowSet = new HashSet<IsolationWindow>();
             foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
-                if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec)) continue;
+                if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec))
+                {
+                    continue;
+                }
+
                 isoWindowSet.Add(productSpec.IsolationWindow);
             }
             return isoWindowSet.Count;
@@ -583,9 +635,15 @@ namespace InformedProteomics.Backend.MassSpecData
             var minWidth = double.MaxValue;
             foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
-                if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec)) continue;
+                if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec))
+                {
+                    continue;
+                }
 
-                if (productSpec.IsolationWindow.Width < minWidth) minWidth = productSpec.IsolationWindow.Width;
+                if (productSpec.IsolationWindow.Width < minWidth)
+                {
+                    minWidth = productSpec.IsolationWindow.Width;
+                }
             }
             return minWidth;
         }
@@ -682,7 +740,10 @@ namespace InformedProteomics.Backend.MassSpecData
                 var scanNum = scan.Key;
                 var msLevel = scan.Value;
 
-                if (msLevel == 0) continue; // corrupted scan
+                if (msLevel == 0)
+                {
+                    continue; // corrupted scan
+                }
 
                 // determine precursor scan
                 if (msLevel == prevMsLevel)
@@ -717,7 +778,10 @@ namespace InformedProteomics.Backend.MassSpecData
                 var scanNum = scan.Key;
                 var msLevel = scan.Value;
 
-                if (msLevel == 0) continue; // corrupted scan
+                if (msLevel == 0)
+                {
+                    continue; // corrupted scan
+                }
 
                 // determine next scan
                 if (msLevel == nextMsLevel)

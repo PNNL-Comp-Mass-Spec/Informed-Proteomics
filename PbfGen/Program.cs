@@ -111,11 +111,17 @@ namespace PbfGen
                     Console.WriteLine("Creating {0} from {1}", pbfFilePath, rawFilePath);
 
                     if (options.StartScan > 0 && options.EndScan > 0)
+                    {
                         Console.WriteLine("Only including scans {0} to {1}", options.StartScan, options.EndScan);
+                    }
                     else if (options.StartScan > 0)
+                    {
                         Console.WriteLine("Only including scans {0} to the end", options.StartScan);
+                    }
                     else if (options.EndScan > 0)
+                    {
                         Console.WriteLine("Only including scans 1 to {0}", options.EndScan);
+                    }
 
                     var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(rawFilePath);
                     var progress = new Progress<ProgressData>(p =>
@@ -127,8 +133,8 @@ namespace PbfGen
                         }
                     });
 
-                    var precursorSignalToNoiseRatioThreshold = 0.0;
-                    var productSignalToNoiseRatioThreshold = 0.0;
+                    const double precursorSignalToNoiseRatioThreshold = 0.0;
+                    const double productSignalToNoiseRatioThreshold = 0.0;
                     const bool keepDataReaderOpen = false;
 
                     var run = new PbfLcMsRun(

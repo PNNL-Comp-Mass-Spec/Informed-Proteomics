@@ -67,13 +67,23 @@ namespace InformedProteomics.FeatureFinding.Data
         {
             //if (_minorTaggedFeatures != null) foreach (var f in _minorTaggedFeatures) yield return f;
             //if (_majorTaggedFeatures != null) foreach (var f in _majorTaggedFeatures) yield return f;
-            for (var i = 0; i < _countMajorTaggedFeatures; i++) yield return _majorTaggedFeatures[i];
-            for (var i = 0; i < _countMinorTaggedFeatures; i++) yield return _minorTaggedFeatures[i];
+            for (var i = 0; i < _countMajorTaggedFeatures; i++)
+            {
+                yield return _majorTaggedFeatures[i];
+            }
+
+            for (var i = 0; i < _countMinorTaggedFeatures; i++)
+            {
+                yield return _minorTaggedFeatures[i];
+            }
         }
         public IEnumerable<LcMsPeakCluster> GetMajorTaggedFeatures()
         {
             //if (_majorTaggedFeatures != null) foreach (var f in _majorTaggedFeatures) yield return f;
-            for (var i = 0; i < _countMajorTaggedFeatures; i++) yield return _majorTaggedFeatures[i];
+            for (var i = 0; i < _countMajorTaggedFeatures; i++)
+            {
+                yield return _majorTaggedFeatures[i];
+            }
         }
 
         public int IndexInSpectrum { get; }

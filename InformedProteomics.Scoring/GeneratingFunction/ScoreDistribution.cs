@@ -23,7 +23,10 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
         public void AddEValueDist(ScoreDistribution otherDistribution, int deltaScore, double weight)
         {
-            if (otherDistribution == null) return;
+            if (otherDistribution == null)
+            {
+                return;
+            }
 
             for (var index = Math.Max(otherDistribution.MinScore, MinScore - deltaScore); index < otherDistribution.MaxScore; index++)
             {
@@ -51,7 +54,10 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             double spectralEValue;
             if (InformedProteomics.Backend.Utils.FlipSwitch.UseFlipScoring)
             {
-                if (area.Equals(0.0)) area = this._eValueDistribution.Last(v => v > 0);
+                if (area.Equals(0.0))
+                {
+                    area = this._eValueDistribution.Last(v => v > 0);
+                }
 
                 spectralEValue = area / _scoreTotal;
             }
@@ -60,7 +66,11 @@ namespace InformedProteomics.Scoring.GeneratingFunction
                 spectralEValue = area; // / _scoreTotal;
             }
 
-            if (spectralEValue < double.Epsilon) return double.Epsilon; // to avoid underflow
+            if (spectralEValue < double.Epsilon)
+            {
+                return double.Epsilon; // to avoid underflow
+            }
+
             return spectralEValue;
         }
 

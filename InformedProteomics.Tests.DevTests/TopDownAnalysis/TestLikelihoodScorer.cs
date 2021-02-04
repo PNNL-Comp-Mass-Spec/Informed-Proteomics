@@ -15,7 +15,7 @@ using NUnit.Framework;
 
 namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 {
-    class TestLikelihoodScorer
+    internal class TestLikelihoodScorer
     {
         public void TestLoadTrainingParam()
         {
@@ -54,7 +54,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 var decoyFile = string.Format(@"{0}\{1}_IcDecoy.tsv", idFileFolder, dataname);
                //  var targetFile = string.Format(@"{0}\{1}_IcTarget.tsv", idFileFolder, dataname);
 
-                if (!File.Exists(idFile)) continue;
+                if (!File.Exists(idFile))
+                {
+                    continue;
+                }
 
                 var prsmReader = new ProteinSpectrumMatchReader(0.01);
                 var prsmList = prsmReader.LoadIdentificationResult(idFile);
@@ -100,13 +103,20 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
         private void GetMatchStatistics(ProductSpectrum ms2Spec, Sequence sequence, int parentIonCharge, StreamWriter writer)
         {
-            if (ms2Spec == null) return;
-            if (sequence == null) return;
+            if (ms2Spec == null)
+            {
+                return;
+            }
+
+            if (sequence == null)
+            {
+                return;
+            }
 
             var BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             var BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
             var tolerance = new Tolerance(12);
-            var MinProductCharge = 1;
+            const int MinProductCharge = 1;
             var MaxProductCharge = Math.Min(parentIonCharge+2, 20);
 
             var baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
@@ -140,7 +150,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                                   ? c.PrefixComposition + baseIonType.OffsetComposition
                                   : c.SuffixComposition + baseIonType.OffsetComposition;
 
-                    if (fragmentComposition.Mass < ms2Spec.Peaks[0].Mz) continue;
+                    if (fragmentComposition.Mass < ms2Spec.Peaks[0].Mz)
+                    {
+                        continue;
+                    }
 
                     var curFragMass = fragmentComposition.Mass;
                     /*var curObsIonCharge = 0;
@@ -154,8 +167,15 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                     var maxCharge = (int)Math.Floor(fragmentIonMostAbuMass / (minMz - Constants.Proton));
                     var minCharge = (int)Math.Ceiling(fragmentIonMostAbuMass / (maxMz - Constants.Proton));
-                    if (maxCharge < 1 || maxCharge > MaxProductCharge) maxCharge = MaxProductCharge;
-                    if (minCharge < 1 || minCharge < MinProductCharge) minCharge = MinProductCharge;
+                    if (maxCharge < 1 || maxCharge > MaxProductCharge)
+                    {
+                        maxCharge = MaxProductCharge;
+                    }
+
+                    if (minCharge < 1 || minCharge < MinProductCharge)
+                    {
+                        minCharge = MinProductCharge;
+                    }
 
                     //var ionMatch = false;
                     for (var charge = minCharge; charge <= maxCharge; charge++)
@@ -164,10 +184,17 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                         var isotopePeaks = ms2Spec.GetAllIsotopePeaks(ion, tolerance, 0.1);
 
-                        if (isotopePeaks == null) continue;
+                        if (isotopePeaks == null)
+                        {
+                            continue;
+                        }
 
                         var distCorr = CompositeScorer.GetDistCorr(ion, isotopePeaks);
-                        if (distCorr.Item2 < 0.7 && distCorr.Item1 > 0.03) continue;
+                        if (distCorr.Item2 < 0.7 && distCorr.Item1 > 0.03)
+                        {
+                            continue;
+                        }
+
                         var mostAbuPeak = isotopePeaks[mostAbundantIsotopeIndex];
                         var intScore = mostAbuPeak.Intensity / refIntensity;
                         /*
@@ -195,15 +222,28 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         stat.Dist += distCorr.Item1;
                         stat.MassError += curObsIonMassError;
 
-                        if (baseIonType.IsPrefix) prefixHit = true;
-                        else suffixHit = true;
+                        if (baseIonType.IsPrefix)
+                        {
+                            prefixHit = true;
+                        }
+                        else
+                        {
+                            suffixHit = true;
+                        }
                     }
 
                     //if (!ionMatch) continue;
                 }
 
-                if (prefixHit) preFixIonCheck[cleavageIndex] = true;
-                if (suffixHit) sufFixIonCheck[cleavageIndex] = true;
+                if (prefixHit)
+                {
+                    preFixIonCheck[cleavageIndex] = true;
+                }
+
+                if (suffixHit)
+                {
+                    sufFixIonCheck[cleavageIndex] = true;
+                }
 
                 if (prefixHit && suffixHit)
                 {
@@ -216,8 +256,15 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var sufContCount = 0;
             for (var i = 0; i < preFixIonCheck.Length - 1; i++)
             {
-                if (preFixIonCheck[i] && preFixIonCheck[i + 1]) preContCount++;
-                if (sufFixIonCheck[i] && sufFixIonCheck[i + 1]) sufContCount++;
+                if (preFixIonCheck[i] && preFixIonCheck[i + 1])
+                {
+                    preContCount++;
+                }
+
+                if (sufFixIonCheck[i] && sufFixIonCheck[i + 1])
+                {
+                    sufContCount++;
+                }
             }
 
             writer.Write(activationMethodFlag);
@@ -237,16 +284,23 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
         private void GetNodeStatistics(bool isDecoy, ProductSpectrum ms2Spec, Sequence sequence, StreamWriter writer) //, StreamWriter mzErrorWriter)
         {
-            if (ms2Spec == null) return;
-            if (sequence == null) return;
+            if (ms2Spec == null)
+            {
+                return;
+            }
+
+            if (sequence == null)
+            {
+                return;
+            }
             //var refIntensity = ms2Spec.Peaks.Max(p => p.Intensity) * 0.01;
             //refIntensity = Math.Min(ms2Spec.Peaks.Select(p => p.Intensity).Median(), refIntensity);
 
             var BaseIonTypesCID = new[] { BaseIonType.B, BaseIonType.Y };
             var BaseIonTypesETD = new[] { BaseIonType.C, BaseIonType.Z };
             var tolerance = new Tolerance(15);
-            var minCharge = 1;
-            var maxCharge = 20;
+            const int minCharge = 1;
+            const int maxCharge = 20;
             var baseIonTypes = ms2Spec.ActivationMethod != ActivationMethod.ETD ? BaseIonTypesCID : BaseIonTypesETD;
 
             var refIntensity = ms2Spec.Peaks.Max(p => p.Intensity);
@@ -292,11 +346,18 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
                         var isotopePeaks = ms2Spec.GetAllIsotopePeaks(ion, tolerance, 0.1);
 
-                        if (isotopePeaks == null) continue;
+                        if (isotopePeaks == null)
+                        {
+                            continue;
+                        }
 
                         var distCorr = AbstractFragmentScorer.GetDistCorr(ion, isotopePeaks);
 
-                        if (distCorr.Item2 < 0.7 && distCorr.Item1 > 0.07) continue;
+                        if (distCorr.Item2 < 0.7 && distCorr.Item1 > 0.07)
+                        {
+                            continue;
+                        }
+
                         var mostAbundantIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
                         var mostAbuPeak = isotopePeaks[mostAbundantIsotopeIndex];
 
@@ -403,7 +464,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
             var mostAbundantIsotopeMz = ion.GetIsotopeMz(mostAbundantIsotopeIndex);
             var mostAbundantIsotopeMatchedPeakIndex = spec.FindPeakIndex(mostAbundantIsotopeMz, tolerance);
-            if (mostAbundantIsotopeMatchedPeakIndex < 0) return null;
+            if (mostAbundantIsotopeMatchedPeakIndex < 0)
+            {
+                return null;
+            }
 
             var observedPeaks = new Peak[isotopomerEnvelope.Length];
             observedPeaks[mostAbundantIsotopeIndex] = spec.Peaks[mostAbundantIsotopeMatchedPeakIndex];
@@ -413,7 +477,11 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var peakIndex = mostAbundantIsotopeMatchedPeakIndex - 1;
             for (var isotopeIndex = mostAbundantIsotopeIndex - 1; isotopeIndex >= 0; isotopeIndex--)
             {
-                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold)
+                {
+                    break;
+                }
+
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
                 var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
@@ -443,7 +511,11 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             peakIndex = mostAbundantIsotopeMatchedPeakIndex + 1;
             for (var isotopeIndex = mostAbundantIsotopeIndex + 1; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
             {
-                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold)
+                {
+                    break;
+                }
+
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
                 var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;

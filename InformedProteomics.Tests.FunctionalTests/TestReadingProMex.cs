@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace InformedProteomics.Tests.FunctionalTests
 {
     [TestFixture]
-    class TestReadingProMex
+    internal class TestReadingProMex
     {
         [OneTimeSetUp]
         public void Setup()
@@ -45,7 +45,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             var matchingScanNums = new SortedSet<int>();
 
             foreach (var item in ms1Filter.GetMatchingMs2ScanNums(massToFind))
+            {
                 matchingScanNums.Add(item);
+            }
 
             var scanNumList = string.Join(",", matchingScanNums);
 
@@ -60,7 +62,9 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var scanNum = int.Parse(scanNumText);
 
                 if (!matchingScanNums.Contains(scanNum))
+                {
                     Assert.Fail("Did not find scan {0} for mass {1}", scanNum, massToFind);
+                }
 
                 matchCount++;
             }

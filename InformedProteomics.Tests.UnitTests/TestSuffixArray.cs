@@ -54,7 +54,10 @@ namespace InformedProteomics.Tests.UnitTests
             foreach (var annotationAndOffset in indexedDb.AnnotationsAndOffsetsNoEnzyme(10, 13))
             {
                 if (numPeptides < 20)
+                {
                     Console.WriteLine(annotationAndOffset.Annotation);
+                }
+
                 numPeptides++;
             }
             sw.Stop();
@@ -82,7 +85,10 @@ namespace InformedProteomics.Tests.UnitTests
             foreach (var annotationAndOffset in indexedDb.IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(100, 300, 3))
             {
                 if (numPeptides < 20)
+                {
                     Console.WriteLine(annotationAndOffset.Annotation);
+                }
+
                 numPeptides++;
             }
             sw.Stop();
@@ -114,7 +120,10 @@ namespace InformedProteomics.Tests.UnitTests
             foreach (var peptide in peptides)
             {
                 if (numPeptides < 20)
+                {
                     Console.WriteLine("{0}\t{1}",peptide.Annotation, peptide.Offset);
+                }
+
                 numPeptides++;
             }
 
@@ -185,7 +194,10 @@ namespace InformedProteomics.Tests.UnitTests
                             : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
 
                         if (displayedResults < 20)
+                        {
                             Console.WriteLine(anno);
+                        }
+
                         displayedResults++;
                     }
                     ++numNTermCleavage;
@@ -213,7 +225,10 @@ namespace InformedProteomics.Tests.UnitTests
                             : string.Format("{0}.{1}", annotation[1 + numNTermCleavage], annotation.Substring(2 + numNTermCleavage));
 
                         if (displayedResults < 20)
+                        {
                             Console.WriteLine(anno);
+                        }
+
                         displayedResults++;
                     }
                 }

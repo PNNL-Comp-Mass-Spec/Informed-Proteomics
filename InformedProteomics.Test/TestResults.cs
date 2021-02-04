@@ -55,14 +55,21 @@ namespace InformedProteomics.Test
 
                 for (var i = 0; i < qValues.Length; i++)
                 {
-                    if (qValues[i] > 0.01) break;
+                    if (qValues[i] > 0.01)
+                    {
+                        break;
+                    }
+
                     var scanNum = scanNums[i];
                     var spec = run.GetSpectrum(scanNum) as ProductSpectrum;
                     Assert.True(spec != null);
                     ++numId[spec.ActivationMethod];
 
                     var mass = masses[i];
-                    if (mass > maxMass[spec.ActivationMethod]) maxMass[spec.ActivationMethod] = mass;
+                    if (mass > maxMass[spec.ActivationMethod])
+                    {
+                        maxMass[spec.ActivationMethod] = mass;
+                    }
                 }
                 Console.Write(datasetName);
                 foreach (var actMethod in actMethods)
@@ -198,7 +205,11 @@ namespace InformedProteomics.Test
             var matchedCompSet = new HashSet<string>();
             for (var i = 0; i < qValues.Length; i++)
             {
-                if (qValues[i] > 0.01) break;
+                if (qValues[i] > 0.01)
+                {
+                    break;
+                }
+
                 var mass = masses[i];
                 var scan = scans[i];
                 var matches = PeakListUtils.FindAllPeaks(peakList, mass, massTolerance)

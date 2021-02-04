@@ -89,13 +89,19 @@ namespace InformedProteomics.TopDown.Quantification
                 {
                     currentNode = n1;
                     currentIndex = GetIndexRange(nodeList, elutionInterval, currentNode);
-                    if (currentIndex.Item2 == -1) break;
+                    if (currentIndex.Item2 == -1)
+                    {
+                        break;
+                    }
                 }
                 edgeDict.Add(n1, new List<MSDeconvNode>());
                 for (var i = currentIndex.Item1; i < currentIndex.Item2; i++)
                 {
                     var deltaMass = Math.Abs(nodeList[i].RealMonoMass - n1.RealMonoMass);
-                    if (deltaMass <= tol.GetValue()) edgeDict[n1].Add(nodeList[i]);
+                    if (deltaMass <= tol.GetValue())
+                    {
+                        edgeDict[n1].Add(nodeList[i]);
+                    }
                 }
             }
             return edgeDict;
@@ -119,9 +125,17 @@ namespace InformedProteomics.TopDown.Quantification
                 if (!connectedComp.Contains(current))
                 {
                     connectedComp.Add(current);
-                    if (connectedNodes.ContainsKey(current)) break;
+                    if (connectedNodes.ContainsKey(current))
+                    {
+                        break;
+                    }
+
                     connectedNodes.Add(current, 0);
-                    if (!edges.ContainsKey(current)) break;
+                    if (!edges.ContainsKey(current))
+                    {
+                        break;
+                    }
+
                     foreach (var n in edges[current])
                     {
                         toVisit.Add(n);

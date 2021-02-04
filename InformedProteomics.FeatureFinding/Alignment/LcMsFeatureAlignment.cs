@@ -81,7 +81,10 @@ namespace InformedProteomics.FeatureFinding.Alignment
             {
                 var abundance = double.Parse(abu[i]);
                 var repMass = double.Parse(monoMass[i]);
-                if (repMass < minMass || repMass > maxMass) continue;
+                if (repMass < minMass || repMass > maxMass)
+                {
+                    continue;
+                }
 
                 var minCharge = int.Parse(minCharges[i]);
                 var maxCharge = int.Parse(maxCharges[i]);
@@ -145,7 +148,10 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
         public void FillMissingFeatures(int dataSetIndex, double scoreThreshold = -30, IProgress<ProgressData> progressReporter = null)
         {
-            if (_alignedFeatures == null) return;
+            if (_alignedFeatures == null)
+            {
+                return;
+            }
 
             var run = _runList[dataSetIndex];
             var ms1ScanNums = run.GetMs1ScanVector();
@@ -155,7 +161,10 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
             for (var j = 0; j < CountAlignedFeatures; j++)
             {
-                if (_alignedFeatures[j][dataSetIndex] != null) continue;
+                if (_alignedFeatures[j][dataSetIndex] != null)
+                {
+                    continue;
+                }
 
                 var minScanNum = -1;
                 var maxScanNum = ms1ScanNums.Last();
@@ -180,7 +189,10 @@ namespace InformedProteomics.FeatureFinding.Alignment
                     }
                 }
 
-                if (minScanNum < 0) minScanNum = 0;
+                if (minScanNum < 0)
+                {
+                    minScanNum = 0;
+                }
 
                 var newFt = featureFinder.GetLcMsPeakCluster(mass, charge, minScanNum, maxScanNum);
                 _alignedFeatures[j][dataSetIndex] = newFt ?? featureFinder.GetLcMsPeaksFromNoisePeaks(mass, charge, minScanNum, maxScanNum, repFt.MinCharge, repFt.MaxCharge);
@@ -200,7 +212,10 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
         public void RefineAbundance(double scoreThreshold = -30, IProgress<ProgressData> progressReporter = null)
         {
-            if (_alignedFeatures == null) return;
+            if (_alignedFeatures == null)
+            {
+                return;
+            }
 
             var progressData = new ProgressData(progressReporter) { IsPartialRange = true };
 
@@ -352,7 +367,11 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
             foreach (var f in features)
             {
-                if (f == null) continue;
+                if (f == null)
+                {
+                    continue;
+                }
+
                 minNet = Math.Min(minNet, f.MinNet);
                 maxNet = Math.Max(maxNet, f.MaxNet);
                 minCharge = Math.Min(minCharge, f.MinCharge);
@@ -383,7 +402,11 @@ namespace InformedProteomics.FeatureFinding.Alignment
         {
             var adjList = new List<int>[features.Count];
 
-            for (var i = 0; i < features.Count; i++) adjList[i] = new List<int>();
+            for (var i = 0; i < features.Count; i++)
+            {
+                adjList[i] = new List<int>();
+            }
+
             for (var i = 0; i < features.Count; i++)
             {
                 var fi = features[i];
@@ -391,7 +414,11 @@ namespace InformedProteomics.FeatureFinding.Alignment
                 for (var j = i + 1; j < features.Count; j++)
                 {
                     var fj = features[j];
-                    if (fj.Mass - fi.Mass > 1.5) break;
+                    if (fj.Mass - fi.Mass > 1.5)
+                    {
+                        break;
+                    }
+
                     if (_featureCompare.SameCluster(fi, fj))
                     {
                         adjList[i].Add(j);
@@ -409,7 +436,11 @@ namespace InformedProteomics.FeatureFinding.Alignment
                 {
                     var featureGroup = new LcMsFeature[CountDatasets];
                     var featureSet = GetAlignedFeatures(component, adjList);
-                    foreach (var f in featureSet) featureGroup[f.DataSetId] = f;
+                    foreach (var f in featureSet)
+                    {
+                        featureGroup[f.DataSetId] = f;
+                    }
+
                     ret.Add(featureGroup);
                 }
             }
@@ -443,7 +474,10 @@ namespace InformedProteomics.FeatureFinding.Alignment
 
                 foreach(var idx2 in component)
                 {
-                    if (idx1 == idx2 || !adjList[idx1].Contains(idx2)) continue;
+                    if (idx1 == idx2 || !adjList[idx1].Contains(idx2))
+                    {
+                        continue;
+                    }
 
                     var f2 = _featureList[idx2];
                     var netDiff = NetDiff(f1, f2);
@@ -490,10 +524,17 @@ namespace InformedProteomics.FeatureFinding.Alignment
                     //var f1 = _featureList[idx1];
                     foreach(var idx2 in component)
                     {
-                        if (idx1 == idx2 || !adjList[idx1].Contains(idx2)) continue;
+                        if (idx1 == idx2 || !adjList[idx1].Contains(idx2))
+                        {
+                            continue;
+                        }
+
                         var f2 = _featureList[idx2];
 
-                        if (chkDataset[f2.DataSetId]) continue;
+                        if (chkDataset[f2.DataSetId])
+                        {
+                            continue;
+                        }
 
                         var netDiff = NetDiff(centroid, f2);
                         if (minScoreNode < 0 || netDiff < minScore)
@@ -503,14 +544,20 @@ namespace InformedProteomics.FeatureFinding.Alignment
                         }
                     }
                 }
-                if (minScoreNode < 0) break;
+                if (minScoreNode < 0)
+                {
+                    break;
+                }
 
                 // pick closest node to current cluster
                 nodeSet.Add(minScoreNode);
 
                 chkDataset[_featureList[minScoreNode].DataSetId] = true;
 
-                if (nodeSet.Count == component.Count) break;
+                if (nodeSet.Count == component.Count)
+                {
+                    break;
+                }
             }
 
             var alignedFeatures = new List<LcMsFeature>(nodeSet.Select(idx => _featureList[idx]));
@@ -527,7 +574,10 @@ namespace InformedProteomics.FeatureFinding.Alignment
             var visited = new bool[nNodes];
             for (var i = 0; i < nNodes; i++)
             {
-                if (visited[i]) continue;
+                if (visited[i])
+                {
+                    continue;
+                }
 
                 //var featureSet = new AlignedMs1FeatureSet();
                 var nodeSet = new List<int>();
@@ -535,16 +585,28 @@ namespace InformedProteomics.FeatureFinding.Alignment
                 neighbors.Enqueue(i);
                 while (true)
                 {
-                    if (neighbors.Count < 1) break;
+                    if (neighbors.Count < 1)
+                    {
+                        break;
+                    }
+
                     var j = neighbors.Dequeue();
-                    if (visited[j]) continue;
+                    if (visited[j])
+                    {
+                        continue;
+                    }
+
                     visited[j] = true;
 
                     //featureSet.Add(features[j]);
                     nodeSet.Add(j);
                     foreach (var k in adjList[j])
                     {
-                        if (visited[k]) continue;
+                        if (visited[k])
+                        {
+                            continue;
+                        }
+
                         neighbors.Enqueue(k);
                     }
                 }
@@ -577,8 +639,15 @@ namespace InformedProteomics.FeatureFinding.Alignment
         {
             public int Compare(LcMsFeature x, LcMsFeature y)
             {
-                if (x == null) return y == null ? 0 : -1;
-                if (y == null) return 1;
+                if (x == null)
+                {
+                    return y == null ? 0 : -1;
+                }
+
+                if (y == null)
+                {
+                    return 1;
+                }
 
                 return (x.Mass.CompareTo(y.Mass));
             }

@@ -39,9 +39,15 @@ namespace InformedProteomics.Tests.DevTests
 
             foreach (var c in arr)
             {
-                for (var i = 0; i < c * 10000; i++) sum += i;
+                for (var i = 0; i < c * 10000; i++)
+                {
+                    sum += i;
+                }
                 //                Interlocked.Increment(ref num);
-                if (++num == 1000) break;
+                if (++num == 1000)
+                {
+                    break;
+                }
             }
 
             Console.WriteLine("NumPeptides: {0}", sum);
@@ -94,12 +100,12 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("{0:F2} msec/sum, on average for parallel", s2.Elapsed.TotalMilliseconds / m);
         }
 
-        static void SumDefault(IEnumerable<int> array)
+        private static void SumDefault(IEnumerable<int> array)
         {
             return;
         }
 
-        static int SumAsParallel(IEnumerable<int> array)
+        private static int SumAsParallel(IEnumerable<int> array)
         {
             return array.AsParallel().AsUnordered().Sum();
         }
@@ -410,7 +416,9 @@ namespace InformedProteomics.Tests.DevTests
                     index++;
 
                     if (index >= resultsToPreview)
+                    {
                         break;
+                    }
                 }
             }
         }
@@ -452,7 +460,9 @@ namespace InformedProteomics.Tests.DevTests
                     index++;
 
                     if (index >= resultsToPreview)
+                    {
                         break;
+                    }
                 }
             }
         }

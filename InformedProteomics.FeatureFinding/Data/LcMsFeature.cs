@@ -125,30 +125,81 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public bool CoElutedByTime(LcMsFeature other, double tolTime = 0d)
         {
-            if (MinElutionTime - tolTime < other.MinElutionTime && other.MinElutionTime < MaxElutionTime + tolTime) return true;
-            if (MinElutionTime - tolTime < other.MaxElutionTime && other.MaxElutionTime < MaxElutionTime + tolTime) return true;
-            if (other.MinElutionTime - tolTime < MinElutionTime && MinElutionTime < other.MaxElutionTime + tolTime) return true;
-            if (other.MinElutionTime - tolTime < MaxElutionTime && MaxElutionTime < other.MaxElutionTime + tolTime) return true;
+            if (MinElutionTime - tolTime < other.MinElutionTime && other.MinElutionTime < MaxElutionTime + tolTime)
+            {
+                return true;
+            }
+
+            if (MinElutionTime - tolTime < other.MaxElutionTime && other.MaxElutionTime < MaxElutionTime + tolTime)
+            {
+                return true;
+            }
+
+            if (other.MinElutionTime - tolTime < MinElutionTime && MinElutionTime < other.MaxElutionTime + tolTime)
+            {
+                return true;
+            }
+
+            if (other.MinElutionTime - tolTime < MaxElutionTime && MaxElutionTime < other.MaxElutionTime + tolTime)
+            {
+                return true;
+            }
+
             return false;
         }
 
         public bool CoElutedByNet(LcMsFeature other, double tolNet = 0d)
         {
-            if (MinNet - tolNet < other.MinNet && other.MinNet < MaxNet + tolNet) return true;
-            if (MinNet - tolNet < other.MaxNet && other.MaxNet < MaxNet + tolNet) return true;
-            if (other.MinNet - tolNet < MinNet && MinNet < other.MaxNet + tolNet) return true;
-            if (other.MinNet - tolNet < MaxNet && MaxNet < other.MaxNet + tolNet) return true;
+            if (MinNet - tolNet < other.MinNet && other.MinNet < MaxNet + tolNet)
+            {
+                return true;
+            }
+
+            if (MinNet - tolNet < other.MaxNet && other.MaxNet < MaxNet + tolNet)
+            {
+                return true;
+            }
+
+            if (other.MinNet - tolNet < MinNet && MinNet < other.MaxNet + tolNet)
+            {
+                return true;
+            }
+
+            if (other.MinNet - tolNet < MaxNet && MaxNet < other.MaxNet + tolNet)
+            {
+                return true;
+            }
+
             return false;
         }
 
         public bool CoElutedByScanNum(LcMsFeature other, int tolScan = 0)
         {
-            if (tolScan == 0) tolScan++;
+            if (tolScan == 0)
+            {
+                tolScan++;
+            }
 
-            if (MinScanNum - tolScan < other.MinScanNum && other.MinScanNum < MaxScanNum + tolScan) return true;
-            if (MinScanNum - tolScan < other.MaxScanNum && other.MaxScanNum < MaxScanNum + tolScan) return true;
-            if (other.MinScanNum - tolScan < MinScanNum && MinScanNum < other.MaxScanNum + tolScan) return true;
-            if (other.MinScanNum - tolScan < MaxScanNum && MaxScanNum < other.MaxScanNum + tolScan) return true;
+            if (MinScanNum - tolScan < other.MinScanNum && other.MinScanNum < MaxScanNum + tolScan)
+            {
+                return true;
+            }
+
+            if (MinScanNum - tolScan < other.MaxScanNum && other.MaxScanNum < MaxScanNum + tolScan)
+            {
+                return true;
+            }
+
+            if (other.MinScanNum - tolScan < MinScanNum && MinScanNum < other.MaxScanNum + tolScan)
+            {
+                return true;
+            }
+
+            if (other.MinScanNum - tolScan < MaxScanNum && MaxScanNum < other.MaxScanNum + tolScan)
+            {
+                return true;
+            }
+
             return false;
         }
 

@@ -51,9 +51,19 @@ namespace InformedProteomics.TopDown.SequenceTag
                     for (var charge = _minCharge; charge <= _maxCharge; charge++)
                     {
                         var ion = new Ion(fragmentComposition, charge);
-                        if (_spectrum.GetCorrScore(ion, _tolerance, RelativeIsotopeIntensityThreshold) < .7) continue;
-                        if (baseIonType.IsPrefix) prefixValueArr[cleavageIndex] = 1;
-                        else suffixValueArr[cleavageIndex] = 1;
+                        if (_spectrum.GetCorrScore(ion, _tolerance, RelativeIsotopeIntensityThreshold) < .7)
+                        {
+                            continue;
+                        }
+
+                        if (baseIonType.IsPrefix)
+                        {
+                            prefixValueArr[cleavageIndex] = 1;
+                        }
+                        else
+                        {
+                            suffixValueArr[cleavageIndex] = 1;
+                        }
                     }
                 }
                 cleavageIndex++;
@@ -68,7 +78,11 @@ namespace InformedProteomics.TopDown.SequenceTag
             {
                 if (prefixValueArr[i] == 1 && prefixValueArr[i - 1] == 1)
                 {
-                    if (_sequence[i] is ModifiedAminoAcid) continue;
+                    if (_sequence[i] is ModifiedAminoAcid)
+                    {
+                        continue;
+                    }
+
                     prefixSequenceArr[i] = 1;
                 }
             }
@@ -77,7 +91,11 @@ namespace InformedProteomics.TopDown.SequenceTag
             {
                 if (suffixValueArr[i] == 1 && suffixValueArr[i + 1] == 1)
                 {
-                    if (_sequence[i + 1] is ModifiedAminoAcid) continue;
+                    if (_sequence[i + 1] is ModifiedAminoAcid)
+                    {
+                        continue;
+                    }
+
                     suffixSequenceArr[i + 1] = 1;
                 }
             }
@@ -205,7 +223,10 @@ namespace InformedProteomics.TopDown.SequenceTag
             var largestSubstring = string.Empty;
             foreach (Match m in matches)
             {
-                if (m.Length > largestSubstring.Length) largestSubstring = m.Value;
+                if (m.Length > largestSubstring.Length)
+                {
+                    largestSubstring = m.Value;
+                }
             }
 
             return largestSubstring;

@@ -23,7 +23,11 @@ namespace InformedProteomics.FeatureFinding.Util
             var sb = new StringBuilder();
             for (var i = 0; i < intensity.Length; i++)
             {
-                if (i != 0) sb.Append(";");
+                if (i != 0)
+                {
+                    sb.Append(";");
+                }
+
                 sb.AppendFormat("{0},{1:0.000}", feature.TheoreticalEnvelope.Isotopes[i].Index, intensity[i] / maxIntensity);
             }
 

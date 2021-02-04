@@ -96,9 +96,13 @@ namespace InformedProteomics.Test
             {
                 ++count;
                 if (count < 15)
+                {
                     Console.WriteLine((count - 1) + ": " + string.Join(",", combination));
+                }
                 else if (count == 15)
+                {
                     Console.WriteLine("...");
+                }
             }
 
             var count2 = SimpleMath.GetCombination(n + k - 1, k);
@@ -124,9 +128,13 @@ namespace InformedProteomics.Test
             {
                 ++count;
                 if (count < 15)
+                {
                     Console.WriteLine((count - 1) + ": " + string.Join(",", combination));
+                }
                 else if (count == 15)
+                {
                     Console.WriteLine("...");
+                }
             }
 
             var count2 = SimpleMath.GetCombination(n + k - 1, k);
@@ -477,7 +485,9 @@ namespace InformedProteomics.Test
             {
                 var ionList = ionCache[ionType];
                 if (ionList.Count <= 6)
+                {
                     ShowProductIons(ionType, 0, ionList);
+                }
                 else
                 {
                     ShowProductIons(ionType, 0, ionList.Take(3));
@@ -633,7 +643,9 @@ namespace InformedProteomics.Test
                                           modCombIndex, modCombination, modCombination.Composition, comboMass);
                     }
                     else if (modCombIndex == 3)
+                    {
                         Console.WriteLine("...");
+                    }
 
                     minMass = Math.Min(minMass, comboMass);
                     maxMass = Math.Max(maxMass, comboMass);
@@ -675,8 +687,10 @@ namespace InformedProteomics.Test
             var matchFound = false;
 
             if (printTable)
+            {
                 Console.WriteLine("{0,2} {1,-10} {2,-40} {3,-12} {4,4} {5,6}",
                                   "#", "Name", "Composition", "      Mass", "Charge", "IsPrefixIon");
+            }
 
             var ionTypeFactory = new IonTypeFactory();
             var index = 0;
@@ -697,7 +711,9 @@ namespace InformedProteomics.Test
                 }
 
                 if (!validateIonInfo)
+                {
                     continue;
+                }
 
                 matchFound = true;
 
@@ -778,7 +794,9 @@ namespace InformedProteomics.Test
 
             var elementItem = parameterBaseElement.Element("ElementIsotopes");
             if (elementItem == null)
+            {
                 Assert.Fail("ElementIsotopes element not found in " + xmlFile.FullName);
+            }
 
             var elements = elementItem.Elements("Element").ToList();
 
@@ -788,15 +806,21 @@ namespace InformedProteomics.Test
                 var name = element.Element("Name");
 
                 if (symbol == null)
+                {
                     Assert.Fail("Symbol element not found for " + element);
+                }
 
                 if (name == null)
+                {
                     Assert.Fail("Name element not found for " + element);
+                }
 
                 Console.WriteLine("{0,3}\t{1}", symbol.Value, name.Value);
 
                 if (symbol.Value == "K")
+                {
                     Assert.AreEqual("Potassium", name.Value);
+                }
             }
 
             Console.WriteLine("Element Count: " + elements.Count);
@@ -914,12 +938,16 @@ namespace InformedProteomics.Test
                 var atom = Regex.Match(element, @"[A-Z][a-z]?");
                 var num = element.Substring(atom.Index + atom.Length);
                 if (num.Length == 0)
+                {
                     num = "1";
+                }
 
                 Console.Write("{0} ({1}) ", atom, num);
 
                 if (!expectedMatches.TryGetValue(atom.ToString(), out var expectedCount))
+                {
                     Assert.Fail("Unrecognized atom: " + atom);
+                }
 
                 Assert.AreEqual(expectedCount, int.Parse(num), "Atom count mismatch");
             }
@@ -1015,7 +1043,9 @@ namespace InformedProteomics.Test
             {
                 Console.WriteLine(ionType);
                 if (!massByIontype.TryGetValue(ionType.Name, out var expectedOffsetMass))
+                {
                     Assert.Fail("Unrecognized ion type for combo: " + ionType.Name);
+                }
 
                 Assert.AreEqual(expectedOffsetMass, ionType.Mass, 0.00001, "Unexpected offset mass for ion " + ionType.Name);
 
@@ -1076,11 +1106,19 @@ namespace InformedProteomics.Test
             {
                 var ion = iontype.GetIon(sequence.Composition);
                 var obsPeaks = spectrum.GetAllIsotopePeaks(ion, tolerance, minimumRelativeIntensity);
-                if (obsPeaks == null) continue;
+                if (obsPeaks == null)
+                {
+                    continue;
+                }
+
                 var isotopes = ion.GetIsotopes(minimumRelativeIntensity).ToArray();
                 for (var i = 0; i < isotopes.Length; i++)
                 {
-                    if (obsPeaks[i] == null) continue;
+                    if (obsPeaks[i] == null)
+                    {
+                        continue;
+                    }
+
                     var obsMz = obsPeaks[i].Mz;
                     var theoMz = ion.GetIsotopeMz(isotopes[i].Index);
                     var ppmError = (obsMz - theoMz) / theoMz * 1e6;
@@ -1153,7 +1191,9 @@ namespace InformedProteomics.Test
         {
             var maxIntensity = (from item in isotopes select item.Ratio).Max();
             if (Math.Abs(maxIntensity) < float.Epsilon)
+            {
                 maxIntensity = 1.0;
+            }
 
             foreach (var isotope in isotopes)
             {

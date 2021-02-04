@@ -167,7 +167,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             else
             {
                 var builder = new StringBuilder(Charge);
-                for (var i = 0; i < Charge; i++) builder.Append("+");
+                for (var i = 0; i < Charge; i++)
+                {
+                    builder.Append("+");
+                }
+
                 chargeStr = builder.ToString();
             }
             return BaseIonType.Symbol + index + chargeStr + NeutralLoss.Name;
@@ -182,7 +186,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public static IonType Parse(string s)
         {
             var t = s.Split(',');
-            if (t.Length < 5) return null;
+            if (t.Length < 5)
+            {
+                return null;
+            }
+
             var name = t[0];
             var composition = Composition.Composition.Parse(t[1]);
             var charge = int.Parse(t[3]);
@@ -219,9 +227,21 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
             return Equals((IonType)obj);
         }
 
@@ -232,7 +252,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 //var hashCode = (this.Name != null ? this.Name.GetHashCode() : 0);
                 var hashCode = Charge;
-                hashCode = (hashCode * 397) ^ (OffsetComposition != null ? OffsetComposition.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ ((OffsetComposition?.GetHashCode()) ?? 0);
                 hashCode = (hashCode * 397) ^ IsPrefixIon.GetHashCode();
                 return hashCode;
             }

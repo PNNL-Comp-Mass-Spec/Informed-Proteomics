@@ -43,10 +43,17 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IScorer GetMs2Scorer(int scanNum)
         {
-            if (_ms2Scorer.TryGetValue(scanNum, out var scorer)) return scorer;
+            if (_ms2Scorer.TryGetValue(scanNum, out var scorer))
+            {
+                return scorer;
+            }
 
             scorer = GetScorer(scanNum);
-            if (scorer == null) return null;
+            if (scorer == null)
+            {
+                return null;
+            }
+
             return _ms2Scorer[scanNum] = scorer;
         }
 
@@ -61,10 +68,14 @@ namespace InformedProteomics.TopDown.Scoring
         public IScorer GetScorer(int scanNum)
         {
             if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec))
+            {
                 return null;
+            }
 
             if (GetDeconvolutedSpectrum(spec, _minProductCharge, _maxProductCharge, _productTolerance, CorrScoreThresholdMs2) is ProductSpectrum deconvolutedSpec)
+            {
                 return new DeconvScorer(deconvolutedSpec, _productTolerance);
+            }
 
             return null;
         }
@@ -85,7 +96,11 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 var mass = deconvolutedPeak.Mass;
                 var binNum = GetBinNumber(mass);
-                if (!binHash.Add(binNum)) continue;
+                if (!binHash.Add(binNum))
+                {
+                    continue;
+                }
+
                 peakList.Add(new Peak(mass, deconvolutedPeak.Intensity));
             }
 
@@ -152,10 +167,17 @@ namespace InformedProteomics.TopDown.Scoring
                 var score = 0.0;
 
                 var prefixMass = prefixFragmentComposition.Mass + _prefixOffsetMass;
-                if (_ionMassBins.Contains(GetBinNumber(prefixMass))) score += 1;
+                if (_ionMassBins.Contains(GetBinNumber(prefixMass)))
+                {
+                    score++;
+                }
 
                 var suffixMass = suffixFragmentComposition.Mass + _suffixOffsetMass;
-                if (_ionMassBins.Contains(GetBinNumber(suffixMass))) score += 1;
+                if (_ionMassBins.Contains(GetBinNumber(suffixMass)))
+                {
+                    score++;
+                }
+
                 return score;
             }
         }

@@ -49,7 +49,9 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static List<SearchModification> ParseModification(string line)
         {
             if (string.IsNullOrWhiteSpace(line))
+            {
                 return null;
+            }
 
             var poundIndex = line.IndexOf('#');
             if (poundIndex > 0)
@@ -160,11 +162,15 @@ namespace InformedProteomics.Backend.Data.Sequence
                 lineNum++;
                 var tokenArr = line.Split('#');
                 if (tokenArr.Length == 0)
+                {
                     continue;
+                }
 
                 var s = tokenArr[0].Trim();
                 if (s.Length == 0)
+                {
                     continue;
+                }
 
                 if (s.StartsWith("NumMods=", StringComparison.OrdinalIgnoreCase))
                 {
@@ -190,7 +196,9 @@ namespace InformedProteomics.Backend.Data.Sequence
                     }
 
                     if (mods != null)
+                    {
                         searchModList.AddRange(mods);
+                    }
                 }
             }
 

@@ -23,7 +23,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static SequenceGraph CreateGraph(AminoAcidSet aaSet, string annotation)
         {
             const char delimiter = (char)FastaDatabaseConstants.Delimiter;
-            if (annotation == null || !Regex.IsMatch(annotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"]$")) return null;
+            if (annotation == null || !Regex.IsMatch(annotation, @"^[A-Z" + delimiter + @"]\.[A-Z]+\.[A-Z" + delimiter + @"]$"))
+            {
+                return null;
+            }
 
             var nTerm = annotation[0] == FastaDatabaseConstants.Delimiter
                                   ? AminoAcid.ProteinNTerm
@@ -59,7 +62,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Modifications used in this graph
         /// </summary>
-        public ModificationParams ModificationParams => _modificationParams;
+        public ModificationParams ModificationParams { get; }
 
         /// <summary>
         /// If the sequence graph is valid
@@ -125,15 +128,25 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public double GetNumProteoformSequencesByNumMods(int nDynMods)
         {
-            if (nDynMods < 1 || nDynMods > ModificationParams.MaxNumDynModsPerSequence) return 0;
+            if (nDynMods < 1 || nDynMods > ModificationParams.MaxNumDynModsPerSequence)
+            {
+                return 0;
+            }
 
             var numModCombs = _graph[_index].Length;
             var nProteoforms = 0d;
             for (var modIndex = 0; modIndex < numModCombs; modIndex++)
             {
                 var modCombs = ModificationParams.GetModificationCombination(_graph[_index][modIndex].ModificationCombinationIndex);
-                if (modCombs.GetNumModifications() < nDynMods) continue;
-                if (modCombs.GetNumModifications() > nDynMods) break;
+                if (modCombs.GetNumModifications() < nDynMods)
+                {
+                    continue;
+                }
+
+                if (modCombs.GetNumModifications() > nDynMods)
+                {
+                    break;
+                }
 
                 nProteoforms += GetNumProteoformSequences(modIndex);
                 //if (nProteoforms > double.MaxValue) return double.MaxValue; // overflow
@@ -149,7 +162,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         public double GetNumProteoformSequences(int modIndex)
         {
             var numModCombs = _graph[_index].Length;
-            if (modIndex < 0 || modIndex >= numModCombs) return 0;
+            if (modIndex < 0 || modIndex >= numModCombs)
+            {
+                return 0;
+            }
 
             if (_countTable == null)
             {
@@ -182,7 +198,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         public void CleaveNTerm()
         {
-            _index = _index - 3;
+            _index -= 3;
             for (var seqIndex = _index + 1; seqIndex < _index + 3; seqIndex++)
             {
                 for (var modIndex = 0; modIndex < _graph[seqIndex].Length; modIndex++)
@@ -268,7 +284,11 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var newModIndexList = new HashSet<int>();
                 foreach (var mi in modIndexList)
                 {
-                    if (si < seqIndex) fragmentCompositions.Add(GetComposition(si, mi));
+                    if (si < seqIndex)
+                    {
+                        fragmentCompositions.Add(GetComposition(si, mi));
+                    }
+
                     var node = _graph[si][mi];
                     foreach (var prevModIndex in node.GetPrevNodeIndices())
                     {
@@ -290,7 +310,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             _sinkModIndex = modIndex;
             _sinkSequenceComposition = GetComposition(_index, modIndex);
             _sinkSequenceCompositionWithH2O = _sinkSequenceComposition + Composition.Composition.H2O;
-            foreach (var cn in _compNodeComposition) Array.Clear(cn, 0, cn.Length);
+            foreach (var cn in _compNodeComposition)
+            {
+                Array.Clear(cn, 0, cn.Length);
+            }
         }
 
         /// <summary>
@@ -363,7 +386,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             _sequence = sequence;
             _nTerm = nTerm;
 
-            _modificationParams = aminoAcidSet.GetModificationParams();
+            ModificationParams = aminoAcidSet.GetModificationParams();
 
             _maxSeqIndex = sequence.Length + 3;  // init + C-term + sequence length + N-term
 
@@ -383,8 +406,8 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             for (var i = 0; i < _maxSeqIndex; i++)
             {
-                _compNodeComposition[i] = new Composition.Composition[_modificationParams.NumModificationCombinations];
-                _nodeComposition[i] = new Composition.Composition[_modificationParams.NumModificationCombinations];
+                _compNodeComposition[i] = new Composition.Composition[ModificationParams.NumModificationCombinations];
+                _nodeComposition[i] = new Composition.Composition[ModificationParams.NumModificationCombinations];
             }
 
             NumNTermCleavages = 0;
@@ -399,7 +422,10 @@ namespace InformedProteomics.Backend.Data.Sequence
                     break;
                 }
             }
-            if (IsValid) AddAminoAcid(nTerm.Residue);
+            if (IsValid)
+            {
+                AddAminoAcid(nTerm.Residue);
+            }
         }
 
         private Tuple<double, string> GetFragmentScoreAndModifications(
@@ -410,7 +436,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             IReadOnlyList<Tuple<double, string>[]> maxScoreAndMods)
         {
             var scoreAndMods = maxScoreAndMods[seqIndex][modIndex];
-            if (scoreAndMods != null) return scoreAndMods;
+            if (scoreAndMods != null)
+            {
+                return scoreAndMods;
+            }
 
             var node = _graph[seqIndex][modIndex];
             var curNodeScore = nodeScore[seqIndex][modIndex] ??
@@ -486,7 +515,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 var node = _graph[seqIndex][modIndex];
                 _nodeComposition[seqIndex][modIndex] = _suffixComposition[seqIndex] +
-                                  _modificationParams.GetModificationCombination(node.ModificationCombinationIndex).Composition;
+                                  ModificationParams.GetModificationCombination(node.ModificationCombinationIndex).Composition;
             }
             return _nodeComposition[seqIndex][modIndex];
         }
@@ -519,7 +548,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         protected double GetFragmentScore(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
         {
             var score = maxScore[seqIndex][modIndex];
-            if (score != null) return (double)score;
+            if (score != null)
+            {
+                return (double)score;
+            }
 
             var node = _graph[seqIndex][modIndex];
             double? curNodeScore;
@@ -553,11 +585,15 @@ namespace InformedProteomics.Backend.Data.Sequence
                     foreach (var previousNode in node.GetPrevNodeIndices())
                     {
                         if (seqIndex == 0)
+                        {
                             continue;
+                        }
 
                         var prevScore = GetFragmentScore(seqIndex - 1, previousNode, scorer, nodeScore, maxScore);
                         if (prevScore > prevNodeScore)
+                        {
                             prevNodeScore = prevScore;
+                        }
                     }
                 }
             }
@@ -582,8 +618,6 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Max sequence index
         /// </summary>
         protected readonly int _maxSeqIndex;
-
-        private readonly ModificationParams _modificationParams;
 
         private int _index;
 
@@ -626,30 +660,57 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             if(_index == 1) // C-term residue
             {
-                if (residue == AminoAcid.PeptideCTerm.Residue) location = SequenceLocation.PeptideCTerm;
-                else if (residue == AminoAcid.ProteinCTerm.Residue) location = SequenceLocation.ProteinCTerm;
+                if (residue == AminoAcid.PeptideCTerm.Residue)
+                {
+                    location = SequenceLocation.PeptideCTerm;
+                }
+                else if (residue == AminoAcid.ProteinCTerm.Residue)
+                {
+                    location = SequenceLocation.ProteinCTerm;
+                }
             }
             else if (_index == _aminoAcidSequence.Length - 1 - NumNTermCleavages)   // N-term residue
             {
-                if (residue == AminoAcid.PeptideNTerm.Residue) location = SequenceLocation.PeptideNTerm;
-                else if (residue == AminoAcid.ProteinNTerm.Residue) location = SequenceLocation.ProteinNTerm;
+                if (residue == AminoAcid.PeptideNTerm.Residue)
+                {
+                    location = SequenceLocation.PeptideNTerm;
+                }
+                else if (residue == AminoAcid.ProteinNTerm.Residue)
+                {
+                    location = SequenceLocation.ProteinNTerm;
+                }
             }
             else if(_index == 2) // Amino acid at the C-term
             {
-                if (_aminoAcidSequence[1] == AminoAcid.PeptideCTerm) location = SequenceLocation.PeptideCTerm;
-                else if (_aminoAcidSequence[1] == AminoAcid.ProteinCTerm) location = SequenceLocation.ProteinCTerm;
+                if (_aminoAcidSequence[1] == AminoAcid.PeptideCTerm)
+                {
+                    location = SequenceLocation.PeptideCTerm;
+                }
+                else if (_aminoAcidSequence[1] == AminoAcid.ProteinCTerm)
+                {
+                    location = SequenceLocation.ProteinCTerm;
+                }
             }
             else if (_index == _aminoAcidSequence.Length - 2 - NumNTermCleavages) // Amino acid at the N-term
             {
-                if (_aminoAcidSequence[_aminoAcidSequence.Length - 1] == AminoAcid.PeptideNTerm) location = SequenceLocation.PeptideNTerm;
-                else if (_aminoAcidSequence[_aminoAcidSequence.Length - 1] == AminoAcid.ProteinNTerm) location = SequenceLocation.ProteinNTerm;
+                if (_aminoAcidSequence[_aminoAcidSequence.Length - 1] == AminoAcid.PeptideNTerm)
+                {
+                    location = SequenceLocation.PeptideNTerm;
+                }
+                else if (_aminoAcidSequence[_aminoAcidSequence.Length - 1] == AminoAcid.ProteinNTerm)
+                {
+                    location = SequenceLocation.ProteinNTerm;
+                }
             }
             else
             {
                 location = SequenceLocation.Everywhere;
             }
 
-            if (location == null) return false;
+            if (location == null)
+            {
+                return false;
+            }
 
             var loc = (SequenceLocation) location;
             var aminoAcid = AminoAcidSet.GetAminoAcid(residue, loc);
@@ -662,7 +723,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             _suffixComposition[_index] = _suffixComposition[_index - 1] + aminoAcid.Composition;
 
             var modIndices = AminoAcidSet.GetModificationIndices(residue, loc);
-            if (!modIndices.Any())  // No modification
+            if (modIndices.Length == 0)  // No modification
             {
                 _graph[_index] = new Node[_graph[_index - 1].Length];
                 for (var i = 0; i < _graph[_index - 1].Length; i++)
@@ -695,7 +756,10 @@ namespace InformedProteomics.Backend.Data.Sequence
                         var modCombIndex = ModificationParams.GetModificationCombinationIndex(
                                                     prevNode.ModificationCombinationIndex, modIndex);
                         if (modCombIndex < 0)   // too many modifications
+                        {
                             continue;
+                        }
+
                         if (modCombIndexToNodeMap.TryGetValue(modCombIndex, out var modifiedEdgeNode))
                         {
                             modifiedEdgeNode.AddPrevNodeIndex(prevNodeIndex);
@@ -743,7 +807,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         {
             for (var i = 0; i < _count; i++)
             {
-                if (_prevNodeIndices[i] == prevNodeIndex) return false;
+                if (_prevNodeIndices[i] == prevNodeIndex)
+                {
+                    return false;
+                }
             }
             if(_count >= _prevNodeIndices.Length)
             {

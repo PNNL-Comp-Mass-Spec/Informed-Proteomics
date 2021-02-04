@@ -5,7 +5,7 @@ using InformedProteomics.Backend.MassSpecData;
 
 namespace InformedProteomics.TopDown.Scoring
 {
-    class TopDownTrainer
+    internal class TopDownTrainer
     {
         private Dictionary<int, int> _missingXicCounterTarget; // charge, count
         private Dictionary<int, Dictionary<int, int>> _xicCorrScoreCounterTarget;    // charge, correlation raw score, count
@@ -64,7 +64,7 @@ namespace InformedProteomics.TopDown.Scoring
                         {
                             var t = corrScoreCounter[c] ?? new Dictionary<int, int>();
                             var score = corrScores[c - TopDownScorer.MinCharge];
-                            t[score] = t[score] + 1;
+                            t[score]++;
                         }
                     }
                 }

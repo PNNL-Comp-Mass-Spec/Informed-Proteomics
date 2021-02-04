@@ -23,23 +23,50 @@ namespace InformedProteomics.Scoring.BottomUp
         public int CompareTo(Partition other)
         {
             if (Charge < other.Charge)
+            {
                 return -1;
+            }
+
             if (Charge > other.Charge)
+            {
                 return 1;
+            }
+
             if (SegmentIndex < other.SegmentIndex)
+            {
                 return -1;
+            }
+
             if (SegmentIndex > other.SegmentIndex)
+            {
                 return 1;
+            }
+
             if (NeutralPeptideMass < other.NeutralPeptideMass)
+            {
                 return -1;
+            }
+
             return NeutralPeptideMass > other.NeutralPeptideMass ? 1 : 0;
         }
 
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
             return Equals((Partition) obj);
         }
 

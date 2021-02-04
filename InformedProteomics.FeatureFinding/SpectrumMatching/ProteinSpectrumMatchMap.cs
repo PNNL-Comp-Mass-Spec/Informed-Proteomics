@@ -15,7 +15,10 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             Run = run;
             _scanNumToMatchMap = new Dictionary<int, ProteinSpectrumMatch>();
 
-            if (prsmList == null) return;
+            if (prsmList == null)
+            {
+                return;
+            }
 
             ProteinSpectrumMatches = prsmList;
             _scanNumToMatchMap.Clear();
@@ -24,7 +27,10 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             {
                 if (_scanNumToMatchMap.ContainsKey(prsm.ScanNum))
                 {
-                    if (_scanNumToMatchMap[prsm.ScanNum].Score < prsm.Score) _scanNumToMatchMap[prsm.ScanNum] = prsm;
+                    if (_scanNumToMatchMap[prsm.ScanNum].Score < prsm.Score)
+                    {
+                        _scanNumToMatchMap[prsm.ScanNum] = prsm;
+                    }
                 }
                 else
                 {
@@ -67,13 +73,23 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             ProteinSpectrumMatch ret = null;
             for (var scanNum = minScanNum + 1; scanNum < maxScanNum; scanNum++)
             {
-                if (_scanNumToMatchMap[scanNum] == null) continue;
+                if (_scanNumToMatchMap[scanNum] == null)
+                {
+                    continue;
+                }
+
                 if (Math.Abs(massBin - massComparerWithBinning.GetBinNumber(_scanNumToMatchMap[scanNum].Mass)) <= 1)
                 {
-                    if (ret == null) ret = _scanNumToMatchMap[scanNum];
+                    if (ret == null)
+                    {
+                        ret = _scanNumToMatchMap[scanNum];
+                    }
                     else
                     {
-                        if (ret.Score < _scanNumToMatchMap[scanNum].Score) ret = _scanNumToMatchMap[scanNum];
+                        if (ret.Score < _scanNumToMatchMap[scanNum].Score)
+                        {
+                            ret = _scanNumToMatchMap[scanNum];
+                        }
                     }
                 }
             }
@@ -87,17 +103,33 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
         public int CountIdentifiedUniqueProteoforms()
         {
-            if (ProteinSpectrumMatches == null) return 0;
+            if (ProteinSpectrumMatches == null)
+            {
+                return 0;
+            }
+
             var uniqueSeq = new HashSet<string>();
-            foreach (var prsm in ProteinSpectrumMatches) uniqueSeq.Add(prsm.SequenceText);
+            foreach (var prsm in ProteinSpectrumMatches)
+            {
+                uniqueSeq.Add(prsm.SequenceText);
+            }
+
             return uniqueSeq.Count;
         }
 
         public int CountIdentifiedProteins()
         {
-            if (ProteinSpectrumMatches == null) return 0;
+            if (ProteinSpectrumMatches == null)
+            {
+                return 0;
+            }
+
             var uniqueSeq = new HashSet<string>();
-            foreach (var prsm in ProteinSpectrumMatches) uniqueSeq.Add(prsm.ProteinName);
+            foreach (var prsm in ProteinSpectrumMatches)
+            {
+                uniqueSeq.Add(prsm.ProteinName);
+            }
+
             return uniqueSeq.Count;
         }
 

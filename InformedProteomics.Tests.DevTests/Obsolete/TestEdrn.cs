@@ -75,15 +75,26 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                 {
                     foreach (var line in File.ReadLines(resultFile))
                     {
-                        if (line.StartsWith("Peptide")) continue;
+                        if (line.StartsWith("Peptide"))
+                        {
+                            continue;
+                        }
+
                         var token = line.Split('\t');
                         var peptide = token[0];
 
                         var fraction = Convert.ToInt32(resultFile.Substring(resultFile.IndexOf("_Serum", System.StringComparison.Ordinal) + 7, 2));
-                        if (peptide.Equals(spikedInPeptide)) fractionList.Add(fraction);
+                        if (peptide.Equals(spikedInPeptide))
+                        {
+                            fractionList.Add(fraction);
+                        }
                     }
                 }
-                if (fractionList.Any()) numIdentifiedPeptides++;
+                if (fractionList.Count > 0)
+                {
+                    numIdentifiedPeptides++;
+                }
+
                 Console.WriteLine("{0}\t{1}", spikedInPeptide, string.Join(",", fractionList));
             }
             Console.WriteLine("NumPeptides: {0}", numPeptides);
@@ -110,7 +121,11 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             Console.WriteLine("Peptide\tCharge\tMz");
             foreach (var line in File.ReadLines(pepListFile))
             {
-                if (line.Length == 0) continue;
+                if (line.Length == 0)
+                {
+                    continue;
+                }
+
                 var peptide = line;
                 var composition = aaSet.GetComposition(peptide) + Composition.H2O;
 
@@ -119,7 +134,11 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                     var precursorIon = new Ion(composition, charge);
                     var precursorIonMz = precursorIon.GetMonoIsotopicMz();
 
-                    if (precursorIonMz < 400 || precursorIonMz >= 900) continue;
+                    if (precursorIonMz < 400 || precursorIonMz >= 900)
+                    {
+                        continue;
+                    }
+
                     var histIndex = (int)((precursorIonMz - 400)/125);
                     hist[histIndex]++;
 

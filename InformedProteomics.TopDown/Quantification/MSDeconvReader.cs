@@ -48,7 +48,11 @@ namespace InformedProteomics.TopDown.Quantification
                     {
                         isInfoLine = true;
                         file.ReadLine();
-                        if (msLevel == 2) file.ReadLine();
+                        if (msLevel == 2)
+                        {
+                            file.ReadLine();
+                        }
+
                         continue;
                     }
                 }
@@ -57,7 +61,10 @@ namespace InformedProteomics.TopDown.Quantification
                 {
                     splitString = line.Split('\t');
                     var infoLine = GetDeconvLineMsDeconv(splitString);
-                    if(infoLine != null) lineInfoList.Add(infoLine);
+                    if(infoLine != null)
+                    {
+                        lineInfoList.Add(infoLine);
+                    }
                 }
             }
 
@@ -81,7 +88,10 @@ namespace InformedProteomics.TopDown.Quantification
             {
                 var line = lineList[i].Split(',');
                 var node = GetDeconvLineDecon2Ls(line);
-                if (node != null) nodeList.Add(node);
+                if (node != null)
+                {
+                    nodeList.Add(node);
+                }
             }
 
             return nodeList;
@@ -94,11 +104,25 @@ namespace InformedProteomics.TopDown.Quantification
             var mass =  double.Parse(line[11]);
             var intensity = double.Parse(line[13]);
 
-            if (double.IsNaN(intensity)) intensity = 0;
+            if (double.IsNaN(intensity))
+            {
+                intensity = 0;
+            }
 
-            if (scanNum < MinScanNum || scanNum > MaxScanNum) return null;
-            if (charge < MinCharge || charge > MaxCharge) return null;
-            if (mass < MinMass || mass > MaxMass) return null;
+            if (scanNum < MinScanNum || scanNum > MaxScanNum)
+            {
+                return null;
+            }
+
+            if (charge < MinCharge || charge > MaxCharge)
+            {
+                return null;
+            }
+
+            if (mass < MinMass || mass > MaxMass)
+            {
+                return null;
+            }
 
             return new MSDeconvNode(scanNum,mass,intensity,charge);
         }
@@ -110,9 +134,20 @@ namespace InformedProteomics.TopDown.Quantification
             var mass = double.Parse(line[6]);
             var intensity = double.Parse(line[10]);
 
-            if (scanNum < MinScanNum || scanNum > MaxScanNum) return null;
-            if (charge < MinCharge || charge > MaxCharge) return null;
-            if (mass < MinMass || mass > MaxMass) return null;
+            if (scanNum < MinScanNum || scanNum > MaxScanNum)
+            {
+                return null;
+            }
+
+            if (charge < MinCharge || charge > MaxCharge)
+            {
+                return null;
+            }
+
+            if (mass < MinMass || mass > MaxMass)
+            {
+                return null;
+            }
 
             return new MSDeconvNode(scanNum,mass,intensity,charge);
         }

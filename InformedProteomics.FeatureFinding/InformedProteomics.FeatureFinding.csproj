@@ -54,6 +54,7 @@
     <Compile Include="FeatureDetection\LcMsPeakMatrix.cs" />
     <Compile Include="FeatureDetection\LcMsPeakMatrixLowResolution.cs" />
     <Compile Include="FeatureDetection\MaxEntDeconvoluter.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Graphics\LcMsFeatureMap.cs" />
     <Compile Include="IsotopicEnvelope\IsotopeEnvelope.cs" />
     <Compile Include="IsotopicEnvelope\LcMsEnvelopeComparer.cs" />

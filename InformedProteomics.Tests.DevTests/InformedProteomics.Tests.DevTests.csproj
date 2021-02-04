@@ -37,6 +37,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Obsolete\TestEdrn.cs" />
     <Compile Include="Obsolete\TestPeptideCentricAnalysis.cs" />
     <Compile Include="Obsolete\TestTopDownMs1Scoring.cs" />

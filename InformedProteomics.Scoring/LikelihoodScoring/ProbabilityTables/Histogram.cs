@@ -19,7 +19,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             _compare = compare;
             if (compare == null)
+            {
                 _compare = Comparer<T1>.Default;
+            }
+
             Total = 0;
             Bins = new List<List<T1>>();
             for (var i = 0; i < binEdges.Length; i++)
@@ -41,7 +44,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             _compare = compare;
             if (compare == null)
+            {
                 _compare = Comparer<T1>.Default;
+            }
+
             Total = 0;
             Bins = new List<List<T1>>();
             for (var i = 0; i < binEdges.Length; i++)
@@ -60,7 +66,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             _compare = compare;
             if (compare == null)
+            {
                 _compare = Comparer<T1>.Default;
+            }
+
             Total = 0;
             Bins = new List<List<T1>> {new List<T1>()};
         }
@@ -160,7 +169,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
             }
             Equalize(bins, excludeLow);
             if (bins > 0)
+            {
                 BinEdges[0] = minimum;
+            }
         }
 
         /// <summary>
@@ -170,7 +181,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         public void AddDatum(T1 datum)
         {
             if (BinEdges != null)
+            {
                 Compute(new List<T1> { datum });
+            }
             else
             {
                 Bins[0].Add(datum);
@@ -185,7 +198,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         public void AddData(List<T1> data)
         {
             if (BinEdges != null)
+            {
                 Compute(data);
+            }
             else
             {
                 Bins[0].AddRange(data);
@@ -195,7 +210,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
         private void Equalize(int bins, List<T1> dataCollection)
         {
-            if (dataCollection.Count == 0) return;
+            if (dataCollection.Count == 0)
+            {
+                return;
+            }
+
             dataCollection.Sort(_compare);
 
             Bins = new List<List<T1>>();
@@ -208,7 +227,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 BinEdges[j] = dataCollection[min];
 
                 if (j == bins - 1)
+                {
                     Bins[j].AddRange(dataCollection.GetRange(min + binSize, dataCollection.Count - (min + binSize)));
+                }
             }
             Total = dataCollection.Count;
         }
@@ -243,7 +264,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
     };
 
     // bin edge alignment functions only for Histogram<double>, Histogram<float> and Histogram<int>
-    static class NumericHistogramAlignment
+    internal static class NumericHistogramAlignment
     {
         public static double[] GetAlignedBinEdges(this Histogram<double> hist, BinEdgeAlignment align, double binWidth)
         {

@@ -25,7 +25,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             var decoyResultPath = Utils.GetTestFile(methodName, decoyFile);
 
             if (targetResultPath.DirectoryName == null)
+            {
                 Assert.Ignore("Cannot determine the parent directory of " + targetResultPath.FullName);
+            }
 
             var tdaResultPath = Path.Combine(targetResultPath.DirectoryName, "QC_Shew_Intact_26Sep14_Bane_C2Column3_result.tsv");
 
@@ -40,12 +42,16 @@ namespace InformedProteomics.Tests.FunctionalTests
             using (var reader = new StreamReader(new FileStream(tdaResultPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
             {
                 if (reader.EndOfStream)
+                {
                     Assert.Fail("Result file is empty: " + tdaResultPath);
+                }
 
                 var headerLine = reader.ReadLine();
 
                 if (string.IsNullOrWhiteSpace(headerLine))
+                {
                     Assert.Fail("Header line is empty: " + tdaResultPath);
+                }
 
                 var headerColumns = headerLine.Split('\t');
 
@@ -69,7 +75,9 @@ namespace InformedProteomics.Tests.FunctionalTests
                 }
 
                 if (reader.EndOfStream)
+                {
                     Assert.Fail("Result file has a header line but no results: " + tdaResultPath);
+                }
 
                 var qValueByScan = new Dictionary<int, string>();
 
@@ -77,7 +85,9 @@ namespace InformedProteomics.Tests.FunctionalTests
                 {
                     var result = reader.ReadLine();
                     if (string.IsNullOrWhiteSpace(result))
+                    {
                         continue;
+                    }
 
                     var dataColumns = result.Split('\t');
 
@@ -119,21 +129,33 @@ namespace InformedProteomics.Tests.FunctionalTests
         private void VerifyQValue(string tdaResultPath, IReadOnlyDictionary<int, string> qValueByScan, int scanNumber, double expectedValue)
         {
             if (!qValueByScan.TryGetValue(scanNumber, out var qValueText))
+            {
                 Assert.Fail("Scan number {0} not found in results: {1}", scanNumber, tdaResultPath);
+            }
 
             if (!double.TryParse(qValueText, out var qValue))
+            {
                 Assert.Fail("QValue not numeric for scan {0}: {1}", scanNumber, tdaResultPath);
+            }
 
             var tolerance = expectedValue / 1000;
             if (tolerance < double.Epsilon)
+            {
                 tolerance = double.Epsilon;
+            }
 
             if (Math.Abs(qValue) < double.Epsilon)
+            {
                 Console.WriteLine("QValue for scan {0} is 0", scanNumber);
+            }
             else if (qValue < 0.000001)
+            {
                 Console.WriteLine("QValue for scan {0} is {1:E4}", scanNumber, qValue);
+            }
             else
+            {
                 Console.WriteLine("QValue for scan {0} is {1:F8}", scanNumber, qValue);
+            }
 
             Assert.AreEqual(expectedValue, qValue, tolerance, "Unexpected QValue for scan {0} in {1}", scanNumber, tdaResultPath);
         }

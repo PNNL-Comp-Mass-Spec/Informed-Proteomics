@@ -36,9 +36,15 @@ namespace MSPathFinderT
             get
             {
                 if (InternalCleavageMode == InternalCleavageType.MultipleInternalCleavages)
+                {
                     return 0;
+                }
+
                 if (InternalCleavageMode == InternalCleavageType.SingleInternalCleavage)
+                {
                     return 1;
+                }
+
                 return 2;
             }
             set
@@ -287,7 +293,9 @@ namespace MSPathFinderT
                 {
                     var success = LoadModsFromMSPathFinderParameterFile(parameterFilePath);
                     if (!success)
+                    {
                         return false;
+                    }
                 }
             }
             else
@@ -385,8 +393,6 @@ namespace MSPathFinderT
         {
             Console.WriteLine();
 
-            Console.WriteLine("MaxThreads: " + MaxNumThreads);
-
             foreach (var specFilePath in SpecFilePaths)
             {
                 Console.WriteLine("SpectrumFilePath:  " + specFilePath);
@@ -398,9 +404,10 @@ namespace MSPathFinderT
 
             var parameterFilePathToShow = string.IsNullOrWhiteSpace(parameterFilePath) ? "N/A" : parameterFilePath;
             Console.WriteLine("ParameterFilePath: {0}", parameterFilePathToShow);
-
             Console.WriteLine("OutputDir:         " + OutputDir);
             Console.WriteLine();
+
+            Console.WriteLine("MaxThreads:                 " + MaxNumThreads);
             Console.WriteLine("InternalCleavageMode:       " + InternalCleavageMode);
             Console.WriteLine("Tag-based search:           " + TagBasedSearch);
             Console.WriteLine("Tda:                        " + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
@@ -436,7 +443,9 @@ namespace MSPathFinderT
             }
 
             if (UseFLIP)
+            {
                 Console.WriteLine("Using FLIP scoring.");
+            }
 
             Console.WriteLine();
         }
@@ -512,7 +521,9 @@ namespace MSPathFinderT
                 MaxDynamicModificationsPerSequence = parser.MaxNumDynModsPerSequence;
 
                 if (Modifications == null)
+                {
                     return "Error while parsing " + modFilePath;
+                }
 
                 AminoAcidSet = new AminoAcidSet(Modifications, MaxDynamicModificationsPerSequence);
                 return string.Empty;
@@ -526,7 +537,9 @@ namespace MSPathFinderT
         private string LoadScansFile(string scansFilePath)
         {
             if (string.IsNullOrWhiteSpace(scansFilePath))
+            {
                 return string.Empty;
+            }
 
             if (!File.Exists(scansFilePath))
             {
@@ -543,16 +556,22 @@ namespace MSPathFinderT
                 {
                     var dataLine = reader.ReadLine();
                     if (string.IsNullOrWhiteSpace(dataLine))
+                    {
                         continue;
+                    }
 
                     var dataValues = dataLine.Split(delimiters);
                     foreach (var value in dataValues)
                     {
                         if (!int.TryParse(value, out var scanNumber))
+                        {
                             continue;
+                        }
 
                         if (!scanNumbers.Contains(scanNumber))
+                        {
                             scanNumbers.Add(scanNumber);
+                        }
                     }
                 }
             }
@@ -597,7 +616,7 @@ namespace MSPathFinderT
                         }
                         else
                         {
-                            var errMsg = "Invalid value for NumMods in the MSPathFinder parameter file";
+                            const string errMsg = "Invalid value for NumMods in the MSPathFinder parameter file";
                             ConsoleMsgUtils.ShowWarning(errMsg + ": " + kvSetting.Key + "=" + kvSetting.Value);
                             return false;
                         }
@@ -646,7 +665,7 @@ namespace MSPathFinderT
                         {
                             // Static (fixed) mod is listed as dynamic
                             // Abort the analysis since the parameter file is misleading and needs to be fixed
-                            var errMsg = "Static mod definition contains ',opt,'; update the param file to have ',fix,' or change to 'DynamicMod='";
+                            const string errMsg = "Static mod definition contains ',opt,'; update the param file to have ',fix,' or change to 'DynamicMod='";
                             PrintError(errMsg + "\n" + staticMod);
                             return false;
                         }
@@ -667,7 +686,7 @@ namespace MSPathFinderT
                         {
                             // Dynamic (optional) mod is listed as static
                             // Abort the analysis since the parameter file is misleading and needs to be fixed
-                            var errMsg = "Dynamic mod definition contains ',fix,'; update the param file to have ',opt,' or change to 'StaticMod='";
+                            const string errMsg = "Dynamic mod definition contains ',fix,'; update the param file to have ',opt,' or change to 'StaticMod='";
                             PrintError(errMsg + "\n" + dynamicMod);
                             return false;
                         }

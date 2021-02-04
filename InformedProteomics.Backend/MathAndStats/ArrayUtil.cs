@@ -82,7 +82,11 @@ namespace InformedProteomics.Backend.MathAndStats
             var i = 0;
             foreach (var v in values)
             {
-                if (v > lowerBoundValue) temp.Add(new KeyValuePair<double, int>(v, i));
+                if (v > lowerBoundValue)
+                {
+                    temp.Add(new KeyValuePair<double, int>(v, i));
+                }
+
                 i++;
             }
 
@@ -108,7 +112,11 @@ namespace InformedProteomics.Backend.MathAndStats
             var i = 0;
             foreach (var v in values)
             {
-                if (v > lowerBoundValue) temp.Add(new KeyValuePair<double, int>(v, i));
+                if (v > lowerBoundValue)
+                {
+                    temp.Add(new KeyValuePair<double, int>(v, i));
+                }
+
                 i++;
             }
 
@@ -118,7 +126,11 @@ namespace InformedProteomics.Backend.MathAndStats
             median = 0;
             foreach (var t in temp.OrderByDescending(x => x.Key))
             {
-                if (ranking == medianRanking) median = t.Key;
+                if (ranking == medianRanking)
+                {
+                    median = t.Key;
+                }
+
                 rankingList[t.Value] = ranking++;
             }
             return rankingList;
@@ -156,7 +168,10 @@ namespace InformedProteomics.Backend.MathAndStats
                 }
 
                 if ((curSum <= sum) && (curSum != sum || curLen >= len) &&
-                    (curSum != sum || curLen != len || curStart >= start)) continue;
+                    (curSum != sum || curLen != len || curStart >= start))
+                {
+                    continue;
+                }
 
                 start = curStart;
                 len = curLen;
@@ -199,7 +214,10 @@ namespace InformedProteomics.Backend.MathAndStats
                 }
 
                 if ((curSum <= sum) && (Math.Abs(curSum - sum) > 1E-10 || curLen >= len) &&
-                    (Math.Abs(curSum - sum) > 1E-10 || curLen != len || curStart >= start)) continue;
+                    (Math.Abs(curSum - sum) > 1E-10 || curLen != len || curStart >= start))
+                {
+                    continue;
+                }
 
                 start = curStart;
                 len = curLen;

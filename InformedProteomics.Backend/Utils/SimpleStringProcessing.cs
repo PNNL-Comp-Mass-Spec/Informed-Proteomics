@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.Utils
     /// <summary>
     /// Simple string processing functions
     /// </summary>
-    public class SimpleStringProcessing
+    public static class SimpleStringProcessing
     {
         /// <summary>
         /// Random shuffle a string
@@ -20,7 +20,11 @@ namespace InformedProteomics.Backend.Utils
         {
             var indices = Enumerable.Range(0, str.Length).OrderBy(r => _random.Next()).ToArray();
             var sflStr = new StringBuilder(str.Length);
-            foreach (var index in indices) sflStr.Append(str[index]);
+            foreach (var index in indices)
+            {
+                sflStr.Append(str[index]);
+            }
+
             return sflStr.ToString();
         }
 
@@ -74,7 +78,11 @@ namespace InformedProteomics.Backend.Utils
             //if (!Regex.IsMatch(str, @"^[A-Z" + FastaDatabase.Delimiter + @"]\.[A-Z]+\.[A-Z" + FastaDatabase.Delimiter + @"]$")) return null;
             var firstDotIndex = str.IndexOf('.');
             var lastDotIndex = str.LastIndexOf('.');
-            if (firstDotIndex >= lastDotIndex) return null;
+            if (firstDotIndex >= lastDotIndex)
+            {
+                return null;
+            }
+
             return str.Substring(firstDotIndex + 1, lastDotIndex - firstDotIndex - 1);
         }
 

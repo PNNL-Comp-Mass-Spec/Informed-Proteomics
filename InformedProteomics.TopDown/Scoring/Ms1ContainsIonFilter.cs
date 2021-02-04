@@ -20,7 +20,11 @@ namespace InformedProteomics.TopDown.Scoring
 
         public bool IsValid(Ion precursorIon, int scanNum)
         {
-            if (Run.GetMsLevel(scanNum) != 2) return false;
+            if (Run.GetMsLevel(scanNum) != 2)
+            {
+                return false;
+            }
+
             var precursorScanNum = Run.GetPrecursorScanNum(scanNum);
             var nextMs1ScanNum = Run.GetNextScanNum(scanNum);
 
@@ -33,10 +37,18 @@ namespace InformedProteomics.TopDown.Scoring
 
         private bool IsValidForMs1Scan(Ion precursorIon, int scanNum)
         {
-            if (scanNum < Run.MinLcScan || scanNum > Run.MaxLcScan) return false;
-            if (Run.GetMsLevel(scanNum) != 1) return true;
+            if (scanNum < Run.MinLcScan || scanNum > Run.MaxLcScan)
+            {
+                return false;
+            }
+
+            if (Run.GetMsLevel(scanNum) != 1)
+            {
+                return true;
+            }
+
             var spec = Run.GetSpectrum(scanNum);
-            return spec != null && spec.ContainsIon(precursorIon, MzTolerance, RelativeIsotopeIntensityThreshold);
+            return spec?.ContainsIon(precursorIon, MzTolerance, RelativeIsotopeIntensityThreshold) == true;
         }
     }
 }

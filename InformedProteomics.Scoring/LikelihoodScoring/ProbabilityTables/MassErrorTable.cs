@@ -38,8 +38,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                     : sequence.GetRange(1, sequence.Count - 1);
                 var ions = match.GetCleavageIons(ionType);
 
-                var nextIonIndex = 1;
-                while (nextIonIndex < ions.Count)
+                for (var nextIonIndex = 1; nextIonIndex < ions.Count; nextIonIndex++)
                 {
                     // look for peaks for current ion and next ion
                     _totalPairs++;
@@ -50,21 +49,26 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                     var nextPeak = match.Spectrum.FindPeak(nextMz, _tolerance);
 
                     if (currentPeak == null && nextPeak == null)
+                    {
                         _ionPairFrequency[ionType].AddDatum(IonPairFound.Neither);
+                    }
                     else if (nextPeak == null)
+                    {
                         _ionPairFrequency[ionType].AddDatum(IonPairFound.First);
+                    }
                     else if (currentPeak == null)
+                    {
                         _ionPairFrequency[ionType].AddDatum(IonPairFound.Second);
+                    }
                     else
                     {
                         // found both peaks, compute mass error
                         _ionPairFrequency[ionType].AddDatum(IonPairFound.Both);
                         var aaIndex = (ionType.IsPrefixIon ? nextIonIndex : currentIonIndex);
-                        var aaMz = pepSeq[aaIndex].Mass/charge;
+                        var aaMz = pepSeq[aaIndex].Mass / charge;
                         var massError = Math.Abs(nextPeak.Mz - currentPeak.Mz) - aaMz;
                         _massError[ionType].AddDatum(massError);
                     }
-                    nextIonIndex++;
                 }
             }
         }
@@ -84,7 +88,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         public Probability<double> GetMassErrorProbability(double massError, IonType ionType)
         {
             var index = _massError[ionType].GetBinIndex(massError);
-            if (index < 0) return new Probability<double>(massError, 0, _massError[ionType].Total);
+            if (index < 0)
+            {
+                return new Probability<double>(massError, 0, _massError[ionType].Total);
+            }
+
             var found = _massError[ionType].Bins[index].Count;
             var total = _massError[ionType].Total;
             return new Probability<double>(massError, found, total);

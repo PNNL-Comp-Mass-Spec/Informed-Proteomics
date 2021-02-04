@@ -40,14 +40,18 @@ namespace InformedProteomics.Tests.FunctionalTests
                 foreach (var ionType in prefixIonTypes)
                 {
                     if (!probabilities.ContainsKey(ionType))
+                    {
                         probabilities.Add(ionType, new Probability<IonType>(ionType));
+                    }
 
                     var ion = ionType.GetIon(prefixes[i]);
                     double mz = ion.GetMonoIsotopicMz();
                     var present = spectrum.ContainsIon(ion, _tolerance, RelativeIntensityThreshold);
                     probabilities[ionType].Total++;
                     if (present)
+                    {
                         probabilities[ionType].Found++;
+                    }
 
                     debugFile.WriteLine("{0}\t{1}\t{2}\t{3}", segmentStr, ionType.Name, mz, present);
                 }
@@ -63,14 +67,18 @@ namespace InformedProteomics.Tests.FunctionalTests
                 foreach (var ionType in suffixIonTypes)
                 {
                     if (!probabilities.ContainsKey(ionType))
+                    {
                         probabilities.Add(ionType, new Probability<IonType>(ionType));
+                    }
 
                     var ion = ionType.GetIon(suffixes[i]);
                     double mz = ion.GetMonoIsotopicMz();
                     var present = spectrum.ContainsIon(ion, _tolerance, RelativeIntensityThreshold);
                     probabilities[ionType].Total++;
                     if (present)
+                    {
                         probabilities[ionType].Found++;
+                    }
 
                     debugFile.WriteLine("{0}\t{1}\t{2}\t{3}", segmentStr, ionType.Name, mz, present);
                 }
@@ -96,7 +104,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             var spectrumMatchList = InitTest();
 
             var ionProbabilityTable = new Dictionary<IonType, Probability<IonType>>[MaxPrecCharge];
-            for (int i = 0; i < ionProbabilityTable.Count(); i++)
+            for (int i = 0; i < ionProbabilityTable.Length; i++)
             {
                 ionProbabilityTable[i] = new Dictionary<IonType, Probability<IonType>>();
             }
@@ -126,7 +134,10 @@ namespace InformedProteomics.Tests.FunctionalTests
 
                     var ion = testProbabilities[i].Label;
                     if (!ionProbabilityTable[charge].ContainsKey(ion))
+                    {
                         ionProbabilityTable[charge].Add(ion, new Probability<IonType>(ion));
+                    }
+
                     ionProbabilityTable[charge][ion] += testProbabilities[i];
 
                     outputFile.Write(probabilities[i].Label + "\t");
@@ -182,7 +193,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         private const ActivationMethod Act = ActivationMethod.HCD;
         private const int MaxCharge = 1;
         private const int MaxPrecCharge = 4;
-        const double RelativeIntensityThreshold = 1.0;
+        private const double RelativeIntensityThreshold = 1.0;
 
         private readonly BaseIonType[] _baseIons =
         {
@@ -217,11 +228,11 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
     }
 
-    class CompareIonProbabilityByIon : IComparer<Probability<IonType>>
+    internal class CompareIonProbabilityByIon : IComparer<Probability<IonType>>
     {
         public int Compare(Probability<IonType> x, Probability<IonType> y)
         {
-            return String.Compare(x.Label.Name, y.Label.Name, StringComparison.Ordinal);
+            return string.CompareOrdinal(x.Label.Name, y.Label.Name);
         }
     }
 }

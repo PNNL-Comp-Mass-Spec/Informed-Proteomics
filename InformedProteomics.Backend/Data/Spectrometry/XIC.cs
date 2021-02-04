@@ -27,7 +27,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public double GetCorrelation(Xic other)
         {
-            if (Count == 0 || other == null || other.Count == 0) return 0;
+            if (Count == 0 || other == null || other.Count == 0)
+            {
+                return 0;
+            }
 
             var count1 = Count;
             var count2 = other.Count;
@@ -39,8 +42,14 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             while (index1 < count1 && index2 < count2)
             {
                 var comp = this[index1].ScanNum - other[index2].ScanNum;
-                if (comp < 0) ++index1;
-                else if (comp > 0) ++index2;
+                if (comp < 0)
+                {
+                    ++index1;
+                }
+                else if (comp > 0)
+                {
+                    ++index2;
+                }
                 else
                 {
                     intList1.Add(this[index1].Intensity);
@@ -61,7 +70,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public double GetCosine(Xic other)
         {
-            if (Count == 0 || other == null || other.Count == 0) return 0;
+            if (Count == 0 || other == null || other.Count == 0)
+            {
+                return 0;
+            }
 
             //var minScanNum = Math.Min(this[0].ScanNum, other[0].ScanNum);
             //var maxScanNum = Math.Max(this[Count-1].ScanNum, other[other.Count-1].ScanNum);
@@ -79,7 +91,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             foreach (var p in other)
             {
                 var index = p.ScanNum - minScanNum;
-                if (index < 0 || index >= intArr2.Length) continue;
+                if (index < 0 || index >= intArr2.Length)
+                {
+                    continue;
+                }
+
                 intArr2[p.ScanNum - minScanNum] = p.Intensity;
             }
 
@@ -134,7 +150,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public int GetNearestApexScanNum(int scanNumber, bool performSmoothing = true)
         {
             // If there are not very many points, just return the global apex
-            if (Count < 6) return GetApexScanNum();
+            if (Count < 6)
+            {
+                return GetApexScanNum();
+            }
 
             var xicPointList = new List<XicPoint>();
 
@@ -157,39 +176,71 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var searchPoint = new XicPoint(scanNumber, 0, 0);
             var indexOfClosestScan = xicPointList.BinarySearch(searchPoint, new AnonymousComparer<XicPoint>((x, y) => x.ScanNum.CompareTo(y.ScanNum)));
             indexOfClosestScan = indexOfClosestScan < 0 ? ~indexOfClosestScan : indexOfClosestScan;
-            if (indexOfClosestScan >= xicPointList.Count) indexOfClosestScan = xicPointList.Count - 1;
+            if (indexOfClosestScan >= xicPointList.Count)
+            {
+                indexOfClosestScan = xicPointList.Count - 1;
+            }
+
             var closestXicPoint = xicPointList[indexOfClosestScan];
 
             // Figure out if we want to search for an apex by moving left or right
             bool moveRight;
-            if (indexOfClosestScan <= 1) moveRight = true;
-            else if (indexOfClosestScan >= xicPointList.Count - 2) moveRight = false;
-            else if (xicPointList[indexOfClosestScan + 1].Intensity > closestXicPoint.Intensity) moveRight = true;
-            else moveRight = false;
+            if (indexOfClosestScan <= 1)
+            {
+                moveRight = true;
+            }
+            else if (indexOfClosestScan >= xicPointList.Count - 2)
+            {
+                moveRight = false;
+            }
+            else if (xicPointList[indexOfClosestScan + 1].Intensity > closestXicPoint.Intensity)
+            {
+                moveRight = true;
+            }
+            else
+            {
+                moveRight = false;
+            }
 
             // Check to the right
             if (moveRight)
             {
-                if (indexOfClosestScan + 1 >= xicPointList.Count) return GetApexScanNum();
+                if (indexOfClosestScan + 1 >= xicPointList.Count)
+                {
+                    return GetApexScanNum();
+                }
+
                 var previousIntensity = xicPointList[indexOfClosestScan + 1].Intensity;
 
                 for (var i = indexOfClosestScan + 2; i < xicPointList.Count; i++)
                 {
                     var currentIntensity = xicPointList[i].Intensity;
-                    if (currentIntensity < previousIntensity) return xicPointList[i - 1].ScanNum;
+                    if (currentIntensity < previousIntensity)
+                    {
+                        return xicPointList[i - 1].ScanNum;
+                    }
+
                     previousIntensity = currentIntensity;
                 }
             }
             // Check to the left
             else
             {
-                if (indexOfClosestScan - 1 < 0) return GetApexScanNum();
+                if (indexOfClosestScan - 1 < 0)
+                {
+                    return GetApexScanNum();
+                }
+
                 var previousIntensity = this[indexOfClosestScan - 1].Intensity;
 
                 for (var i = indexOfClosestScan - 2; i >= 0; i--)
                 {
                     var currentIntensity = this[i].Intensity;
-                    if (currentIntensity < previousIntensity) return this[i + 1].ScanNum;
+                    if (currentIntensity < previousIntensity)
+                    {
+                        return this[i + 1].ScanNum;
+                    }
+
                     previousIntensity = currentIntensity;
                 }
             }
@@ -210,7 +261,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             {
                 threshold = (int)Math.Round(this.Count / (double)maxPointsToShow);
                 if (threshold < 1)
+                {
                     threshold = 1;
+                }
             }
 
             var index = 0;
@@ -237,7 +290,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public static Xic GetSelectedXic(Xic xic)
         {
-            if (xic.Count == 0) return xic;
+            if (xic.Count == 0)
+            {
+                return xic;
+            }
+
             xic.Sort(); // Need to guarantee a sorted Xic
 
             // select one best peak for each scan
@@ -270,7 +327,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public override bool Equals(object obj)
         {
             if (!(obj is Xic itemToCompare))
+            {
                 return false;
+            }
 
             return this.Equals(itemToCompare);
         }
@@ -284,7 +343,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             for (var i = 0; i < Count; i++)
             {
-                if (!this[i].Equals(other[i])) return false;
+                if (!this[i].Equals(other[i]))
+                {
+                    return false;
+                }
             }
             return true;
         }

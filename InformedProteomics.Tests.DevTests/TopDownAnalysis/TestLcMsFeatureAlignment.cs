@@ -13,7 +13,7 @@ using NUnit.Framework;
 
 namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 {
-    class TestLcMsFeatureAlignment
+    internal class TestLcMsFeatureAlignment
     {
         [Test]
         [Category("PNL_Domain")]
@@ -88,7 +88,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             //var dataset = (from fileName in fileEntries where fileName.EndsWith("ms1ft") select Path.GetFileNameWithoutExtension(fileName)).ToList();
             //dataset.Sort();
             var dataset = new List<string>();
-            for (var i = 1; i <= 10; i++) dataset.Add(string.Format(@"CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i));
+            for (var i = 1; i <= 10; i++)
+            {
+                dataset.Add(string.Format(@"CPTAC_Intact_rep{0}_15Jan15_Bane_C2-14-08-02RZ", i));
+            }
 
             var rawFiles = new List<string>();
             var ms1FtFiles = new List<string>();
@@ -321,7 +324,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             }
             writer.Close();
 
-            if (isTemp) return;
+            if (isTemp)
+            {
+                return;
+            }
 
             var outDirectory = Path.GetDirectoryName(Path.GetFullPath(outFilePath));
             for (var i = 0; i < align.CountDatasets; i++)
@@ -348,7 +354,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var runList = new List<LcMsRun>();
 
             foreach(var rawFile in rawFiles)
+            {
                 runList.Add(new PbfLcMsRun(rawFile));
+            }
 
             var align = new LcMsFeatureAlignment(ms1FtFiles, runList, new LcMsFeatureAlignComparer(new Tolerance(10)));
             align.AlignFeatures();
@@ -395,7 +403,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             var charge = 0;
             foreach (var f in features)
             {
-                if (f == null) continue;
+                if (f == null)
+                {
+                    continue;
+                }
                 //minNet = Math.Min(minNet, f.MinNet);
                 //maxNet = Math.Max(maxNet, f.MaxNet);
                 //minElutionTime = Math.Min(minElutionTime, f.MinElutionTime);

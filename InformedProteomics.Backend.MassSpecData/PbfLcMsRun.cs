@@ -109,11 +109,12 @@ namespace InformedProteomics.Backend.MassSpecData
         public static LcMsRun GetLcMsRun(string specFilePath, IMassSpecDataReader specReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null)
         {
-            // ReSharper disable once CanBeReplacedWithTryCastAndCheckForNull (being silly)
-            if (specReader is PbfLcMsRun)
-                return (LcMsRun)specReader;
+            if (specReader is PbfLcMsRun lcMsRun)
+            {
+                return lcMsRun;
+            }
 
-            return new PbfLcMsRun(specFilePath, specReader, "", precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
+            return new PbfLcMsRun(specFilePath, specReader, string.Empty, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress);
         }
 
         /// <summary>
@@ -210,10 +211,16 @@ namespace InformedProteomics.Backend.MassSpecData
                         throw;
                     }
                     //var fileName = Path.GetFileName(pbfFilePath);
-                    if (String.IsNullOrEmpty(fileName)) throw; // invalid path?
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        throw; // invalid path?
+                    }
                     //var tempPath = Path.Combine(Path.GetTempPath(), fileName);
                     if (!File.Exists(tempPath) || !(CheckFileFormatVersion(tempPath, out isCurrent) && isCurrent))
+                    {
                         WriteAsPbf(run, tempPath, prog);
+                    }
+
                     pbfPath = tempPath;
                 }
             }
@@ -512,7 +519,9 @@ namespace InformedProteomics.Backend.MassSpecData
             isCurrent = false;
             var pbfFile = new FileInfo(filePath);
             if (!pbfFile.Exists || pbfFile.Length < sizeof(int))
+            {
                 return false;
+            }
 
             var fs = new FileStream(pbfFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using (var reader = new BinaryReader(fs))
@@ -521,9 +530,14 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 var fileFormatId = reader.ReadInt32();
                 if (fileFormatId > FileFormatId && fileFormatId < EarliestSupportedFileFormatId)
+                {
                     return false;
+                }
+
                 if (fileFormatId == FileFormatId)
+                {
                     isCurrent = true;
+                }
             }
             return true;
         }
@@ -696,10 +710,21 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public override Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
-            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out var offset)) return null;
+            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out var offset))
+            {
+                return null;
+            }
+
             var spec = ReadSpectrum(offset, includePeaks);
-            if (spec.MsLevel == 1 && _precursorSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(_precursorSignalToNoiseRatioThreshold);
-            else if (_productSignalToNoiseRatioThreshold > 0.0) spec.FilterNoise(_productSignalToNoiseRatioThreshold);
+            if (spec.MsLevel == 1 && _precursorSignalToNoiseRatioThreshold > 0.0)
+            {
+                spec.FilterNoise(_precursorSignalToNoiseRatioThreshold);
+            }
+            else if (_productSignalToNoiseRatioThreshold > 0.0)
+            {
+                spec.FilterNoise(_productSignalToNoiseRatioThreshold);
+            }
+
             return spec;
         }
 
@@ -777,9 +802,16 @@ namespace InformedProteomics.Backend.MassSpecData
             long targetOffset;
             if (minBinIndex == maxBinIndex)
             {
-                if (maxBinIndex < _minMzIndex || maxBinIndex > _maxMzIndex) return new Xic();
+                if (maxBinIndex < _minMzIndex || maxBinIndex > _maxMzIndex)
+                {
+                    return new Xic();
+                }
+
                 var offset = _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
-                if (offset < _offsetPrecursorChromatogramBegin) return new Xic();
+                if (offset < _offsetPrecursorChromatogramBegin)
+                {
+                    return new Xic();
+                }
 
                 // binary search
                 var beginOffset = offset;
@@ -788,11 +820,19 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             else
             {
-                if (maxBinIndex < _minMzIndex || minBinIndex > _maxMzIndex) return new Xic();
+                if (maxBinIndex < _minMzIndex || minBinIndex > _maxMzIndex)
+                {
+                    return new Xic();
+                }
+
                 targetOffset = maxBinIndex > _maxMzIndex ? _offsetPrecursorChromatogramEnd : _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
             }
 
-            if (targetOffset < _offsetPrecursorChromatogramBegin) return new Xic();
+            if (targetOffset < _offsetPrecursorChromatogramBegin)
+            {
+                return new Xic();
+            }
+
             var xic = GetXic(minMz, maxMz, _offsetPrecursorChromatogramBegin, _offsetPrecursorChromatogramEnd, targetOffset);
             return xic;
         }
@@ -818,9 +858,16 @@ namespace InformedProteomics.Backend.MassSpecData
             long targetOffset;
             if (minBinIndex == maxBinIndex)
             {
-                if (maxBinIndex < _minMzIndex || maxBinIndex > _maxMzIndex) return new Xic();
+                if (maxBinIndex < _minMzIndex || maxBinIndex > _maxMzIndex)
+                {
+                    return new Xic();
+                }
+
                 var offset = _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
-                if (offset < _offsetPrecursorChromatogramBegin) return new Xic();
+                if (offset < _offsetPrecursorChromatogramBegin)
+                {
+                    return new Xic();
+                }
 
                 // binary search
                 var beginOffset = offset;
@@ -829,13 +876,25 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             else
             {
-                if (maxBinIndex < _minMzIndex || minBinIndex > _maxMzIndex) return new Xic();
+                if (maxBinIndex < _minMzIndex || minBinIndex > _maxMzIndex)
+                {
+                    return new Xic();
+                }
+
                 targetOffset = maxBinIndex > _maxMzIndex ? _offsetPrecursorChromatogramEnd : _chromMzIndexToOffset[maxBinIndex - _minMzIndex];
             }
 
-            if (targetOffset < _offsetPrecursorChromatogramBegin) return new Xic();
+            if (targetOffset < _offsetPrecursorChromatogramBegin)
+            {
+                return new Xic();
+            }
+
             var xic = GetChromatogramRange(minMz, maxMz, _offsetPrecursorChromatogramBegin, _offsetPrecursorChromatogramEnd, targetOffset);
-            if (!xic.Any()) return xic;
+            if (!xic.Any())
+            {
+                return xic;
+            }
+
             xic.Sort();
             return xic;
         }
@@ -849,11 +908,17 @@ namespace InformedProteomics.Backend.MassSpecData
         public override Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex)
         {
             ms1ScanIndex = -1;
-            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out var offset)) return null;
+            if (!_scanNumToSpecOffset.TryGetValue(scanNum, out var offset))
+            {
+                return null;
+            }
 
             var ms1ScanNums = GetMs1ScanVector();
             ms1ScanIndex = Array.BinarySearch(ms1ScanNums, scanNum);
-            if (ms1ScanIndex < 0) return null;
+            if (ms1ScanIndex < 0)
+            {
+                return null;
+            }
 
             return ReadSpectrum(offset, true);
         }
@@ -873,7 +938,9 @@ namespace InformedProteomics.Backend.MassSpecData
             _fileFormatId = _reader.ReadInt32();
             FileFormatVersion = _fileFormatId.ToString();
             if (_fileFormatId > FileFormatId || _fileFormatId < EarliestSupportedFileFormatId)
+            {
                 return false;
+            }
 
             // Backup 10 bytes
             _reader.BaseStream.Seek(-3 * sizeof (long) - 1 * sizeof (int), SeekOrigin.End);
@@ -905,16 +972,23 @@ namespace InformedProteomics.Backend.MassSpecData
             var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
             var minMsLevel = int.MaxValue;
             var maxMsLevel = int.MinValue;
-            var scanNum = MinLcScan;
-            while (scanNum <= MaxLcScan)
+
+            for (var scanNum = MinLcScan; scanNum <= MaxLcScan; scanNum++)
             {
                 if (_fileFormatId > 150605)
                 {
                     scanNum = _reader.ReadInt32();
                 }
                 var msLevel = _reader.ReadInt32();
-                if (msLevel < minMsLevel) minMsLevel = msLevel;
-                if (msLevel > maxMsLevel) maxMsLevel = msLevel;
+                if (msLevel < minMsLevel)
+                {
+                    minMsLevel = msLevel;
+                }
+
+                if (msLevel > maxMsLevel)
+                {
+                    maxMsLevel = msLevel;
+                }
 
                 ScanNumToMsLevel[scanNum] = msLevel;
                 ScanNumElutionTimeMap[scanNum] = _reader.ReadDouble();
@@ -926,7 +1000,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         var isoWindow = new IsolationWindow((minMz + maxMz) / 2, (maxMz - minMz) / 2, (maxMz - minMz) / 2);
                         isoWindowSet.Add(isoWindow);
-                        if (isoWindowSet.Count >= NumUniqueIsolationWindowThresholdForDia) isDda = true;
+                        if (isoWindowSet.Count >= NumUniqueIsolationWindowThresholdForDia)
+                        {
+                            isDda = true;
+                        }
                     }
                     var minBinNum = (int)Math.Round(minMz * IsolationWindowBinningFactor);
                     var maxBinNum = (int)Math.Round(maxMz * IsolationWindowBinningFactor);
@@ -941,8 +1018,6 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                 }
                 _scanNumToSpecOffset[scanNum] = _reader.ReadInt64();
-                // Increment for the check, and for file formats <= 150605
-                scanNum++;
             }
 
             MinMsLevel = minMsLevel;
@@ -1107,9 +1182,17 @@ namespace InformedProteomics.Backend.MassSpecData
             if (msLevel > 1)
             {
                 double? precursorMass = reader.ReadDouble();
-                if (Math.Abs(precursorMass.Value) < float.Epsilon) precursorMass = null;
+                if (Math.Abs(precursorMass.Value) < float.Epsilon)
+                {
+                    precursorMass = null;
+                }
+
                 int? precursorCharge = reader.ReadInt32();
-                if (precursorCharge == 0) precursorCharge = null;
+                if (precursorCharge == 0)
+                {
+                    precursorCharge = null;
+                }
+
                 var activationMethod = (ActivationMethod)reader.ReadByte();
                 var isolationWindowTargetMz = reader.ReadDouble();
                 var isolationWindowLowerOffset = reader.ReadDouble();
@@ -1329,10 +1412,13 @@ namespace InformedProteomics.Backend.MassSpecData
                 counter++;
                 scanNumToSpecOffset[scanNum - lcmsRun.MinLcScan] = writer.BaseStream.Position;
                 var spec = lcmsRun.GetSpectrum(scanNum);
-                if (spec == null) continue;
-                var productSpec = spec as ProductSpectrum;
+                if (spec == null)
+                {
+                    continue;
+                }
+
                 scanNumToIsolationWindow[scanNum - lcmsRun.MinLcScan] = null;
-                if (productSpec != null)
+                if (spec is ProductSpectrum productSpec)
                 {
                     scanNumToIsolationWindow[scanNum - lcmsRun.MinLcScan] = productSpec.IsolationWindow;
                     countMS2Spec++;
@@ -1343,8 +1429,8 @@ namespace InformedProteomics.Backend.MassSpecData
             // Precursor ion chromatogram (MS1 spectra)
             var offsetBeginPrecursorChromatogram = writer.BaseStream.Position;
 
-            var minMzIndex = lcmsRun.Ms1PeakList.Any() ? GetMzBinIndex(lcmsRun.Ms1PeakList[0].Mz) : 0;
-            var maxMzIndex = lcmsRun.Ms1PeakList.Any() ? GetMzBinIndex(lcmsRun.Ms1PeakList[lcmsRun.Ms1PeakList.Count - 1].Mz) : -1;
+            var minMzIndex = lcmsRun.Ms1PeakList.Count > 0 ? GetMzBinIndex(lcmsRun.Ms1PeakList[0].Mz) : 0;
+            var maxMzIndex = lcmsRun.Ms1PeakList.Count > 0 ? GetMzBinIndex(lcmsRun.Ms1PeakList[lcmsRun.Ms1PeakList.Count - 1].Mz) : -1;
 
             var chromMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
             var prevMzIndex = -1;
@@ -1379,7 +1465,11 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 progressData.Report(counter, countTotal);
                 counter++;
-                if (!(lcmsRun.GetSpectrum(ms2ScanNum) is ProductSpectrum productSpec)) continue;
+                if (!(lcmsRun.GetSpectrum(ms2ScanNum) is ProductSpectrum productSpec))
+                {
+                    continue;
+                }
+
                 foreach (var peak in productSpec.Peaks)
                 {
                     ms2PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, ms2ScanNum));
@@ -1466,8 +1556,14 @@ namespace InformedProteomics.Backend.MassSpecData
             var prevOffset = offsetBeginMetaInformation;
             for (var i = chromMzIndexToOffset.Length - 1; i >= 0; i--)
             {
-                if (chromMzIndexToOffset[i] < offsetBeginPrecursorChromatogram) chromMzIndexToOffset[i] = prevOffset;
-                else prevOffset = chromMzIndexToOffset[i];
+                if (chromMzIndexToOffset[i] < offsetBeginPrecursorChromatogram)
+                {
+                    chromMzIndexToOffset[i] = prevOffset;
+                }
+                else
+                {
+                    prevOffset = chromMzIndexToOffset[i];
+                }
             }
 
             foreach (var offset in chromMzIndexToOffset)
@@ -1491,9 +1587,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="msDataReader"></param>
         /// <param name="writer"></param>
+        /// <param name="startScan"></param>
         /// <param name="endScan"></param>
         /// <param name="progress"></param>
-        /// <param name="startScan"></param>
         private void WriteToPbf(
             IMassSpecDataReader msDataReader,
             BinaryWriter writer,
@@ -1528,7 +1624,9 @@ namespace InformedProteomics.Backend.MassSpecData
             int countTotal;
 
             if (endScan > 0 && endScan > msDataReader.NumSpectra)
+            {
                 endScan = 0;
+            }
 
             if (startScan > 0)
             {
@@ -1554,10 +1652,14 @@ namespace InformedProteomics.Backend.MassSpecData
             foreach (var spec in msDataReader.ReadAllSpectra())
             {
                 if (startScan > 0 && spec.ScanNum < startScan)
+                {
                     continue;
+                }
 
                 if (endScan > 0 && spec.ScanNum > endScan)
+                {
                     break;
+                }
 
                 progressData.Report(counter, countTotal);
                 counter++;
@@ -1569,14 +1671,15 @@ namespace InformedProteomics.Backend.MassSpecData
                 // Handle other metadata stuff.
                 var maxMz = double.MinValue;
                 var minMz = double.MaxValue;
+
                 if (spec.Peaks.Length > 0)
                 {
                     minMz = spec.Peaks[0].Mz;
                     maxMz = spec.Peaks[spec.Peaks.Length - 1].Mz;
                 }
-                var productSpec = spec as ProductSpectrum;
                 scanNumToIsolationWindow[spec.ScanNum] = null;
-                if (productSpec != null)
+
+                if (spec is ProductSpectrum productSpec)
                 {
                     scanNumToIsolationWindow[spec.ScanNum] = productSpec.IsolationWindow;
                     ms2Scans.Add(productSpec.ScanNum);
@@ -1678,8 +1781,8 @@ namespace InformedProteomics.Backend.MassSpecData
             var isDda = false;
             var isolationMzBinToScanNums = new Dictionary<int, List<int>>();
 
-            MinMsLevel = scanMetadata.Select(scan => scan.MsLevel).Min();
-            MaxMsLevel = scanMetadata.Select(scan => scan.MsLevel).Max();
+            MinMsLevel = scanMetadata.Min(scan => scan.MsLevel);
+            MaxMsLevel = scanMetadata.Max(scan => scan.MsLevel);
             foreach (var scan in scanMetadata)
             {
                 var msLevel = scan.MsLevel;
@@ -1732,7 +1835,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         var isoWindow = new IsolationWindow((minMz + maxMz) / 2, (maxMz - minMz) / 2, (maxMz - minMz) / 2);
                         isoWindowSet.Add(isoWindow);
-                        if (isoWindowSet.Count >= NumUniqueIsolationWindowThresholdForDia) isDda = true;
+                        if (isoWindowSet.Count >= NumUniqueIsolationWindowThresholdForDia)
+                        {
+                            isDda = true;
+                        }
                     }
                     var minBinNum = (int)Math.Round(minMz * IsolationWindowBinningFactor);
                     var maxBinNum = (int)Math.Round(maxMz * IsolationWindowBinningFactor);
@@ -1770,9 +1876,13 @@ namespace InformedProteomics.Backend.MassSpecData
                 for (var i = _chromMzIndexToOffset.Length - 2; i >= 0; i--)
                 {
                     if (_chromMzIndexToOffset[i] < _offsetPrecursorChromatogramBegin)
+                    {
                         _chromMzIndexToOffset[i] = prevOffset;
+                    }
                     else
+                    {
                         prevOffset = _chromMzIndexToOffset[i];
+                    }
                 }
 
                 foreach (var offset in _chromMzIndexToOffset.Take(_chromMzIndexToOffset.Length - 1))
@@ -1818,9 +1928,15 @@ namespace InformedProteomics.Backend.MassSpecData
             const int max = 25000000;
             var maxInMemoryPerSpec = (int)(memFreeKB * 1024 / 2 / scansCount / (20 + 8));
             if (maxInMemoryPerSpec * scansCount > max) // Set a hard limit at 10 millions peaks in memory at once (only exception is the minimum)
+            {
                 maxInMemoryPerSpec = max / scansCount;
+            }
+
             if (maxInMemoryPerSpec < 5)
+            {
                 maxInMemoryPerSpec = 5;
+            }
+
             return maxInMemoryPerSpec;
         }
 
@@ -1854,7 +1970,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Cut the reserve down on systems with large amounts of physical memory (16GB and greater)
             while (quarterTotalPhysicalMemory > 4194304)
             {
-                quarterTotalPhysicalMemory = quarterTotalPhysicalMemory / 2;
+                quarterTotalPhysicalMemory /= 2;
             }
             var memFreeLessReserve = memoryFreeKB - quarterTotalPhysicalMemory;
 
@@ -1941,7 +2057,9 @@ namespace InformedProteomics.Backend.MassSpecData
                         count++;
 
                         if (peak.Mz.Equals(0))
+                        {
                             continue;
+                        }
 
                         if (isMs1List)
                         {
@@ -2250,8 +2368,14 @@ namespace InformedProteomics.Backend.MassSpecData
                     curOffset = minOffset + (maxOffset - minOffset)/NumBytePeak/2*NumBytePeak;
                     _reader.BaseStream.Seek(curOffset, SeekOrigin.Begin);
                     var curMz = _reader.ReadDouble();
-                    if (curMz < minMz) minOffset = curOffset + NumBytePeak;
-                    else if (curMz > maxMz) maxOffset = curOffset - NumBytePeak;
+                    if (curMz < minMz)
+                    {
+                        minOffset = curOffset + NumBytePeak;
+                    }
+                    else if (curMz > maxMz)
+                    {
+                        maxOffset = curOffset - NumBytePeak;
+                    }
                     else
                     {
                         return curOffset;
@@ -2266,7 +2390,10 @@ namespace InformedProteomics.Backend.MassSpecData
         private Xic GetXic(double minMz, double maxMz, long beginOffset, long endOffset, long targetOffset)
         {
             var xic = GetXicPointsWithin(minMz, maxMz, beginOffset, endOffset, targetOffset);
-            if (!xic.Any()) return xic;
+            if (!xic.Any())
+            {
+                return xic;
+            }
 
             return Xic.GetSelectedXic(xic);
         }
@@ -2275,7 +2402,10 @@ namespace InformedProteomics.Backend.MassSpecData
         private Xic GetChromatogramRange(double minMz, double maxMz, long beginOffset, long endOffset, long targetOffset)
         {
             var xic = GetXicPointsWithin(minMz, maxMz, beginOffset, endOffset, targetOffset);
-            if (!xic.Any()) return xic;
+            if (!xic.Any())
+            {
+                return xic;
+            }
 
             return xic;
         }

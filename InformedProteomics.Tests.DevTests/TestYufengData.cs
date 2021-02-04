@@ -71,23 +71,27 @@ namespace InformedProteomics.Tests.DevTests
                     foreach (var peak in isotopePeaks)
                     {
                         if (peak != null && peak.Intensity > maxIntensity)
+                        {
                             maxIntensity = peak.Intensity;
+                        }
                     }
                     precursorIntensities[i] = maxIntensity;
                 }
 
                 if (i % 100 == 0 && sw.Elapsed.TotalSeconds > MAX_RUNTIME_SECONDS)
+                {
                     break;
+                }
             }
 
             // Writing
             var newResultFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTdaWithIntensities.tsv");
             using (var writer = new StreamWriter(newResultFilePath))
             {
-                writer.WriteLine(string.Join("\t", parser.GetHeaders())+"\t"+"PrecursorIntensity");
+                writer.WriteLine(string.Join("\t", parser.GetHeaders()) + "\tPrecursorIntensity");
                 for (var i = 0; i < parser.NumData; i++)
                 {
-                    writer.WriteLine(parser.GetRows()[i]+"\t"+precursorIntensities[i]);
+                    writer.WriteLine(parser.GetRows()[i] + "\t" + precursorIntensities[i]);
                 }
             }
 
@@ -140,7 +144,7 @@ namespace InformedProteomics.Tests.DevTests
                 nethylmaleimideC
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
-//            var aaSet = new AminoAcidSet();
+            //            var aaSet = new AminoAcidSet();
 
             if (!File.Exists(TestRawFilePath))
             {
@@ -152,15 +156,25 @@ namespace InformedProteomics.Tests.DevTests
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
             const string annotation = "_." + protSequence + "._";
             var seqGraph = SequenceGraph.CreateGraph(aaSet, AminoAcid.ProteinNTerm, protSequence, AminoAcid.ProteinCTerm);
-            if (seqGraph == null) return;
+            if (seqGraph == null)
+            {
+                return;
+            }
 
             var ms1Filter = new SimpleMs1Filter();
             var ms2ScorerFactory = new ProductScorerBasedOnDeconvolutedSpectra(run);
-            foreach(var ms2ScanNum in Ms2ScanNums) ms2ScorerFactory.GetScorer(ms2ScanNum);
+            foreach (var ms2ScanNum in Ms2ScanNums)
+            {
+                ms2ScorerFactory.GetScorer(ms2ScanNum);
+            }
 
             for (var numNTermCleavages = 0; numNTermCleavages <= 0; numNTermCleavages++)
             {
-                if (numNTermCleavages > 0) seqGraph.CleaveNTerm();
+                if (numNTermCleavages > 0)
+                {
+                    seqGraph.CleaveNTerm();
+                }
+
                 var numProteoforms = seqGraph.GetNumProteoformCompositions();
                 var modCombs = seqGraph.GetModificationCombinations();
                 for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
@@ -172,14 +186,21 @@ namespace InformedProteomics.Tests.DevTests
 
                     foreach (var ms2ScanNum in ms1Filter.GetMatchingMs2ScanNums(sequenceMass))
                     {
-                        if (!(run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec)) continue;
+                        if (!(run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+                        {
+                            continue;
+                        }
+
                         var charge =
                             (int)
                                 Math.Round(sequenceMass /
                                            (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
                         var scorer = ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
-                        if (score <= 3) continue;
+                        if (score <= 3)
+                        {
+                            continue;
+                        }
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
                         var sequence = protSequence.Substring(numNTermCleavages);
@@ -220,7 +241,11 @@ namespace InformedProteomics.Tests.DevTests
             const int maxScanNum = 46661;   // 638.90
             const int MAX_POINTS = 50;
 
-            if (!(PbfLcMsRun.GetLcMsRun(TestRawFilePath) is PbfLcMsRun run)) return;
+            if (!(PbfLcMsRun.GetLcMsRun(TestRawFilePath) is PbfLcMsRun run))
+            {
+                return;
+            }
+
             var summedSpec = run.GetSummedMs1Spectrum(minScanNum, maxScanNum);
             summedSpec.FilterNoise(50.0);
             // summedSpec.Display(MAX_POINTS);
@@ -245,8 +270,11 @@ namespace InformedProteomics.Tests.DevTests
             const int maxScanNum = 6661;
             const int MAX_POINTS = 50;
 
-            var run = PbfLcMsRun.GetLcMsRun(TestRawFilePath2) as PbfLcMsRun;
-            if (run == null) return;
+            if (!(PbfLcMsRun.GetLcMsRun(TestRawFilePath2) is PbfLcMsRun run))
+            {
+                return;
+            }
+
             var summedSpec = run.GetSummedMs1Spectrum(minScanNum, maxScanNum);
 
             summedSpec.Display(MAX_POINTS);
@@ -305,7 +333,11 @@ namespace InformedProteomics.Tests.DevTests
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
             //const string annotation = "_." + protSequence + "._";
             var seqGraph = SequenceGraph.CreateGraph(new AminoAcidSet(), AminoAcid.ProteinNTerm, protSequence, AminoAcid.ProteinCTerm);
-            if (seqGraph == null) return;
+            if (seqGraph == null)
+            {
+                return;
+            }
+
             seqGraph.SetSink(0);
             var neutral = seqGraph.GetSinkSequenceCompositionWithH2O();
 
@@ -315,16 +347,23 @@ namespace InformedProteomics.Tests.DevTests
             {
                 var ion = new Ion(neutral, charge);
                 var isotopePeaks = spec.GetAllIsotopePeaks(ion, tolerance, 0.1);
-                if (isotopePeaks == null) continue;
+                if (isotopePeaks == null)
+                {
+                    continue;
+                }
+
                 Assert.True(isotopePeaks.Length == theoProfile.Length);
                 for (var i = 0; i < isotopePeaks.Length; i++)
                 {
-                    if (isotopePeaks[i] != null) expProfile[i] += isotopePeaks[i].Intensity;
+                    if (isotopePeaks[i] != null)
+                    {
+                        expProfile[i] += isotopePeaks[i].Intensity;
+                    }
                 }
             }
             for (var i = 0; i < theoProfile.Length; i++)
             {
-                Console.WriteLine("{0}\t{1}\t{2}", neutral.GetIsotopeMass(i), theoProfile[i], expProfile[i]/expProfile.Max());
+                Console.WriteLine("{0}\t{1}\t{2}", neutral.GetIsotopeMass(i), theoProfile[i], expProfile[i] / expProfile.Max());
             }
             Console.WriteLine("Corr: " + FitScoreCalculator.GetPearsonCorrelation(theoProfile, expProfile));
         }
@@ -347,7 +386,11 @@ namespace InformedProteomics.Tests.DevTests
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
             //const string annotation = "_." + protSequence + "._";
             var seqGraph = SequenceGraph.CreateGraph(new AminoAcidSet(), AminoAcid.ProteinNTerm, protSequence, AminoAcid.ProteinCTerm);
-            if (seqGraph == null) return;
+            if (seqGraph == null)
+            {
+                return;
+            }
+
             seqGraph.SetSink(0);
             var neutral = seqGraph.GetSinkSequenceCompositionWithH2O();
             var ion = new Ion(neutral, 43);
@@ -383,7 +426,11 @@ namespace InformedProteomics.Tests.DevTests
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
             //const string annotation = "_." + protSequence + "._";
             var seqGraph = SequenceGraph.CreateGraph(new AminoAcidSet(), AminoAcid.ProteinNTerm, protSequence, AminoAcid.ProteinCTerm);
-            if (seqGraph == null) return;
+            if (seqGraph == null)
+            {
+                return;
+            }
+
             seqGraph.SetSink(0);
             var neutral = seqGraph.GetSinkSequenceCompositionWithH2O() - Composition.Hydrogen;
             //Console.WriteLine(neutral);
@@ -439,7 +486,11 @@ namespace InformedProteomics.Tests.DevTests
                 "AIPQSVEGQSIPSLAPMLERTTPAVVSVAVSGTHVSKQRVPDVFRYFFGPNAPQEQVQERPFRGLGSGVIIDADKGYIVTNNHVIDGADDIQVGLHDGREVKAKLIGTDSESDIALLQIEAKNLVAIKTSDSDELRVGDFAVAIGNPFGLGQTVTSGIVSALGRSGLGIEMLENFIQTDAAINSGNSGGALVNLKGELIGINTAIVAPNGGNVGIGFAIPANMVKNLIAQIAEHGEVRRGVLGIAGRDLDSQLAQGFGLDTQHGGFVNEVSAGSAAEKAGIKAGDIIVSVDGRAIKSFQELRAKVATMGAGAKVELGLIRDGDKKTVNVTLGEANQTTEKAAGAVHPMLQGASLENASKGVEITDVAQGSPAAMSGLQKGDLIVGINRTAVKDLKSLKELLKDQEGAVALKIVRGKSMLYLVLR";
             //const string annotation = "_." + protSequence + "._";
             var seqGraph = SequenceGraph.CreateGraph(new AminoAcidSet(), AminoAcid.ProteinNTerm, protSequence, AminoAcid.ProteinCTerm);
-            if (seqGraph == null) return;
+            if (seqGraph == null)
+            {
+                return;
+            }
+
             seqGraph.SetSink(0);
             var neutral = seqGraph.GetSinkSequenceCompositionWithH2O() - Composition.Hydrogen;
             var proteinMass = neutral.Mass;
@@ -448,9 +499,11 @@ namespace InformedProteomics.Tests.DevTests
             const bool SHOW_ALL_SCANS = false;
             var targetColIndex = 0;
 
-            #pragma warning disable 0162
+#pragma warning disable 0162
             if (SHOW_ALL_SCANS)
+            {
                 Console.WriteLine("Charge\t" + string.Join("\t", run.GetScanNumbers(1)));
+            }
             else
             {
                 // Just display data for scan 161
@@ -458,11 +511,14 @@ namespace InformedProteomics.Tests.DevTests
                 foreach (var scanNumber in run.GetScanNumbers(1))
                 {
                     if (scanNumber == 161)
+                    {
                         break;
+                    }
+
                     targetColIndex++;
                 }
             }
-            #pragma warning restore 0162
+#pragma warning restore 0162
 
             const int minCharge = 2;
             const int maxCharge = 60;
@@ -476,14 +532,18 @@ namespace InformedProteomics.Tests.DevTests
                 var mzEnd = comparer.GetMzEnd(binNum);
 
                 var xic = run.GetFullPrecursorIonExtractedIonChromatogram(mzStart, mzEnd);
-                Console.Write(charge+"\t");
+                Console.Write(charge + "\t");
 
-                #pragma warning disable 0162
+#pragma warning disable 0162
                 if (SHOW_ALL_SCANS)
+                {
                     Console.WriteLine(string.Join("\t", xic.Select(p => p.Intensity)));
+                }
                 else
+                {
                     Console.WriteLine(xic[targetColIndex].Intensity);
-                #pragma warning restore 0162
+                }
+#pragma warning restore 0162
             }
         }
 
@@ -508,7 +568,11 @@ namespace InformedProteomics.Tests.DevTests
             const int MAX_POINTS = 50;
 
             var run = PbfLcMsRun.GetLcMsRun(specFilePath);
-            if (run == null) return;
+            if (run == null)
+            {
+                return;
+            }
+
             var summedSpec = run.GetSummedMs1Spectrum(minScanNum, maxScanNum);
             var peakList = summedSpec.GetPeakListWithin(1180.0, 1192.0);
             var filteredPeakList = new List<Peak>();
@@ -528,7 +592,7 @@ namespace InformedProteomics.Tests.DevTests
             var ion = new Ion(comp, 9);
             foreach (var i in ion.GetIsotopes(0.1))
             {
-                Console.WriteLine(ion.GetIsotopeMz(i.Index)+"\t"+i.Ratio);
+                Console.WriteLine(ion.GetIsotopeMz(i.Index) + "\t" + i.Ratio);
             }
         }
 

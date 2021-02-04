@@ -6,7 +6,7 @@ using InformedProteomics.Scoring.LikelihoodScoring.Data;
 
 namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 {
-    class DiaTsvReader: IDataFileReader
+    internal class DiaTsvReader: IDataFileReader
     {
         public DiaTsvReader(string fileName, LazyLcMsRun lcms, bool decoy)
         {
@@ -33,7 +33,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 
                 for (var i = 0; i < peptides.Count; i++)
                 {
-                    if (Convert.ToDouble(filterValues[i]) > filterThreshold || peptideSet.Contains(peptides[i])) continue;
+                    if (Convert.ToDouble(filterValues[i]) > filterThreshold || peptideSet.Contains(peptides[i]))
+                    {
+                        continue;
+                    }
+
                     peptideSet.Add(peptides[i]);
                     var scanNum = Convert.ToInt32(scans[i]);
                     var precursorCharge = Convert.ToInt32(precursorCharges[i]);

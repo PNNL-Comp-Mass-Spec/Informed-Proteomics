@@ -58,7 +58,10 @@ namespace InformedProteomics.Backend.Database
         public IList<int> FindAllMatchedSequenceIndices(byte[] pattern)
         {
             var matchIndex = Search(pattern);
-            if (matchIndex < 0) return new List<int>();
+            if (matchIndex < 0)
+            {
+                return new List<int>();
+            }
 
             var matchedIndices = new List<int>();
 
@@ -67,8 +70,14 @@ namespace InformedProteomics.Backend.Database
                 var index = _suffixArray[i];
                 var lcp = GetLcp(pattern, index, 0);
 
-                if (lcp == pattern.Length) matchedIndices.Add(index);
-                else break;
+                if (lcp == pattern.Length)
+                {
+                    matchedIndices.Add(index);
+                }
+                else
+                {
+                    break;
+                }
             }
             return matchedIndices;
         }
@@ -93,13 +102,21 @@ namespace InformedProteomics.Backend.Database
             // check that the pattern is within the left boundary
             var leftResult = Compare(pattern, _suffixArray[0], 0);
             if (Math.Abs(leftResult) - 1 == pattern.Length)
+            {
                 return 0;              // exact leftmost match of the first element
+            }
+
             if (leftResult < 0)
+            {
                 return -1;             // insertion point is at position 0
+            }
 
             // check that the pattern is within the right boundary
             var rightResult = Compare(pattern, _suffixArray[_suffixArray.Length - 1], 0);
-            if (rightResult > 0) return -_suffixArray.Length;     // insertion point is at the end of the array
+            if (rightResult > 0)
+            {
+                return -_suffixArray.Length;     // insertion point is at the end of the array
+            }
 
             // initialize the longest common prefixes values
             var queryLeftLcp = GetLcp(pattern, _suffixArray[0], 0);
@@ -178,7 +195,10 @@ namespace InformedProteomics.Backend.Database
             }
 
             // evaluate the base cases, found!
-            if (queryRightLcp == pattern.Length) return rightIndex;
+            if (queryRightLcp == pattern.Length)
+            {
+                return rightIndex;
+            }
 
             // not found
             return -rightIndex - 1;
@@ -226,13 +246,27 @@ namespace InformedProteomics.Backend.Database
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             for (var offset = startIndex; offset <= byte.MaxValue; offset++)
             {
-                if (offset >= pattern.Count) return -offset - 1;
-                if (index + offset >= _sequence.Length) return offset + 1;
+                if (offset >= pattern.Count)
+                {
+                    return -offset - 1;
+                }
+
+                if (index + offset >= _sequence.Length)
+                {
+                    return offset + 1;
+                }
 
                 var byte1 = pattern[offset];
                 var byte2 = _sequence[index + offset];
-                if (byte1 > byte2) return offset + 1;
-                if (byte1 < byte2) return -offset - 1;
+                if (byte1 > byte2)
+                {
+                    return offset + 1;
+                }
+
+                if (byte1 < byte2)
+                {
+                    return -offset - 1;
+                }
             }
 
             return byte.MaxValue;
@@ -249,8 +283,15 @@ namespace InformedProteomics.Backend.Database
         {
             for (var offset = startIndex; offset < pattern.Count; offset++)
             {
-                if (pattern[offset] != _sequence[index + offset]) return offset;
-                if (offset == byte.MaxValue) return offset;
+                if (pattern[offset] != _sequence[index + offset])
+                {
+                    return offset;
+                }
+
+                if (offset == byte.MaxValue)
+                {
+                    return offset;
+                }
             }
 
             return (byte)(pattern.Count);

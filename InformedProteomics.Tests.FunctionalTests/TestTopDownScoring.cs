@@ -22,7 +22,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 {
     [TestFixture]
 
-    class TestTopDownScoring
+    internal class TestTopDownScoring
     {
         [OneTimeSetUp]
         public void Setup()
@@ -281,7 +281,9 @@ namespace InformedProteomics.Tests.FunctionalTests
             var scorer = new InformedTopDownScorer(run, aminoAcidSet, minCharge, maxCharge, tolerance);
 
             if (pbfFile.DirectoryName == null)
+            {
                 Assert.Ignore("Ignoring test since cannot determine the parent directory of " + pbfFile.FullName);
+            }
 
             var fileExt = new[] {"IcTarget", "IcDecoy"};
             foreach (var ext in fileExt)
@@ -345,7 +347,9 @@ namespace InformedProteomics.Tests.FunctionalTests
                     });
 
                     foreach (var line in (from item in lines where !string.IsNullOrWhiteSpace(item) select item).Take(20))
+                    {
                         Console.WriteLine(line);
+                    }
                 }
                 Console.WriteLine("Done");
             }

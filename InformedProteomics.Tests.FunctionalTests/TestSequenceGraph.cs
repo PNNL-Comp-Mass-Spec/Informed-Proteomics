@@ -136,9 +136,13 @@ namespace InformedProteomics.Tests.FunctionalTests
             {
                 var seqComposition = seqCompositions[modIndex];
                 if (modIndex < 5 || modIndex >= seqCompositions.Length - 5)
+                {
                     Console.WriteLine("  Seq: {0}, ModComb: {1}", seqComposition, modCombs[modIndex]);
+                }
                 else if (modIndex == 5)
+                {
                     Console.WriteLine("  ...");
+                }
             }
             Console.WriteLine();
 
@@ -151,9 +155,13 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var seqComposition = seqCompositions[modIndex];
 
                 if (modIndex < 5 || modIndex >= seqCompositions.Length - 5)
+                {
                     Console.WriteLine("  Seq: {0}, ModComb: {1}", seqComposition, modCombs[modIndex]);
+                }
                 else if (modIndex == 5)
+                {
                     Console.WriteLine("  ...");
+                }
             }
         }
 
@@ -345,7 +353,10 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var composition = protCompositions[modIndex];
                 Console.WriteLine("{0}\t{1}", composition, composition.Mass);
                 var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(new DummyScorer());
-                if (curScoreAndModifications != null) Console.WriteLine("Score: {0}, Modifications: {1}", curScoreAndModifications.Item1, curScoreAndModifications.Item2);
+                if (curScoreAndModifications != null)
+                {
+                    Console.WriteLine("Score: {0}, Modifications: {1}", curScoreAndModifications.Item1, curScoreAndModifications.Item2);
+                }
             }
         }
 

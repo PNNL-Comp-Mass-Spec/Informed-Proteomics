@@ -13,7 +13,10 @@ namespace InformedProteomics.TopDown.Scoring
             _comparer = comparer;
             _adjList = new LinkedList<ScoringGraphEdge>[_comparer.NumberOfBins];
 
-            for (var i = 0; i < _comparer.NumberOfBins; i++) _adjList[i] = new LinkedList<ScoringGraphEdge>();
+            for (var i = 0; i < _comparer.NumberOfBins; i++)
+            {
+                _adjList[i] = new LinkedList<ScoringGraphEdge>();
+            }
 
             var terminalModifications = FilteredProteinMassBinning.GetTerminalModifications(aminoAcidSet);
             var aminoAcidArray = FilteredProteinMassBinning.GetExtendedAminoAcidArray(aminoAcidSet);
@@ -27,7 +30,9 @@ namespace InformedProteomics.TopDown.Scoring
                 {
                     var j = _comparer.GetBinNumber(fineNodeMass + aa.Mass);
                     if (j < 0 || j >= _comparer.NumberOfBins)
+                    {
                         continue;
+                    }
 
                     _adjList[j].AddLast(new ScoringGraphEdge(i));
 
@@ -37,7 +42,11 @@ namespace InformedProteomics.TopDown.Scoring
                         {
                             var modifiedAa = new ModifiedAminoAcid(aa, terminalMod);
                             j = _comparer.GetBinNumber(fineNodeMass + modifiedAa.Mass);
-                            if (j < 0 || j >= _comparer.NumberOfBins) continue;
+                            if (j < 0 || j >= _comparer.NumberOfBins)
+                            {
+                                continue;
+                            }
+
                             _adjList[j].AddLast(new ScoringGraphEdge(i));
                         }
                     }
@@ -47,7 +56,10 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IScoringGraph CreateScoringGraph(CompositeScorerBasedOnDeconvolutedSpectrum scorer, double proteinMass)
         {
-            if (proteinMass > _comparer.MaxMass || proteinMass < _comparer.MinMass) return null;
+            if (proteinMass > _comparer.MaxMass || proteinMass < _comparer.MinMass)
+            {
+                return null;
+            }
 
             var nodeScores = scorer.GetNodeScores(proteinMass);
             var graph = new ProteinScoringGraph(nodeScores[0], nodeScores[1], _adjList, _comparer);

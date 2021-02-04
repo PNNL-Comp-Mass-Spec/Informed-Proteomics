@@ -45,7 +45,10 @@ namespace InformedProteomics.TopDown.Scoring
                         ? prefixFragmentComposition + baseIonType.OffsetComposition
                         : suffixFragmentComposition + baseIonType.OffsetComposition;
 
-                    if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz) continue;
+                    if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz)
+                    {
+                        continue;
+                    }
 
                     var param = baseIonType.IsPrefix ? ScoreParam.Prefix : ScoreParam.Suffix;
                     var fragmentIonMass = fragmentComposition.Mass;
@@ -64,8 +67,14 @@ namespace InformedProteomics.TopDown.Scoring
                         score += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
                         score += param.MassError * massErrorPpm; // Envelope correlation-based scoring
 
-                        if (baseIonType.IsPrefix) prefixHit = true;
-                        else suffixHit = true;
+                        if (baseIonType.IsPrefix)
+                        {
+                            prefixHit = true;
+                        }
+                        else
+                        {
+                            suffixHit = true;
+                        }
                     }
                 }
             }
@@ -81,7 +90,10 @@ namespace InformedProteomics.TopDown.Scoring
                             ? prefixFragmentComposition + baseIonType.OffsetComposition
                             : suffixFragmentComposition + baseIonType.OffsetComposition;
 
-                        if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz) continue;
+                        if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz)
+                        {
+                            continue;
+                        }
 
                         var param = baseIonType.IsPrefix ? ScoreParam.Prefix : ScoreParam.Suffix;
                         var fragmentIonMass = fragmentComposition.Mass;
@@ -100,8 +112,14 @@ namespace InformedProteomics.TopDown.Scoring
                             score += param.Corr * matchedPeak.Corr; // Envelope correlation-based scoring
                             score += param.MassError * massErrorPpm; // Envelope correlation-based scoring
 
-                            if (baseIonType.IsPrefix) prefixHit = true;
-                            else suffixHit = true;
+                            if (baseIonType.IsPrefix)
+                            {
+                                prefixHit = true;
+                            }
+                            else
+                            {
+                                suffixHit = true;
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -112,7 +130,11 @@ namespace InformedProteomics.TopDown.Scoring
                 }
             }
 
-            if (prefixHit && suffixHit) score += ScoreParam.ComplementaryIonCount;
+            if (prefixHit && suffixHit)
+            {
+                score += ScoreParam.ComplementaryIonCount;
+            }
+
             return score;
         }
 
@@ -121,7 +143,9 @@ namespace InformedProteomics.TopDown.Scoring
             var intensities = peaks.Select(p => p.Intensity).ToArray();
             Array.Sort(intensities, 0, intensities.Length);
             if (intensities.Length == 0)
+            {
                 return 0;
+            }
 
             var refIntensity = intensities[(int)(0.8750 * intensities.Length)];
             return refIntensity;

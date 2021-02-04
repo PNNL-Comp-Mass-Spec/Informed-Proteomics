@@ -24,19 +24,51 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
             return Equals(obj as SequenceTag);
         }
 
         public bool Equals(SequenceTag other)
         {
-            if (other == null) return false;
-            if (other.ScanNum != ScanNum) return false;
-            if (other.IsPrefix != IsPrefix) return false;
-            if (!other.Sequence.Equals(Sequence)) return false;
-            if (_mzComparer.GetBinNumber(FlankingMass) != _mzComparer.GetBinNumber(other.FlankingMass)) return false;
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (other.ScanNum != ScanNum)
+            {
+                return false;
+            }
+
+            if (other.IsPrefix != IsPrefix)
+            {
+                return false;
+            }
+
+            if (!other.Sequence.Equals(Sequence))
+            {
+                return false;
+            }
+
+            if (_mzComparer.GetBinNumber(FlankingMass) != _mzComparer.GetBinNumber(other.FlankingMass))
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -58,8 +90,16 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public double? GetNTermFlankingMass(double? sequenceMass, BaseIonType prefixIonType, BaseIonType suffixIonType)
         {
-            if (IsPrefix) return FlankingMass - prefixIonType.OffsetComposition.Mass;
-            if (sequenceMass == null) return null;
+            if (IsPrefix)
+            {
+                return FlankingMass - prefixIonType.OffsetComposition.Mass;
+            }
+
+            if (sequenceMass == null)
+            {
+                return null;
+            }
+
             return sequenceMass - (FlankingMass - suffixIonType.OffsetComposition.Mass) - TagMass;
         }
 
@@ -71,8 +111,16 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public double? GetCTermFlankingMass(double? sequenceMass, BaseIonType prefixIonType, BaseIonType suffixIonType)
         {
-            if (!IsPrefix) return FlankingMass - suffixIonType.OffsetComposition.Mass;
-            if (sequenceMass == null) return null;
+            if (!IsPrefix)
+            {
+                return FlankingMass - suffixIonType.OffsetComposition.Mass;
+            }
+
+            if (sequenceMass == null)
+            {
+                return null;
+            }
+
             return sequenceMass - (FlankingMass - prefixIonType.OffsetComposition.Mass) - TagMass;
         }
 

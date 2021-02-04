@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// <summary>
     /// Base class for IonTypes
     /// </summary>
-    public class BaseIonType
+    public sealed class BaseIonType
     {
         /// <summary>
         /// Default base ion types
@@ -123,7 +123,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             IReadOnlyDictionary<char, double[]> possibleOffsets,
             AminoAcid aminoAcid)
         {
-            if (aminoAcid == null) return possibleOffsets['*'].Select(off => new CompositionWithDeltaMass(off));
+            if (aminoAcid == null)
+            {
+                return possibleOffsets['*'].Select(off => new CompositionWithDeltaMass(off));
+            }
+
             var key = possibleOffsets.ContainsKey(aminoAcid.Residue) ? aminoAcid.Residue : '*';
             return possibleOffsets[key].Select(offset => new CompositionWithDeltaMass(offset) - aminoAcid.Composition);
         }

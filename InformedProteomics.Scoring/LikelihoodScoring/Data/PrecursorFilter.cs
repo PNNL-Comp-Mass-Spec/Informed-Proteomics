@@ -39,7 +39,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
                 {
                     var offsetMz = mz + offset;
                     var peakIndex = specMatch.Spectrum.FindPeakIndex(offsetMz, _tolerance);
-                    if (peakIndex > 0) indexes.Add(peakIndex);
+                    if (peakIndex > 0)
+                    {
+                        indexes.Add(peakIndex);
+                    }
                 }
             }
             indexes = indexes.Distinct().ToList();

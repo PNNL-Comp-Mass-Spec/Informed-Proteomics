@@ -42,7 +42,10 @@ namespace InformedProteomics.TopDown.Scoring
                 if (requiredColNum == null)
                 {
                     requiredColNum = new int[RequiredColumns.Length];
-                    for (var j = 0; j < requiredColNum.Length; j++) requiredColNum[j] = -1;
+                    for (var j = 0; j < requiredColNum.Length; j++)
+                    {
+                        requiredColNum[j] = -1;
+                    }
 
                     var header = line.Split('\t');
                     for (var i = 0; i < header.Length; i++)
@@ -65,7 +68,10 @@ namespace InformedProteomics.TopDown.Scoring
 
                 var data = line.Split('\t');
                 var featureId = Convert.ToInt32(data[requiredColNum[0]]);
-                if (featureId > maxFeatureId) maxFeatureId = featureId;
+                if (featureId > maxFeatureId)
+                {
+                    maxFeatureId = featureId;
+                }
 
                 var minScan = Convert.ToInt32(data[requiredColNum[1]]);
                 var maxScan = Convert.ToInt32(data[requiredColNum[2]]);
@@ -78,7 +84,10 @@ namespace InformedProteomics.TopDown.Scoring
             }
 
             _featureArr = new ProMexFeature[maxFeatureId];
-            foreach (var feature in featureList) _featureArr[feature.FeatureId - 1] = feature;
+            foreach (var feature in featureList)
+            {
+                _featureArr[feature.FeatureId - 1] = feature;
+            }
 
             return true;
         }

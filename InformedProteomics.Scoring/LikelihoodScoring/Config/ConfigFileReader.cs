@@ -23,11 +23,27 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
         public List<Node> Nodes { get; protected set; }
 
         // Exception
-        public class InvalidHeader : Exception { }
+        public class InvalidHeaderException : Exception
+        {
+            public InvalidHeaderException() : base()
+            {
+            }
+
+            public InvalidHeaderException(string message) : base(message)
+            {
+            }
+
+            public InvalidHeaderException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+        }
 
         private bool ValidHeader(string header)
         {
-            return (header[0] == '[' && header[header.Length - 1] == ']');
+            if (string.IsNullOrWhiteSpace(header) || header.Length < 2)
+                return false;
+
+            return header[0] == '[' && header[header.Length - 1] == ']';
         }
 
         /* read() Read the file and store the result
@@ -39,46 +55,65 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             var keyValue = new Dictionary<string, string>();
             var lines = System.IO.File.ReadAllLines(fileName);
             char[] headerBrackets = { '[', ']' };
-            var header = string.Empty;
+            var headerName = string.Empty;
+
             foreach (var line in lines)
             {
                 var commentsStripped = line.Split('#')[0];      // remove comments
                 var parts = commentsStripped.Split('=');       // split key/value
+
+                if (parts.Length < 1)
+                    continue;
+
                 if (parts.Length < 2)
                 {
-                    // The line is either a header, empty line, or invalid
+                    // The line is either a header, an empty line, or invalid
                     parts[0] = parts[0].Trim().ToLower();
-                    if (parts[0] == string.Empty)
+                    if (string.IsNullOrWhiteSpace(parts[0]))
+                    {
                         // empty line
                         continue;
+                    }
+
                     if (currentNode == null)
                     {
-                        // first node in the file
+                        // First node in the file
                         currentNode = new Node(null, null);
-                        header = parts[0].Trim(headerBrackets);
+                        headerName = parts[0].Trim(headerBrackets);
                     }
                     else
                     {
-                        // this isn't the first node in the file
-                        currentNode = new Node(header, keyValue);
-                        keyValue = new Dictionary<string, string>();
+                        // This isn't the first node in the file
+                        // Store the values for the current header
+                        currentNode = new Node(headerName, keyValue);
                         Nodes.Add(currentNode);
-                        header = parts[0].Trim(headerBrackets);
+
+                        // Initialize the new header
+                        keyValue = new Dictionary<string, string>();
+                        headerName = parts[0].Trim(headerBrackets);
                     }
 
                     if (!ValidHeader(parts[0]))
-                        // invalid header
-                        throw new InvalidHeader();
+                    {
+                        // Invalid header; should be in the form
+                        // [HeaderName]
+                        throw new InvalidHeaderException();
+                    }
+                    continue;
                 }
-                else
-                {
-                    // key value pair
-                    var key = parts[0].Trim().ToLower();
-                    var value = parts[1].Trim();
-                    keyValue.Add(key, value);
-                }
+
+
+                // key value pair
+                var key = parts[0].Trim().ToLower();
+                var value = parts[1].Trim();
+                keyValue.Add(key, value);
             }
-            currentNode = new Node(header, keyValue);
+
+            if (string.IsNullOrEmpty(headerName) || keyValue.Count == 0)
+                return;
+
+            // Store the values for the current header
+            currentNode = new Node(headerName, keyValue);
             Nodes.Add(currentNode);
         }
 

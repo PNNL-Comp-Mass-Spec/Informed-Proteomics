@@ -55,8 +55,11 @@ namespace InformedProteomics.BottomUp.Scoring
             var index = GetChargeScanNumPairIndex(charge, ms2ScanNum);
             if (!_scoredSpectra.TryGetValue(index, out var scoredSpectrum))
             {
-                var spec = Run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                if (spec == null) return null;
+                if (!(Run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+                {
+                    return null;
+                }
+
                 scoredSpectrum = new ScoredSpectrum(spec, _rankScorer, charge, composition.Mass, Tolerance);
                 _scoredSpectra.Add(index, scoredSpectrum);
             }
@@ -74,7 +77,10 @@ namespace InformedProteomics.BottomUp.Scoring
             {
                 seqGraph.SetSink(modIndex);
                 var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
-                if (!protCompositionWithH2O.Equals(composition)) continue;
+                if (!protCompositionWithH2O.Equals(composition))
+                {
+                    continue;
+                }
 
                 var curScoreAndModifications = seqGraph.GetFragmentScoreAndModifications(scoredSpectrum);
                 var curScore = curScoreAndModifications.Item1;
@@ -85,7 +91,10 @@ namespace InformedProteomics.BottomUp.Scoring
                 }
             }
 
-            if (scoreAndModifications == null) return null;
+            if (scoreAndModifications == null)
+            {
+                return null;
+            }
 
             var ms2Score = scoreAndModifications.Item1;
 
@@ -98,12 +107,24 @@ namespace InformedProteomics.BottomUp.Scoring
             var creditC = Math.Log(probC / sumAAProbabilities);
             var penaltyC = Math.Log((1.0 - probC) / (1.0 - sumAAProbabilities));
 
-            if (pre == 'K' || pre == 'R' || pre == FastaDatabaseConstants.Delimiter || pre == '-') ms2Score += creditN;
-            else ms2Score += penaltyN;
+            if (pre == 'K' || pre == 'R' || pre == FastaDatabaseConstants.Delimiter || pre == '-')
+            {
+                ms2Score += creditN;
+            }
+            else
+            {
+                ms2Score += penaltyN;
+            }
 
             var lastResidue = sequence[sequence.Length - 1];
-            if (lastResidue == 'K' || lastResidue == 'R' || post == FastaDatabaseConstants.Delimiter || post == '-') ms2Score += creditC;
-            else ms2Score += penaltyC;
+            if (lastResidue == 'K' || lastResidue == 'R' || post == FastaDatabaseConstants.Delimiter || post == '-')
+            {
+                ms2Score += creditC;
+            }
+            else
+            {
+                ms2Score += penaltyC;
+            }
 
             var modifications = scoreAndModifications.Item2;
 

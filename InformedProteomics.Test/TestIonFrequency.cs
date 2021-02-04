@@ -26,7 +26,7 @@ namespace InformedProteomics.Test
 
         private List<IonType> _ionTypes;
         private IonTypeFactory _ionTypeFactory;
-        double _relativeIntensityThreshold = 1.0;
+        private double _relativeIntensityThreshold = 1.0;
         private bool _combineCharges;
         private bool _useDecoy;
         private int _precursorCharge;
@@ -61,7 +61,9 @@ namespace InformedProteomics.Test
 
                 var tableCount = 1;
                 if (_precursorCharge > 0)
+                {
                     tableCount = _precursorCharge;
+                }
 
                 var ionFrequencyFunctions = new IonFrequencyTable[tableCount];
                 var decoyionFrequencyFunctions = new IonFrequencyTable[tableCount];
@@ -82,7 +84,9 @@ namespace InformedProteomics.Test
                     var matchList = new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcBottomUp);
                     SpectrumMatchList decoyMatchList = null;
                     if (_useDecoy)
+                    {
                         decoyMatchList = new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcBottomUp, 0, true);
+                    }
 
                     for (var j = 0; j < tableCount; j++)
                     {
@@ -110,7 +114,11 @@ namespace InformedProteomics.Test
                     using (var finalOutputFile = new StreamWriter(outFileName))
                     {
                         finalOutputFile.Write("Ion\tTarget");
-                        if (_useDecoy) finalOutputFile.Write("\tDecoy");
+                        if (_useDecoy)
+                        {
+                            finalOutputFile.Write("\tDecoy");
+                        }
+
                         finalOutputFile.WriteLine();
                         for (var j=0;j<ionFrequencies.Length;j++)
                         {

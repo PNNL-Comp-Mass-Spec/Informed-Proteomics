@@ -23,7 +23,9 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 
             var peptides = tsvFile.GetData(BottomUpPeptideHeader);
             if (scans == null)
+            {
                 throw new FormatException();
+            }
 
             var pepQValues = tsvFile.GetData(PepQValueHeader);
             var formulas = tsvFile.GetData(FormulaHeader);
@@ -32,7 +34,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
 
             for (var i = 0; i < peptides.Count; i++)
             {
-                if (Convert.ToDouble(pepQValues[i]) > PepQValueThreshold || peptideSet.Contains(peptides[i])) continue;
+                if (Convert.ToDouble(pepQValues[i]) > PepQValueThreshold || peptideSet.Contains(peptides[i]))
+                {
+                    continue;
+                }
+
                 peptideSet.Add(peptides[i]);
                 var scanNum = Convert.ToInt32(scans[i]);
 //                    var spectrum = lcms.GetSpectrum(scanNum);

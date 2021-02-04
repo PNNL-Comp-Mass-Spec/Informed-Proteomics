@@ -97,7 +97,9 @@ namespace InformedProteomics.FeatureFinding.Scoring
                 table[i] = new double[NumberOfBins];
                 var line = textStreamReader.ReadLine();
                 if (string.IsNullOrWhiteSpace(line))
+                {
                     continue;
+                }
 
                 var token = line.Split('\t');
                 for (var k = 0; k < NumberOfBins; k++)
@@ -112,7 +114,10 @@ namespace InformedProteomics.FeatureFinding.Scoring
 
         private double[][] LoadTable(string fileName)
         {
-            if (!File.Exists(fileName)) throw new FileNotFoundException("Missing score datafile: " + fileName);
+            if (!File.Exists(fileName))
+            {
+                throw new FileNotFoundException("Missing score datafile: " + fileName);
+            }
 
             var parser = new TsvFileParser(fileName);
             var table = new double[_massBins.Length][];

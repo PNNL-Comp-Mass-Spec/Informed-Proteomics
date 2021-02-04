@@ -24,7 +24,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         public void AddMatch(SpectrumMatch match)
         {
             var charge = match.PrecursorCharge;
-            if (!_offsets.ContainsKey(charge)) throw new Exception("Invalid charge.");
+            if (!_offsets.ContainsKey(charge))
+            {
+                throw new Exception("Invalid charge.");
+            }
+
             for (var i = charge; i > 0; i--)
             {
                 _offsets[i].AddMatches(new List<SpectrumMatch>{match});
@@ -33,12 +37,18 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
         public void AddMatches(IEnumerable<SpectrumMatch> matches)
         {
-            foreach (var match in matches)  AddMatch(match);
+            foreach (var match in matches)
+            {
+                AddMatch(match);
+            }
         }
 
         public List<double> GetChargeOffsets(int charge)
         {
-            if (charge > Charge || charge < 1)  throw new Exception("Charge must be between 1 and "+Charge);
+            if (charge > Charge || charge < 1)
+            {
+                throw new Exception("Charge must be between 1 and "+Charge);
+            }
 
             var bins = _offsets[charge].GetProbabilities();
             var offsets = (from offsetProb in bins

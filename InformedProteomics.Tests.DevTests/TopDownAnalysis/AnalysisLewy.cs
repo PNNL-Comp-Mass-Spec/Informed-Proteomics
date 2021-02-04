@@ -11,7 +11,7 @@ using NUnit.Framework;
 
 namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 {
-    class AnalysisLewy
+    internal class AnalysisLewy
     {
         // Ignore Spelling: Lewy, Jungkap, prsm, promex, Desc, dest, msp, foreach, Pbf, Tsv, Lc
 
@@ -51,7 +51,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 else
                 {
                     if (prsm.SpectralEValue < ret[scan].SpectralEValue)
+                    {
                         ret[scan] = prsm;
+                    }
                 }
             }
 
@@ -210,21 +212,31 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     for (var i = 0; i < DATASET_COUNT; i++)
                     {
                         if (features[i] == null)
+                        {
                             dataLine.Add("0");
+                        }
                         else
+                        {
                             dataLine.Add(PRISM.StringUtilities.DblToString(features[i].Abundance, 2));
+                        }
                     }
 
                     for (var i = 0; i < DATASET_COUNT; i++)
                     {
                         if (features[i] == null)
+                        {
                             dataLine.Add("0");
+                        }
                         else
                         {
                             if (features[i].Score <= float.MinValue)
+                            {
                                 dataLine.Add(PRISM.StringUtilities.DblToStringScientific(float.MinValue, 2));
+                            }
                             else
+                            {
                                 dataLine.Add(PRISM.StringUtilities.DblToString(features[i].Score, 3));
+                            }
                         }
                     }
 
@@ -256,9 +268,13 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     for (var i = 0; i < DATASET_COUNT; i++)
                     {
                         if (features[i] == null)
+                        {
                             dataLine.Add("0");
+                        }
                         else
+                        {
                             dataLine.Add(features[i].ProteinSpectrumMatches.Count.ToString());
+                        }
                     }
 
                     writer.WriteLine(string.Join("\t", dataLine));
@@ -288,7 +304,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Category("PNL_Domain")]
         public void CopyAllMSPFResult()
         {
-            var destPath = @"\\protoapps\UserData\Jungkap\Lewy\DMS_old\201502";
+            const string destPath = @"\\protoapps\UserData\Jungkap\Lewy\DMS_old\201502";
             //var oldDestPath = @"\\protoapps\UserData\Jungkap\Lewy\DMS_old";
 
             for (var i = 1; i < 52; i++)
@@ -364,9 +380,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Category("PNL_Domain")]
         public void CopyAllMSPFResultFor10Reps()
         {
-            var destPath = @"\\protoapps\UserData\Jungkap\CPTAC_10reps\DMS_old";
+            const string destPath = @"\\protoapps\UserData\Jungkap\CPTAC_10reps\DMS_old";
             //var oldDestPath = @"\\protoapps\UserData\Jungkap\Lewy\DMS_old";
-            var dmsPath = @"\\Proto-5\VOrbiETD02\2015_1";
+            const string dmsPath = @"\\Proto-5\VOrbiETD02\2015_1";
 
             for (var i = 1; i < 11; i++)
             {

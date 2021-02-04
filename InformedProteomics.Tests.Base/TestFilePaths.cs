@@ -44,7 +44,9 @@ namespace InformedProteomics.Tests.Base
             var testFile = Utils.GetTestFile(methodName, filePath);
 
             if (testFile == null)
+            {
                 Assert.Ignore("File not found: " + filePath);
+            }
 
             Console.WriteLine("File found at {0}, size {1} bytes", testFile, testFile.Length);
 

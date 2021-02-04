@@ -45,7 +45,7 @@ namespace InformedProteomics.Test
 
             var fastaDb = new FastaDatabase(fastaFilePath);
             var tolerance = new Tolerance(10);
-            var modsFilePath = @"D:\MSPathFinder\Fasta\Mods.txt";
+            const string modsFilePath = @"D:\MSPathFinder\Fasta\Mods.txt";
 
             if (!File.Exists(modsFilePath))
             {
@@ -55,7 +55,7 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(modsFilePath);
 
             //TestTagBasedSearch(run, fastaDb, tolerance, aaSet);
-            var tagSearchEngine = new ScanBasedTagSearchEngine(run, new SequenceTagGenerator(run, new Tolerance(8)),  new LcMsPeakMatrix(run),  fastaDb, tolerance,aaSet);
+            var tagSearchEngine = new ScanBasedTagSearchEngine(run, new SequenceTagGenerator(run, new Tolerance(8)), new LcMsPeakMatrix(run), fastaDb, tolerance, aaSet);
 
             var matchedTags = tagSearchEngine.RunSearch(4672);
             foreach (var match in matchedTags)
@@ -93,7 +93,7 @@ namespace InformedProteomics.Test
             var fastaDb = new FastaDatabase(fastaFilePath);
 
             var tolerance = new Tolerance(10);
-            var modsFilePath = @"D:\MassSpecFiles\Lewy\Mods.txt";
+            const string modsFilePath = @"D:\MassSpecFiles\Lewy\Mods.txt";
             if (!File.Exists(modsFilePath))
             {
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, modsFilePath);
@@ -164,11 +164,11 @@ namespace InformedProteomics.Test
             var methodName = MethodBase.GetCurrentMethod().Name;
             Utils.ShowStarting(methodName);
 
-//            const string rawFilePath = @"H:\Research\Lewy\raw\Lewy_intact_01.raw";
-//            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
-//            const string rawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
-//            const string rawFilePath = @"H:\Research\Weijun_TopDown\raw\UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ.raw";
-//            const string rawFilePath = @"H:\Research\Charles\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
+            //            const string rawFilePath = @"H:\Research\Lewy\raw\Lewy_intact_01.raw";
+            //            const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
+            //            const string rawFilePath = @"H:\Research\Yufeng\TopDownYufeng\raw\yufeng_column_test2.raw";
+            //            const string rawFilePath = @"H:\Research\Weijun_TopDown\raw\UC4_Intact_plasmaTest_90_6May15_Bane_14-09-01RZ.raw";
+            //            const string rawFilePath = @"H:\Research\Charles\TopDown\raw\SBEP_STM_001_02272012_Aragon.raw";
             const string rawFilePath = @"D:\MassSpecFiles\60k\Yufeng_SampleTest1_150614113438.pbf";
             //const string rawFilePath = @"D:\MassSpecFiles\60k\NCR_50K_Test_24Jun15_Bane_15-02-02RZ.pbf";
 
@@ -193,9 +193,9 @@ namespace InformedProteomics.Test
             var fastaDb = new FastaDatabase(fastaFilePath);
 
             var tolerance = new Tolerance(10);
-//            var modsFilePath = @"H:\Research\QCShew_TopDown\Production\Mods_Methyl.txt";
-            var modsFilePath = @"D:\MassSpecFiles\60k\Mods.txt";
-//            var modsFilePath = "";
+            //            var modsFilePath = @"H:\Research\QCShew_TopDown\Production\Mods_Methyl.txt";
+            const string modsFilePath = @"D:\MassSpecFiles\60k\Mods.txt";
+            //            var modsFilePath = "";
 
             if (!File.Exists(modsFilePath))
             {
@@ -211,8 +211,8 @@ namespace InformedProteomics.Test
             FastaDatabase fastaDb, Tolerance tolerance, AminoAcidSet aaSet)
         {
             var engine = new ScanBasedTagSearchEngine(run, new SequenceTagGenerator(run, new Tolerance(8)), new LcMsPeakMatrix(run), fastaDb, tolerance, aaSet);
-//            engine.MinScan = 3400;
-//            engine.MaxScan = 3900;
+            //            engine.MinScan = 3400;
+            //            engine.MaxScan = 3900;
             engine.RunSearch();
         }
 
@@ -247,12 +247,16 @@ namespace InformedProteomics.Test
                     if (isHeader)
                     {
                         isHeader = false;
-                        writer.WriteLine(line+"\t"+"Proteins");
+                        writer.WriteLine(line + "\tProteins");
                         continue;
                     }
 
                     var token = line.Split('\t');
-                    if (token.Length != 3) continue;
+                    if (token.Length != 3)
+                    {
+                        continue;
+                    }
+
                     var tag = token[1];
 
                     var matchedProteins =
@@ -289,7 +293,11 @@ namespace InformedProteomics.Test
             var qValues = parser.GetData("QValue").Select(Convert.ToDouble).ToArray();
             for (var i = 0; i < qValues.Length; i++)
             {
-                if (qValues[i] > 0.01) break;
+                if (qValues[i] > 0.01)
+                {
+                    break;
+                }
+
                 scanToProtein.Add(scans[i], proteinNames[i]);
                 idTag.Add(scans[i], false);
             }
@@ -308,9 +316,9 @@ namespace InformedProteomics.Test
                 Assert.Ignore(@"Skipping test {0} since file not found: {1}", methodName, fastaFilePath);
             }
 
-//            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
-//            const string fastaFilePath =
-//                @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
+            //            const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.icsfldecoy.fasta";
+            //            const string fastaFilePath =
+            //                @"D:\Research\Data\CommonContaminants\H_sapiens_Uniprot_SPROT_2013-05-01_withContam.fasta";
             var fastaDb = new FastaDatabase(fastaFilePath);
             var searchableDb = new SearchableDatabase(fastaDb);
             Console.WriteLine("Sequence length: {0}", fastaDb.GetSequence().Length);
@@ -337,7 +345,11 @@ namespace InformedProteomics.Test
                 }
 
                 var token = line.Split('\t');
-                if (token.Length < 3) continue;
+                if (token.Length < 3)
+                {
+                    continue;
+                }
+
                 var scan = Convert.ToInt32(token[0]);
                 var proteinId = scanToProtein.ContainsKey(scan) ? scanToProtein[scan] : null;
 
@@ -346,9 +358,14 @@ namespace InformedProteomics.Test
                     if (proteinSetForThisScan != null)
                     {
                         var numMatches = proteinSetForThisScan.Count;
-                        int numOcc;
-                        if (hist.TryGetValue(numMatches, out numOcc)) hist[numMatches] = numOcc + 1;
-                        else hist.Add(numMatches, 1);
+                        if (hist.TryGetValue(numMatches, out var numOcc))
+                        {
+                            hist[numMatches] = numOcc + 1;
+                        }
+                        else
+                        {
+                            hist.Add(numMatches, 1);
+                        }
                     }
 
                     prevScan = scan;
@@ -357,9 +374,15 @@ namespace InformedProteomics.Test
 
                 scanSet.Add(scan);
                 var tag = token[1];
-                if (tag.Length < minTagLength) continue;
+                if (tag.Length < minTagLength)
+                {
+                    continue;
+                }
 
-                if (proteinSetForThisScan == null) continue;
+                if (proteinSetForThisScan == null)
+                {
+                    continue;
+                }
 
                 var numMatchesForThisTag = 0;
                 foreach (var matchedProtein in searchableDb.FindAllMatchedSequenceIndices(tag)
@@ -374,21 +397,26 @@ namespace InformedProteomics.Test
                     }
                 }
                 totalNumMatches += numMatchesForThisTag;
-//                if (numMatchesForThisTag > 10)
-//                {
-//                    Console.WriteLine("{0}\t{1}", tag, numMatchesForThisTag);
-//                }
+                //                if (numMatchesForThisTag > 10)
+                //                {
+                //                    Console.WriteLine("{0}\t{1}", tag, numMatchesForThisTag);
+                //                }
             }
 
             if (proteinSetForThisScan != null)
             {
                 var numMatches = proteinSetForThisScan.Count;
-                int numOcc;
-                if (hist.TryGetValue(numMatches, out numOcc)) hist[numMatches] = numOcc + 1;
-                else hist.Add(numMatches, 1);
+                if (hist.TryGetValue(numMatches, out var numOcc))
+                {
+                    hist[numMatches] = numOcc + 1;
+                }
+                else
+                {
+                    hist.Add(numMatches, 1);
+                }
             }
 
-            Console.WriteLine("AvgNumMatches: {0}", totalNumMatches/(float)scanSet.Count);
+            Console.WriteLine("AvgNumMatches: {0}", totalNumMatches / (float)scanSet.Count);
             Console.WriteLine("Histogram:");
             foreach (var entry in hist.OrderBy(e => e.Key))
             {
@@ -438,24 +466,30 @@ namespace InformedProteomics.Test
                 }
 
                 var token = line.Split('\t');
-                if (token.Length != 3) continue;
+                if (token.Length != 3)
+                {
+                    continue;
+                }
+
                 var scan = Convert.ToInt32(token[0]);
 
                 var tag = token[1];
-                if (tag.Length < minTagLength) continue;
+                if (tag.Length < minTagLength)
+                {
+                    continue;
+                }
 
                 foreach (var matchedProtein in searchableDb.FindAllMatchedSequenceIndices(tag)
                     .Select(index => fastaDb.GetProteinName(index)))
                 {
                     ++numMatchedPairs;
-                    HashSet<int> matchedScans;
-                    if (proteinToScan.TryGetValue(matchedProtein, out matchedScans))
+                    if (proteinToScan.TryGetValue(matchedProtein, out var matchedScans))
                     {
                         matchedScans.Add(scan);
                     }
                     else
                     {
-                        matchedScans = new HashSet<int> {scan};
+                        matchedScans = new HashSet<int> { scan };
                         proteinToScan.Add(matchedProtein, matchedScans);
                     }
                 }
@@ -502,6 +536,13 @@ namespace InformedProteomics.Test
                     var isHeader = true;
                     var nReadSeqTag = 0;
 
+                    var headerNames = new List<string>() {
+                        "Protein",
+                        "DetectedFlankingMass",
+                        "ExpectedFlankingMass",
+                        "DeltaMass"
+                    };
+
                     Console.WriteLine(@"Reading {0} file", tagFilePath);
 
                     var nColumn = 0;
@@ -511,21 +552,31 @@ namespace InformedProteomics.Test
                         {
                             isHeader = false;
                             nColumn = line.Split('\t').Length;
-                            writer.WriteLine(line + "\t" + "Protein" + "\t" + "DetectedFlankingMass" + "\t" + "ExpectedFlankingMass" + "\t" + "DeltaMass");
+                            writer.WriteLine(line + "\t" + string.Join("\t", headerNames));
                             continue;
                         }
 
                         var token = line.Split('\t');
-                        if (token.Length != nColumn) continue;
+                        if (token.Length != nColumn)
+                        {
+                            continue;
+                        }
+
                         var tag = token[1];
                         //var scan = Convert.ToInt32(token[0]);
 
-                        if (tag.Length < 6) continue;
+                        if (tag.Length < 6)
+                        {
+                            continue;
+                        }
 
                         var nTerminal = token[2].Equals("1");
                         var detectedFlankingMass = Double.Parse(token[3]);
 
-                        if (!nTerminal) detectedFlankingMass -= Composition.H2O.Mass;
+                        if (!nTerminal)
+                        {
+                            detectedFlankingMass -= Composition.H2O.Mass;
+                        }
 
                         nReadSeqTag++;
 
@@ -534,7 +585,10 @@ namespace InformedProteomics.Test
                                 .Select(index => fastaDb.GetProteinName(index))
                                 .Distinct().ToArray();
 
-                        if (matchedProteins.Length < 1) continue;
+                        if (matchedProteins.Length < 1)
+                        {
+                            continue;
+                        }
 
                         foreach (var protName in matchedProteins)
                         {
@@ -546,7 +600,10 @@ namespace InformedProteomics.Test
                             {
                                 var idx = seqStr.IndexOf(tag, startIdx);
 
-                                if (idx < 0) break; //no matching
+                                if (idx < 0)
+                                {
+                                    break; //no matching
+                                }
 
                                 //var nClv = (nTerminal) ? idx : seqStr.Length - idx - tag.Length;
                                 var nClv = (nTerminal) ? 2 : 1;
@@ -564,7 +621,10 @@ namespace InformedProteomics.Test
                                         writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", line, protName, detectedFlankingMass, flankComposition.Mass, massDiff);
                                     }
 
-                                    if (massDiff > 2000) break;
+                                    if (massDiff > 2000)
+                                    {
+                                        break;
+                                    }
                                 }
 
                                 startIdx = idx + tag.Length;

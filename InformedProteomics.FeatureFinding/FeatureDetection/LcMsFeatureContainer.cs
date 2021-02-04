@@ -22,17 +22,31 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
         public bool Add(LcMsPeakCluster newFeature)
         {
-            if (newFeature.Score < _scorer.ScoreThreshold) return false;
-            if (!newFeature.GoodEnough) return false;
+            if (newFeature.Score < _scorer.ScoreThreshold)
+            {
+                return false;
+            }
+
+            if (!newFeature.GoodEnough)
+            {
+                return false;
+            }
 
             for (var i = _featureList.Count - 1; i >= 0; i--)
             {
                 var massDiff = Math.Abs(_featureList[i].RepresentativeMass - newFeature.RepresentativeMass);
-                if (massDiff > 1.0d) break;
+                if (massDiff > 1.0d)
+                {
+                    break;
+                }
+
                 if (massDiff < 1e-4)
                 {
                     var coeLen = _featureList[i].CoElutionLength(newFeature);
-                    if (coeLen > _featureList[i].ElutionLength * 0.7 || coeLen > newFeature.ElutionLength * 0.7) return false;
+                    if (coeLen > _featureList[i].ElutionLength * 0.7 || coeLen > newFeature.ElutionLength * 0.7)
+                    {
+                        return false;
+                    }
                 }
             }
             /*
@@ -53,7 +67,10 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
         public void Add(IEnumerable<LcMsPeakCluster> features)
         {
-            foreach(var f in features) Add(f);
+            foreach(var f in features)
+            {
+                Add(f);
+            }
         }
 
         public IEnumerable<LcMsPeakCluster> GetFilteredFeatures(LcMsPeakMatrix featureFinder)
@@ -108,7 +125,11 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             while (true)
             {
                 var featureSet = GetConnectedFeatures(ref startIndex);
-                if (featureSet.Count < 1) break;
+                if (featureSet.Count < 1)
+                {
+                    break;
+                }
+
                 ret.Add(featureSet);
             }
             //stopwatch.Stop(); stopwatch.Reset();
@@ -163,8 +184,16 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                     //Console.WriteLine("------------- Merge -----------------");
                     //foreach (var f in fSet) Console.WriteLine("*\t{0}\t{1}\t{2}\t{3}", f.RepresentativeMass, f.MinScanNum, f.MaxScanNum, f.Score);
                     //Console.WriteLine("**\t{0}\t{1}\t{2}\t{3}", maxScoredCluster.RepresentativeMass, maxScoredCluster.MinScanNum, maxScoredCluster.MaxScanNum, maxScoredCluster.Score);
-                    if (maxScoredCluster == null) maxScoredCluster = maxScoredClusterOriginal;
-                    if (maxScoredCluster != null && maxScoredCluster.Score < maxScore) maxScoredCluster.Score = maxScore;
+                    if (maxScoredCluster == null)
+                    {
+                        maxScoredCluster = maxScoredClusterOriginal;
+                    }
+
+                    if (maxScoredCluster != null && maxScoredCluster.Score < maxScore)
+                    {
+                        maxScoredCluster.Score = maxScore;
+                    }
+
                     mergedFeatures.Add(maxScoredCluster);
                 }
                 //if (selectedFeature != null) postFilteredSet.Add(selectedFeature);
@@ -181,7 +210,10 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             if (minScore > 0 && maxScore > minScore*5) return false;*/
 
             if (f1.Score >= _scorer.ScoreThreshold && f1.GoodEnough
-             && f2.Score >= _scorer.ScoreThreshold && f2.GoodEnough) return true;
+             && f2.Score >= _scorer.ScoreThreshold && f2.GoodEnough)
+            {
+                return true;
+            }
 
             return false;
         }
@@ -192,7 +224,10 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var tol = new Tolerance(5);
             while (true)
             {
-                if (featureSet.Count < 1) break;
+                if (featureSet.Count < 1)
+                {
+                    break;
+                }
 
                 var bestFeature = featureSet.First();
                 featureSet.Remove(bestFeature);
@@ -239,7 +274,11 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var neighbors = new Queue<LcMsPeakCluster>();
             for (var i = startIndex; i < _featureList.Count; i++)
             {
-                if (_featureList[i].Flag == 1) continue;
+                if (_featureList[i].Flag == 1)
+                {
+                    continue;
+                }
+
                 neighbors.Enqueue(_featureList[i]);
                 startIndex = i + 1;
                 break;
@@ -248,16 +287,27 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var featureSet = new SortedSet<LcMsPeakCluster>(new LcMsFeatureScoreComparer());
             while (true)
             {
-                if (neighbors.Count < 1) break;
+                if (neighbors.Count < 1)
+                {
+                    break;
+                }
+
                 var feature = neighbors.Dequeue();
-                if (feature.Flag == 1) continue;
+                if (feature.Flag == 1)
+                {
+                    continue;
+                }
 
                 feature.Flag = 1;
                 featureSet.Add(feature);
 
                 foreach (var f in feature.OverlappedFeatures)
                 {
-                    if (f.Flag == 1) continue;
+                    if (f.Flag == 1)
+                    {
+                        continue;
+                    }
+
                     neighbors.Enqueue(f);
                 }
             }
@@ -277,8 +327,15 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         {
             public int Compare(LcMsPeakCluster x, LcMsPeakCluster y)
             {
-                if (x == null) return y == null ? 0 : -1;
-                if (y == null) return 1;
+                if (x == null)
+                {
+                    return y == null ? 0 : -1;
+                }
+
+                if (y == null)
+                {
+                    return 1;
+                }
 
                 return (y.Score.CompareTo(x.Score));
             }

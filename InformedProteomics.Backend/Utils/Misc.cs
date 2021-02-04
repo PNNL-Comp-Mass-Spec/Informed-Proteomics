@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.Utils
     /// <summary>
     /// Miscellaneous utilities
     /// </summary>
-    public class Misc
+    public static class Misc
     {
         /// <summary>
         /// Parse the assembly's version to try to get a build date

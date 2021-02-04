@@ -9,7 +9,7 @@ namespace InformedProteomics.Backend.Utils
     /// <summary>
     /// Peak List utilities
     /// </summary>
-    public class PeakListUtils
+    public static class PeakListUtils
     {
         /// <summary>
         /// Find the highest-intensity peak that matches <paramref name="mz"/> within a tolerance
@@ -38,7 +38,10 @@ namespace InformedProteomics.Backend.Utils
             //var index = peakList.BinarySearch(new Peak(mz, 0.0), comparer);
             //return index < 0 ? null : peakList[index];
             var index = peakList.BinarySearch(new Peak((minMz + maxMz) / 2, 0));
-            if (index < 0) index = ~index;
+            if (index < 0)
+            {
+                index = ~index;
+            }
 
             var bestPeakIndex = -1;
             var bestIntensity = 0.0;
@@ -47,7 +50,11 @@ namespace InformedProteomics.Backend.Utils
             var i = index - 1;
             while (i >= 0 && i < peakList.Count)
             {
-                if (peakList[i].Mz <= minMz) break;
+                if (peakList[i].Mz <= minMz)
+                {
+                    break;
+                }
+
                 if (peakList[i].Intensity > bestIntensity)
                 {
                     bestIntensity = peakList[i].Intensity;
@@ -60,7 +67,11 @@ namespace InformedProteomics.Backend.Utils
             i = index;
             while (i >= 0 && i < peakList.Count)
             {
-                if (peakList[i].Mz >= maxMz) break;
+                if (peakList[i].Mz >= maxMz)
+                {
+                    break;
+                }
+
                 if (peakList[i].Intensity > bestIntensity)
                 {
                     bestIntensity = peakList[i].Intensity;
@@ -98,14 +109,21 @@ namespace InformedProteomics.Backend.Utils
             //var index = peakList.BinarySearch(new Peak(mz, 0.0), comparer);
             //return index < 0 ? null : peakList[index];
             var index = peakList.BinarySearch(new Peak((minMz + maxMz) / 2, 0));
-            if (index < 0) index = ~index;
+            if (index < 0)
+            {
+                index = ~index;
+            }
 
             var matchedPeakList = new List<Peak>();
             // go down
             var i = index - 1;
             while (i >= 0 && i < peakList.Count)
             {
-                if (peakList[i].Mz <= minMz) break;
+                if (peakList[i].Mz <= minMz)
+                {
+                    break;
+                }
+
                 matchedPeakList.Add(peakList[i]);
                 --i;
             }
@@ -114,7 +132,11 @@ namespace InformedProteomics.Backend.Utils
             i = index;
             while (i >= 0 && i < peakList.Count)
             {
-                if (peakList[i].Mz >= maxMz) break;
+                if (peakList[i].Mz >= maxMz)
+                {
+                    break;
+                }
+
                 matchedPeakList.Add(peakList[i]);
                 ++i;
             }
@@ -143,7 +165,10 @@ namespace InformedProteomics.Backend.Utils
             while (index1 < numPeaksSpec && index2 < numTheoProfilePeaks)
             {
                 var comp = comparer.Compare(spec[index1], isoProfile[index2]);
-                if (comp < 0) ++index1;
+                if (comp < 0)
+                {
+                    ++index1;
+                }
                 else if (comp > 0)
                 {
                     ++index2;
@@ -182,7 +207,10 @@ namespace InformedProteomics.Backend.Utils
             while (index1 < numPeaksSpec && index2 < numTheoProfilePeaks)
             {
                 var comp = comparer.Compare(spec[index1], isoProfile[index2]);
-                if (comp < 0) ++index1;
+                if (comp < 0)
+                {
+                    ++index1;
+                }
                 else if (comp > 0)
                 {
                     ++index2;
@@ -220,8 +248,14 @@ namespace InformedProteomics.Backend.Utils
             while (index1 < count1 && index2 < count2)
             {
                 var comp = comparer.Compare(peakList1[index1], peakList2[index2]);
-                if (comp < 0) ++index1;
-                else if (comp > 0) ++index2;
+                if (comp < 0)
+                {
+                    ++index1;
+                }
+                else if (comp > 0)
+                {
+                    ++index2;
+                }
                 else
                 {
                     intersection.Add(peakList1[index1]);
@@ -257,7 +291,10 @@ namespace InformedProteomics.Backend.Utils
                     exceptWith.Add(peakList1[index1]);
                     ++index1;
                 }
-                else if (comp > 0) ++index2;
+                else if (comp > 0)
+                {
+                    ++index2;
+                }
                 else
                 {
                     ++index1;
@@ -308,8 +345,15 @@ namespace InformedProteomics.Backend.Utils
                 }
             }
 
-            while (index1 < count1) sum.Add(peakList1[index1++]);
-            while (index2 < count2) sum.Add(peakList2[index2++]);
+            while (index1 < count1)
+            {
+                sum.Add(peakList1[index1++]);
+            }
+
+            while (index2 < count2)
+            {
+                sum.Add(peakList2[index2++]);
+            }
 
             return sum;
         }

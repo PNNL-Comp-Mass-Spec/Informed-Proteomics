@@ -22,15 +22,22 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             for (var i = 0; i < nDataset; i++)
             {
                 var groupedPrsms = prsmGroup[i];
-                if (groupedPrsms == null) continue;
+                if (groupedPrsms == null)
+                {
+                    continue;
+                }
+
                 prsmSet.AddRange(groupedPrsms);
             }
 
             var alignedPrsms = prsmSet.ConnectedComponents(prsmGroupComparer);
             var alignedResult = new ProteinSpectrumMatchSet[alignedPrsms.Count][];
-            for (var i = 0; i < alignedResult.Length; i++) alignedResult[i] = new ProteinSpectrumMatchSet[nDataset];
+            for (var i = 0; i < alignedResult.Length; i++)
+            {
+                alignedResult[i] = new ProteinSpectrumMatchSet[nDataset];
+            }
 
-            for(var i = 0; i < alignedPrsms.Count; i++)
+            for (var i = 0; i < alignedPrsms.Count; i++)
             {
                 foreach (var set in alignedPrsms[i])
                 {

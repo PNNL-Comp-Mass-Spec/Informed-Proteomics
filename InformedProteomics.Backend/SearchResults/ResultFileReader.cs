@@ -5,7 +5,7 @@ namespace InformedProteomics.Backend.SearchResults
     /// <summary>
     /// Reader factory for result files
     /// </summary>
-    public class ResultFileReader
+    public static class ResultFileReader
     {
         /// <summary>
         /// File extensions supported by the results reader.

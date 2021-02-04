@@ -29,7 +29,11 @@ namespace InformedProteomics.Backend.MassSpecData
             foreach (var scanNum in scanNums)
             {
                 var spec = lcmsRun.GetSpectrum(scanNum);
-                if (spec == null) continue;
+                if (spec == null)
+                {
+                    continue;
+                }
+
                 foreach (var peak in spec.Peaks)
                 {
                     var mzBin = mzComparer.GetBinNumber(peak.Mz);
@@ -77,8 +81,14 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 curScanNum = lcmsRun.GetPrevScanNum(curScanNum, 1);
                 var curElutionTime = lcmsRun.GetElutionTime(curScanNum);
-                if (elutionTime - curElutionTime < elutionTimeTolerance) minScanNum = curScanNum;
-                else break;
+                if (elutionTime - curElutionTime < elutionTimeTolerance)
+                {
+                    minScanNum = curScanNum;
+                }
+                else
+                {
+                    break;
+                }
             }
             var maxScanNum = scanNum;
             curScanNum = scanNum;
@@ -86,8 +96,14 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 curScanNum = lcmsRun.GetNextScanNum(curScanNum, 1);
                 var curElutionTime = lcmsRun.GetElutionTime(curScanNum);
-                if (curElutionTime - elutionTime < elutionTimeTolerance) maxScanNum = curScanNum;
-                else break;
+                if (curElutionTime - elutionTime < elutionTimeTolerance)
+                {
+                    maxScanNum = curScanNum;
+                }
+                else
+                {
+                    break;
+                }
             }
             return lcmsRun.GetSummedMs1Spectrum(minScanNum, maxScanNum);
         }
@@ -101,13 +117,24 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         public static SummedSpectrum GetSummedMs1Spectrum(this ISpectrumAccessor lcmsRun, int minScanNum, int maxScanNum)
         {
-            if (minScanNum < lcmsRun.MinLcScan) minScanNum = lcmsRun.MinLcScan;
-            if (maxScanNum > lcmsRun.MaxLcScan) maxScanNum = lcmsRun.MaxLcScan;
+            if (minScanNum < lcmsRun.MinLcScan)
+            {
+                minScanNum = lcmsRun.MinLcScan;
+            }
+
+            if (maxScanNum > lcmsRun.MaxLcScan)
+            {
+                maxScanNum = lcmsRun.MaxLcScan;
+            }
 
             var scanNums = new List<int>();
             for (var scanNum = minScanNum; scanNum <= maxScanNum; scanNum++)
             {
-                if (lcmsRun.GetMsLevel(scanNum) != 1) continue;
+                if (lcmsRun.GetMsLevel(scanNum) != 1)
+                {
+                    continue;
+                }
+
                 scanNums.Add(scanNum);
             }
 

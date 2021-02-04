@@ -144,9 +144,15 @@ namespace InformedProteomics.Backend.Data.Sequence
                 var hashValue = _indexToHashValue[modCombIndex];
                 var modArray = ToModArray(hashValue);
                 if (modArray.Length == 0)
+                {
                     continue;
+                }
+
                 if (modArray[0] != 0) // this ModificationCombination has _maxNumDynModsPerSequence modifications
+                {
                     continue;
+                }
+
                 for (var modIndex = 0; modIndex < _modifications.Length; modIndex++)
                 {
                     var newArray = new int[modArray.Length];

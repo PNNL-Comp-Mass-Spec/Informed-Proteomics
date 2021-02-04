@@ -10,6 +10,12 @@ namespace InformedProteomics.Backend.Database
     public enum DatabaseSearchMode
     {
         /// <summary>
+        /// Search mode not defined
+        /// </summary>
+        [Description("Search mode not defined")]
+        Undefined = 0,
+
+        /// <summary>
         /// Target search only
         /// </summary>
         [Description("Target search only")]

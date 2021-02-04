@@ -266,9 +266,13 @@ namespace InformedProteomics.Tests.UnitTests
             Console.Write(@"{0,20}, digits={1,2}: {2,-8}", value, digitsAfterDecimal, result);
 
             if (limitDecimalsForLargeValues)
+            {
                 Console.WriteLine(@" (limitDecimals=True)");
+            }
             else
+            {
                 Console.WriteLine();
+            }
 
             var expectedResultFound = string.CompareOrdinal(result, resultExpected) == 0;
 

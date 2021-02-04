@@ -36,19 +36,31 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             if (actToUse == ActivationMethod.Unknown)
             {
                 if (spec is ProductSpectrum spectrum)
+                {
                     actToUse = spectrum.ActivationMethod;
+                }
                 else
+                {
                     actToUse = ActivationMethod.CID;
+                }
             }
 
             if (actToUse == ActivationMethod.CID || actToUse == ActivationMethod.HCD)
+            {
                 BaseIonTypes = BaseIonTypesCID;
+            }
             else if (actToUse == ActivationMethod.ETD)
+            {
                 BaseIonTypes = BaseIonTypesETD;
+            }
             else if (actToUse == ActivationMethod.UVPD)
+            {
                 BaseIonTypes = BaseIonTypesUVPD;
+            }
             else
+            {
                 BaseIonTypes = BaseIonTypesCID;
+            }
 
             if (actToUse == ActivationMethod.UVPD)
             {
@@ -100,8 +112,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             var maxCharge = (int)Math.Floor(fragmentIonMostAbuMass / (minMz - Constants.Proton));
             var minCharge = (int)Math.Ceiling(fragmentIonMostAbuMass / (maxMz - Constants.Proton));
-            if (maxCharge < 1 || maxCharge > MaxProductCharge) maxCharge = MaxProductCharge;
-            if (minCharge < 1 || minCharge < MinProductCharge) minCharge = MinProductCharge;
+            if (maxCharge < 1 || maxCharge > MaxProductCharge)
+            {
+                maxCharge = MaxProductCharge;
+            }
+
+            if (minCharge < 1 || minCharge < MinProductCharge)
+            {
+                minCharge = MinProductCharge;
+            }
 
             return new IntRange(minCharge, maxCharge);
         }
@@ -121,7 +140,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
             //var matchedPeak = new MatchedFragmentPeak();
             //var deconvPeak = new DeconvolutedPeak()
-            if (fragmentIonMass < Ms2Spectrum.Peaks.First().Mz) yield break;
+            if (fragmentIonMass < Ms2Spectrum.Peaks.First().Mz)
+            {
+                yield break;
+            }
 
             var prevObservedCharge = 0;
             var fragmentIonMostAbuMass = fragmentIonMass + Constants.C13MinusC12 * mostAbundantIsotopeIndex;
@@ -134,14 +156,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var observedPeaks = Ms2Spectrum.GetAllIsotopePeaks(ion, Tolerance, RelativeIsotopeIntensityThreshold);
                 if (observedPeaks == null)
                 {
-                    if (prevObservedCharge > 0 && charge - prevObservedCharge > 1) yield break;
+                    if (prevObservedCharge > 0 && charge - prevObservedCharge > 1)
+                    {
+                        yield break;
+                    }
+
                     continue;
                 }
 
                 var distCorr = GetDistCorr(ion, observedPeaks);
                 if (distCorr.Item2 < corrThreshold && distCorr.Item1 > distThreshold)
                 {
-                    if (prevObservedCharge > 0 && charge - prevObservedCharge > 1) yield break;
+                    if (prevObservedCharge > 0 && charge - prevObservedCharge > 1)
+                    {
+                        yield break;
+                    }
+
                     continue;
                 }
                 var matchedPeak = new DeconvolutedPeak(fragmentIonMass, observedPeaks[mostAbundantIsotopeIndex].Intensity, charge, distCorr.Item2, distCorr.Item1, observedPeaks);
@@ -209,7 +239,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             envelopeCorr = 0d;
             envelopeDist = 1.0d;
 
-            if (fragmentIonMass < Ms2Spectrum.Peaks.First().Mz) return null;
+            if (fragmentIonMass < Ms2Spectrum.Peaks.First().Mz)
+            {
+                return null;
+            }
 
             var fragmentIonMostAbuMass = fragmentIonMass + Constants.C13MinusC12 * mostAbundantIsotopeIndex;
             var chargeRange = GetMinMaxChargeRange(fragmentIonMostAbuMass);
@@ -219,10 +252,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 var ion = new Ion(fragmentComposition, charge);
 
                 var observedPeaks = Ms2Spectrum.GetAllIsotopePeaks(ion, Tolerance, RelativeIsotopeIntensityThreshold);
-                if (observedPeaks == null) continue;
+                if (observedPeaks == null)
+                {
+                    continue;
+                }
 
                 var distCorr = GetDistCorr(ion, observedPeaks);
-                if (distCorr.Item2 < corrThreshold && distCorr.Item1 > distThreshold) continue;
+                if (distCorr.Item2 < corrThreshold && distCorr.Item1 > distThreshold)
+                {
+                    continue;
+                }
+
                 var mostAbuPeak = observedPeaks[mostAbundantIsotopeIndex];
 
                 if (intenseObservedPeaks == null || mostAbuPeak.Intensity > intenseObservedPeaks[mostAbundantIsotopeIndex].Intensity)
@@ -249,7 +289,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var observedIntensities = new double[envelope.Length];
             for (var i = 0; i < isotopomerEnvelope.Length; i++)
             {
-                if (observedPeaks[i] != null) observedIntensities[i] = observedPeaks[i].Intensity;
+                if (observedPeaks[i] != null)
+                {
+                    observedIntensities[i] = observedPeaks[i].Intensity;
+                }
             }
 
             return FitScoreCalculator.GetDistanceAndCorrelation(envelope, observedIntensities);

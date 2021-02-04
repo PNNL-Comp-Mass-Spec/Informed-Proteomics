@@ -53,12 +53,17 @@ namespace InformedProteomics.Test
             foreach (var ms2ScanNum in ms2ScanNumArr)
             {
                 if (!(run.GetSpectrum(ms2ScanNum) is ProductSpectrum productSpec))
+                {
                     continue;
+                }
 
                 productSpec.FilterNoise();
                 var deconvolutedPeaks = Deconvoluter.GetDeconvolutedPeaks(productSpec.ScanNum, productSpec.Peaks, minCharge, maxCharge, 2, 1.1, tolerance, corrThreshold);
 
-                if (deconvolutedPeaks == null) continue;
+                if (deconvolutedPeaks == null)
+                {
+                    continue;
+                }
 
                 foreach (var p in deconvolutedPeaks)
                 {
@@ -71,7 +76,10 @@ namespace InformedProteomics.Test
                     var maxBinNum = comparer.GetBinNumber(maxMass);
                     for (var binNum = minBinNum; binNum <= maxBinNum; binNum++)
                     {
-                        if (binNum >= minFragMassBin && binNum <= maxFragMassBin) massVectors[binNum - minFragMassBin][ms2ScanNum] = true;
+                        if (binNum >= minFragMassBin && binNum <= maxFragMassBin)
+                        {
+                            massVectors[binNum - minFragMassBin][ms2ScanNum] = true;
+                        }
                     }
                 }
             }
@@ -112,11 +120,18 @@ namespace InformedProteomics.Test
                 // suffix
                 var seqGraph = SequenceGraph.CreateGraph(aminoAcidSet, AminoAcid.ProteinNTerm, protSequence,
                     AminoAcid.ProteinCTerm);
-                if (seqGraph == null) continue;
+                if (seqGraph == null)
+                {
+                    continue;
+                }
 
                 for (var numNTermCleavage = 0; numNTermCleavage <= 0; numNTermCleavage++)
                 {
-                    if (numNTermCleavage > 0) seqGraph.CleaveNTerm();
+                    if (numNTermCleavage > 0)
+                    {
+                        seqGraph.CleaveNTerm();
+                    }
+
                     var allCompositions = seqGraph.GetAllFragmentNodeCompositions().ToArray();
 
                     var scoreArr = new int[run.MaxLcScan + 1];
@@ -124,7 +139,10 @@ namespace InformedProteomics.Test
                     {
                         var suffixMass = fragComp.Mass + BaseIonType.Y.OffsetComposition.Mass;
                         var binNum = comparer.GetBinNumber(suffixMass);
-                        if (binNum < minFragMassBin || binNum > maxFragMassBin) continue;
+                        if (binNum < minFragMassBin || binNum > maxFragMassBin)
+                        {
+                            continue;
+                        }
 
                         var vector = massVectors[binNum - minFragMassBin];
                         foreach (var ms2ScanNum in ms2ScanNumArr)

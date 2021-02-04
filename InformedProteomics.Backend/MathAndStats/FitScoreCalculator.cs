@@ -7,7 +7,7 @@ namespace InformedProteomics.Backend.MathAndStats
     /// <summary>
     /// Class containing various methods for computing fit scores
     /// </summary>
-    public class FitScoreCalculator
+    public static class FitScoreCalculator
     {
         /// <summary>
         /// Calculate the Bhattacharyya distance for the provided data
@@ -20,8 +20,15 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static double GetBhattacharyyaDistance(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0 )
         {
-            if (count == -1) count = v1.Length;
-            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return 0.0;
+            if (count == -1)
+            {
+                count = v1.Length;
+            }
+
+            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length)
+            {
+                return 0.0;
+            }
 
             var s1 = 0d;
             var s2 = 0d;
@@ -32,7 +39,10 @@ namespace InformedProteomics.Backend.MathAndStats
                 s2 += v2[i + v2Index];
             }
 
-            if (!(s1 > 0) || !(s2 > 0)) return double.PositiveInfinity;
+            if (!(s1 > 0) || !(s2 > 0))
+            {
+                return double.PositiveInfinity;
+            }
 
             var bc = 0d;
             for (var i = 0; i < count; i++)
@@ -56,11 +66,20 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static double GetHyperGeometricPValue(int n, int k, int n1, int k1, bool upperTailProb = true)
         {
-            if (k >= n) return 1.0d;
+            if (k >= n)
+            {
+                return 1.0d;
+            }
 
             var pValue = Hypergeometric.CDF(n, k, n1, k1);
-            if (upperTailProb) pValue = 1 - pValue;
-            else pValue = Math.Min(pValue, 1 - pValue);
+            if (upperTailProb)
+            {
+                pValue = 1 - pValue;
+            }
+            else
+            {
+                pValue = Math.Min(pValue, 1 - pValue);
+            }
 
             return pValue;
         }
@@ -85,8 +104,14 @@ namespace InformedProteomics.Backend.MathAndStats
 
             var pValue = Normal.CDF(meanU, sigU, u1);
 
-            if (upperTailProb) pValue = 1 - pValue;
-            else pValue = Math.Min(pValue, 1 - pValue);
+            if (upperTailProb)
+            {
+                pValue = 1 - pValue;
+            }
+            else
+            {
+                pValue = Math.Min(pValue, 1 - pValue);
+            }
 
             return Math.Abs(pValue); //negative tiny value
         }
@@ -141,8 +166,15 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static Tuple<double, double> GetDistanceAndCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
-            if (count == -1) count = v1.Length;
-            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return new Tuple<double, double>(0d, 0d);
+            if (count == -1)
+            {
+                count = v1.Length;
+            }
+
+            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length)
+            {
+                return new Tuple<double, double>(0d, 0d);
+            }
 
             var s1 = 0d;
             var s2 = 0d;
@@ -204,9 +236,20 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static double GetPearsonCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
-            if (count == -1) count = v1.Length;
-            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length) return 0.0;
-            if (count == 1) return 1.0;
+            if (count == -1)
+            {
+                count = v1.Length;
+            }
+
+            if (count == 0 || v1Index + count > v1.Length || v2Index + count > v2.Length)
+            {
+                return 0.0;
+            }
+
+            if (count == 1)
+            {
+                return 1.0;
+            }
 
             // Compute means
             var m1 = 0.0;
@@ -235,7 +278,10 @@ namespace InformedProteomics.Backend.MathAndStats
                 s2 += d2 * d2;
             }
 
-            if (s1 <= 0 || s2 <= 0) return 0;
+            if (s1 <= 0 || s2 <= 0)
+            {
+                return 0;
+            }
 
             return cov < 0 ? 0f : cov / Math.Sqrt(s1 * s2);
         }
@@ -248,7 +294,10 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static double GetCosine(double[] theoreticalPeakList, double[] observedPeakList)
         {
-            if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0) return 0;
+            if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0)
+            {
+                return 0;
+            }
 
             var innerProduct = 0.0;
             var magnitudeTheo = 0.0;
@@ -273,7 +322,10 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static double GetDotProduct(double[] theoreticalPeakList, double[] observedPeakList)
         {
-            if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0) return 0;
+            if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0)
+            {
+                return 0;
+            }
 
             var innerProduct = 0.0;
             for (var i = 0; i < theoreticalPeakList.Length; i++)
@@ -294,10 +346,17 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static double GetDeconToolsFit(double[] theoreticalPeakList, double[] observedPeakList)
         {
-            if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0) return 1.0;
+            if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0)
+            {
+                return 1.0;
+            }
 
             var maxObs = observedPeakList.Max();
-            if (Math.Abs(maxObs - 0) < float.Epsilon) maxObs = double.PositiveInfinity;
+            if (Math.Abs(maxObs - 0) < float.Epsilon)
+            {
+                maxObs = double.PositiveInfinity;
+            }
+
             var normalizedObs = observedPeakList.Select(p => p / maxObs).ToList();
 
             double sumSquareOfDiffs = 0;
@@ -311,7 +370,10 @@ namespace InformedProteomics.Backend.MathAndStats
             }
 
             var fitScore = sumSquareOfDiffs / sumSquareOfTheoretical;
-            if (double.IsNaN(fitScore) || fitScore > 1) fitScore = 1;
+            if (double.IsNaN(fitScore) || fitScore > 1)
+            {
+                fitScore = 1;
+            }
 
             return fitScore;
         }
@@ -324,7 +386,11 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <returns></returns>
         public static double GetFitOfNormalizedVectors(double[] normTheoreticalPeakList, double[] normObservedPeakList)
         {
-            if (normTheoreticalPeakList.Length != normObservedPeakList.Length || normTheoreticalPeakList.Length == 0) return 1.0;
+            if (normTheoreticalPeakList.Length != normObservedPeakList.Length || normTheoreticalPeakList.Length == 0)
+            {
+                return 1.0;
+            }
+
             double sumSquareOfDiffs = 0;
             double sumSquareOfTheoretical = 0;
             for (var i = 0; i < normTheoreticalPeakList.Length; i++)
@@ -336,7 +402,10 @@ namespace InformedProteomics.Backend.MathAndStats
             }
 
             var fitScore = sumSquareOfDiffs / sumSquareOfTheoretical;
-            if (double.IsNaN(fitScore) || fitScore > 1) fitScore = 1;
+            if (double.IsNaN(fitScore) || fitScore > 1)
+            {
+                fitScore = 1;
+            }
 
             return fitScore;
         }

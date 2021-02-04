@@ -75,7 +75,11 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             {
                 var prevNodeIndex = edge.PrevNodeIndex;
                 var prevScoreDistribution = gfTable[prevNodeIndex];
-                if (prevScoreDistribution == null) continue;
+                if (prevScoreDistribution == null)
+                {
+                    continue;
+                }
+
                 var combinedScore = curNodeScore + _graph.GetEdgeScore(prevNodeIndex, nodeIndex);
 
                 if (prevScoreDistribution.MaxScore + combinedScore > maxScore)
@@ -89,7 +93,10 @@ namespace InformedProteomics.Scoring.GeneratingFunction
                 hasValidEdge = true;
             }
 
-            if (!hasValidEdge) return null; //new ScoreDistribution(0, 1);
+            if (!hasValidEdge)
+            {
+                return null; //new ScoreDistribution(0, 1);
+            }
 
             // considering Target score for fast computing.....max 2 times faster but not useful at this point ScoreDistribution
             //minScore = Math.Max(_targetScore - _maxAchievableScore[nodeIndex], minScore);
@@ -100,7 +107,11 @@ namespace InformedProteomics.Scoring.GeneratingFunction
             foreach (var edge in _graph.GetEdges(nodeIndex))
             {
                 var prevScoreDistribution = gfTable[edge.PrevNodeIndex];
-                if (prevScoreDistribution == null) continue;
+                if (prevScoreDistribution == null)
+                {
+                    continue;
+                }
+
                 var combinedScore = curNodeScore + _graph.GetEdgeScore(edge.PrevNodeIndex, nodeIndex);
                 scoringDistribution.AddEValueDist(prevScoreDistribution, (int)Math.Round(combinedScore), edge.Weight);
             }

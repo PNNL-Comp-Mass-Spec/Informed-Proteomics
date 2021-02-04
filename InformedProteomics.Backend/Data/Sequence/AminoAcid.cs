@@ -173,7 +173,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         public static double GetUniProtFrequency(char residue)
         {
             var index = StandardAminoAcidCharacters.IndexOf(residue);
-            if (index >= 0) return StandardAminoAcidFrequency[index];
+            if (index >= 0)
+            {
+                return StandardAminoAcidFrequency[index];
+            }
+
             return 0;
         }
 

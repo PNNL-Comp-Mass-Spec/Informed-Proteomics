@@ -10,7 +10,7 @@ using PRISM;
 
 namespace PromexAlign
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -45,9 +45,13 @@ namespace PromexAlign
 
             string outputFilePath;
             if (string.IsNullOrWhiteSpace(directory))
+            {
                 outputFilePath = crosstabFilename;
+            }
             else
+            {
                 outputFilePath = Path.Combine(directory, crosstabFilename);
+            }
 
             var nDataset = datasets.Count;
             var prsmReader = new ProteinSpectrumMatchReader();
@@ -208,7 +212,7 @@ namespace PromexAlign
                 for (var i = 0; i < nDataset; i++)
                 {
                     writer.Write("\t");
-                    writer.Write(features[i] == null ? 0 : features[i].FeatureId);
+                    writer.Write((features[i]?.FeatureId) ?? 0);
                 }
 
                 var prsm = (from f in features
@@ -249,7 +253,7 @@ namespace PromexAlign
                 for (var i = 0; i < nDataset; i++)
                 {
                     writer.Write("\t");
-                    writer.Write(features[i] == null ? 0 : features[i].ProteinSpectrumMatches.Count);
+                    writer.Write((features[i]?.ProteinSpectrumMatches.Count) ?? 0);
                 }
                 writer.Write("\n");
             }

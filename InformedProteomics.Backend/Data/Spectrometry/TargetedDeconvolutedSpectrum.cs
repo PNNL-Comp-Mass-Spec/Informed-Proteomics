@@ -78,7 +78,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var observedIntensities = new double[envelope.Length];
             for (var i = 0; i < isotopomerEnvelope.Length; i++)
             {
-                if (observedPeaks[i] != null) observedIntensities[i] = observedPeaks[i].Intensity;
+                if (observedPeaks[i] != null)
+                {
+                    observedIntensities[i] = observedPeaks[i].Intensity;
+                }
             }
 
             var pearsonCorrelation = FitScoreCalculator.GetPearsonCorrelation(envelope, observedIntensities);

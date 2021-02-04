@@ -46,14 +46,23 @@ namespace InformedProteomics.TopDown.Scoring
             for (var i = 0; i < monoMassArr.Length; i++)
             {
                 if (fitArray != null && fitArray[i] > _fitScoreThreshold || chargeArray[i] <= 1)
+                {
                     continue;
+                }
 
                 featureCountFiltered++;
 
                 var scan = scanArray[i];
                 var monoMass = monoMassArr[i];
-                if (minMass > monoMass) minMass = monoMass;
-                if (maxMass < monoMass) maxMass = monoMass;
+                if (minMass > monoMass)
+                {
+                    minMass = monoMass;
+                }
+
+                if (maxMass < monoMass)
+                {
+                    maxMass = monoMass;
+                }
 
                 var minScan = _run.GetPrevScanNum(scan, 1);
                 var maxScan = _run.GetNextScanNum(scan, 1);

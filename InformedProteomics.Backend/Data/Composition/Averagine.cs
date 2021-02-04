@@ -71,7 +71,11 @@ namespace InformedProteomics.Backend.Data.Composition
             for (var isotopeIndex = 0; isotopeIndex < envelope.Envelope.Length; isotopeIndex++)
             {
                 var intensity = envelope.Envelope[isotopeIndex];
-                if (intensity < relativeIntensityThreshold) continue;
+                if (intensity < relativeIntensityThreshold)
+                {
+                    continue;
+                }
+
                 var mz = Ion.GetIsotopeMz(monoIsotopeMass, charge, isotopeIndex);
                 peakList.Add(new Peak(mz, intensity));
             }
@@ -97,7 +101,10 @@ namespace InformedProteomics.Backend.Data.Composition
         public IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMassInst(int nominalMass, IsoProfilePredictor isoProfilePredictor = null)
         {
             var nominalMassFound = IsotopeEnvelopMap.TryGetValue(nominalMass, out var envelope);
-            if (nominalMassFound) return envelope;
+            if (nominalMassFound)
+            {
+                return envelope;
+            }
 
             var mass = nominalMass/Constants.RescalingConstant;
             envelope = ComputeIsotopomerEnvelope(mass, isoProfilePredictor);
@@ -132,7 +139,10 @@ namespace InformedProteomics.Backend.Data.Composition
             var numO = (int)Math.Round(O * averagineCount);
             var numS = (int)Math.Round(S * averagineCount);
 
-            if (numH == 0) numH = 1;
+            if (numH == 0)
+            {
+                numH = 1;
+            }
 
             isoProfilePredictor = isoProfilePredictor ?? IsoProfilePredictor.Predictor;
             return isoProfilePredictor.GetIsotopomerEnvelope(numC, numH, numN, numO, numS);

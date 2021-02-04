@@ -61,11 +61,22 @@ namespace InformedProteomics.TopDown.Scoring
             var nMatchedIons = _prefixIonPeakIndex.Count + _suffixIonPeakIndex.Count;
             var nObservedPeaks = _ms2Spec.Peaks.Length;
 
-            foreach (var peakIndex in _prefixIonPeakIndex) rankSum += _peakRanking[peakIndex];
-            foreach (var peakIndex in _suffixIonPeakIndex) rankSum += _peakRanking[peakIndex];
+            foreach (var peakIndex in _prefixIonPeakIndex)
+            {
+                rankSum += _peakRanking[peakIndex];
+            }
+
+            foreach (var peakIndex in _suffixIonPeakIndex)
+            {
+                rankSum += _peakRanking[peakIndex];
+            }
 
             var pValue = FitScoreCalculator.GetRankSumPValue(nObservedPeaks, nMatchedIons, rankSum);
-            if (pValue > 0) return -Math.Log(pValue, 2);
+            if (pValue > 0)
+            {
+                return -Math.Log(pValue, 2);
+            }
+
             return 50;
         }
 
@@ -74,7 +85,11 @@ namespace InformedProteomics.TopDown.Scoring
             var nPossiblePeaks = Comparer.GetBinNumber(_ms2Spec.Peaks.Last().Mz) - Comparer.GetBinNumber(_ms2Spec.Peaks.First().Mz) + 1;
             var nObservedPeaks = _ms2Spec.Peaks.Length;
             var pValue = FitScoreCalculator.GetHyperGeometricPValue(nPossiblePeaks, nObservedPeaks, _nTheoreticalIonPeaks, _nObservedIonPeaks);
-            if (pValue > 0) return -Math.Log(pValue, 2);
+            if (pValue > 0)
+            {
+                return -Math.Log(pValue, 2);
+            }
+
             return 50;
         }
 
@@ -102,8 +117,15 @@ namespace InformedProteomics.TopDown.Scoring
 
                         if (FindIon(ion, _tolerance, RelativeIsotopeIntensityThreshold, out var baseIsotopePeakIndex, out _, out _))
                         {
-                            if (baseIonType.IsPrefix) _prefixIonPeakIndex.Add(baseIsotopePeakIndex);
-                            else _suffixIonPeakIndex.Add(baseIsotopePeakIndex);
+                            if (baseIonType.IsPrefix)
+                            {
+                                _prefixIonPeakIndex.Add(baseIsotopePeakIndex);
+                            }
+                            else
+                            {
+                                _suffixIonPeakIndex.Add(baseIsotopePeakIndex);
+                            }
+
                             _nObservedIonPeaks++;
                         }
                         //_nObservedIonPeaks += nMatchedIsotopes;
@@ -126,7 +148,10 @@ namespace InformedProteomics.TopDown.Scoring
             nIsotopes = isotopomerEnvelope.Select(x => x >= relativeIntensityThreshold).Count();
             nMatchedIsotopes = 0;
 
-            if (baseIsotopePeakIndex < 0) return false;
+            if (baseIsotopePeakIndex < 0)
+            {
+                return false;
+            }
             //if (baseIsotopePeakIndex < 0) baseIsotopePeakIndex = ~baseIsotopePeakIndex;
             nMatchedIsotopes++;
 
@@ -135,7 +160,10 @@ namespace InformedProteomics.TopDown.Scoring
             //matchedPeakIndex.Add(peakIndex);
             for (var isotopeIndex = baseIsotopeIndex - 1; isotopeIndex >= 0; isotopeIndex--)
             {
-                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold)
+                {
+                    break;
+                }
 
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
                 var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
@@ -164,7 +192,10 @@ namespace InformedProteomics.TopDown.Scoring
             peakIndex = baseIsotopePeakIndex;
             for (var isotopeIndex = baseIsotopeIndex + 1; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
             {
-                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold)
+                {
+                    break;
+                }
 
                 var isotopeMz = ion.GetIsotopeMz(isotopeIndex);
                 var tolTh = tolerance.GetToleranceAsMz(isotopeMz);

@@ -37,7 +37,9 @@ namespace InformedProteomics.Backend.Database
         public static bool ValidFASTAExtension(string databaseFilePath)
         {
             if (string.IsNullOrWhiteSpace(databaseFilePath))
+            {
                 return false;
+            }
 
             var dbExtension = Path.GetExtension(databaseFilePath).ToLower();
 

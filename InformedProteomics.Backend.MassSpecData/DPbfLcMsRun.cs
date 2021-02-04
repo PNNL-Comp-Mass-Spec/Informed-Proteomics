@@ -136,9 +136,17 @@ namespace InformedProteomics.Backend.MassSpecData
             var tic = reader.ReadSingle();
 
             double? precursorMass = reader.ReadDouble();
-            if (Math.Abs(precursorMass.Value) < float.Epsilon) precursorMass = null;
+            if (Math.Abs(precursorMass.Value) < float.Epsilon)
+            {
+                precursorMass = null;
+            }
+
             int? precursorCharge = reader.ReadInt32();
-            if (precursorCharge == 0) precursorCharge = null;
+            if (precursorCharge == 0)
+            {
+                precursorCharge = null;
+            }
+
             var activationMethod = (ActivationMethod)reader.ReadByte();
             var isolationWindowTargetMz = reader.ReadDouble();
             var isolationWindowLowerOffset = reader.ReadDouble();

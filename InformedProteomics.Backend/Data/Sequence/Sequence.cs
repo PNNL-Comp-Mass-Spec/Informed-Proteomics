@@ -52,10 +52,16 @@ namespace InformedProteomics.Backend.Data.Sequence
             var sb = new StringBuilder();
             for (var i = 0; i < Count; i++)
             {
-                var modAa = this[i] as ModifiedAminoAcid;
-                if (modAa == null) continue;
+                if (!(this[i] is ModifiedAminoAcid modAa))
+                {
+                    continue;
+                }
 
-                if (sb.Length > 0) sb.Append(",");
+                if (sb.Length > 0)
+                {
+                    sb.Append(",");
+                }
+
                 sb.AppendFormat("{0} {1}", modAa.Modification.Name, i);
             }
             return sb.ToString();
@@ -70,15 +76,26 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns></returns>
         public static Sequence CreateSequence(string sequence, string modStr, AminoAcidSet aminoAcidSet)
         {
-            if(string.IsNullOrEmpty(modStr)) return new Sequence(sequence, aminoAcidSet);
+            if(string.IsNullOrEmpty(modStr))
+            {
+                return new Sequence(sequence, aminoAcidSet);
+            }
 
             var indexModMap = new Dictionary<int, Modification>();
             foreach (var modIns in modStr.Split(','))
             {
                 var token = modIns.Split(' ');
-                if (token.Length != 2) return null; // invalid modStr
+                if (token.Length != 2)
+                {
+                    return null; // invalid modStr
+                }
+
                 var mod = Modification.Get(token[0]);
-                if (mod == null) return null;
+                if (mod == null)
+                {
+                    return null;
+                }
+
                 var index = Convert.ToInt32(token[1])-1;
                 indexModMap.Add(index, mod);
             }
@@ -258,7 +275,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             const string aminoAcidRegex = @"[" + AminoAcid.StandardAminoAcidCharacters + "]";
             const string massRegex = @"[+-]?\d+\.\d+";
 
-            if (!Regex.IsMatch(msgfPlusPeptideStr, "(" + aminoAcidRegex + "|" + massRegex + ")+")) return null;
+            if (!Regex.IsMatch(msgfPlusPeptideStr, "(" + aminoAcidRegex + "|" + massRegex + ")+"))
+            {
+                return null;
+            }
 
             var stdAaSet = AminoAcidSet.GetStandardAminoAcidSet();
             var aaList = new List<AminoAcid>();
@@ -269,7 +289,11 @@ namespace InformedProteomics.Backend.Data.Sequence
             foreach (Match match in matches)
             {
                 var element = match.Value;
-                if (element.Length == 0) continue;
+                if (element.Length == 0)
+                {
+                    continue;
+                }
+
                 if (element.Length == 1 && char.IsLetter(element[0]))   // amino acid
                 {
                     if (aa != null)
@@ -279,13 +303,20 @@ namespace InformedProteomics.Backend.Data.Sequence
                         mods = new List<Modification>();
                     }
                     aa = stdAaSet.GetAminoAcid(element[0]);
-                    if(aa == null) throw new Exception("Unrecognized amino acid character: " + element[0]);
-//                    Console.WriteLine("{0} {1} {2}", aa.Residue, aa.Composition, aa.GetMass());
+                    if(aa == null)
+                    {
+                        throw new Exception("Unrecognized amino acid character: " + element[0]);
+                    }
+                    //                    Console.WriteLine("{0} {1} {2}", aa.Residue, aa.Composition, aa.GetMass());
                 }
                 else
                 {
                     var modList = Modification.GetFromMass(element);
-                    if (modList == null || modList.Count == 1) throw new Exception("Unrecognized modification mass: " + element);
+                    if (modList == null || modList.Count == 1)
+                    {
+                        throw new Exception("Unrecognized modification mass: " + element);
+                    }
+
                     var mod = modList[0];
                     mods.Add(mod);
 //                    Console.WriteLine("{0} {1} {2}", mod.Name, mod.Composition, mod.Composition.AveragineMass);

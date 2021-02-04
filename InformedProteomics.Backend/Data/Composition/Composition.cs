@@ -285,20 +285,37 @@ namespace InformedProteomics.Backend.Data.Composition
         public override bool Equals(object obj)
         {
             if (!(obj is Composition other))
+            {
                 return false;
+            }
 
             if (_c != other.C || _h != other.H || _n != other.N || _o != other.O || _s != other.S || _p != other.P)
+            {
                 return false;
+            }
 
-            if (_additionalElements == null) return other._additionalElements == null;
+            if (_additionalElements == null)
+            {
+                return other._additionalElements == null;
+            }
 
-            if (other._additionalElements == null) return false;
+            if (other._additionalElements == null)
+            {
+                return false;
+            }
 
             // Both have additional elements
             foreach (var entry in _additionalElements)
             {
-                if (!(other._additionalElements.TryGetValue(entry.Key, out var otherValue))) return false;
-                if (entry.Value != otherValue) return false;
+                if (!(other._additionalElements.TryGetValue(entry.Key, out var otherValue)))
+                {
+                    return false;
+                }
+
+                if (entry.Value != otherValue)
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -320,7 +337,9 @@ namespace InformedProteomics.Backend.Data.Composition
             var numP = _p + c._p;
 
             if (_additionalElements == null && c._additionalElements == null)
+            {
                 return new Composition(numC, numH, numN, numO, numS, numP);
+            }
 
             Dictionary<Atom, short> additionalElements = null;
             if (_additionalElements != null && c._additionalElements != null)
@@ -363,7 +382,9 @@ namespace InformedProteomics.Backend.Data.Composition
         public Composition Add(Composition c)
         {
             if (c is CompositionWithDeltaMass comWithDelta)
+            {
                 return comWithDelta.Add(this);
+            }
 
             return AddComposition(c);
         }
@@ -377,7 +398,9 @@ namespace InformedProteomics.Backend.Data.Composition
         public static Composition operator +(Composition c1, Composition c2)
         {
             if (!(c1 is CompositionWithDeltaMass compWithDelta))
+            {
                 return c1.Add(c2);
+            }
 
             return compWithDelta.Add(c2);
         }
@@ -389,7 +412,10 @@ namespace InformedProteomics.Backend.Data.Composition
         public Composition Negate()
         {
             if (_additionalElements == null)
+            {
                 return new Composition(-_c, -_h, -_n, -_o, -_s, -_p);
+            }
+
             var additionalElements =
                 _additionalElements.ToDictionary(element => element.Key, element => (short)(-element.Value));
             return new Composition(-_c, -_h, -_n, -_o, -_s, -_p, additionalElements);
@@ -403,7 +429,9 @@ namespace InformedProteomics.Backend.Data.Composition
         public static Composition operator -(Composition c)
         {
             if (!(c is CompositionWithDeltaMass compWithDelta))
+            {
                 return c.Negate();
+            }
 
             return compWithDelta.Negate();
         }
@@ -428,12 +456,14 @@ namespace InformedProteomics.Backend.Data.Composition
         {
             var basicCompositionStr = "C(" + C + ") H(" + H + ") N(" + N + ") O(" + O + ") S(" + S + (P != 0 ? ") P(" + P + ")" : ")");
             if (_additionalElements == null)
+            {
                 return basicCompositionStr;
+            }
 
             var buf = new StringBuilder(basicCompositionStr);
             foreach (var element in _additionalElements)
             {
-                buf.Append(" " + element.Key.Code + "(" + element.Value + ")");
+                buf.AppendFormat(" {0}({1})", element.Key.Code, element.Value);
             }
             return buf.ToString();
         }
@@ -459,17 +489,21 @@ namespace InformedProteomics.Backend.Data.Composition
             };
 
             if (P != 0)
+            {
                 elements.Add(string.Format(formatString, string.Format("{0}({1}) ", "P", P)));
+            }
 
             if (_additionalElements == null)
-                return string.Join(string.Empty, elements).Trim();
+            {
+                return string.Concat(elements).Trim();
+            }
 
             foreach (var element in _additionalElements)
             {
                 elements.Add(string.Format(formatString, string.Format("{0}({1}) ", element.Key.Code, element.Value)));
             }
 
-            return string.Join(string.Empty, elements).Trim();
+            return string.Concat(elements).Trim();
         }
         /// <summary>
         /// Return the composition as an empirical formula
@@ -487,12 +521,14 @@ namespace InformedProteomics.Backend.Data.Composition
                 (P == 0 ? string.Empty : "P" + P);
 
             if (_additionalElements == null)
+            {
                 return basicCompositionStr;
+            }
 
             var buf = new StringBuilder(basicCompositionStr);
             foreach (var element in _additionalElements)
             {
-                buf.Append(element.Key.Code + element.Value);
+                buf.Append(element.Key.Code).Append(element.Value);
             }
             return buf.ToString();
         }
@@ -506,7 +542,10 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns>Composition object, or null if a parse error</returns>
         public static Composition ParseFromPlainString(string plainCompositionStr)
         {
-            if (!Regex.IsMatch(plainCompositionStr, @"^([A-Z][a-z]?-?\d*)+$")) return null;
+            if (!Regex.IsMatch(plainCompositionStr, @"^([A-Z][a-z]?-?\d*)+$"))
+            {
+                return null;
+            }
 
             var uniModString = new StringBuilder();
 
@@ -516,8 +555,16 @@ namespace InformedProteomics.Backend.Data.Composition
                 var element = match.Value;
                 var atom = Regex.Match(element, @"[A-Z][a-z]?");
                 var num = element.Substring(atom.Index + atom.Length);
-                if (num.Length == 0) num = "1";
-                if (uniModString.Length != 0) uniModString.Append(" ");
+                if (num.Length == 0)
+                {
+                    num = "1";
+                }
+
+                if (uniModString.Length != 0)
+                {
+                    uniModString.Append(" ");
+                }
+
                 uniModString.AppendFormat("{0}({1})", atom, num);
             }
 
@@ -558,23 +605,51 @@ namespace InformedProteomics.Backend.Data.Composition
                         element = e.Substring(0, e.IndexOf('('));
                         num = int.Parse(e.Substring(e.IndexOf('(') + 1, e.LastIndexOf(')') - e.IndexOf('(') - 1));
                     }
-                    if (element.Equals("C")) c += num;
-                    else if (element.Equals("H")) h += num;
-                    else if (element.Equals("N")) n += num;
-                    else if (element.Equals("O")) o += num;
-                    else if (element.Equals("S")) s += num;
-                    else if (element.Equals("P")) p += num;
+                    if (element.Equals("C"))
+                    {
+                        c += num;
+                    }
+                    else if (element.Equals("H"))
+                    {
+                        h += num;
+                    }
+                    else if (element.Equals("N"))
+                    {
+                        n += num;
+                    }
+                    else if (element.Equals("O"))
+                    {
+                        o += num;
+                    }
+                    else if (element.Equals("S"))
+                    {
+                        s += num;
+                    }
+                    else if (element.Equals("P"))
+                    {
+                        p += num;
+                    }
                     else
                     {
                         var atom = Atom.Get(element);
-                        if (atom == null) return null;
+                        if (atom == null)
+                        {
+                            return null;
+                        }
+
                         if (additionalElements == null)
+                        {
                             additionalElements = new Dictionary<Atom, short>();
+                        }
 
                         if (additionalElements.TryGetValue(atom, out var currentAtomCount))
+                        {
                             additionalElements[atom] = (short)(currentAtomCount + num);
+                        }
                         else
+                        {
                             additionalElements.Add(atom, (short)num);
+                        }
                     }
                 }
                 else // illegal string
@@ -594,7 +669,11 @@ namespace InformedProteomics.Backend.Data.Composition
         private double GetMonoIsotopicMass()
         {
             var mass = _c * MassC + _h * MassH + _n * MassN + _o * MassO + _s * MassS + _p * MassP;
-            if (_additionalElements != null) mass += _additionalElements.Sum(entry => entry.Key.Mass * entry.Value);
+            if (_additionalElements != null)
+            {
+                mass += _additionalElements.Sum(entry => entry.Key.Mass * entry.Value);
+            }
+
             return mass;
         }
 
@@ -604,8 +683,12 @@ namespace InformedProteomics.Backend.Data.Composition
         private int GetNominalMass()
         {
             var nominalMass = _c * NominalMassC + _h * NominalMassH + _n * NominalMassN + _o * NominalMassO + _s * NominalMassS + _p * NominalMassP;
-            if (_additionalElements != null) nominalMass += _additionalElements.Sum(entry => entry.Key.NominalMass * entry.Value);
-           return nominalMass;
+            if (_additionalElements != null)
+            {
+                nominalMass += _additionalElements.Sum(entry => entry.Key.NominalMass * entry.Value);
+            }
+
+            return nominalMass;
         }
 
         #endregion

@@ -50,7 +50,11 @@ namespace InformedProteomics.Tests.DevTests
             for (var i = 0; i < qValues.Length; i++)
             {
                 var qValue = qValues[i];
-                if (qValue > qValueThreshold) break;
+                if (qValue > qValueThreshold)
+                {
+                    break;
+                }
+
                 if (compScanTable.TryGetValue(compositions[i], out var scanNums))
                 {
                     scanNums.Add(ms2Scans[i]);
@@ -82,7 +86,7 @@ namespace InformedProteomics.Tests.DevTests
             var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
             var filter = new IsosFilter(run, new Tolerance(10), isosfile.FullName);
 
-            var massToFind = 944.08176;
+            const double massToFind = 944.08176;
             var matchingScanNums = filter.GetMatchingMs2ScanNums(massToFind).ToList();
 
             var scanNumList = string.Join(",", matchingScanNums);
@@ -175,20 +179,30 @@ namespace InformedProteomics.Tests.DevTests
             for (var i = 0; i < scores.Count; i++)
             {
                 var score = Convert.ToDouble(scores[i]);
-                if (score > 1E-4) continue;
+                if (score > 1E-4)
+                {
+                    continue;
+                }
                 //if (score < 10) continue;
 
                 var scanNum = Convert.ToInt32(scanNums[i]);
                 var charge = Convert.ToInt32(charges[i]);
 
                 var sequence = SimpleStringProcessing.GetStringBetweenDots(sequences[i]);
-                if (sequence == null || sequence.Contains("(")) continue;
+                if (sequence == null || sequence.Contains("("))
+                {
+                    continue;
+                }
                 //var sequence = sequences[i];
                 var composition = aaSet.GetComposition(sequence) + Composition.H2O;
 
                 var precursorIon = new Ion(composition, charge);
                 var isValid = run.GetSpectrum(scanNum) is ProductSpectrum spec && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
-                if (!isValid) continue;
+                if (!isValid)
+                {
+                    continue;
+                }
+
                 ++totalSpecs;
 
                 var precursorScanNum = run.GetPrecursorScanNum(scanNum);
@@ -299,23 +313,38 @@ namespace InformedProteomics.Tests.DevTests
                 if (qvalues != null)
                 {
                     var qValue = Convert.ToDouble(qvalues[i]);
-                    if (qValue > 0.01) continue;
+                    if (qValue > 0.01)
+                    {
+                        continue;
+                    }
                 }
                 else
                 {
                     var score = Convert.ToDouble(scores[i]);
-                    if (score < 13) continue;
+                    if (score < 13)
+                    {
+                        continue;
+                    }
                 }
                 var scanNum = Convert.ToInt32(scanNums[i]);
                 var charge = Convert.ToInt32(charges[i]);
                 var composition = Composition.Parse(compositions[i]);
                 var precursorIon = new Ion(composition, charge);
                 var isValid = run.GetSpectrum(scanNum) is ProductSpectrum spec && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
-                if (!isValid) continue;
+                if (!isValid)
+                {
+                    continue;
+                }
 
                 var sequence = sequences[i];
-                if (sequenceCount.TryGetValue(sequence, out var count)) sequenceCount[sequence] = count + 1;
-                else sequenceCount[sequence] = 1;
+                if (sequenceCount.TryGetValue(sequence, out var count))
+                {
+                    sequenceCount[sequence] = count + 1;
+                }
+                else
+                {
+                    sequenceCount[sequence] = 1;
+                }
             }
             //var sequences = tsvReader.GetData("Annotation");
 
@@ -328,19 +357,28 @@ namespace InformedProteomics.Tests.DevTests
                 if (qvalues != null)
                 {
                     var qValue = Convert.ToDouble(qvalues[i]);
-                    if (qValue > 0.01) continue;
+                    if (qValue > 0.01)
+                    {
+                        continue;
+                    }
                 }
                 else
                 {
                     var score = Convert.ToDouble(scores[i]);
-                    if (score < 13) continue;
+                    if (score < 13)
+                    {
+                        continue;
+                    }
                 }
                 var scanNum = Convert.ToInt32(scanNums[i]);
                 var charge = Convert.ToInt32(charges[i]);
                 var composition = Composition.Parse(compositions[i]);
                 var precursorIon = new Ion(composition, charge);
                 var isValid = run.GetSpectrum(scanNum) is ProductSpectrum spec && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
-                if (!isValid) continue;
+                if (!isValid)
+                {
+                    continue;
+                }
 
                 ++totalSpecs;
 
@@ -480,7 +518,10 @@ namespace InformedProteomics.Tests.DevTests
                 if (qValues != null)
                 {
                     var qValue = Convert.ToDouble(qValues[i]);
-                    if (qValue > 0.01) continue;
+                    if (qValue > 0.01)
+                    {
+                        continue;
+                    }
                 }
 
                 var scanNum = Convert.ToInt32(scanNums[i]);
@@ -489,7 +530,10 @@ namespace InformedProteomics.Tests.DevTests
 
                 var precursorIon = new Ion(composition, charge);
                 var isValid = run.GetSpectrum(scanNum) is ProductSpectrum spec && spec.IsolationWindow.Contains(precursorIon.GetMostAbundantIsotopeMz());
-                if (!isValid) continue;
+                if (!isValid)
+                {
+                    continue;
+                }
 
                 var score = Convert.ToDouble(scores[i]);
 
@@ -504,7 +548,10 @@ namespace InformedProteomics.Tests.DevTests
                 var xicMostAbundant = run.GetPrecursorExtractedIonChromatogram(precursorIon.GetMostAbundantIsotopeMz(), tolerance, scanNum);
 
                 var apexScanNum = xicMostAbundant.GetApexScanNum();
-                if (apexScanNum < run.MinLcScan) apexScanNum = scanNum;
+                if (apexScanNum < run.MinLcScan)
+                {
+                    apexScanNum = scanNum;
+                }
                 //var sumSpec = run.GetSummedMs1Spectrum(apexScanNum);
                 //                var apexIsotopeCorr = sumSpec.GetCorrScore(precursorIon, tolerance, 0.1);
                 //                var corr3 = ms1Filter.GetMatchingMs2ScanNums(composition.Mass).Contains(scanNum) ? 1 : 0;
@@ -640,12 +687,22 @@ namespace InformedProteomics.Tests.DevTests
                 var nominalMass = sequenceComp.NominalMass;
                 var error = (int)Math.Round(mass * Constants.RescalingConstant) - nominalMass;
                 var errorBin = error + hist.Length / 2;
-                if (errorBin < 0) errorBin = 0;
-                if (errorBin >= hist.Length) errorBin = hist.Length - 1;
+                if (errorBin < 0)
+                {
+                    errorBin = 0;
+                }
+
+                if (errorBin >= hist.Length)
+                {
+                    errorBin = hist.Length - 1;
+                }
+
                 hist[errorBin]++;
 
                 if (numSequences % 100 == 0 && sw.Elapsed.TotalSeconds > MAX_RUNTIME_SECONDS)
+                {
                     break;
+                }
             }
 
             Console.WriteLine("Sequence count: {0:N0}", numSequences);

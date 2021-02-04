@@ -143,14 +143,21 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                     for (var i = 0; i < _massBins[charge]; i++)
                     {
                         file.Write(massBins[i].Count);
-                        if (i < _massBins[charge]-1) file.Write("\t");
+                        if (i < _massBins[charge]-1)
+                        {
+                            file.Write("\t");
+                        }
                     }
                     file.WriteLine();
                     for (var i = 0; i < _massBins[charge]; i++)
                     {
                         file.Write("BinEdges\t{0}", _massSorter[charge].BinEdges[i]);
                         var max = double.PositiveInfinity;
-                        if (i < _massBins[charge]-1) max = _massSorter[charge].BinEdges[i+1];
+                        if (i < _massBins[charge]-1)
+                        {
+                            max = _massSorter[charge].BinEdges[i+1];
+                        }
+
                         file.Write("\t"+max);
                         file.WriteLine();
                         var ionTypes = _ionProbabilities[charge][i].SelectIonTypes(Config.SelectedIonThreshold);
@@ -180,7 +187,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 var parts = line.Split('\t').ToList();
                 var header = parts[0];
                 parts.RemoveAt(0);
-                if (header == "BinSize") massBins.AddRange(parts.Select(Convert.ToDouble));
+                if (header == "BinSize")
+                {
+                    massBins.AddRange(parts.Select(Convert.ToDouble));
+                }
                 else if (header == "BinEdges")
                 {
                     binEdges.Add(Convert.ToDouble(parts[0]));
@@ -205,7 +215,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 }
                 else if (header == "RankProbabilities")
                 {
-                    if (massBins.Count == 0 || charge == 0) throw new FormatException("Badly formatted training file.");
+                    if (massBins.Count == 0 || charge == 0)
+                    {
+                        throw new FormatException("Badly formatted training file.");
+                    }
+
                     _rankTables[charge].Add(new RankTable(file, ionTypeFactory));
                     _drankTables[charge].Add(new RankTable(file, ionTypeFactory));
                 }
@@ -232,14 +246,22 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         private void Compute()
         {
-            if (_computed) return;
+            if (_computed)
+            {
+                return;
+            }
+
             Initialize();
             var total = _dataSet.Count;
             for (var i = 0; i < total; i++)
             {
                 var target = _dataSet.Dequeue();
                 var charge = target.PrecursorCharge;
-                if (!_charges.Contains(charge)) continue;
+                if (!_charges.Contains(charge))
+                {
+                    continue;
+                }
+
                 var decoy = new SpectrumMatch(target, true);
                 var mass = target.PrecursorComposition.Mass;
                 var index = _massSorter[charge].GetBinIndex(mass);
@@ -273,7 +295,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
                 acMatch = precursorFilter.Filter(acMatch);
             }
             rankTable.AddMatch(acMatch);
-            if (isDecoy) return;
+            if (isDecoy)
+            {
+                return;
+            }
 
             massErrors.AddMatch(match);
 
@@ -313,10 +338,18 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         private int GetCharge(int charge)
         {
-            if (_charges.Count == 0) throw new Exception("Empty training set.");
+            if (_charges.Count == 0)
+            {
+                throw new Exception("Empty training set.");
+            }
+
             var key = charge;
             var maxCharge = _charges.Max();
-            while (!_charges.Contains(key)) key = (key + 1) % maxCharge;
+            while (!_charges.Contains(key))
+            {
+                key = (key + 1) % maxCharge;
+            }
+
             return key;
         }
 

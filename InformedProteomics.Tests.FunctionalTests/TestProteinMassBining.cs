@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace InformedProteomics.Tests.FunctionalTests
 {
     [TestFixture]
-    class TestProteinMassBining
+    internal class TestProteinMassBining
     {
         [Test]
         public void TestProteinMassComparerWithBinning()
@@ -50,8 +50,8 @@ namespace InformedProteomics.Tests.FunctionalTests
         public void CompareWithLinearScaling()
         {
             var comparer = new ProteinMassBinning(50, 50001, true);
-            var minMass = 0;
-            var maxMass = 50000;
+            const int minMass = 0;
+            const int maxMass = 50000;
             var hBins = new List<int>();
             var resultCount = 0;
 
@@ -63,7 +63,9 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var binNum2 = comparer.GetBinNumber(m);
 
                 if (resultCount < 20 || resultCount % 50 == 0)
+                {
                     Console.WriteLine("{0,10}\t{1,10}\t{2,10}", m, binNum1, binNum2);
+                }
 
                 resultCount++;
             }

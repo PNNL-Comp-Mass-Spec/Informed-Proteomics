@@ -88,7 +88,10 @@ namespace InformedProteomics.Backend.Utils
         {
             FindPeptideHeaders(out var peptideColumnIndex, out var proteinColumnIndex, out var pepQValueColumnIndex, "PepQValue");
 
-            if (peptideColumnIndex < 0 || proteinColumnIndex < 0 || pepQValueColumnIndex < 0) return null;
+            if (peptideColumnIndex < 0 || proteinColumnIndex < 0 || pepQValueColumnIndex < 0)
+            {
+                return null;
+            }
 
             var peptideSet = GetPeptidesAboveThreshold(peptideColumnIndex, proteinColumnIndex, pepQValueColumnIndex, pepQValueThreshold);
             return peptideSet;
@@ -103,7 +106,10 @@ namespace InformedProteomics.Backend.Utils
         {
             FindPeptideHeaders(out var peptideColumnIndex, out var proteinColumnIndex, out var qValueColumnIndex, "QValue");
 
-            if (peptideColumnIndex < 0 || proteinColumnIndex < 0 || qValueColumnIndex < 0) return null;
+            if (peptideColumnIndex < 0 || proteinColumnIndex < 0 || qValueColumnIndex < 0)
+            {
+                return null;
+            }
 
             var peptideSet = GetPeptidesAboveThreshold(peptideColumnIndex, proteinColumnIndex, qValueColumnIndex, qValueThreshold);
             return peptideSet;
@@ -142,11 +148,17 @@ namespace InformedProteomics.Backend.Utils
             foreach (var i in _header.Keys)
             {
                 if (_header[i].Equals("Peptide") || _header[i].Equals("#Peptide") || _header[i].Equals("Sequence"))
+                {
                     peptideColumnIndex = i;
+                }
                 else if (_header[i].Equals("Protein") || _header[i].Equals("ProteinName"))
+                {
                     proteinColumnIndex = i;
+                }
                 else if (_header[i].Equals(qValueColumnName))
+                {
                     qValueColumnIndex = i;
+                }
             }
 
             if (peptideColumnIndex < 0)
@@ -183,7 +195,9 @@ namespace InformedProteomics.Backend.Utils
                 if (double.TryParse(qValues[i], out var qValue))
                 {
                     if (qValue <= qValueThreshold && !proteins[i].StartsWith("XXX"))
+                    {
                         peptideSet.Add(peptides[i]);
+                    }
                 }
             }
 
@@ -204,7 +218,9 @@ namespace InformedProteomics.Backend.Utils
                 {
                     var line = reader.ReadLine();
                     if (string.IsNullOrWhiteSpace(line))
+                    {
                         continue;
+                    }
 
                     var token = line.Split(_delimiter);
                     if (!headerParsed)
@@ -224,12 +240,16 @@ namespace InformedProteomics.Backend.Utils
                     }
 
                     if (token.Length > _header.Count)
+                    {
                         continue;
+                    }
 
                     for (var i = 0; i < token.Length; i++)
                     {
                         if (!_header.ContainsKey(i))
+                        {
                             continue;
+                        }
 
                         _data[_header[i]].Add(token[i]);
                     }

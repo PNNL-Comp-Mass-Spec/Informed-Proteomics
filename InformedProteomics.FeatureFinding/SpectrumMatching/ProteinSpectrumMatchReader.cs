@@ -28,24 +28,36 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             if (tool == ProteinSpectrumMatch.SearchTool.Unknown)
             {
                 if (path.EndsWith("IcTda.tsv", StringComparison.OrdinalIgnoreCase))
+                {
                     tool = ProteinSpectrumMatch.SearchTool.MsPathFinder;
+                }
                 else if (path.EndsWith("MSAlign_ResultTable.txt", StringComparison.OrdinalIgnoreCase))
+                {
                     tool = ProteinSpectrumMatch.SearchTool.MsAlign;
+                }
                 // ReSharper disable StringLiteralTypo
                 else if (path.EndsWith("msgfplus_syn.txt", StringComparison.OrdinalIgnoreCase) ||
                          path.EndsWith("msgfplus_fht.txt", StringComparison.OrdinalIgnoreCase) ||
                          path.EndsWith("msgfdb_syn.txt", StringComparison.OrdinalIgnoreCase) ||
                          path.EndsWith("msgfdb_fht.txt", StringComparison.OrdinalIgnoreCase))
+                {
                     tool = ProteinSpectrumMatch.SearchTool.MsGfPlus;
+                }
                 // ReSharper restore StringLiteralTypo
             }
 
             if (tool == ProteinSpectrumMatch.SearchTool.MsAlign)
+            {
                 prsmList = ReadMsAlignResult(path, maxPrsm);
+            }
             else if (tool == ProteinSpectrumMatch.SearchTool.MsPathFinder)
+            {
                 prsmList = ReadMsPathFinderResult(path, maxPrsm);
+            }
             else if (tool == ProteinSpectrumMatch.SearchTool.MsGfPlus)
+            {
                 prsmList = ReadMsGfPlusResult(path, maxPrsm);
+            }
 
             return prsmList;
         }
@@ -74,7 +86,10 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var eValue = double.Parse(parser.GetData("E-value")[i]);
 
                 var fdr = double.Parse(parser.GetData("FDR")[i]);
-                if (fdr > FdrCutoff) continue;
+                if (fdr > FdrCutoff)
+                {
+                    continue;
+                }
 
                 var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, charge, protName, protDesc, firstResId, lastResId, score, ProteinSpectrumMatch.SearchTool.MsAlign)
                 {
@@ -84,7 +99,10 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
                 prsmList.Add(prsm);
 
-                if (prsmList.Count >= maxPrsm) break;
+                if (prsmList.Count >= maxPrsm)
+                {
+                    break;
+                }
             }
 
             return prsmList;
@@ -101,7 +119,11 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var sequence = parser.GetData("Peptide")[i];
                 var scanNum = int.Parse(parser.GetData("Scan")[i]);
 
-                if (prevScanNum == scanNum) continue;
+                if (prevScanNum == scanNum)
+                {
+                    continue;
+                }
+
                 prevScanNum = scanNum;
 
                 var mz = double.Parse(parser.GetData("PrecursorMZ")[i]);
@@ -117,7 +139,9 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var lastResId = 0;
                 var fdr = double.Parse(parser.GetData("QValue")[i]);
                 if (fdr > FdrCutoff)
+                {
                     continue;
+                }
 
                 var prsm = new ProteinSpectrumMatch(sequence, scanNum, mass, charge, protName, protDesc, firstResId, lastResId, score, ProteinSpectrumMatch.SearchTool.MsGfPlus)
                 {
@@ -127,7 +151,9 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 prsmList.Add(prsm);
 
                 if (prsmList.Count >= maxPrsm)
+                {
                     break;
+                }
             }
 
             return prsmList;
@@ -162,12 +188,18 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 var post = parser.GetData("Post")[i];
                 var proteinLen = int.Parse(parser.GetData("ProteinLength")[i]);
 
-                if (score < minScore || score > maxScore) continue;
+                if (score < minScore || score > maxScore)
+                {
+                    continue;
+                }
 
                 if (qValColumn != null)
                 {
                     var fdr = double.Parse(qValColumn[i]);
-                    if (fdr > FdrCutoff) continue;
+                    if (fdr > FdrCutoff)
+                    {
+                        continue;
+                    }
                 }
 
                 var sequenceText = GetSequenceText(sequence, mod);
@@ -184,7 +216,10 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
                 prsmList.Add(prsm);
 
-                if (prsmList.Count >= maxPrsm) break;
+                if (prsmList.Count >= maxPrsm)
+                {
+                    break;
+                }
             }
 
             return prsmList;
@@ -219,7 +254,9 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 prsmList.Add(prsm);
 
                 if (prsmList.Count >= maxPrsm)
+                {
                     break;
+                }
             }
 
             return prsmList;
@@ -257,7 +294,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
         {
             var mods = modifications.Split(',');
             var parsedMods = new List<Tuple<int, string>>();
-            if (mods.Length < 1 || mods[0] == string.Empty)
+            if (mods.Length < 1 || string.IsNullOrWhiteSpace(mods[0]))
             {
                 return parsedMods;
             }

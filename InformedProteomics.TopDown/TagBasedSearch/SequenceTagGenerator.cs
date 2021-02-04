@@ -31,8 +31,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
         public void Generate(int ms2ScanNum)
         {
-            var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-            if (spec == null) return;
+            if (!(_run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+            {
+                return;
+            }
+
             var tagFinder = new SequenceTagFinder(spec, _tolerance, _minTagLen, _maxTagLen, _aminoAcids);
 
             var tags = tagFinder.GetAllSequenceTagString();
@@ -55,8 +58,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 }
             }
 
-            var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-            if (spec == null) return new List<SequenceTag.SequenceTag>();
+            if (!(_run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+            {
+                return new List<SequenceTag.SequenceTag>();
+            }
+
             var tagFinder = new SequenceTagFinder(spec, _tolerance, _minTagLen, _maxTagLen, _aminoAcids);
             tags = tagFinder.GetAllSequenceTagString();
 

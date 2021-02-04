@@ -41,7 +41,11 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             foreach (var specFile in specFilesDia)
             {
                 var specFileNoExt = Path.GetFileNameWithoutExtension(specFile);
-                if (specFileNoExt == null) continue;
+                if (specFileNoExt == null)
+                {
+                    continue;
+                }
+
                 var reader = new XcaliburReader(specFile);
                 specFileToReader.Add(specFileNoExt, reader);
             }
@@ -252,7 +256,10 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
             var precursorIon = new Ion(aaSet.GetComposition(peptide) + Composition.H2O, charge);
 
             Console.WriteLine("Theoretical isotopomer profile:");
-            foreach(var p in precursorIon.GetIsotopes(0.1)) Console.WriteLine("{0}\t{1}", precursorIon.GetIsotopeMz(p.Index), p.Ratio);
+            foreach(var p in precursorIon.GetIsotopes(0.1))
+            {
+                Console.WriteLine("{0}\t{1}", precursorIon.GetIsotopeMz(p.Index), p.Ratio);
+            }
 
             var xicArr = new Dictionary<int, Xic>();
             var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -303,20 +310,36 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
             foreach(var line in File.ReadLines(resultFilePath))
             {
-                if (line.StartsWith("#")) continue;
+                if (line.StartsWith("#"))
+                {
+                    continue;
+                }
+
                 var token = line.Split('\t');
-                if (token.Length != 16) continue;
+                if (token.Length != 16)
+                {
+                    continue;
+                }
 
                 var qValue = Convert.ToDouble(token[14]);
-                if (qValue > fdrThreshold) continue;
+                if (qValue > fdrThreshold)
+                {
+                    continue;
+                }
 
                 var peptide = token[8].Replace("C+57.021", "C");
                 var scanNum = Convert.ToInt32(token[2]);
                 var charge = Convert.ToInt32(token[7]);
                 var protein = token[9];
                 var isDecoy = protein.StartsWith("XXX_");
-                if (isDecoy) numDecoys++;
-                else numTargets++;
+                if (isDecoy)
+                {
+                    numDecoys++;
+                }
+                else
+                {
+                    numTargets++;
+                }
 
                 var precursorIon = new Ion(aaSet.GetComposition(peptide) + Composition.H2O, charge);
                 var basePeakIndex = precursorIon.Composition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -326,7 +349,11 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                 var isValid = true;
                 foreach (var isotope in precursorIon.GetIsotopes(relativeIntensityThreshold))
                 {
-                    if (isotope.Index == basePeakIndex) continue;
+                    if (isotope.Index == basePeakIndex)
+                    {
+                        continue;
+                    }
+
                     var isotopeMz = precursorIon.GetIsotopeMz(isotope.Index);
                     var xic = run.GetPrecursorExtractedIonChromatogram(isotopeMz, tolerance, scanNum);
 
@@ -365,8 +392,14 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                     //}
                 }
 
-                if (isValid && !isDecoy) numValidTargets++;
-                else if (isValid) numValidDecoys++;
+                if (isValid && !isDecoy)
+                {
+                    numValidTargets++;
+                }
+                else if (isValid)
+                {
+                    numValidDecoys++;
+                }
 
                 //Console.WriteLine("{0}\t{1}\t{2}", peptide, scanNum, charge);
             }
@@ -406,12 +439,22 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                               "\tObs0\tCorr0\tObs1\tCorr1\tObs2\tCorr2\tObs3\tCorr3\tObs-1\tCorr-1\tObs0.5\tCorr0.5");
             foreach (var line in File.ReadLines(resultFilePath))
             {
-                if (line.StartsWith("#")) continue;
+                if (line.StartsWith("#"))
+                {
+                    continue;
+                }
+
                 var token = line.Split('\t');
-                if (token.Length != 16) continue;
+                if (token.Length != 16)
+                {
+                    continue;
+                }
 
                 var qValue = Convert.ToDouble(token[14]);
-                if (qValue > fdrThreshold) continue;
+                if (qValue > fdrThreshold)
+                {
+                    continue;
+                }
 
                 var peptide = token[8].Replace("C+57.021", "C");
                 var scanNum = Convert.ToInt32(token[2]);
@@ -433,7 +476,10 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
                 foreach (var theoIsotope in theoIsotopes)
                 {
                    Console.Write("\t"+theoIsotope.Ratio);
-                    if (++numIsotopes == 4) break;
+                    if (++numIsotopes == 4)
+                    {
+                        break;
+                    }
                 }
 
                 foreach (var isotopeIndex in isotopeIndices)

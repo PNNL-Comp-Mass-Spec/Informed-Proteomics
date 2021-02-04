@@ -46,7 +46,9 @@ namespace InformedProteomics.Backend.Data.Composition
         public new Composition Add(Composition c)
         {
             if (!(c is CompositionWithDeltaMass comWithDelta))
+            {
                 return new CompositionWithDeltaMass(AddComposition(c), _deltaMass, _deltaNominalMass);
+            }
 
             return new CompositionWithDeltaMass(AddComposition(c), _deltaMass + comWithDelta._deltaMass, _deltaNominalMass + comWithDelta._deltaNominalMass);
         }
@@ -79,9 +81,21 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != GetType())
+            {
+                return false;
+            }
+
             return Equals((CompositionWithDeltaMass)obj);
         }
 

@@ -72,7 +72,10 @@ namespace InformedProteomics.Test
 
                 int tsvIndex = ms2ScanNumbers.FindIndex(x => int.Parse(x) == scanNum);
                 var qValue = double.Parse(tsvData["QValue"].ElementAt(tsvIndex));
-                if (qValue > 0.01) break;
+                if (qValue > 0.01)
+                {
+                    break;
+                }
 
                 var seqStr = tsvData["Sequence"].ElementAt(tsvIndex).Trim();
                 var modStr = tsvData["Modifications"].ElementAt(tsvIndex).Trim();
@@ -105,13 +108,19 @@ namespace InformedProteomics.Test
                         Console.Write(seqTagStr.IsPrefix);
                         Console.WriteLine("");
                         */
-                        if (seqStr.Contains(seqTagStr.Sequence)) nHit++;
+                        if (seqStr.Contains(seqTagStr.Sequence))
+                        {
+                            nHit++;
+                        }
                     }
                     nTags++;
                 }
 
                 nSpec++;
-                if (nHit > 0) nHitSpec++;
+                if (nHit > 0)
+                {
+                    nHitSpec++;
+                }
 
                 Console.WriteLine(@"[{0}]seqLen = {1}: {2}/{3}", scanNum, seqStr.Length, nHit, nTags);
             }

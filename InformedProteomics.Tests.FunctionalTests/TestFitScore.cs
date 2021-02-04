@@ -148,7 +148,7 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             var series2 = new double[series1.Length];
             double smallestFit = 1;
-            var threshold = (int)(1000000 / 10.0);
+            const int threshold = (int)(1000000 / 10.0);
 
             for (var iteration = 0; iteration < 1000000; iteration++)
             {
@@ -160,10 +160,14 @@ namespace InformedProteomics.Tests.FunctionalTests
                 var result = FitScoreCalculator.GetPearsonCorrelation(series1, series2);
 
                 if (iteration % threshold == 0)
+                {
                     Console.WriteLine(@"Fit=" + result);
+                }
 
                 if (result < smallestFit)
+                {
                     smallestFit = result;
+                }
             }
 
             Console.WriteLine(@"SmallestFit=" + smallestFit);

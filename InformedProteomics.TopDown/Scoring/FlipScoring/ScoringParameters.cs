@@ -35,7 +35,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <summary>
         /// Gets the peak tolerance value used during training.
         /// </summary>
-        public Tolerance TrainerTolerance { get; private set; }
+        public Tolerance TrainerTolerance { get; }
 
         /// <summary>
         /// Gets the maximum bin mass for the scoring parameters.
@@ -50,10 +50,10 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <summary>
         /// Gets the weights for the selected ion features.
         /// </summary>
-        public FeatureWeights FeatureWeights { get; private set; }
+        public FeatureWeights FeatureWeights { get; }
 
         /// <summary>
-        /// Gets the the ions selected for scoring for this bin.
+        /// Gets the ions selected for scoring for this bin.
         /// </summary>
         public BaseIonType[] SelectedIonTypes => this.FeatureWeights.IonWeights.Keys.ToArray();
 

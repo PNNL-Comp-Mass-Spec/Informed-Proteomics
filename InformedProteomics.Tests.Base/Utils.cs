@@ -36,7 +36,9 @@ namespace InformedProteomics.Tests.Base
             var mzmlFileInfo = GetTestFile("MzmlTestFilePath", mzmlFilePath, false);
 
             if (mzmlFileInfo != null)
+            {
                 return mzmlFileInfo.FullName;
+            }
 
             // The file is missing; return the default path, despite the fact that the file does not exist
             // The calling method will discover that the file is missing and act accordingly
@@ -111,7 +113,9 @@ namespace InformedProteomics.Tests.Base
                         var statusMessage = string.Format("{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
 
                         if (string.Equals(mLastStatus, statusMessage))
+                        {
                             return;
+                        }
 
                         mLastStatus = statusMessage;
                         Console.Write("\r{0}, {1:00.0}% complete                        ", p.Status, p.Percent);
@@ -134,7 +138,9 @@ namespace InformedProteomics.Tests.Base
                 {
                     var incompletePbfFile = new FileInfo(newPbfFilePath);
                     if (incompletePbfFile.Exists)
+                    {
                         incompletePbfFile.Delete();
+                    }
 
                     DeleteLockFile(lockFile);
                 }
@@ -161,11 +167,15 @@ namespace InformedProteomics.Tests.Base
             try
             {
                 if (lockFile == null)
+                {
                     return;
+                }
 
                 lockFile.Refresh();
                 if (lockFile.Exists)
+                {
                     lockFile.Delete();
+                }
             }
             catch (Exception ex)
             {
@@ -178,12 +188,16 @@ namespace InformedProteomics.Tests.Base
             try
             {
                 if (lockFile == null)
+                {
                     return;
+                }
 
                 if (!lockFile.Exists)
                 {
                     if (createNewLockFile)
+                    {
                         CreateLockFile(lockFile);
+                    }
 
                     return;
                 }
@@ -202,7 +216,9 @@ namespace InformedProteomics.Tests.Base
                 }
 
                 if (createNewLockFile)
+                {
                     CreateLockFile(lockFile);
+                }
             }
             catch (Exception ex)
             {
@@ -249,7 +265,9 @@ namespace InformedProteomics.Tests.Base
                     }
 
                     if (altFile2.Directory == null)
+                    {
                         break;
+                    }
 
                     parentFolder = altFile2.Directory.Parent;
                     iteration++;
@@ -277,11 +295,17 @@ namespace InformedProteomics.Tests.Base
         public static void ShowStarting(string methodName, string filePathForTestCase)
         {
             if (string.IsNullOrWhiteSpace(filePathForTestCase))
+            {
                 ShowStarting(methodName + " ( ?? UnknownFilePath ?? )");
+            }
             else if (filePathForTestCase.Any(x => Path.GetInvalidPathChars().Contains(x)))
+            {
                 ShowStarting(methodName + " (" + filePathForTestCase + ")");
+            }
             else
+            {
                 ShowStarting(methodName + " (" + Path.GetFileName(filePathForTestCase) + ")");
+            }
         }
 
         private static void ShowMessage(string methodName, string message)

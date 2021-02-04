@@ -16,10 +16,16 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             //e2.SumEnvelopeTo(summedEnvelope);
 
             var scanDiff = Math.Abs(e2.ScanNum - e1.ScanNum);
-            if (scanDiff > 3) return false;
+            if (scanDiff > 3)
+            {
+                return false;
+            }
 
             var chargeDiff = Math.Abs(e2.Charge - e1.Charge);
-            if (chargeDiff > 3) return false;
+            if (chargeDiff > 3)
+            {
+                return false;
+            }
 
             return true;
         }

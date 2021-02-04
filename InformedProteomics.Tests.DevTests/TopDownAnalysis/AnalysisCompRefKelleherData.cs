@@ -12,7 +12,7 @@ using NUnit.Framework;
 
 namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 {
-    class AnalysisCompRefKelleherData
+    internal class AnalysisCompRefKelleherData
     {
         private List<string> GetDataSetNamesStudy3(int fraction1, int fraction2)
         {
@@ -38,7 +38,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Ignore("Local files")]
         public void CopyAllMSPFResult()
         {
-            var destPath = @"D:\MassSpecFiles\CompRef_Kelleher\Study2";
+            const string destPath = @"D:\MassSpecFiles\CompRef_Kelleher\Study2";
 
             if (!Directory.Exists(DataPath))
             {
@@ -97,7 +97,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             }
 
             if (filesCopied == 0)
+            {
                 Assert.Ignore(@"Skipping since data files were not found");
+            }
         }
 
         [Test]
@@ -105,8 +107,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Ignore("Local files")]
         public void FindMissingLcMsFeatures()
         {
-            var mspfFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
-            var ms1ftFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
+            const string mspfFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
+            const string ms1ftFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
 
             const int Nfraction1 = 3;
             const int Nfraction2 = 5;
@@ -176,7 +178,13 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         }
 
                         var missingPrsm = new List<ProteinSpectrumMatch>();
-                        for (var k = 0; k < prsmList.Count; k++) if (!prsmFeatureMatch[k]) missingPrsm.Add(prsmList[k]);
+                        for (var k = 0; k < prsmList.Count; k++)
+                        {
+                            if (!prsmFeatureMatch[k])
+                            {
+                                missingPrsm.Add(prsmList[k]);
+                            }
+                        }
 
                         FeatureFind(missingPrsm, run, outPath);
                         Console.WriteLine(outPath);
@@ -186,7 +194,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             }
 
             if (filesProcessed == 0)
+            {
                 Assert.Ignore(@"Skipping since data files were not found");
+            }
         }
 
         private void FeatureFind(List<ProteinSpectrumMatch> prsms, LcMsRun run, string outTsvFilePath)
@@ -203,7 +213,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 var maxScan = run.GetNextScanNum(match.ScanNum, 1);
                 var feature = featureFinder.GetLcMsPeakCluster(match.Mass, match.Charge, minScan, maxScan);
 
-                if (feature == null) continue;
+                if (feature == null)
+                {
+                    continue;
+                }
 
                 tsvWriter.WriteLine("{0}\t{1}", featureId, LcMsFeatureFinderLauncher.GetString(feature));
                 featureId++;
@@ -217,8 +230,8 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Ignore("Local files")]
         public void AnalysisStudy3()
         {
-            var mspfFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
-            var ms1ftFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
+            const string mspfFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
+            const string ms1ftFolder = @"D:\MassSpecFiles\CompRef_Kelleher\Study3";
 
             const int Nfraction1 = 3;
             const int Nfraction2 = 5;
@@ -232,7 +245,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                     var datasets = GetDataSetNamesStudy3(frac1, frac2);
                     var outFilePath = string.Format(@"D:\MassSpecFiles\CompRef_Kelleher\study3_GFrep{0:D2}_Gfrac{1:D2}.tsv", frac1, frac2);
                     if (!File.Exists(outFilePath))
+                    {
                         continue;
+                    }
 
                     AlignFeatures(datasets, mspfFolder, ms1ftFolder, outFilePath);
                     Console.WriteLine("############ {0}-{1} has been completed", frac1, frac2);
@@ -242,7 +257,9 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
             }
 
             if (filesProcessed == 0)
+            {
                 Assert.Ignore("Skipped since data files not found");
+            }
         }
 
         private void AlignFeatures(List<string> datasets, string mspfFolder, string ms1ftFolder, string outFilePath)

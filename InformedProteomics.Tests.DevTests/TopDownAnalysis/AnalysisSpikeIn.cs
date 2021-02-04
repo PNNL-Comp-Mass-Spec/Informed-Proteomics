@@ -46,11 +46,17 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
 
             public bool SameCluster(LcMsFeature f1, LcMsFeature f2)
             {
-                if (f1.DataSetId == f2.DataSetId) return false;
+                if (f1.DataSetId == f2.DataSetId)
+                {
+                    return false;
+                }
                 // tolerant in mass dimension?
 
                 var massTol = Math.Min(_tolerance.GetToleranceAsMz(f1.Mass), _tolerance.GetToleranceAsMz(f2.Mass));
-                if (Math.Abs(f1.Mass - f2.Mass) > massTol) return false;
+                if (Math.Abs(f1.Mass - f2.Mass) > massTol)
+                {
+                    return false;
+                }
 
                 //if (!f1.CoElutedByNet(f2, 0.004)) return false; //e.g) 200*0.001 = 0.2 min = 30 sec
                 if (f1.ProteinSpectrumMatches.Count > 0 && f2.ProteinSpectrumMatches.Count > 0)
@@ -238,7 +244,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                 for (var i = 0; i < nDataset; i++)
                 {
                     writer.Write("\t");
-                    writer.Write(features[i] == null ? 0 : features[i].ProteinSpectrumMatches.Count);
+                    writer.Write((features[i]?.ProteinSpectrumMatches.Count) ?? 0);
                 }
                 writer.Write("\n");
             }

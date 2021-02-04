@@ -3,7 +3,7 @@ using System.Text;
 
 namespace InformedProteomics.Backend.Database
 {
-    class ProteinHashInfo
+    internal class ProteinHashInfo
     {
         private static readonly SHA1 mSha1Hasher = new SHA1Managed();
 

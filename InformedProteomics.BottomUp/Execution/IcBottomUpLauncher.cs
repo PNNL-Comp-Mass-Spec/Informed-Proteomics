@@ -133,9 +133,14 @@ namespace InformedProteomics.BottomUp.Execution
             get
             {
                 if (RunTargetDecoyAnalysis == DatabaseSearchMode.Both)
+                {
                     return true;
+                }
+
                 if (RunTargetDecoyAnalysis == DatabaseSearchMode.Decoy)
+                {
                     return null;
+                }
                 //(Tda2 == DatabaseSearchMode.Target)
                 return false;
             }
@@ -388,13 +393,19 @@ namespace InformedProteomics.BottomUp.Execution
 
                     foreach (var ms2ScanNum in ms1Filter.GetMatchingMs2ScanNums(sequenceMass))
                     {
-                        var spec = _run.GetSpectrum(ms2ScanNum) as ProductSpectrum;
-                        if (spec == null) continue;
+                        if (!(_run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+                        {
+                            continue;
+                        }
+
                         var charge =
                             (int)Math.Round(sequenceMass / (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
                         var scorer = _ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
-                        if (score <= 2) continue;
+                        if (score <= 2)
+                        {
+                            continue;
+                        }
 
                         var precursorIon = new Ion(protCompositionWithH2O, charge);
                         var sequence = annotation.Substring(2, annotation.Length - 4);
@@ -440,7 +451,11 @@ namespace InformedProteomics.BottomUp.Execution
                              );
                 for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
                 {
-                    if (matches[scanNum] == null) continue;
+                    if (matches[scanNum] == null)
+                    {
+                        continue;
+                    }
+
                     foreach (var match in matches[scanNum].Reverse())
                     {
                         var sequence = match.Sequence;

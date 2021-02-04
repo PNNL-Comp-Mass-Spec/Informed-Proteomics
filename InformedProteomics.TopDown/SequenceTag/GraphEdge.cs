@@ -15,16 +15,36 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public bool Equals(GraphEdge other)
         {
-            if (other == null) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
             return Node1 == other.Node1 && Node2 == other.Node2;
         }
 
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
             return Equals((GraphEdge)obj);
         }
 
@@ -38,8 +58,10 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public static bool operator ==(GraphEdge edge1, GraphEdge edge2)
         {
-            if ((object)edge1 == null || ((object)edge2) == null)
+            if (edge1 is null || ((object)edge2) == null)
+            {
                 return object.Equals(edge1, edge2);
+            }
 
             return edge1.Equals(edge2);
         }
@@ -47,7 +69,9 @@ namespace InformedProteomics.TopDown.SequenceTag
         public static bool operator !=(GraphEdge edge1, GraphEdge edge2)
         {
             if (edge1 == null || edge2 == null)
+            {
                 return !object.Equals(edge1, edge2);
+            }
 
             return !(edge1.Equals(edge2));
         }

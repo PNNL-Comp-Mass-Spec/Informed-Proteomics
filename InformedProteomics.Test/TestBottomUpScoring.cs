@@ -149,7 +149,10 @@ namespace InformedProteomics.Test
                 "Start\tEnd\tCharge\tMostAbundantIsotopeMz\t" +
                 "Mass\t#MatchedFragments\tIcScore";
             var header = headerStr.Split('\t').ToList();
-            if (concatenated.Count <= 1) return;
+            if (concatenated.Count <= 1)
+            {
+                return;
+            }
 
             var scoreIndex = header.IndexOf("IcScore");
             var sequenceIndex = header.IndexOf("Sequence");
@@ -157,7 +160,10 @@ namespace InformedProteomics.Test
             var postIndex = header.IndexOf("Post");
             var proteinIndex = header.IndexOf("ProteinName");
             var scanIndex = header.IndexOf("Scan");
-            if (scoreIndex < 0 || sequenceIndex < 0 || preIndex < 0 || postIndex < 0 || proteinIndex < 0) return;
+            if (scoreIndex < 0 || sequenceIndex < 0 || preIndex < 0 || postIndex < 0 || proteinIndex < 0)
+            {
+                return;
+            }
 
             //var distinctSorted = concatenated.OrderByDescending(r => Convert.ToDouble(r.Split('\t')[scoreIndex]))
             //    .GroupBy(r => Convert.ToDouble(r.Split('\t')[scanIndex]))
@@ -185,8 +191,15 @@ namespace InformedProteomics.Test
                 var row = distinctSorted[i];
                 var columns = row.Split('\t');
                 var protein = columns[proteinIndex];
-                if (protein.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix)) numDecoy++;
-                else numTarget++;
+                if (protein.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix))
+                {
+                    numDecoy++;
+                }
+                else
+                {
+                    numTarget++;
+                }
+
                 fdr[i] = numDecoy / (double)numTarget;
             }
 
@@ -196,7 +209,10 @@ namespace InformedProteomics.Test
             for (var i = fdr.Length - 2; i >= 0; i--)
             {
                 qValue[i] = Math.Min(qValue[i + 1], fdr[i]);
-                if (qValue[i] < 0.01) numPeptides++;
+                if (qValue[i] < 0.01)
+                {
+                    numPeptides++;
+                }
             }
 
             Console.WriteLine("NumPeptides: {0}", numPeptides);
@@ -219,7 +235,10 @@ namespace InformedProteomics.Test
             foreach (var icResultFilePath in Directory.GetFiles(resultDir, "*DIA*IcTarget.tsv"))
             {
                 var icParser = new TsvFileParser(icResultFilePath);
-                foreach (var peptide in icParser.GetData("Sequence")) targetPeptides.Add(peptide);
+                foreach (var peptide in icParser.GetData("Sequence"))
+                {
+                    targetPeptides.Add(peptide);
+                }
             }
 
             const string ipaResultPath = @"D:\Research\Data\UW\QExactive\DIA_All_Summary.tsv";
@@ -234,7 +253,10 @@ namespace InformedProteomics.Test
             var both = 0;
             foreach (var ipaPeptide in ipaPeptides)
             {
-                if (targetPeptides.Contains(ipaPeptide)) ++both;
+                if (targetPeptides.Contains(ipaPeptide))
+                {
+                    ++both;
+                }
                 else
                 {
                     ++ipaOnly;

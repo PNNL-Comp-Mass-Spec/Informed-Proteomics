@@ -49,7 +49,9 @@ namespace InformedProteomics.Tests.FunctionalTests
                     foreach (var offsetFrequency in offsetFrequencies)
                     {
                         if (offsetFrequency.Found > 0)
+                        {
                             debugFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Label+mz);
+                        }
                     }
                 }
             }

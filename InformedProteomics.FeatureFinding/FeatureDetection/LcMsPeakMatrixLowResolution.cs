@@ -42,9 +42,21 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             foreach (var feature in deconvoluter.GetMassFeatures())
             {
-                if (features.Count >= _maxFeaturesPerSpec) break;
-                if (maxInt < 0) maxInt = feature.Abundance;
-                if (feature.Abundance < AbundanceRatioCutoff * maxInt) break;
+                if (features.Count >= _maxFeaturesPerSpec)
+                {
+                    break;
+                }
+
+                if (maxInt < 0)
+                {
+                    maxInt = feature.Abundance;
+                }
+
+                if (feature.Abundance < AbundanceRatioCutoff * maxInt)
+                {
+                    break;
+                }
+
                 features.Add(feature);
             }
 
@@ -61,14 +73,19 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var ret = new List<LcMsFeature>();
 
             if (_ms1Features == null)
+            {
                 return ret;
+            }
 
             // ReSharper disable once InconsistentlySynchronizedField
             var clusters = _ms1Features.ConnectedComponents(new Ms1FeatureComparer(Run, _tolerance));
 
             foreach (var cluster in clusters)
             {
-                if (cluster.Count < 3) continue;
+                if (cluster.Count < 3)
+                {
+                    continue;
+                }
 
                 var maxCharge = cluster.Select(m => m.MaxCharge).Max();
                 var minCharge = cluster.Select(m => m.MinCharge).Min();
@@ -113,10 +130,16 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             public bool SameCluster(Ms1Feature node1, Ms1Feature node2)
             {
                 var massDiff = Math.Abs(node1.Mass - node2.Mass);
-                if (massDiff > _tolerance.GetToleranceAsMz(node1.Mass)) return false;
+                if (massDiff > _tolerance.GetToleranceAsMz(node1.Mass))
+                {
+                    return false;
+                }
 
                 var etDiff = Math.Abs(_run.GetElutionTime(node1.ScanNum) - _run.GetElutionTime(node2.ScanNum));
-                if (etDiff > ElutionTimeWindowSize) return false;
+                if (etDiff > ElutionTimeWindowSize)
+                {
+                    return false;
+                }
 
                 return true;
             }

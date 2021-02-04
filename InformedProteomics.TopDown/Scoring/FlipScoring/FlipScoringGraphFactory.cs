@@ -65,7 +65,10 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         private List<FlipScoringGraphEdge> InitEdges(AminoAcidSet aminoAcidSet, IReadOnlyDictionary<char, double> aminoAcidProbabilities)
         {
             var adjList = new LinkedList<FlipScoringGraphEdge>[massBins.NumberOfBins];
-            for (var i = 0; i < massBins.NumberOfBins; i++) adjList[i] = new LinkedList<FlipScoringGraphEdge>();
+            for (var i = 0; i < massBins.NumberOfBins; i++)
+            {
+                adjList[i] = new LinkedList<FlipScoringGraphEdge>();
+            }
 
             var terminalModifications = FilteredProteinMassBinning.GetTerminalModifications(aminoAcidSet);
             var aminoAcidArray = FilteredProteinMassBinning.GetExtendedAminoAcidArray(aminoAcidSet);
@@ -78,7 +81,11 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
                 foreach (var aa in aminoAcidArray)
                 {
                     var j = massBins.GetBinNumber(fineNodeMass + aa.Mass);
-                    if (j < 0 || j >= massBins.NumberOfBins) continue;
+                    if (j < 0 || j >= massBins.NumberOfBins)
+                    {
+                        continue;
+                    }
+
                     var aaWeight = aminoAcidProbabilities.ContainsKey(aa.Residue) ? Math.Log10(aminoAcidProbabilities[aa.Residue]) : 0;
                     adjList[j].AddLast(new FlipScoringGraphEdge(i, j, aaWeight, aa, null));
 
@@ -88,7 +95,11 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
                         {
                             var modifiedAa = new ModifiedAminoAcid(aa, terminalMod);
                             j = massBins.GetBinNumber(fineNodeMass + modifiedAa.Mass);
-                            if (j < 0 || j >= massBins.NumberOfBins) continue;
+                            if (j < 0 || j >= massBins.NumberOfBins)
+                            {
+                                continue;
+                            }
+
                             adjList[j].AddLast(new FlipScoringGraphEdge(i, j, aaWeight, modifiedAa, null));
                         }
                     }

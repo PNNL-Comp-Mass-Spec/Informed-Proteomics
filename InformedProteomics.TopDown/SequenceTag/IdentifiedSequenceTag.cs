@@ -25,14 +25,26 @@ namespace InformedProteomics.TopDown.SequenceTag
 
         public int GetBeginResidue()
         {
-            if (DerivedFromPrefix) return CleavageIndex1 + 1;
-            else return _sequence.Count - CleavageIndex2 - 1;
+            if (DerivedFromPrefix)
+            {
+                return CleavageIndex1 + 1;
+            }
+            else
+            {
+                return _sequence.Count - CleavageIndex2 - 1;
+            }
         }
 
         public int GetEndResidue()
         {
-            if (DerivedFromPrefix) return CleavageIndex2;
-            else return _sequence.Count - CleavageIndex1 - 2;
+            if (DerivedFromPrefix)
+            {
+                return CleavageIndex2;
+            }
+            else
+            {
+                return _sequence.Count - CleavageIndex1 - 2;
+            }
         }
 
         public int GetLength()
@@ -43,7 +55,9 @@ namespace InformedProteomics.TopDown.SequenceTag
         public string GetAnnotation(int cleavageIndex)
         {
             if (cleavageIndex < CleavageIndex1 || cleavageIndex > CleavageIndex2)
+            {
                 throw new ArgumentOutOfRangeException();
+            }
 
             var t = IonTypeArray[cleavageIndex];
 
@@ -53,7 +67,10 @@ namespace InformedProteomics.TopDown.SequenceTag
         public string GetSequenceString()
         {
             var sb = new StringBuilder(GetLength());
-            for (var i = GetBeginResidue(); i <= GetEndResidue(); i++) sb.Append(_sequence[i].Residue);
+            for (var i = GetBeginResidue(); i <= GetEndResidue(); i++)
+            {
+                sb.Append(_sequence[i].Residue);
+            }
 
             return sb.ToString();
         }
@@ -62,7 +79,9 @@ namespace InformedProteomics.TopDown.SequenceTag
         public static Sequence GenerateSequence(string seqStr, string modStr)
         {
             if (modStr == null || modStr.Equals(""))
+            {
                 return new Sequence(seqStr, aaSet);
+            }
 
             var residueIndex = 0;
             var modList = modStr.Split(',');
@@ -72,7 +91,10 @@ namespace InformedProteomics.TopDown.SequenceTag
             {
                 var ptmPair = ptm.Split(' ');
                 residueIndex = int.Parse(ptmPair[1]);
-                if (residueIndex == 0) residueIndex++;
+                if (residueIndex == 0)
+                {
+                    residueIndex++;
+                }
 
                 modificationInfo.Add(residueIndex, Modification.Get(ptmPair[0]));
             }
@@ -84,9 +106,13 @@ namespace InformedProteomics.TopDown.SequenceTag
             {
                 var aa = aaSet.GetAminoAcid(residue);
                 if (modificationInfo.ContainsKey(residueIndex))
+                {
                     aaList.Add(new ModifiedAminoAcid(aa, modificationInfo[residueIndex]));
+                }
                 else
+                {
                     aaList.Add(aa);
+                }
 
                 residueIndex++;
             }

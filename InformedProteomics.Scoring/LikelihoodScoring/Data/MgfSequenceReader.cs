@@ -51,7 +51,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             const string massRegex = @"\(\d+\.\d+\(";
             char[] parens = {'(', ')'};
 
-            if (!Regex.IsMatch(sequence, "(" + aminoAcidRegex + "|" + massRegex + ")+")) return null;
+            if (!Regex.IsMatch(sequence, "(" + aminoAcidRegex + "|" + massRegex + ")+"))
+            {
+                return null;
+            }
 
             var stdAaSet = StandardAminoAcidSet;
             var aaList = new List<AminoAcid>();
@@ -62,7 +65,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             foreach (Match match in matches)
             {
                 var element = match.Value;
-                if (element.Length == 0) continue;
+                if (element.Length == 0)
+                {
+                    continue;
+                }
+
                 if (element.Length == 1 && char.IsLetter(element[0]))   // amino acid
                 {
                     if (aa != null)
@@ -72,7 +79,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
                         mods.Clear();
                     }
                     aa = stdAaSet.GetAminoAcid(element[0]);
-                    if (aa == null) throw new Exception("Unrecognized amino acid character: " + element[0]);
+                    if (aa == null)
+                    {
+                        throw new Exception("Unrecognized amino acid character: " + element[0]);
+                    }
                     //                    Console.WriteLine("{0} {1} {2}", aa.Residue, aa.Composition, aa.GetMass());
                 }
                 else

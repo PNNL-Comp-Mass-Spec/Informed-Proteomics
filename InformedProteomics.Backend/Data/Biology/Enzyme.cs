@@ -6,7 +6,7 @@ namespace InformedProteomics.Backend.Data.Biology
     /// <summary>
     /// Enzyme, specifically digestion enzymes
     /// </summary>
-    public class Enzyme
+    public sealed class Enzyme
     {
         private Enzyme(string name, string residues, bool isNTerm, string description, string psiCvAccession)
         {
@@ -50,7 +50,10 @@ namespace InformedProteomics.Backend.Data.Biology
         public bool IsCleavable(char residue)
         {
             if (Residues.Length == 0)
+            {
                 return true;
+            }
+
             return Residues.Any(r => r == residue);
         }
 

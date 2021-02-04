@@ -266,7 +266,7 @@ namespace InformedProteomics.Backend.Database
         /// <returns></returns>
         public int GetLongestSequenceLength()
         {
-            return SequencesWithOffsetNoCleavage().Select(seqWithOffset => seqWithOffset.Sequence.Length).Max();
+            return SequencesWithOffsetNoCleavage().Max(seqWithOffset => seqWithOffset.Sequence.Length);
         }
 
         private IEnumerable<byte> PLcps()
@@ -293,7 +293,10 @@ namespace InformedProteomics.Backend.Database
             }
             else
             {
-                foreach (var lcp in PLcp) yield return lcp;
+                foreach (var lcp in PLcp)
+                {
+                    yield return lcp;
+                }
             }
         }
 
@@ -308,8 +311,10 @@ namespace InformedProteomics.Backend.Database
                 ++offset;
                 if (residue == FastaDatabaseConstants.Delimiter)
                 {
-                    if (buf != null && buf.Count > 0)
+                    if (buf?.Count > 0)
+                    {
                         yield return new SequenceAndOffset(buf.ToArray(), curOffset);
+                    }
 
                     buf = new List<byte>();
                     curOffset = offset;
@@ -385,7 +390,10 @@ namespace InformedProteomics.Backend.Database
                             sequences.Enqueue(new IntWrapper(curSequence.Count - 1));
                         }
 
-                        if (curSequence.Count < maxLength + 2) continue;
+                        if (curSequence.Count < maxLength + 2)
+                        {
+                            continue;
+                        }
                     }
 
                     if (sequences.Count > 0 && sequences.Peek().Value == 0)
@@ -473,7 +481,9 @@ namespace InformedProteomics.Backend.Database
                 {
                     isCleavable[residue] = true;
                     if (isCleavable.Length > FastaDatabaseConstants.Delimiter)
+                    {
                         isCleavable[FastaDatabaseConstants.Delimiter] = true;
+                    }
                 }
             }
 
@@ -495,7 +505,7 @@ namespace InformedProteomics.Backend.Database
                 var lcp = seqAndLcp.Lcp;
                 var offset = seqAndLcp.Offset;
                 seqBuild.Clear();
-                seqBuild.Append(seqArr[0] + ".");
+                seqBuild.Append(seqArr[0]).Append('.');
 
                 if (enzymaticResidues != null)
                 {
@@ -503,15 +513,29 @@ namespace InformedProteomics.Backend.Database
                     var nmc = 0;
                     if (!isNTermEnzyme) // C-term enzyme
                     {
-                        if (isCleavable[seqArr[0]]) ++ntt;
-                        if (ntt < numTolerableTermini - 1) continue;
+                        if (isCleavable[seqArr[0]])
+                        {
+                            ++ntt;
+                        }
+
+                        if (ntt < numTolerableTermini - 1)
+                        {
+                            continue;
+                        }
 
                         // Could be run in parallel, but probably not worth the cost.
                         for (var i = 1; i < seqArr.Length - 1; i++)
                         {
                             var code = seqArr[i];
-                            if (!isStandardAminoAcid[code]) break;
-                            if (isCleavable[code]) ++nmc;
+                            if (!isStandardAminoAcid[code])
+                            {
+                                break;
+                            }
+
+                            if (isCleavable[code])
+                            {
+                                ++nmc;
+                            }
 
                             seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
@@ -521,21 +545,42 @@ namespace InformedProteomics.Backend.Database
                                     yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                                 }
                             }
-                            if (nmc > numMissedCleavages) break;
+                            if (nmc > numMissedCleavages)
+                            {
+                                break;
+                            }
                         }
                     }
                     else // N-term enzyme
                     {
-                        if (seqArr[0] == FastaDatabaseConstants.Delimiter || isCleavable[seqArr[1]]) ++ntt;
-                        if (ntt < numTolerableTermini - 1) continue;
+                        if (seqArr[0] == FastaDatabaseConstants.Delimiter || isCleavable[seqArr[1]])
+                        {
+                            ++ntt;
+                        }
+
+                        if (ntt < numTolerableTermini - 1)
+                        {
+                            continue;
+                        }
 
                         // Could be run in parallel, but probably not worth the cost.
                         for (var i = 2; i < seqArr.Length - 1; i++)
                         {
                             var code = seqArr[i];
-                            if (!isStandardAminoAcid[code]) break;
-                            if (isCleavable[code]) ++nmc;
-                            if (nmc > numMissedCleavages) break;
+                            if (!isStandardAminoAcid[code])
+                            {
+                                break;
+                            }
+
+                            if (isCleavable[code])
+                            {
+                                ++nmc;
+                            }
+
+                            if (nmc > numMissedCleavages)
+                            {
+                                break;
+                            }
 
                             seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
@@ -554,7 +599,10 @@ namespace InformedProteomics.Backend.Database
                     for (var i = 1; i < seqArr.Length - 1; i++)
                     {
                         var code = seqArr[i];
-                        if (!isStandardAminoAcid[code]) break;
+                        if (!isStandardAminoAcid[code])
+                        {
+                            break;
+                        }
 
                         seqBuild.Append(code);
                         if (i >= minLength && i >= lcp)
@@ -591,7 +639,9 @@ namespace InformedProteomics.Backend.Database
             {
                 isCleavable[residue] = true;
                 if (isCleavable.Length > FastaDatabaseConstants.Delimiter)
+                {
                     isCleavable[FastaDatabaseConstants.Delimiter] = true;
+                }
             }
 
             var isStandardAminoAcid = new bool[256];
@@ -635,7 +685,7 @@ namespace InformedProteomics.Backend.Database
             var lcp = seqAndLcp.Lcp;
             var offset = seqAndLcp.Offset;
             var seqBuild = new StringBuilder(seqArr.Length + 3);
-            seqBuild.Append(seqArr[0] + ".");
+            seqBuild.Append(seqArr[0]).Append('.');
 
             if (enzymaticResidues != null)
             {
@@ -643,15 +693,26 @@ namespace InformedProteomics.Backend.Database
                 var nmc = 0;
                 if (!isNTermEnzyme) // C-term enzyme
                 {
-                    if (isCleavable[seqArr[0]]) ++ntt;
+                    if (isCleavable[seqArr[0]])
+                    {
+                        ++ntt;
+                    }
+
                     if (!(ntt < numTolerableTermini - 1))
                     {
                         // Could be run in parallel, but probably not worth the cost.
                         for (var i = 1; i < seqArr.Length - 1; i++)
                         {
                             var code = seqArr[i];
-                            if (!isStandardAminoAcid[code]) break;
-                            if (isCleavable[code]) ++nmc;
+                            if (!isStandardAminoAcid[code])
+                            {
+                                break;
+                            }
+
+                            if (isCleavable[code])
+                            {
+                                ++nmc;
+                            }
 
                             seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
@@ -661,22 +722,40 @@ namespace InformedProteomics.Backend.Database
                                     yield return new AnnotationAndOffset(offset, seqBuild + "." + seqArr[i + 1]);
                                 }
                             }
-                            if (nmc > numMissedCleavages) break;
+                            if (nmc > numMissedCleavages)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
                 else // N-term enzyme
                 {
-                    if (seqArr[0] == FastaDatabaseConstants.Delimiter || isCleavable[seqArr[1]]) ++ntt;
+                    if (seqArr[0] == FastaDatabaseConstants.Delimiter || isCleavable[seqArr[1]])
+                    {
+                        ++ntt;
+                    }
+
                     if (!(ntt < numTolerableTermini - 1))
                     {
                         // Could be run in parallel, but probably not worth the cost.
                         for (var i = 2; i < seqArr.Length - 1; i++)
                         {
                             var code = seqArr[i];
-                            if (!isStandardAminoAcid[code]) break;
-                            if (isCleavable[code]) ++nmc;
-                            if (nmc > numMissedCleavages) break;
+                            if (!isStandardAminoAcid[code])
+                            {
+                                break;
+                            }
+
+                            if (isCleavable[code])
+                            {
+                                ++nmc;
+                            }
+
+                            if (nmc > numMissedCleavages)
+                            {
+                                break;
+                            }
 
                             seqBuild.Append(code);
                             if (i >= minLength && i >= lcp)
@@ -696,7 +775,10 @@ namespace InformedProteomics.Backend.Database
                 for (var i = 1; i < seqArr.Length - 1; i++)
                 {
                     var code = seqArr[i];
-                    if (!isStandardAminoAcid[code]) break;
+                    if (!isStandardAminoAcid[code])
+                    {
+                        break;
+                    }
 
                     seqBuild.Append(code);
                     if (i >= minLength && i >= lcp)
@@ -721,7 +803,10 @@ namespace InformedProteomics.Backend.Database
                 curSequence.AddLast(residue);
                 lcpList.AddLast(lcpEnum.Current);
 
-                if (curSequence.Count < maxLength) continue;
+                if (curSequence.Count < maxLength)
+                {
+                    continue;
+                }
 
                 /**/
                 var seqArr = new byte[curSequence.Count];
@@ -776,7 +861,9 @@ namespace InformedProteomics.Backend.Database
         private void CreatePermutedLongestCommonPrefixFile()
         {
             if (File.Exists(_pLcpFilePath))
+            {
                 File.Delete(_pLcpFilePath);
+            }
 
             var sequence = FastaDatabase.GetSequence();
             //Console.WriteLine("Annotation: {0}", System.Text.Encoding.ASCII.GetString(sequence));
@@ -822,7 +909,10 @@ namespace InformedProteomics.Backend.Database
             while (sequence[index1 + lcp] == sequence[index2 + lcp])
             {
                 ++lcp;
-                if (lcp == byte.MaxValue) break;
+                if (lcp == byte.MaxValue)
+                {
+                    break;
+                }
             }
 
             return lcp;

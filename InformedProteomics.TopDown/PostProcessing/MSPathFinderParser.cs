@@ -12,13 +12,19 @@ namespace InformedProteomics.TopDown.PostProcessing
         {
             _idList = new List<MsPathFinderId>();
             _scanNumToPrSm = new Dictionary<int, MsPathFinderId>();
-            if (!Parse(fileName)) _scanNumToPrSm = null;
+            if (!Parse(fileName))
+            {
+                _scanNumToPrSm = null;
+            }
         }
 
         public MsPathFinderId GetId(int scanNum)
         {
-            MsPathFinderId id;
-            if (_scanNumToPrSm != null && _scanNumToPrSm.TryGetValue(scanNum, out id)) return id;
+            if (_scanNumToPrSm != null && _scanNumToPrSm.TryGetValue(scanNum, out var id))
+            {
+                return id;
+            }
+
             return null;
         }
 
@@ -39,10 +45,18 @@ namespace InformedProteomics.TopDown.PostProcessing
             var parser = new TsvFileParser(fileName);
             var scan = parser.GetData("Scan").Select(s => Convert.ToInt32(s)).ToArray();
             var pre = parser.GetData("Pre").Where(s => s.Length == 1).Select(p => p[0]).ToArray();
-            if (pre.Length != parser.NumData) return false;
+            if (pre.Length != parser.NumData)
+            {
+                return false;
+            }
+
             var sequence = parser.GetData("Sequence").ToArray();
             var post = parser.GetData("Post").Where(s => s.Length == 1).Select(p => p[0]).ToArray();
-            if (post.Length != parser.NumData) return false;
+            if (post.Length != parser.NumData)
+            {
+                return false;
+            }
+
             var mod = parser.GetData("Modifications").ToArray();
             var composition = parser.GetData("Composition").Select(Composition.Parse).ToArray();
             var proteinName = parser.GetData("ProteinName").ToArray();
@@ -66,7 +80,10 @@ namespace InformedProteomics.TopDown.PostProcessing
                 ;
                 _idList.Add(id);
 
-                if(!_scanNumToPrSm.ContainsKey(scan[i])) _scanNumToPrSm.Add(scan[i], id);
+                if(!_scanNumToPrSm.ContainsKey(scan[i]))
+                {
+                    _scanNumToPrSm.Add(scan[i], id);
+                }
             }
             return true;
         }

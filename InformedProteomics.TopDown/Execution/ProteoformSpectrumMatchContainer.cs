@@ -35,10 +35,17 @@ namespace InformedProteomics.TopDown.Execution
 
         public void AddMatch(DatabaseSequenceSpectrumMatch newMatch)
         {
-            if (newMatch.Score < _scoreCutoff) return;
+            if (newMatch.Score < _scoreCutoff)
+            {
+                return;
+            }
+
             var scanIndex = _ms2ScanToIndexMap[newMatch.ScanNum];
             var modIndex = newMatch.Modifications?.GetNumModifications() ?? 0;
-            if (modIndex >= _matchedSet.Length) return;
+            if (modIndex >= _matchedSet.Length)
+            {
+                return;
+            }
 
             // thread safe
             lock (_matchedSet[modIndex])

@@ -113,7 +113,7 @@ namespace InformedProteomics.Test
             // ReSharper restore IdentifierTypo
 
             const InternalCleavageType searchMode = InternalCleavageType.SingleInternalCleavage;   // 0: all sub-sequences, 1: close to N- or C-term, 2: close to N- and C-term
-            var tda = DatabaseSearchMode.Target;   // true: target & decoy, false: target, null: decoy
+            const DatabaseSearchMode tda = DatabaseSearchMode.Target;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 
@@ -167,7 +167,7 @@ namespace InformedProteomics.Test
 
             var aaSet = new AminoAcidSet();
             const InternalCleavageType searchMode = InternalCleavageType.NoInternalCleavage;   // 0: all sub-sequences, 1: close to N- or C-term, 2: close to N- and C-term
-            var tda = DatabaseSearchMode.Target;   // true: target & decoy, false: target, null: decoy
+            const DatabaseSearchMode tda = DatabaseSearchMode.Target;   // true: target & decoy, false: target, null: decoy
 
             const int minSequenceLength = 21; // 7
             const int maxSequenceLength = 500; // 1000
@@ -236,7 +236,7 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             const InternalCleavageType searchMode = InternalCleavageType.NoInternalCleavage;   // 0: all sub-sequences, 1: close to N- or C-term, 2: close to N- and C-term
-            var tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
+            const DatabaseSearchMode tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 
@@ -280,7 +280,7 @@ namespace InformedProteomics.Test
             };
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
             const InternalCleavageType searchMode = InternalCleavageType.SingleInternalCleavage;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
-            DatabaseSearchMode tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
+            const DatabaseSearchMode tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 
@@ -335,7 +335,7 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             const InternalCleavageType searchMode = InternalCleavageType.SingleInternalCleavage;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
-            DatabaseSearchMode tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
+            const DatabaseSearchMode tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 
@@ -376,7 +376,7 @@ namespace InformedProteomics.Test
             var aaSet = new AminoAcidSet(searchModifications, numMaxModsPerProtein);
 
             const InternalCleavageType searchMode = InternalCleavageType.NoInternalCleavage;   // 0: all subsequences, 1: close to N- or C-term, 2: close to N- and C-term
-            DatabaseSearchMode tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
+            const DatabaseSearchMode tda = DatabaseSearchMode.Both;   // true: target & decoy, false: target, null: decoy
             TestTopDownSearch(specFilePath, dbFilePath, outputDir, aaSet, tda, searchMode);
         }
 

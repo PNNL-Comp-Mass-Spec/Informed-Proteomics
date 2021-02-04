@@ -53,13 +53,22 @@ namespace InformedProteomics.Backend.MathAndStats
 
             foreach (var element in Set1)
             {
-                if (Set2.Contains(element)) Intersection.Add(element);
-                else Set1Only.Add(element);
+                if (Set2.Contains(element))
+                {
+                    Intersection.Add(element);
+                }
+                else
+                {
+                    Set1Only.Add(element);
+                }
             }
 
             foreach (var element in Set2)
             {
-                if (!Intersection.Contains(element)) Set2Only.Add(element);
+                if (!Intersection.Contains(element))
+                {
+                    Set2Only.Add(element);
+                }
             }
         }
     }

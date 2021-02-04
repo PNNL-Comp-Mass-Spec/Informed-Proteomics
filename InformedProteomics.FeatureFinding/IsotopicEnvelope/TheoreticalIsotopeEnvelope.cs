@@ -22,12 +22,19 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             var ratioSum = 0d;
             for (var i = 0; i < isoEnv.Envelope.Length; i++)
             {
-                if (isoEnv.Envelope[i] < relativeIntensityThreshold || isotopeRankings[i] > maxNumOfIsotopes) continue;
+                if (isoEnv.Envelope[i] < relativeIntensityThreshold || isotopeRankings[i] > maxNumOfIsotopes)
+                {
+                    continue;
+                }
+
                 ratioSum += isoEnv.Envelope[i];
                 Isotopes.Add(new Isotope(i, isoEnv.Envelope[i]));
             }
 
-            if (!(ratioSum > 0)) throw new Exception("Abnormal Theoretical Envelope");
+            if (!(ratioSum > 0))
+            {
+                throw new Exception("Abnormal Theoretical Envelope");
+            }
 
             _probability            = new double[Isotopes.Count];
             Ranking                 = new int[Isotopes.Count];

@@ -34,22 +34,36 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             {
                 var s = Abundance;
                 var prob = new double[Size];
-                for (var i = 0; i < Size; i++) if (Peaks[i] != null && Peaks[i].Active) prob[i] = Peaks[i].Intensity / s;
+                for (var i = 0; i < Size; i++)
+                {
+                    if (Peaks[i]?.Active == true)
+                    {
+                        prob[i] = Peaks[i].Intensity / s;
+                    }
+                }
+
                 return prob;
             }
         }
 
         public Ms1Peak[] Peaks { get; }
-        public Ms1Peak MinMzPeak { get { return Peaks.FirstOrDefault(t => t != null && t.Active); } }
-        public Ms1Peak MaxMzPeak { get { return Peaks.LastOrDefault(t => t != null && t.Active); } }
-        public int NumberOfPeaks { get { return Peaks.Count(x => x != null && x.Active); } }
-        public double Abundance { get { return Peaks.Where(p => p != null && p.Active).Sum(p => p.Intensity); } }
+        public Ms1Peak MinMzPeak { get { return Peaks.FirstOrDefault(t => t?.Active == true); } }
+        public Ms1Peak MaxMzPeak { get { return Peaks.LastOrDefault(t => t?.Active == true); } }
+        public int NumberOfPeaks { get { return Peaks.Count(x => x?.Active == true); } }
+        public double Abundance { get { return Peaks.Where(p => p?.Active == true).Sum(p => p.Intensity); } }
 
         public Ms1Peak RepresentativePeak
         {
             get
             {
-                foreach (var i in TheoreticalEnvelope.IndexOrderByRanking) if (Peaks[i] != null && Peaks[i].Active) return Peaks[i];
+                foreach (var i in TheoreticalEnvelope.IndexOrderByRanking)
+                {
+                    if (Peaks[i]?.Active == true)
+                    {
+                        return Peaks[i];
+                    }
+                }
+
                 return null;
             }
         }
@@ -59,9 +73,12 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             get
             {
                 var ret = 0d;
-                foreach (var peak in Peaks.Where(p => p != null && p.Active))
+                foreach (var peak in Peaks.Where(p => p?.Active == true))
                 {
-                    if (peak.Intensity > ret) ret = peak.Intensity;
+                    if (peak.Intensity > ret)
+                    {
+                        ret = peak.Intensity;
+                    }
                 }
 
                 return ret;

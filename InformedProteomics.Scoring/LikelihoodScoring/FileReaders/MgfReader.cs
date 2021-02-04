@@ -25,32 +25,58 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
             var peaks = new List<Peak>();
 
             var peptideSet = new HashSet<string>();
+            var lineNumber = 0;
+
             foreach (var line in file)
             {
+                lineNumber++;
                 switch (mgfState)
                 {
                     case MgfState.Label:
-                        if (line == "BEGIN IONS") mgfState = MgfState.Parameter;
-                        else throw new FormatException("Invalid MGF file.");
+                        if (line == "BEGIN IONS")
+                        {
+                            mgfState = MgfState.Parameter;
+                        }
+                        else
+                        {
+                            throw new FormatException("Invalid MGF file, expected BEGIN IONS at line " + lineNumber);
+                        }
+
                         break;
                     case MgfState.Parameter:
                         var parameter = line.Split('=');
-                        if (parameter.Length < 2) throw new FormatException("Invalid line in MGF file: " + line);
-                        if (parameter[0] == "SEQ") sequence = parameter[1];
-                        else if (parameter[0] == "SCANS") scanNum = Convert.ToInt32(parameter[1]);
+                        if (parameter.Length < 2)
+                        {
+                            throw new FormatException(string.Format("Line {0} is invalid in the MGF file: {1}", lineNumber, line));
+                        }
+
+                        if (parameter[0] == "SEQ")
+                        {
+                            sequence = parameter[1];
+                        }
+                        else if (parameter[0] == "SCANS")
+                        {
+                            scanNum = Convert.ToInt32(parameter[1]);
+                        }
                         else if (parameter[0] == "CHARGE")
                         {
                             var chargeStr = parameter[1].Substring(0, parameter[1].Length - 1);
                             charge = Convert.ToInt32(chargeStr);
                             mgfState = MgfState.Peak;
-                            if (sequence == string.Empty || scanNum == 0 || charge == 0)
-                                throw new FormatException("Incomplete spectrum entry.");
+                            if (string.IsNullOrWhiteSpace(sequence) || scanNum == 0 || charge == 0)
+                            {
+                                throw new FormatException("Incomplete spectrum entry, line: " + lineNumber);
+                            }
                         }
                         break;
                     case MgfState.Peak:
                         if (line == "END IONS")
                         {
-                            if (peaks.Count == 0) throw new FormatException("Empty peak list.");
+                            if (peaks.Count == 0)
+                            {
+                                throw new FormatException("Empty peak list, line: " + lineNumber);
+                            }
+
                             mgfState = MgfState.Label;
                             if (peptideSet.Contains(sequence))
                             {
@@ -74,7 +100,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
                         else
                         {
                             var parts = line.Split('\t');
-                            if (parts.Length < 2) throw new FormatException("Invalid line in MGF file: " + line);
+                            if (parts.Length < 2)
+                            {
+                                throw new FormatException(string.Format("Line {0} is invalid in the MGF file: {1}", lineNumber, line));
+                            }
+
                             var mz = Convert.ToDouble(parts[0]);
                             var intensity = Convert.ToDouble(parts[1]);
                             peaks.Add(new Peak(mz, intensity));

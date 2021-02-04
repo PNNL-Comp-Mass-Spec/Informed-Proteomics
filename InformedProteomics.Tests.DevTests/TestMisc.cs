@@ -33,7 +33,11 @@ namespace InformedProteomics.Tests.DevTests
             foreach (var resultFile in Directory.GetFiles(henryResultPath, "*_FDR.tsv"))
             {
                 var fileName = Path.GetFileName(resultFile);
-                if (fileName == null) continue;
+                if (fileName == null)
+                {
+                    continue;
+                }
+
                 var sample = fileName.Substring(0, 2);
                 Console.WriteLine("Processing {0}", sample);
 
@@ -69,7 +73,11 @@ namespace InformedProteomics.Tests.DevTests
             foreach (var resultFile in Directory.GetFiles(henryResultPath, "*.tsv"))
             {
                 var fileName = Path.GetFileName(resultFile);
-                if (fileName == null) continue;
+                if (fileName == null)
+                {
+                    continue;
+                }
+
                 var sample = fileName.Substring(0, 2);
                 Console.WriteLine("Processing {0}", sample);
                 var tsvReader = new TsvFileParser(resultFile);
@@ -84,8 +92,7 @@ namespace InformedProteomics.Tests.DevTests
                     var key = sample + ":" + GetPeptide(peptides[i]) + ":" + nominalMass + ":" + charge[i];
                     var pepKey = GetPeptide(peptides[i]) + ":" + nominalMass;
                     pepKeySet.Add(pepKey);
-                    Tuple<double, double> existingScores;
-                    if (resultDic.TryGetValue(key, out existingScores))
+                    if (resultDic.TryGetValue(key, out var existingScores))
                     {
                         if (prob[i] > existingScores.Item1)
                         {
@@ -130,8 +137,7 @@ namespace InformedProteomics.Tests.DevTests
                     }
                     var key = samples[i] + ":" + peptides[i] + ":" + nominalMass + ":" + charge;
                     double? prob = null, qValue = null;
-                    Tuple<double, double> scores;
-                    if (resultDic.TryGetValue(key, out scores))
+                    if (resultDic.TryGetValue(key, out var scores))
                     {
                         prob = scores.Item1;
                         qValue = scores.Item2;
@@ -139,8 +145,14 @@ namespace InformedProteomics.Tests.DevTests
                     var skylineData = skylineTable.GetRows()[i].Split(',');
                     for (var j = 0; j < skylineData.Length - 2; j++)
                     {
-                        if(j != 2) writer.Write(skylineData[j]+"\t");
-                        else writer.Write("" + skylineData[j][0] + skylineData[j][2]+"\t");
+                        if(j != 2)
+                        {
+                            writer.Write(skylineData[j]+"\t");
+                        }
+                        else
+                        {
+                            writer.Write("" + skylineData[j][0] + skylineData[j][2]+"\t");
+                        }
                     }
                     writer.WriteLine("{0}\t{1}",
                         prob != null ? prob.ToString() : "NA",
@@ -162,9 +174,18 @@ namespace InformedProteomics.Tests.DevTests
                     curNominalMass = aaSet.GetAminoAcid(c).GetNominalMass();
                     nominalMass += curNominalMass;
                 }
-                else if (c == '[') buf = new StringBuilder();
-                else if (char.IsNumber(c) && buf != null) buf.Append(c);
-                else if (c == ']' && buf != null) nominalMass += Convert.ToInt32(buf.ToString()) - curNominalMass;
+                else if (c == '[')
+                {
+                    buf = new StringBuilder();
+                }
+                else if (char.IsNumber(c) && buf != null)
+                {
+                    buf.Append(c);
+                }
+                else if (c == ']' && buf != null)
+                {
+                    nominalMass += Convert.ToInt32(buf.ToString()) - curNominalMass;
+                }
             }
             return nominalMass;
         }
@@ -172,7 +193,14 @@ namespace InformedProteomics.Tests.DevTests
         private string GetPeptide(string henryPeptide)
         {
             var buf = new StringBuilder();
-            foreach(var c in henryPeptide) if (char.IsUpper(c)) buf.Append(c);
+            foreach(var c in henryPeptide)
+            {
+                if (char.IsUpper(c))
+                {
+                    buf.Append(c);
+                }
+            }
+
             return buf.ToString();
         }
 
@@ -193,7 +221,7 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine(Path.GetDirectoryName(rawFilePath));
             Console.WriteLine(Path.Combine(Path.GetDirectoryName(rawFilePath), Path.GetFileNameWithoutExtension(rawFilePath) + "_IcTarget.tsv"));
 
-            var outputDir = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\L1_1_Mode2\Synocho_L1_1_IcTarget.tsv";
+            const string outputDir = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\L1_1_Mode2\Synocho_L1_1_IcTarget.tsv";
 
             if (!Directory.Exists(outputDir))
             {

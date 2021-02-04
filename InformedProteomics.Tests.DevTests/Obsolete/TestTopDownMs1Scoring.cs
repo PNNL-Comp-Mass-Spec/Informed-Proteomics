@@ -100,11 +100,18 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
 
                 //Console.WriteLine(seqGraph.GetSequenceCompositions()[0]);
 
-                if (seqGraph == null) continue;
+                if (seqGraph == null)
+                {
+                    continue;
+                }
 
                 for (var nTermCleavages = 0; nTermCleavages <= numNTermCleavages; nTermCleavages++)
                 {
-                    if(nTermCleavages > 0) seqGraph.CleaveNTerm();
+                    if(nTermCleavages > 0)
+                    {
+                        seqGraph.CleaveNTerm();
+                    }
+
                     var protCompositions = seqGraph.GetSequenceCompositions();
                     foreach (var protComposition in protCompositions)
                     {

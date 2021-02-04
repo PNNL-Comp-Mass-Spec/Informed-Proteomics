@@ -60,7 +60,10 @@ namespace InformedProteomics.TopDown.SequenceTag
         {
             for (var i = 0; i < _hasInEdge.Length; i++)
             {
-                if (_hasInEdge[i] == false) yield return i;
+                if (_hasInEdge[i] == false)
+                {
+                    yield return i;
+                }
             }
         }
 
@@ -115,22 +118,37 @@ namespace InformedProteomics.TopDown.SequenceTag
             var visited = new bool[GetNodeCount()];
             for (var i = 0; i < GetNodeCount(); i++)
             {
-                if (visited[i]) continue;
+                if (visited[i])
+                {
+                    continue;
+                }
 
                 var component = new List<int>();
                 var neighbors = new Queue<int>();
                 neighbors.Enqueue(i);
                 while (true)
                 {
-                    if (neighbors.Count < 1) break;
+                    if (neighbors.Count < 1)
+                    {
+                        break;
+                    }
+
                     var j = neighbors.Dequeue();
-                    if (visited[j]) continue;
+                    if (visited[j])
+                    {
+                        continue;
+                    }
+
                     visited[j] = true;
 
                     component.Add(j);
                     foreach (var edge in _adjList[j])
                     {
-                        if (visited[edge.Node2]) continue;
+                        if (visited[edge.Node2])
+                        {
+                            continue;
+                        }
+
                         neighbors.Enqueue(edge.Node2);
                     }
                 }
@@ -185,7 +203,11 @@ namespace InformedProteomics.TopDown.SequenceTag
                 }
             }
 
-            if (e != null) EdgeList.Push(e);
+            if (e != null)
+            {
+                EdgeList.Push(e);
+            }
+
             NodeVisitFlag[node] = true;
 
             var flag = false;
@@ -202,11 +224,17 @@ namespace InformedProteomics.TopDown.SequenceTag
             if(!flag)
             {
                 var t = ProcessPath(EdgeList.Reverse());
-                if (t == false) return;
+                if (t == false)
+                {
+                    return;
+                }
             }
             NodeVisitFlag[node] = false;
 
-            if (EdgeList.Count > 0) EdgeList.Pop();
+            if (EdgeList.Count > 0)
+            {
+                EdgeList.Pop();
+            }
         }
     }
 }

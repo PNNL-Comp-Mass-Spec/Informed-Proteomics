@@ -42,7 +42,10 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         /// <returns>deconvoluted spectrum</returns>
         public DeconvolutedSpectrum GetDeconvolutedSpectrum()
         {
-            if (_deconvolutedSpectrum != null) return _deconvolutedSpectrum;
+            if (_deconvolutedSpectrum != null)
+            {
+                return _deconvolutedSpectrum;
+            }
 
             var minBinIndex = _massBinning.GetBinNumber(_minMass);
             var maxBinIndex = _massBinning.GetBinNumber(_maxMass);
@@ -53,8 +56,15 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 for (var charge = _minCharge; charge <= _maxCharge; charge++)
                 {
                     var mass = (peak.Mz - Constants.Proton) * charge;
-                    if (mass < _minMass) continue;
-                    if (mass > _maxMass) break;
+                    if (mass < _minMass)
+                    {
+                        continue;
+                    }
+
+                    if (mass > _maxMass)
+                    {
+                        break;
+                    }
 
                     var massBinNum = _massBinning.GetBinNumber(mass);
                     massIntensity[massBinNum - minBinIndex] += peak.Intensity;
@@ -64,7 +74,11 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             for (var i = 0; i < massIntensity.Length; i++)
             {
                 var intensity = massIntensity[i];
-                if (intensity < float.Epsilon) continue;
+                if (intensity < float.Epsilon)
+                {
+                    continue;
+                }
+
                 var mass = _massBinning.GetMzAverage(i + minBinIndex);
                 deconvPeaks.Add(new DeconvolutedPeak(mass, intensity, 1, 0, 0));
             }
@@ -85,7 +99,10 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             {
                 var collectedPeaks = CollectMultiplyChargedPeaks(deconvPeak.Mass, _spectrum);
 
-                if (collectedPeaks.Count < 5) continue;
+                if (collectedPeaks.Count < 5)
+                {
+                    continue;
+                }
 
                 var mass = GetAveragingMass(collectedPeaks);
                 var charges = collectedPeaks.Select(p => p.Charge).ToArray();
@@ -146,7 +163,11 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             {
                 var mz = mass / charge + Constants.Proton;
                 var peak = spectrum.FindPeak(mz, _tolerance);
-                if (peak == null) continue;
+                if (peak == null)
+                {
+                    continue;
+                }
+
                 deconvPeaks.Add(new DeconvolutedPeak(peak, charge));
             }
 
@@ -161,7 +182,11 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             if (maxCharge == minCharge)
             {
-                for (var i = 0; i < peakSet.Count; i++) weights[i] = 1;
+                for (var i = 0; i < peakSet.Count; i++)
+                {
+                    weights[i] = 1;
+                }
+
                 return weights;
             }
 
@@ -170,7 +195,11 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 var iPeak = peakSet[i];
                 foreach (var jPeak in peakSet)
                 {
-                    if (iPeak.Charge == jPeak.Charge) continue;
+                    if (iPeak.Charge == jPeak.Charge)
+                    {
+                        continue;
+                    }
+
                     var denominator = (double)iPeak.Charge / jPeak.Charge;
                     var numerator = Math.Abs(denominator - jPeak.MzWithoutAdductIonMass / iPeak.MzWithoutAdductIonMass);
                     weights[i] += Math.Pow(numerator / denominator, WeightingIndex);

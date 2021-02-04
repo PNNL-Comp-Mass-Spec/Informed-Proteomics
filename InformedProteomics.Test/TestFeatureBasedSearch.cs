@@ -19,7 +19,7 @@ using NUnit.Framework;
 namespace InformedProteomics.Test
 {
     [TestFixture]
-    class TestFeatureBasedSearch
+    internal class TestFeatureBasedSearch
     {
         // Ignore Spelling: const, Lewy
 
@@ -106,7 +106,11 @@ namespace InformedProteomics.Test
 
             foreach (var entry in proteinsToTags.OrderByDescending(e => e.Value.Count))
             {
-                if (entry.Value.Count < minNumTagMatches) break;
+                if (entry.Value.Count < minNumTagMatches)
+                {
+                    break;
+                }
+
                 var proteinName = entry.Key;
                 var proteinSequence = fastaDb.GetProteinSequence(proteinName);
                 var protein = new Sequence(proteinSequence, aminoAcidSet);
@@ -132,7 +136,11 @@ namespace InformedProteomics.Test
                 Console.WriteLine("********** After merging");
                 foreach (var matchedTag in matchedTagSet.Tags)
                 {
-                    if (matchedTag.Length < minMergedTagLength) continue;
+                    if (matchedTag.Length < minMergedTagLength)
+                    {
+                        continue;
+                    }
+
                     var seq = proteinSequence.Substring(matchedTag.StartIndex,
                         matchedTag.EndIndex - matchedTag.StartIndex);
                     var nTermMass = protein.GetMass(0, matchedTag.StartIndex);
@@ -206,7 +214,11 @@ namespace InformedProteomics.Test
 
             foreach (var entry in proteinsToTags.OrderByDescending(e => e.Value.Count))
             {
-                if (entry.Value.Count < minNumTagMatches) break;
+                if (entry.Value.Count < minNumTagMatches)
+                {
+                    break;
+                }
+
                 var proteinName = entry.Key;
                 var proteinSequence = fastaDb.GetProteinSequence(proteinName);
                 var protein = new Sequence(proteinSequence, aminoAcidSet);
@@ -261,7 +273,7 @@ namespace InformedProteomics.Test
             {
                 var matchedProteins = searchableDb.FindAllMatchedSequenceIndices(tag.Sequence)
                     .Select(index => fastaDb.GetProteinName(index)).ToArray();
-                if (matchedProteins.Any())
+                if (matchedProteins.Length > 0)
                 {
                     Console.WriteLine("{0}\t{1}\t{2}\t{3}", tag.Sequence, tag.IsPrefix, tag.FlankingMass, string.Join("\t", matchedProteins));
                 }
@@ -297,7 +309,7 @@ namespace InformedProteomics.Test
             var run = PbfLcMsRun.GetLcMsRun(rawFileName);
 
             var idList = resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
-            var idMassList = idList.Select(id => id.Mass).ToList();
+            var idMassList = idList.ConvertAll(id => id.Mass);
             var idFlag = new bool[idList.Count];
 
             // Parse sequence tags
@@ -347,7 +359,10 @@ namespace InformedProteomics.Test
                 var minMass = mass - tolDa;
                 var maxMass = mass + tolDa;
                 var index = idMassList.BinarySearch(mass);
-                if (index < 0) index = ~index;
+                if (index < 0)
+                {
+                    index = ~index;
+                }
 
                 var matchedId = new List<MsPathFinderId>();
                 // go down
@@ -355,7 +370,11 @@ namespace InformedProteomics.Test
                 while (curIndex >= 0)
                 {
                     var curId = idList[curIndex];
-                    if (curId.Mass < minMass) break;
+                    if (curId.Mass < minMass)
+                    {
+                        break;
+                    }
+
                     if (curId.Scan > minScan[i] && curId.Scan < maxScan[i]
                         && curId.Charge >= minCharge[i] && curId.Charge <= maxCharge[i])
                     {
@@ -370,7 +389,11 @@ namespace InformedProteomics.Test
                 while (curIndex < idList.Count)
                 {
                     var curId = idList[curIndex];
-                    if (curId.Mass > maxMass) break;
+                    if (curId.Mass > maxMass)
+                    {
+                        break;
+                    }
+
                     if (curId.Scan >= minScan[i] && curId.Scan <= maxScan[i]
                         && curId.Charge >= minCharge[i] && curId.Charge <= maxCharge[i])
                     {
@@ -381,7 +404,7 @@ namespace InformedProteomics.Test
                 }
 
                 var hasId = false;
-                if (matchedId.Any())
+                if (matchedId.Count > 0)
                 {
                     ++numFeaturesWithId;
                     hasId = true;
@@ -394,10 +417,18 @@ namespace InformedProteomics.Test
                 for (var scanNum = minScan[i]; scanNum <= maxScan[i]; scanNum++)
                 {
                     var isolationWindow = run.GetIsolationWindow(scanNum);
-                    if (isolationWindow == null) continue;
+                    if (isolationWindow == null)
+                    {
+                        continue;
+                    }
+
                     var isolationWindowTargetMz = isolationWindow.IsolationWindowTargetMz;
                     var charge = (int)Math.Round(mass / isolationWindowTargetMz);
-                    if (charge < minCharge[i] || charge > maxCharge[i]) continue;
+                    if (charge < minCharge[i] || charge > maxCharge[i])
+                    {
+                        continue;
+                    }
+
                     var mz = Ion.GetIsotopeMz(mass, charge,
                         Averagine.GetIsotopomerEnvelope(mass).MostAbundantIsotopeIndex);
                     if (isolationWindow.Contains(mz))
@@ -407,33 +438,52 @@ namespace InformedProteomics.Test
                         hasMs2 = true;
                     }
                 }
-                if (hasMs2) ++numFeaturesWithMs2;
-                if (tags.Any()) ++numFeaturesWithTags;
+                if (hasMs2)
+                {
+                    ++numFeaturesWithMs2;
+                }
+
+                if (tags.Count > 0)
+                {
+                    ++numFeaturesWithTags;
+                }
+
                 var protHist = new Dictionary<string, int>();
                 var hasMatchedTag = false;
                 foreach (var tag in tags)
                 {
                     var matchedProteins = searchableDb.FindAllMatchedSequenceIndices(tag.Sequence).Select(idx => fastaDb.GetProteinName(idx)).ToArray();
-                    if (matchedProteins.Any())
+                    if (matchedProteins.Length > 0)
                     {
                         hasMatchedTag = true;
                         foreach (var protein in matchedProteins)
                         {
-                            int num;
-                            if (protHist.TryGetValue(protein, out num)) protHist[protein] = num + 1;
-                            else protHist[protein] = 1;
+                            if (protHist.TryGetValue(protein, out var num))
+                            {
+                                protHist[protein] = num + 1;
+                            }
+                            else
+                            {
+                                protHist[protein] = 1;
+                            }
                         }
                     }
                 }
                 if (hasMatchedTag)
                 {
                     ++numFeaturesWithMatchingTags;
-                    if (!hasId) ++numFeaturesWithNoIdAndMatchingTags;
+                    if (!hasId)
+                    {
+                        ++numFeaturesWithNoIdAndMatchingTags;
+                    }
                 }
-                if (protHist.Any())
+                if (protHist.Count > 0)
                 {
                     var maxOcc = protHist.Values.Max();
-                    if (maxOcc >= numProtMatches) ++numFeaturesWithTwoOrMoreMatchingTags;
+                    if (maxOcc >= numProtMatches)
+                    {
+                        ++numFeaturesWithTwoOrMoreMatchingTags;
+                    }
                 }
             }
 
@@ -499,7 +549,10 @@ namespace InformedProteomics.Test
             const double qValueThreshold = 0.01;
             var idList = resultParser.GetIdWithQValuesNoLargerThan(qValueThreshold);
             var idFlag = new bool[run.MaxLcScan + 1];
-            foreach (var id in idList) idFlag[id.Scan] = true;
+            foreach (var id in idList)
+            {
+                idFlag[id.Scan] = true;
+            }
 
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
             if (!File.Exists(fastaFilePath))
@@ -528,7 +581,11 @@ namespace InformedProteomics.Test
                         {
                             //Console.WriteLine(tag.Sequence);
                             ++numSpectraWithMatchingTag;
-                            if (!idFlag[ms2ScanNum]) ++numSpectraWithMatchedTagNoId;
+                            if (!idFlag[ms2ScanNum])
+                            {
+                                ++numSpectraWithMatchedTagNoId;
+                            }
+
                             break;
                         }
                     }

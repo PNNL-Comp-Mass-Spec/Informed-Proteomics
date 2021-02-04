@@ -32,7 +32,10 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         var ion = new Ion(fragmentComposition, charge);
                         var observedPeaks = spectrum.GetAllIsotopePeaks(ion, tolerance, RelativeIsotopeIntensityThreshold);
 
-                        if (observedPeaks == null) continue;
+                        if (observedPeaks == null)
+                        {
+                            continue;
+                        }
 
                         var mostAbundantIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
 

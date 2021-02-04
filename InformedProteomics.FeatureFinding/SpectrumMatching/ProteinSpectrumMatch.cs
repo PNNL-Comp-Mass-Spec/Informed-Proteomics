@@ -45,7 +45,10 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             {
                 foreach (var prsm2 in other)
                 {
-                    if (prsm1.ProteinId.Equals(prsm2.ProteinId)) return true;
+                    if (prsm1.ProteinId.Equals(prsm2.ProteinId))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -98,7 +101,9 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
         public bool Equals(ProteinSpectrumMatch other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             if (SearchToolType == other.SearchToolType)
             {
@@ -107,7 +112,10 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
             var massDiff = Math.Abs(Mass - other.Mass);
             var tol = new Tolerance(10);
-            if (massDiff < tol.GetToleranceAsMz(Mass) && FirstResidue == other.FirstResidue && LastResidue == other.LastResidue) return true;
+            if (massDiff < tol.GetToleranceAsMz(Mass) && FirstResidue == other.FirstResidue && LastResidue == other.LastResidue)
+            {
+                return true;
+            }
 
             return false;
         }

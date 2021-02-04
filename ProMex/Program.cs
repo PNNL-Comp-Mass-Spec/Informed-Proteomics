@@ -7,7 +7,7 @@ using PRISM;
 
 namespace ProMex
 {
-    class Program
+    internal static class Program
     {
         public const string Name = "ProMex";
         public static string Version
@@ -23,7 +23,7 @@ namespace ProMex
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
         private const uint EnableExtendedFlags = 0x0080;
 
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             LcMsFeatureFinderInputParameters parameters;
 

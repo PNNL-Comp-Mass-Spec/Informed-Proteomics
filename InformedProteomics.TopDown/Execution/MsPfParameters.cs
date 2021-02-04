@@ -214,9 +214,14 @@ namespace InformedProteomics.TopDown.Execution
             get
             {
                 if (TargetDecoySearchMode == DatabaseSearchMode.Both)
+                {
                     return true;
+                }
+
                 if (TargetDecoySearchMode == DatabaseSearchMode.Decoy)
+                {
                     return null;
+                }
                 //(Tda2 == DatabaseSearchMode.Target)
                 return false;
             }
@@ -308,9 +313,15 @@ namespace InformedProteomics.TopDown.Execution
             get
             {
                 if (InternalCleavageMode == InternalCleavageType.MultipleInternalCleavages)
+                {
                     return 0;
+                }
+
                 if (InternalCleavageMode == InternalCleavageType.SingleInternalCleavage)
+                {
                     return 1;
+                }
+
                 return 2;
             }
             set

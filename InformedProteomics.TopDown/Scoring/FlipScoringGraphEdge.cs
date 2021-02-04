@@ -23,7 +23,7 @@ namespace InformedProteomics.TopDown.Scoring
         /// <param name="prevNodeIndex">The source node index.</param>
         /// <param name="sinkNodeIndex">The sink node index.</param>
         /// <param name="weight">The edge weight.</param>
-        /// <param name="label">The amino acid that that the edge corresponds to.</param>
+        /// <param name="label">The amino acid that the edge corresponds to.</param>
         /// <param name="scorer">The FLIP scoring model.</param>
         public FlipScoringGraphEdge(
                     int prevNodeIndex,

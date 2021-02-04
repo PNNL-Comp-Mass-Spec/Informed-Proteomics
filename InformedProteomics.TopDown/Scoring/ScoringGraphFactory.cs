@@ -49,25 +49,20 @@ namespace InformedProteomics.TopDown.Scoring
         /// <returns>The initialized scoring graph.</returns>
         public IScoringGraph GetScoringGraph(IScorer scorer, double parentMass)
         {
-            IScoringGraph scoringGraph;
-            if (scorer is CompositeScorerBasedOnDeconvolutedSpectrum)
+            if (scorer is CompositeScorerBasedOnDeconvolutedSpectrum compositeScorer)
             {
-                var compositeScorer = (CompositeScorerBasedOnDeconvolutedSpectrum) scorer;
                 var scoringGraphFactory = new ProteinScoringGraphFactory(this.massBins, this.aminoAcidSet);
-                scoringGraph = scoringGraphFactory.CreateScoringGraph(compositeScorer, parentMass);
+                return scoringGraphFactory.CreateScoringGraph(compositeScorer, parentMass);
             }
-            else if (scorer is FlipScorer<DeconvolutedSpectrum>)
+            else if (scorer is FlipScorer<DeconvolutedSpectrum> flipScorer)
             {
-                var flipScorer = (FlipScorer<DeconvolutedSpectrum>) scorer;
                 var scoringGraphFactory = new FlipScoringGraphFactory(this.massBins, this.aminoAcidSet, this.aminoAcidProbabilities);
-                scoringGraph = scoringGraphFactory.GetScoringGraph(flipScorer, parentMass);
+                return scoringGraphFactory.GetScoringGraph(flipScorer, parentMass);
             }
             else
             {
                 throw new ArgumentException("No scoring graph exists for that scorer.");
             }
-
-            return scoringGraph;
         }
     }
 }

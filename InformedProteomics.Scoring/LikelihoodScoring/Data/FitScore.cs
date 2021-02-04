@@ -18,8 +18,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
     {
         public int Compare(FitScore x, FitScore y)
         {
-            if (x == null) return y == null ? 0 : -1;
-            if (y == null) return 1;
+            if (x == null)
+            {
+                return y == null ? 0 : -1;
+            }
+
+            if (y == null)
+            {
+                return 1;
+            }
 
             return x.Intensity.CompareTo(y.Intensity);
         }
@@ -29,8 +36,15 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
     {
         public int Compare(FitScore x, FitScore y)
         {
-            if (x == null) return y == null ? 0 : -1;
-            if (y == null) return 1;
+            if (x == null)
+            {
+                return y == null ? 0 : -1;
+            }
+
+            if (y == null)
+            {
+                return 1;
+            }
 
             return x.Score.CompareTo(y.Score);
         }

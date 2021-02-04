@@ -94,7 +94,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="maxNumModsPerSequence"></param>
         public AminoAcidSet(IEnumerable<SearchModification> searchModifications, int maxNumModsPerSequence) : this()
         {
-            if (searchModifications == null) return;
+            if (searchModifications == null)
+            {
+                return;
+            }
 
             var modifications = searchModifications as SearchModification[] ?? searchModifications.ToArray();
             SearchModifications = new List<SearchModification>(modifications);
@@ -102,7 +105,10 @@ namespace InformedProteomics.Backend.Data.Sequence
             // apply fixed modifications
             foreach (var searchModification in modifications)
             {
-                if (!searchModification.IsFixedModification) continue;
+                if (!searchModification.IsFixedModification)
+                {
+                    continue;
+                }
 
                 var location = searchModification.Location;
                 var targetResidue = searchModification.TargetResidue;
@@ -115,7 +121,10 @@ namespace InformedProteomics.Backend.Data.Sequence
                 }
             }
 
-            if (maxNumModsPerSequence <= 0) return;
+            if (maxNumModsPerSequence <= 0)
+            {
+                return;
+            }
 
             // apply dynamic modifications
             var dynamicModifications = new HashSet<Modification>();
@@ -127,7 +136,10 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             foreach (var searchModification in modifications)
             {
-                if (searchModification.IsFixedModification) continue;
+                if (searchModification.IsFixedModification)
+                {
+                    continue;
+                }
 
                 dynamicModifications.Add(searchModification.Modification);
                 var location = searchModification.Location;
@@ -318,7 +330,11 @@ namespace InformedProteomics.Backend.Data.Sequence
                     foreach (var modIndex in GetModificationIndices(residue, location))
                     {
                         var modifiedAa = new ModifiedAminoAcid(aa, _modificationParams.GetModification(modIndex));
-                        if (tempModTable[i].Contains(modifiedAa.Composition)) continue;
+                        if (tempModTable[i].Contains(modifiedAa.Composition))
+                        {
+                            continue;
+                        }
+
                         tempModTable[i].Add(modifiedAa.Composition);
                         uniqueCompositionList.Add(modifiedAa.Composition);
                     }

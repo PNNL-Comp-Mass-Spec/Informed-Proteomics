@@ -208,7 +208,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         var monoIsotopeMass = Ion.GetMonoIsotopicMass(peak.Mz, charge, isotopeIndex);
 
                         var observedPeaks = GetAllIsotopePeaks(spectrum, monoIsotopeMass, charge, isotopomerEnvelope, tolerance, 0.1);
-                        if (observedPeaks == null) continue;
+                        if (observedPeaks == null)
+                        {
+                            continue;
+                        }
 
                         var envelop = isotopomerEnvelope.Envelope;
                         var observedIntensities = new double[observedPeaks.Length];
@@ -244,7 +247,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                         bcDist = Math.Max(bcDist, double.Epsilon);
 
-                        if (corr < corrScoreThreshold && bcDist > 0.1) continue;
+                        if (corr < corrScoreThreshold && bcDist > 0.1)
+                        {
+                            continue;
+                        }
 
                         var score = (foundPeakRatio * corr) / (bcDist * (Math.Abs(mostAbundantIsotopeIndex - isotopeIndex) + 1) * interferenceScore);
 
@@ -343,7 +349,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var isotopomerEnvelope = envelope.Envelope;
             var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoisotopicMass, charge, mostAbundantIsotopeIndex);
             var mostAbundantIsotopePeakIndex = spec.FindPeakIndex(mostAbundantIsotopeMz, tolerance);
-            if (mostAbundantIsotopePeakIndex < 0) return null;
+            if (mostAbundantIsotopePeakIndex < 0)
+            {
+                return null;
+            }
 
             var observedPeaks = new Tuple<Peak, int>[isotopomerEnvelope.Length];
             observedPeaks[mostAbundantIsotopeIndex] = new Tuple<Peak, int>(spec.Peaks[mostAbundantIsotopePeakIndex], mostAbundantIsotopePeakIndex);
@@ -352,7 +361,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var peakIndex = mostAbundantIsotopePeakIndex - 1;
             for (var isotopeIndex = mostAbundantIsotopeIndex - 1; isotopeIndex >= 0; isotopeIndex--)
             {
-                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold)
+                {
+                    break;
+                }
+
                 var isotopeMz = Ion.GetIsotopeMz(monoisotopicMass, charge, isotopeIndex);
                 var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
@@ -381,7 +394,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             peakIndex = mostAbundantIsotopePeakIndex + 1;
             for (var isotopeIndex = mostAbundantIsotopeIndex + 1; isotopeIndex < isotopomerEnvelope.Length; isotopeIndex++)
             {
-                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold) break;
+                if (isotopomerEnvelope[isotopeIndex] < relativeIntensityThreshold)
+                {
+                    break;
+                }
+
                 var isotopeMz = Ion.GetIsotopeMz(monoisotopicMass, charge, isotopeIndex);
                 var tolTh = tolerance.GetToleranceAsMz(isotopeMz);
                 var minMz = isotopeMz - tolTh;
@@ -442,7 +459,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                     while (prevIndex >= 0)
                     {
                         var prevPeak = peaks[prevIndex];
-                        if ((peak.Mz - prevPeak.Mz) > filteringWindowSize) break;
+                        if ((peak.Mz - prevPeak.Mz) > filteringWindowSize)
+                        {
+                            break;
+                        }
+
                         if (prevPeak.Intensity > peak.Intensity)
                         {
                             isBest = false;
@@ -451,13 +472,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         prevIndex--;
                     }
 
-                    if (!isBest) continue;
+                    if (!isBest)
+                    {
+                        continue;
+                    }
 
                     var nextIndex = peakIndex + 1;
                     while (nextIndex < peaks.Length)
                     {
                         var nextPeak = peaks[nextIndex];
-                        if ((nextPeak.Mz - peak.Mz) > filteringWindowSize) break;
+                        if ((nextPeak.Mz - peak.Mz) > filteringWindowSize)
+                        {
+                            break;
+                        }
+
                         if (nextPeak.Intensity > peak.Intensity)
                         {
                             isBest = false;
@@ -466,7 +494,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         nextIndex++;
                     }
 
-                    if (!isBest) continue;
+                    if (!isBest)
+                    {
+                        continue;
+                    }
 
                     // peak has the maximum intensity, window = [previousIndex+1, nextIndex-1]
 
@@ -490,7 +521,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                             {
                                 var monoIsotopeMass = Ion.GetMonoIsotopicMass(peakMz, charge, isotopeIndex);
                                 var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope, tolerance, 0.1);
-                                if (observedPeaks == null) continue;
+                                if (observedPeaks == null)
+                                {
+                                    continue;
+                                }
 
                                 var envelop = isotopomerEnvelope.Envelope;
                                 var observedIntensities = new double[observedPeaks.Length];
@@ -506,7 +540,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 var corr = sim.Item2;
                                 var score = corr / (bcDist * ((double)Math.Abs(isotopeIndex - mostAbundantIsotopeIndex) / envelop.Length));
 
-                                if (corr < corrScoreThreshold && bcDist > 0.03) continue;
+                                if (corr < corrScoreThreshold && bcDist > 0.03)
+                                {
+                                    continue;
+                                }
 
                                 // monoIsotopeMass is valid
                                 if (score >= bestScore)
@@ -534,7 +571,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 var monoIsotopeMass = Ion.GetMonoIsotopicMass(peakMz, charge, isotopeIndex);
                                 var isotopomerEnvelope = Averagine.GetIsotopomerEnvelope(monoIsotopeMass);
                                 var observedPeaks = windowSpectrum.GetAllIsotopePeaks(monoIsotopeMass, charge, isotopomerEnvelope, tolerance, 0.1);
-                                if (observedPeaks == null) continue;
+                                if (observedPeaks == null)
+                                {
+                                    continue;
+                                }
 
                                 var envelop = isotopomerEnvelope.Envelope;
                                 var observedIntensities = new double[observedPeaks.Length];
@@ -549,7 +589,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 var bcDist = sim.Item1;
                                 var corr = sim.Item2;
 
-                                if (corr < corrScoreThreshold && bcDist > 0.03) continue;
+                                if (corr < corrScoreThreshold && bcDist > 0.03)
+                                {
+                                    continue;
+                                }
 
                                 var deconvPeak = new DeconvolutedPeak(monoIsotopeMass, observedIntensities[mostAbundantIsotopeIndex], charge, corr, bcDist, observedPeaks);
                                 monoIsotopePeakList.Add(deconvPeak);
@@ -589,8 +632,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 while (prevIndex >= 0)
                 {
                     var prevPeak = peaks[prevIndex];
-                    if (thisMass - prevPeak.Mass > windowSize) break;
-                    if (prevPeak.Intensity > thisIntensity) rank++;
+                    if (thisMass - prevPeak.Mass > windowSize)
+                    {
+                        break;
+                    }
+
+                    if (prevPeak.Intensity > thisIntensity)
+                    {
+                        rank++;
+                    }
+
                     prevIndex--;
                 }
 
@@ -599,11 +650,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 while (nextIndex < peaks.Count)
                 {
                     var nextPeak = peaks[nextIndex];
-                    if (nextPeak.Mass - thisMass > windowSize) break;
-                    if (nextPeak.Intensity > thisIntensity) rank++;
+                    if (nextPeak.Mass - thisMass > windowSize)
+                    {
+                        break;
+                    }
+
+                    if (nextPeak.Intensity > thisIntensity)
+                    {
+                        rank++;
+                    }
+
                     nextIndex++;
                 }
-                if (rank <= topRankCutoff) retSpec.Add(thisPeak);
+                if (rank <= topRankCutoff)
+                {
+                    retSpec.Add(thisPeak);
+                }
             }
 
             return retSpec;

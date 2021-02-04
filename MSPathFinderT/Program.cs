@@ -136,9 +136,13 @@ namespace MSPathFinderT
                         // (though we will continue processing the next file if there is one)
                         errorCode = -Math.Abs(errorMsg.GetHashCode());
                         if (errorCode == 0)
+                        {
                             return -1;
+                        }
                         else
+                        {
                             return errorCode;
+                        }
                     }
                 }
             }
@@ -153,9 +157,13 @@ namespace MSPathFinderT
                 System.Threading.Thread.Sleep(1500);
 
                 if (errorCode == 0)
+                {
                     return -1;
+                }
                 else
+                {
                     return errorCode;
+                }
             }
 // #endif
 

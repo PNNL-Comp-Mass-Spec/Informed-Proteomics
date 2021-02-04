@@ -10,7 +10,7 @@ using InformedProteomics.FeatureFinding.Util;
 
 namespace InformedProteomics.FeatureFinding.Training
 {
-    public class LcMsFeatureTrain
+    public static class LcMsFeatureTrain
     {
         internal class PrsmComparer : INodeComparer<ProteinSpectrumMatch>
         {
@@ -28,16 +28,25 @@ namespace InformedProteomics.FeatureFinding.Training
                 var tol = new Tolerance(10);
                 //if (!prsm1.ProteinName.Equals(prsm2.ProteinName)) return false;
                 var massDiff = Math.Abs(prsm1.Mass - prsm2.Mass);
-                if (massDiff > tol.GetToleranceAsMz(prsm1.Mass)) return false;
+                if (massDiff > tol.GetToleranceAsMz(prsm1.Mass))
+                {
+                    return false;
+                }
 
                 var elutionDiff = Math.Abs(_run.GetElutionTime(prsm1.ScanNum) - _run.GetElutionTime(prsm2.ScanNum));
                 if (prsm1.SequenceText.Equals(prsm2.SequenceText))
                 {
-                    if (elutionDiff > _elutionLength * 0.02) return false;
+                    if (elutionDiff > _elutionLength * 0.02)
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
-                    if (elutionDiff > _elutionLength * 0.005) return false;
+                    if (elutionDiff > _elutionLength * 0.005)
+                    {
+                        return false;
+                    }
                 }
 
                 return true;
@@ -60,16 +69,25 @@ namespace InformedProteomics.FeatureFinding.Training
 
             foreach (var prsmSet in groupedPrsmList)
             {
-                if (prsmSet.Count < 2) continue;
+                if (prsmSet.Count < 2)
+                {
+                    continue;
+                }
 
                 var isGood = false;
                 var sequence = prsmSet[0].GetSequence();
-                if (sequence == null) continue;
+                if (sequence == null)
+                {
+                    continue;
+                }
 
                 foreach (var scan in prsmSet.Select(prsm => prsm.ScanNum))
                 {
-                    var spectrum = run.GetSpectrum(scan) as ProductSpectrum;
-                    if (spectrum == null) continue;
+                    if (!(run.GetSpectrum(scan) is ProductSpectrum spectrum))
+                    {
+                        continue;
+                    }
+
                     if (IsGoodTarget(spectrum, sequence))
                     {
                         isGood = true;
@@ -77,7 +95,10 @@ namespace InformedProteomics.FeatureFinding.Training
                     }
                 }
 
-                if (isGood) finalPrsmGroups.Add(prsmSet);
+                if (isGood)
+                {
+                    finalPrsmGroups.Add(prsmSet);
+                }
             }
             return finalPrsmGroups;
         }
@@ -119,8 +140,15 @@ namespace InformedProteomics.FeatureFinding.Training
                         var ion = new Ion(fragmentComposition, charge);
                         if (ms2Spec.ContainsIon(ion, tolerance, RelativeIsotopeIntensityThreshold))
                         {
-                            if (baseIonType.IsPrefix) nObservedPrefixIonPeaks++;
-                            else nObservedSuffixIonPeaks++;
+                            if (baseIonType.IsPrefix)
+                            {
+                                nObservedPrefixIonPeaks++;
+                            }
+                            else
+                            {
+                                nObservedSuffixIonPeaks++;
+                            }
+
                             nObservedIonPeaks++;
                         }
                         // nTheoreticalIonPeaks++;
@@ -131,13 +159,22 @@ namespace InformedProteomics.FeatureFinding.Training
             if (sequence.Composition.Mass > 3000)
             {
                 if ((double) nObservedPrefixIonPeaks/nObservedIonPeaks > 0.85 ||
-                    (double) nObservedSuffixIonPeaks/nObservedIonPeaks > 0.85) return false;
+                    (double) nObservedSuffixIonPeaks/nObservedIonPeaks > 0.85)
+                {
+                    return false;
+                }
 
-                if (nObservedPrefixIonPeaks < 3 || nObservedSuffixIonPeaks < 3) return false;
+                if (nObservedPrefixIonPeaks < 3 || nObservedSuffixIonPeaks < 3)
+                {
+                    return false;
+                }
             }
             else
             {
-                if (nObservedPrefixIonPeaks < 1 || nObservedSuffixIonPeaks < 1) return false;
+                if (nObservedPrefixIonPeaks < 1 || nObservedSuffixIonPeaks < 1)
+                {
+                    return false;
+                }
             }
 
             return true;

@@ -25,7 +25,11 @@ namespace InformedProteomics.TopDown.Scoring
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
 
-                if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz) continue;
+                if (fragmentComposition.Mass < Ms2Spectrum.Peaks[0].Mz)
+                {
+                    continue;
+                }
+
                 var chargeRange = GetMinMaxChargeRange(fragmentComposition);
 
                 var containsIon = false;
@@ -39,7 +43,10 @@ namespace InformedProteomics.TopDown.Scoring
                     }
                 }
 
-                if (containsIon) score += 1.0;
+                if (containsIon)
+                {
+                    score++;
+                }
             }
             return score;
         }

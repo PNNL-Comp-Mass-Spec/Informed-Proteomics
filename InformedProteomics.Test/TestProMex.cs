@@ -58,7 +58,10 @@ namespace InformedProteomics.Test
                 var idFile = string.Format(@"{0}\{1}_IcTda.tsv", idFileFolder, dataname);
                 var outFileName = string.Format(@"{0}\{1}.trainset.tsv", outFileFolder, Path.GetFileNameWithoutExtension(dataset));
 
-                if (File.Exists(outFileName)) continue;
+                if (File.Exists(outFileName))
+                {
+                    continue;
+                }
 
                 Console.WriteLine(dataset);
 
@@ -185,7 +188,10 @@ namespace InformedProteomics.Test
                         var massTh = (mass < 2000) ? tolerance2.GetToleranceAsMz(mass) : tolerance.GetToleranceAsMz(mass);
                         foreach (var feature in features)
                         {
-                            if (Math.Abs(mass - feature.Mass) < massTh) tempList.Add(feature);
+                            if (Math.Abs(mass - feature.Mass) < massTh)
+                            {
+                                tempList.Add(feature);
+                            }
                         }
 
                         //var nHits = 0;
@@ -211,7 +217,10 @@ namespace InformedProteomics.Test
                             }*/
                         }
 
-                        if (refinedFeature != null) break;
+                        if (refinedFeature != null)
+                        {
+                            break;
+                        }
                     }
 
                     if (refinedFeature != null)
@@ -397,7 +406,9 @@ namespace InformedProteomics.Test
             for (var i = 0; i < parser.NumData; i++)
             {
                 if (qValues[i] > qValueThreshold)
+                {
                     continue;
+                }
 
                 filterPassingResults++;
 
@@ -407,7 +418,9 @@ namespace InformedProteomics.Test
                 var modComposition = Composition.Zero;
                 var modsStr = modifications[i].Trim(trimChars);
                 if (modsStr.Length == 0)
+                {
                     continue;
+                }
 
                 var mods = modsStr.Split(',');
                 foreach (var modStr in mods.Where(str => str.Length > 0))
@@ -418,7 +431,9 @@ namespace InformedProteomics.Test
                 }
 
                 if (ptmList.Count < 5)
+                {
                     Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", scanNums[i], sequenceComp.Mass, modComposition.Mass, nMacthed[i], sequences[i], modsStr);
+                }
 
                 var compFromSeqAndMods = sequenceComp + modComposition;
 
@@ -453,7 +468,7 @@ namespace InformedProteomics.Test
             var resultParser = new MsPathFinderParser(resultFile.FullName);
 
             var idList = resultParser.GetIdList().TakeWhile(id => id.QValue <= qValueThreshold).OrderBy(id => id.Mass).ToList();
-            var idMassList = idList.Select(id => id.Mass).ToList();
+            var idMassList = idList.ConvertAll(id => id.Mass);
             var idFlag = new bool[idList.Count];
 
             var featureParser = new TsvFileParser(ms1ftFile.FullName);
@@ -475,7 +490,10 @@ namespace InformedProteomics.Test
                 var minMass = mass - tolDa;
                 var maxMass = mass + tolDa;
                 var index = idMassList.BinarySearch(mass);
-                if (index < 0) index = ~index;
+                if (index < 0)
+                {
+                    index = ~index;
+                }
 
                 var matchedId = new List<MsPathFinderId>();
 
@@ -484,7 +502,11 @@ namespace InformedProteomics.Test
                 while (curIndex >= 0)
                 {
                     var curId = idList[curIndex];
-                    if (curId.Mass < minMass) break;
+                    if (curId.Mass < minMass)
+                    {
+                        break;
+                    }
+
                     if (curId.Scan > minScan[i] && curId.Scan < maxScan[i]
                         && curId.Charge >= minCharge[i] && curId.Charge <= maxCharge[i])
                     {
@@ -499,7 +521,11 @@ namespace InformedProteomics.Test
                 while (curIndex < idList.Count)
                 {
                     var curId = idList[curIndex];
-                    if (curId.Mass > maxMass) break;
+                    if (curId.Mass > maxMass)
+                    {
+                        break;
+                    }
+
                     if (curId.Scan >= minScan[i] && curId.Scan <= maxScan[i]
                         && curId.Charge >= minCharge[i] && curId.Charge <= maxCharge[i])
                     {
@@ -509,7 +535,7 @@ namespace InformedProteomics.Test
                     ++curIndex;
                 }
 
-                if (matchedId.Any())
+                if (matchedId.Count > 0)
                 {
                     ++numFeaturesWithId;
                 }
@@ -627,7 +653,9 @@ namespace InformedProteomics.Test
             var matchingScanNums = new SortedSet<int>();
 
             foreach (var item in ms1Filter.GetMatchingMs2ScanNums(massToFind))
+            {
                 matchingScanNums.Add(item);
+            }
 
             var scanNumList = string.Join(",", matchingScanNums);
 
@@ -642,7 +670,9 @@ namespace InformedProteomics.Test
                 var scanNum = int.Parse(scanNumText);
 
                 if (!matchingScanNums.Contains(scanNum))
+                {
                     Assert.Fail("Did not find scan {0} for mass {1}", scanNum, massToFind);
+                }
 
                 matchCount++;
             }
@@ -676,7 +706,10 @@ namespace InformedProteomics.Test
             writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n", "Scan", "Elution_Time", "Charge", "ID", "MZ", "Intensity", "Pearson_Correlation");
 
             var envelope = feature.TheoreticalEnvelope;
-            foreach (var e in envelope.Isotopes) Console.WriteLine(e.Ratio);
+            foreach (var e in envelope.Isotopes)
+            {
+                Console.WriteLine(e.Ratio);
+            }
 
             foreach (var env in feature.EnumerateEnvelopes())
             {
@@ -684,7 +717,11 @@ namespace InformedProteomics.Test
                 for(var i = 0; i < envelope.Size; i++)
                 {
                     var peak = env.Peaks[i];
-                    if (peak == null) continue;
+                    if (peak == null)
+                    {
+                        continue;
+                    }
+
                     writer.Write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\n", env.ScanNum, run.GetElutionTime(env.ScanNum), env.Charge, i, peak.Mz, peak.Intensity, corr);
                 }
             }

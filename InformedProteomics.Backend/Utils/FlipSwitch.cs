@@ -3,7 +3,7 @@
     /// <summary>
     /// Singleton class for conditionalizing use of FLIP scoring code.
     /// </summary>
-    public class FlipSwitch
+    public sealed class FlipSwitch
     {
         /// <summary>
         /// Singleton instance

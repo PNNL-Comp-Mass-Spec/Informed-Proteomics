@@ -21,11 +21,18 @@ namespace InformedProteomics.Scoring.TopDown
             MinMass = MaxMass;
             foreach (var aa in extendedAminoAcidArray)
             {
-                if (aa.Mass < MinMass) MinMass = aa.Mass;
+                if (aa.Mass < MinMass)
+                {
+                    MinMass = aa.Mass;
+                }
+
                 foreach (var mod in terminalModifications)
                 {
                     var modAa = new ModifiedAminoAcid(aa, mod);
-                    if (modAa.Mass < MinMass) MinMass = modAa.Mass;
+                    if (modAa.Mass < MinMass)
+                    {
+                        MinMass = modAa.Mass;
+                    }
                 }
             }
 
@@ -36,7 +43,10 @@ namespace InformedProteomics.Scoring.TopDown
 
             var numberOfMzBins = _maxMzBinIndex - _minMzBinIndex + 2; // pad zero mass bin
             _mzBinToFilteredBinMap = new int[numberOfMzBins];
-            for (var i = 0; i < numberOfMzBins; i++) _mzBinToFilteredBinMap[i] = -1;
+            for (var i = 0; i < numberOfMzBins; i++)
+            {
+                _mzBinToFilteredBinMap[i] = -1;
+            }
 
             var tempMap = new int[numberOfMzBins];
 
@@ -47,14 +57,21 @@ namespace InformedProteomics.Scoring.TopDown
             var effectiveBinCounter = 0;
             for (var fineBinIdx = 0; fineBinIdx < fineNodes.Length; fineBinIdx++)
             {
-                if (!fineNodes[fineBinIdx]) continue;
+                if (!fineNodes[fineBinIdx])
+                {
+                    continue;
+                }
 
                 var fineNodeMass = fineBinIdx / Constants.RescalingConstantHighPrecision;
 
                 foreach (var aa in extendedAminoAcidArray)
                 {
                     var validFineNodeIndex = Constants.GetBinNumHighPrecision(fineNodeMass + aa.Mass);
-                    if (validFineNodeIndex >= fineNodes.Length) break;
+                    if (validFineNodeIndex >= fineNodes.Length)
+                    {
+                        break;
+                    }
+
                     fineNodes[validFineNodeIndex] = true;
 
                     if (fineBinIdx == 0 && !(aa is ModifiedAminoAcid)) // include terminal modifications
@@ -63,7 +80,11 @@ namespace InformedProteomics.Scoring.TopDown
                         {
                             var modifiedAa = new ModifiedAminoAcid(aa, terminalMod);
                             validFineNodeIndex = Constants.GetBinNumHighPrecision(fineNodeMass + modifiedAa.Mass);
-                            if (validFineNodeIndex >= fineNodes.Length) break;
+                            if (validFineNodeIndex >= fineNodes.Length)
+                            {
+                                break;
+                            }
+
                             fineNodes[validFineNodeIndex] = true;
                         }
                     }
@@ -130,20 +151,32 @@ namespace InformedProteomics.Scoring.TopDown
 
         public int GetBinNumber(double mass)
         {
-            if (mass < double.Epsilon) return 0;
+            if (mass < double.Epsilon)
+            {
+                return 0;
+            }
 
             var mzBinNum = _mzComparer.GetBinNumber(mass);
 
             if (mzBinNum >= _minMzBinIndex && mzBinNum <= _maxMzBinIndex)
+            {
                 return _mzBinToFilteredBinMap[mzBinNum - _minMzBinIndex + 1];
+            }
 
             return -1;
         }
 
         public double GetMass(int binNumber)
         {
-            if (binNumber < 1) return 0;
-            if (binNumber >= NumberOfBins) return MaxMass;
+            if (binNumber < 1)
+            {
+                return 0;
+            }
+
+            if (binNumber >= NumberOfBins)
+            {
+                return MaxMass;
+            }
 
             var mzBinNum = _filteredBinToMzBinMap[binNumber];
             return _mzComparer.GetMzAverage(mzBinNum);
@@ -151,8 +184,15 @@ namespace InformedProteomics.Scoring.TopDown
 
         public double GetMassStart(int binNumber)
         {
-            if (binNumber < 1) return 0;
-            if (binNumber >= NumberOfBins) return MaxMass;
+            if (binNumber < 1)
+            {
+                return 0;
+            }
+
+            if (binNumber >= NumberOfBins)
+            {
+                return MaxMass;
+            }
 
             var mzBinNum = _filteredBinToMzBinMap[binNumber];
             return _mzComparer.GetMzStart(mzBinNum);
@@ -160,8 +200,16 @@ namespace InformedProteomics.Scoring.TopDown
 
         public double GetMassEnd(int binNumber)
         {
-            if (binNumber < 1) return 0;
-            if (binNumber >= NumberOfBins) return MaxMass;
+            if (binNumber < 1)
+            {
+                return 0;
+            }
+
+            if (binNumber >= NumberOfBins)
+            {
+                return MaxMass;
+            }
+
             var mzBinNum = _filteredBinToMzBinMap[binNumber];
             return _mzComparer.GetMzEnd(mzBinNum);
         }

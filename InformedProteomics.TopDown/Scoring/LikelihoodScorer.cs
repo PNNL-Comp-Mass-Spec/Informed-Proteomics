@@ -44,25 +44,26 @@ namespace InformedProteomics.TopDown.Scoring
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
 
-                var observedCharge = 0;
-                var envelopeCorr = 0d;
-                var envelopeDist = 0d;
                 var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
 
-                var observedPeaks = FindMostIntensePeak(fragmentComposition, CorrThreshold, DistThreshold, out observedCharge,
-                    out envelopeCorr, out envelopeDist);
+                var observedPeaks = FindMostIntensePeak(fragmentComposition, CorrThreshold, DistThreshold, out var observedCharge,
+                    out var envelopeCorr, out var envelopeDist);
                 var fragmentIonMass = fragmentComposition.Mass;
 
-                if (observedPeaks == null) continue;
+                if (observedPeaks == null)
+                {
+                    continue;
+                }
+
                 var observedMostAbuPeak = observedPeaks[mostAbundantIsotopeIndex];
 
                 var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, observedCharge, mostAbundantIsotopeIndex);
-                var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass)/fragmentIonMass)*1e6;
+                var massErrorPpm = (Math.Abs(observedMass - fragmentIonMass) / fragmentIonMass) * 1e6;
 
-                score += 1;
+                score++;
                 var intScore = (observedMostAbuPeak.Intensity / _refIntensity) * 10;
-                var corrScore = (fragmentIonMass > 1300 & envelopeCorr > 0.7) ? (envelopeCorr - 0.7) : 0;
-                var distScore = (fragmentIonMass > 1300 & envelopeDist < 0.07) ? 0.3 - 3.75 * envelopeDist : 0;
+                var corrScore = (fragmentIonMass > 1300 && envelopeCorr > 0.7) ? (envelopeCorr - 0.7) : 0;
+                var distScore = (fragmentIonMass > 1300 && envelopeDist < 0.07) ? 0.3 - 3.75 * envelopeDist : 0;
                 score += intScore;
                 score += corrScore;
                 score += distScore;
@@ -109,16 +110,17 @@ namespace InformedProteomics.TopDown.Scoring
                               ? prefixFragmentComposition + baseIonType.OffsetComposition
                               : suffixFragmentComposition + baseIonType.OffsetComposition;
 
-                var observedCharge = 0;
-                var envelopeCorr = 0d;
-                var envelopeDist = 0d;
                 var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
 
-                var observedPeaks = FindMostIntensePeak(fragmentComposition, CorrThreshold, DistThreshold, out observedCharge,
-                    out envelopeCorr, out envelopeDist);
+                var observedPeaks = FindMostIntensePeak(fragmentComposition, CorrThreshold, DistThreshold, out var observedCharge,
+                    out var envelopeCorr, out var envelopeDist);
                 var fragmentIonMass = fragmentComposition.Mass;
 
-                if (observedPeaks == null) continue;
+                if (observedPeaks == null)
+                {
+                    continue;
+                }
+
                 var observedMostAbuPeak = observedPeaks[mostAbundantIsotopeIndex];
 
                 var observedMass = Ion.GetMonoIsotopicMass(observedMostAbuPeak.Mz, observedCharge, mostAbundantIsotopeIndex);
@@ -126,10 +128,10 @@ namespace InformedProteomics.TopDown.Scoring
 
                 peakCount++;
 
-                score += 1;
+                score++;
                 var intScore = (observedMostAbuPeak.Intensity / _refIntensity) * 10;
-                var corrScore = (fragmentIonMass > 1300 & envelopeCorr > 0.7) ? (envelopeCorr - 0.7) : 0;
-                var distScore = (fragmentIonMass > 1300 & envelopeDist < 0.07) ? 0.3 - 3.75 * envelopeDist : 0;
+                var corrScore = (fragmentIonMass > 1300 && envelopeCorr > 0.7) ? (envelopeCorr - 0.7) : 0;
+                var distScore = (fragmentIonMass > 1300 && envelopeDist < 0.07) ? 0.3 - 3.75 * envelopeDist : 0;
                 score += intScore;
                 score += corrScore;
                 score += distScore;

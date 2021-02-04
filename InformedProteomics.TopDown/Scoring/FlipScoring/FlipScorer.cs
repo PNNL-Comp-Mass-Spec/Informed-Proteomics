@@ -29,7 +29,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         }
 
         /// <summary>
-        /// Gets the the ions selected for scoring for this bin.
+        /// Gets the ions selected for scoring for this bin.
         /// </summary>
         public BaseIonType[] SelectedIonTypes => scoringParameters.SelectedIonTypes;
 

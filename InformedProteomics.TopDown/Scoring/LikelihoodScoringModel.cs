@@ -18,16 +18,32 @@ namespace InformedProteomics.TopDown.Scoring
 
         public int GetBinIndex(double val)
         {
-            if (val >= MaxBinCenter) return BinCount - 1;
-            if (val <= MinBinCenter) return 0;
+            if (val >= MaxBinCenter)
+            {
+                return BinCount - 1;
+            }
+
+            if (val <= MinBinCenter)
+            {
+                return 0;
+            }
+
             var binNum = (int)Math.Round((val - MinBinCenter) / BinWidth);
             return binNum;
         }
 
         public double GetBinCenter(int binNumber)
         {
-            if (binNumber >= BinCount) return MaxBinCenter;
-            if (binNumber <= 0) return MinBinCenter;
+            if (binNumber >= BinCount)
+            {
+                return MaxBinCenter;
+            }
+
+            if (binNumber <= 0)
+            {
+                return MinBinCenter;
+            }
+
             return MinBinCenter + binNumber * BinWidth;
         }
 
@@ -170,15 +186,31 @@ namespace InformedProteomics.TopDown.Scoring
 
         public int GetChargeDiffIndex(int chargeDiff)
         {
-            if (chargeDiff < 0) return 0;
-            if (chargeDiff >= ChargeBinLength) return ChargeBinLength - 1;
+            if (chargeDiff < 0)
+            {
+                return 0;
+            }
+
+            if (chargeDiff >= ChargeBinLength)
+            {
+                return ChargeBinLength - 1;
+            }
+
             return chargeDiff;
         }
 
         public int GetChargeIndex(int charge)
         {
-            if (charge < 1) return 1;
-            if (charge > ChargeBinLength) return ChargeBinLength - 1;
+            if (charge < 1)
+            {
+                return 1;
+            }
+
+            if (charge > ChargeBinLength)
+            {
+                return ChargeBinLength - 1;
+            }
+
             return charge - 1;
         }
 
@@ -187,7 +219,10 @@ namespace InformedProteomics.TopDown.Scoring
             for (var i = 0; i < ActivationBinLength; i++)
             {
                 var line = reader.ReadLine();
-                if (string.IsNullOrEmpty(line)) break;
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
 
                 var a = GetActivationMethodIndex(line);
                 line = reader.ReadLine();
@@ -208,11 +243,17 @@ namespace InformedProteomics.TopDown.Scoring
             for (var i = 0; i < ActivationBinLength; i++)
             {
                 var line = reader.ReadLine();
-                if (string.IsNullOrEmpty(line)) break;
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
 
                 var tokens = line.Split(',');
 
-                if (tokens.Length != 2) break;
+                if (tokens.Length != 2)
+                {
+                    break;
+                }
 
                 var a = GetActivationMethodIndex(tokens[0]);
                 var t = GetIonTypeIndex(tokens[1]);
@@ -222,7 +263,10 @@ namespace InformedProteomics.TopDown.Scoring
                 {
                     var token = line.Split('\t');
 
-                    for (var j = 0; j < MassBinning.BinCount; j++) MassScoreTable[a][t][j] = GetBoundedLkScore(token[j]);
+                    for (var j = 0; j < MassBinning.BinCount; j++)
+                    {
+                        MassScoreTable[a][t][j] = GetBoundedLkScore(token[j]);
+                    }
                 }
             }
         }
@@ -232,7 +276,10 @@ namespace InformedProteomics.TopDown.Scoring
             while (true)
             {
                 var line = reader.ReadLine();
-                if (string.IsNullOrEmpty(line)) break;
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
 
                 //var tokens = line.Split(',');
                 var m = MassBinning.GetBinIndex(double.Parse(line));
@@ -257,10 +304,16 @@ namespace InformedProteomics.TopDown.Scoring
             {
                 var line = reader.ReadLine();
 
-                if (string.IsNullOrEmpty(line)) break;
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
 
                 var tokens = line.Split(',');
-                if (tokens.Length != 2) break;
+                if (tokens.Length != 2)
+                {
+                    break;
+                }
 
                 var c = GetChargeIndex(int.Parse(tokens[0]));
                 var m = MassBinning.GetBinIndex(double.Parse(tokens[1]));

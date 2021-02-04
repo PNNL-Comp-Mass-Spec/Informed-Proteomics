@@ -18,31 +18,58 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         public int ScanNum { get; }
         public Composition PrecursorComposition => Sequence.Composition + Composition.H2O;
         public bool Decoy { get; }
-        public class MismatchException : Exception {}
+
+        public class MismatchException : Exception {
+            public MismatchException() : base()
+            {
+            }
+
+            public MismatchException(string message) : base(message)
+            {
+            }
+
+            public MismatchException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+        }
 
         public SpectrumMatch(Sequence sequence, Spectrum spectrum, int scanNum=0, int precursorCharge=1, bool decoy=false)
         {
             Peptide = string.Empty;
-            foreach (var aa in sequence) Peptide += aa.Residue;
+            foreach (var aa in sequence)
+            {
+                Peptide += aa.Residue;
+            }
+
             _spectrum = spectrum;
             ScanNum = scanNum;
             PrecursorCharge = precursorCharge;
             Decoy = decoy;
             Sequence = sequence;
-            if (decoy) CreateDecoy();
+            if (decoy)
+            {
+                CreateDecoy();
+            }
         }
 
         public SpectrumMatch(Sequence sequence, LazyLcMsRun lcms, int scanNum = 0, int precursorCharge = 1, bool decoy = false)
         {
             Peptide = string.Empty;
-            foreach (var aa in sequence) Peptide += aa.Residue;
+            foreach (var aa in sequence)
+            {
+                Peptide += aa.Residue;
+            }
+
             _spectrum = null;
             _lcms = lcms;
             ScanNum = scanNum;
             PrecursorCharge = precursorCharge;
             Decoy = decoy;
             Sequence = sequence;
-            if (decoy) CreateDecoy();
+            if (decoy)
+            {
+                CreateDecoy();
+            }
         }
 
         public SpectrumMatch(string peptide, DataFileFormat sequenceFormat,
@@ -57,7 +84,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             Decoy = decoy;
             var sequenceReader = new SequenceReader(sequenceFormat);
             Sequence = sequenceReader.GetSequence(peptide);
-            if (decoy) CreateDecoy();
+            if (decoy)
+            {
+                CreateDecoy();
+            }
             else if (formula.Length > 0)
             {
                 var composition = Composition.Parse(formula);
@@ -79,7 +109,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             Decoy = decoy;
             var sequenceReader = new SequenceReader(sequenceFormat);
             Sequence = sequenceReader.GetSequence(peptide);
-            if (decoy) CreateDecoy();
+            if (decoy)
+            {
+                CreateDecoy();
+            }
             else if (formula.Length > 0)
             {
                 var composition = Composition.Parse(formula);
@@ -99,7 +132,10 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             PrecursorCharge = match.PrecursorCharge;
             Decoy = decoy;
             Sequence = new Sequence(match.Sequence);
-            if (decoy) CreateDecoy();
+            if (decoy)
+            {
+                CreateDecoy();
+            }
         }
 
         public Spectrum Spectrum => _spectrum ?? (_spectrum = _lcms.GetSpectrum(ScanNum));
@@ -141,7 +177,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         public List<Ion> GetCleavageIons(IonType ionType)
         {
             var compositions = ionType.BaseIonType.IsPrefix ? Prefixes : Suffixes;
-            return compositions.Select(ionType.GetIon).ToList();
+            return compositions.ConvertAll(ionType.GetIon);
         }
 
         private void CreateDecoy()

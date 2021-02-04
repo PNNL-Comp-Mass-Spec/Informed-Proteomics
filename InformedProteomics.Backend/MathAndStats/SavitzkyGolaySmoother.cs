@@ -20,10 +20,14 @@ namespace InformedProteomics.Backend.MathAndStats
         public SavitzkyGolaySmoother(int pointsForSmoothing, int polynomialOrder)
         {
             if (pointsForSmoothing < 3)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pointsForSmoothing), "savGolayPoints must be an odd number 3 or higher");
+            }
 
             if (pointsForSmoothing % 2 == 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pointsForSmoothing), "savGolayPoints must be an odd number 3 or higher");
+            }
 
             _mNumPointsForSmoothing = pointsForSmoothing;
             var smoothingFilters = CalculateSmoothingFilters(polynomialOrder, pointsForSmoothing);
@@ -60,7 +64,10 @@ namespace InformedProteomics.Backend.MathAndStats
         public double[] Smooth(double[] inputValues)
         {
             // No need to smooth if all values are 0
-            if (IsEmpty(inputValues)) return inputValues;
+            if (IsEmpty(inputValues))
+            {
+                return inputValues;
+            }
 
             var m = (_mNumPointsForSmoothing - 1) / 2;
             var colCount = inputValues.Length;
@@ -133,7 +140,10 @@ namespace InformedProteomics.Backend.MathAndStats
         {
             foreach (var inputValue in inputValues)
             {
-                if (inputValue > 0) return false;
+                if (inputValue > 0)
+                {
+                    return false;
+                }
             }
 
             return true;

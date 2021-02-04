@@ -120,18 +120,33 @@ namespace InformedProteomics.FeatureFinding.Graphics
 
         public int GetTableIndex(double abundance, double[] breakTable)
         {
-            if (abundance <= breakTable[0]) return 0;
-            if (abundance > breakTable[breakTable.Length - 1]) return -1;
+            if (abundance <= breakTable[0])
+            {
+                return 0;
+            }
+
+            if (abundance > breakTable[breakTable.Length - 1])
+            {
+                return -1;
+            }
+
             for (var i = 1; i < breakTable.Length; i++)
             {
-                if (abundance > breakTable[i - 1] && abundance <= breakTable[i]) return i;
+                if (abundance > breakTable[i - 1] && abundance <= breakTable[i])
+                {
+                    return i;
+                }
             }
             return breakTable.Length - 1;
         }
 
         public OxyColor GetColor(int value, int nColors)
         {
-            if (value == -1) return OxyColor.FromHsv(0, 1, 1);
+            if (value == -1)
+            {
+                return OxyColor.FromHsv(0, 1, 1);
+            }
+
             var delta = 240.0 / (360.0 * (nColors));
             var hue = (240.0 / 360.0) - (delta * (value));
             return OxyColor.FromHsv(hue, 1, 1);
@@ -139,7 +154,7 @@ namespace InformedProteomics.FeatureFinding.Graphics
 
         public double[] GetColorBreaksTable(int nColors, IList<LcMsFeature> features)
         {
-            if (!features.Any())
+            if (features.Count == 0)
             {
                 return new double[1];
             }

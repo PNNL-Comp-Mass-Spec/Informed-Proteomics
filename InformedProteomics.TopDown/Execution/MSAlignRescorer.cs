@@ -39,7 +39,10 @@ namespace InformedProteomics.TopDown.Execution
                 {
                     var row = rows[i];
                     var seqStr = SimpleStringProcessing.GetStringBetweenDots(sequences[i]);
-                    if (seqStr == null || seqStr.Contains("(")) continue; //TODO: currently ignore ids with modifications
+                    if (seqStr == null || seqStr.Contains("("))
+                    {
+                        continue; //TODO: currently ignore ids with modifications
+                    }
 
                     var composition = AASet.GetComposition(seqStr);
                     //var sequence = new Sequence(seqStr, AASet);
@@ -52,7 +55,10 @@ namespace InformedProteomics.TopDown.Execution
                     var scanNum = scanNums[i];
 
                     var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm, composition, charge, scanNum);
-                    if (scores == null) continue;
+                    if (scores == null)
+                    {
+                        continue;
+                    }
 
                     writer.WriteLine("{0}\t{1}", row, scores);
                 }

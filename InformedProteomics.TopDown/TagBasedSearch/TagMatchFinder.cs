@@ -39,15 +39,31 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
         public IEnumerable<TagMatch> FindMatches(MatchedTag matchedTag)
         {
-            if(matchedTag.NTermFlankingMass != null && matchedTag.CTermFlankingMass != null) return FindMatchesWithFeatureMass(matchedTag);
-            if(matchedTag.NTermFlankingMass != null) return FindMatchesForwardAndBackward(matchedTag);
-            if(matchedTag.CTermFlankingMass != null) return FindMatchesBackwardAndForward(matchedTag);
+            if(matchedTag.NTermFlankingMass != null && matchedTag.CTermFlankingMass != null)
+            {
+                return FindMatchesWithFeatureMass(matchedTag);
+            }
+
+            if (matchedTag.NTermFlankingMass != null)
+            {
+                return FindMatchesForwardAndBackward(matchedTag);
+            }
+
+            if (matchedTag.CTermFlankingMass != null)
+            {
+                return FindMatchesBackwardAndForward(matchedTag);
+            }
+
             return Enumerable.Empty<TagMatch>();
         }
 
         private IEnumerable<TagMatch> FindMatchesWithFeatureMass(MatchedTag matchedTag)
         {
-            if (matchedTag.NTermFlankingMass == null || matchedTag.CTermFlankingMass == null) yield break;
+            if (matchedTag.NTermFlankingMass == null || matchedTag.CTermFlankingMass == null)
+            {
+                yield break;
+            }
+
             var featureMass = (double) matchedTag.NTermFlankingMass + matchedTag.Mass +
                               (double)matchedTag.CTermFlankingMass + Composition.H2O.Mass;
             var shiftMass = matchedTag.Mass + (double)matchedTag.NTermFlankingMass;
@@ -67,14 +83,24 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         GetForwardMatches(matchedTag, forwardGraph, featureMass))
                 {
                     var mass = forwardMatch.Mass + matchedTag.Mass + backwardMatch.Mass;
-                    if (mass > _maxSequenceMass) continue;
+                    if (mass > _maxSequenceMass)
+                    {
+                        continue;
+                    }
 
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
 
                     var modList = new List<Modification>();
-                    foreach (var mod in backwardMatch.Modifications) modList.Add(mod.Modification);
-                    foreach (var mod in forwardMatch.Modifications) modList.Add(mod.Modification);
+                    foreach (var mod in backwardMatch.Modifications)
+                    {
+                        modList.Add(mod.Modification);
+                    }
+
+                    foreach (var mod in forwardMatch.Modifications)
+                    {
+                        modList.Add(mod.Modification);
+                    }
 
                     var tagMatch = new TagMatch(
                         backwardMatch.Index,
@@ -93,7 +119,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
         private IEnumerable<TagMatch> FindMatchesForwardAndBackward(MatchedTag matchedTag)
         {
-            if (matchedTag.NTermFlankingMass == null) yield break;
+            if (matchedTag.NTermFlankingMass == null)
+            {
+                yield break;
+            }
+
             var shiftMass = matchedTag.Mass + (double)matchedTag.NTermFlankingMass;
 
             var forwardGraph = new ShiftedSequenceGraph(_aaSet, shiftMass, true,
@@ -112,14 +142,24 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         GetBackwardMatches(matchedTag, backwardGraph, featureMass))
                 {
                     var mass = forwardMatch.Mass + matchedTag.Mass + backwardMatch.Mass;
-                    if (mass > _maxSequenceMass) continue;
+                    if (mass > _maxSequenceMass)
+                    {
+                        continue;
+                    }
 
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
 
                     var modList = new List<Modification>();
-                    foreach (var mod in backwardMatch.Modifications) modList.Add(mod.Modification);
-                    foreach (var mod in forwardMatch.Modifications) modList.Add(mod.Modification);
+                    foreach (var mod in backwardMatch.Modifications)
+                    {
+                        modList.Add(mod.Modification);
+                    }
+
+                    foreach (var mod in forwardMatch.Modifications)
+                    {
+                        modList.Add(mod.Modification);
+                    }
 
                     var tagMatch = new TagMatch(
                         backwardMatch.Index,
@@ -138,7 +178,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
         private IEnumerable<TagMatch> FindMatchesBackwardAndForward(MatchedTag matchedTag)
         {
-            if (matchedTag.CTermFlankingMass == null) yield break;
+            if (matchedTag.CTermFlankingMass == null)
+            {
+                yield break;
+            }
+
             var shiftMass = matchedTag.Mass + (double)matchedTag.CTermFlankingMass;
 
             var backwardGraph = new ShiftedSequenceGraph(_aaSet, shiftMass, false,
@@ -157,13 +201,23 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                         GetForwardMatches(matchedTag, forwardGraph, featureMass))
                 {
                     var mass = forwardMatch.Mass + matchedTag.Mass + backwardMatch.Mass;
-                    if (mass > _maxSequenceMass) continue;
+                    if (mass > _maxSequenceMass)
+                    {
+                        continue;
+                    }
 
                     var offset = matchedTag.EndIndex - backwardMatch.Index - 1;
                     var modStr = string.Join(",", backwardMatch.Modifications.Concat(forwardMatch.Modifications.Select(m => m.GetModificationInstanceWithOffset(offset))));
                     var modList = new List<Modification>();
-                    foreach (var mod in backwardMatch.Modifications) modList.Add(mod.Modification);
-                    foreach (var mod in forwardMatch.Modifications) modList.Add(mod.Modification);
+                    foreach (var mod in backwardMatch.Modifications)
+                    {
+                        modList.Add(mod.Modification);
+                    }
+
+                    foreach (var mod in forwardMatch.Modifications)
+                    {
+                        modList.Add(mod.Modification);
+                    }
 
                     var tagMatch = new TagMatch(
                         backwardMatch.Index,
@@ -203,9 +257,15 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 var location = i < _proteinSequence.Length - 1
                     ? SequenceLocation.Everywhere
                     : SequenceLocation.ProteinCTerm;
-                if (!forwardGraph.AddAminoAcid(residue, location)) yield break;
+                if (!forwardGraph.AddAminoAcid(residue, location))
+                {
+                    yield break;
+                }
 
-                if (i == _proteinSequence.Length - 1) continue;
+                if (i == _proteinSequence.Length - 1)
+                {
+                    continue;
+                }
 
                 var forwardMatch = GetBestMatchInTheGraph(forwardGraph, _spec, featureMass);
 
@@ -227,9 +287,16 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             {
                 var residue = j >= 0 ? _proteinSequence[j] : AminoAcid.ProteinNTerm.Residue;
                 var location = j > 0 ? SequenceLocation.Everywhere : SequenceLocation.ProteinNTerm;
-                if(!backwardGraph.AddAminoAcid(residue, location)) yield break;
+                if(!backwardGraph.AddAminoAcid(residue, location))
+                {
+                    yield break;
+                }
 
-                if (j == 0) continue;
+                if (j == 0)
+                {
+                    continue;
+                }
+
                 var backwardMatch = GetBestMatchInTheGraph(backwardGraph, _spec, featureMass);
                 if (backwardMatch != null)
                 {
@@ -249,7 +316,10 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 seqGraph.SetSink(modIndex);
                 var protCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
                 var sequenceMass = protCompositionWithH2O.Mass;
-                if (featureMass != null && !_tolerance.IsWithin(sequenceMass, (double)featureMass)) continue;
+                if (featureMass != null && !_tolerance.IsWithin(sequenceMass, (double)featureMass))
+                {
+                    continue;
+                }
 
                 var charge =
                     (int)
@@ -259,14 +329,20 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 var mostAbundantIsotopeMz = Ion.GetIsotopeMz(sequenceMass, charge,
                     Averagine.GetIsotopomerEnvelope(sequenceMass).MostAbundantIsotopeIndex);
 
-                if (!spec.IsolationWindow.Contains(mostAbundantIsotopeMz)) continue;
+                if (!spec.IsolationWindow.Contains(mostAbundantIsotopeMz))
+                {
+                    continue;
+                }
 
                 //var feature = new TargetFeature(sequenceMass, charge, spec.ScanNum);
 
                 if (_featureFinder != null)
                 {
                     var ms1Corr = _featureFinder.GetMs1EvidenceScore(spec.ScanNum, sequenceMass, charge);
-                    if (ms1Corr < Ms1CorrThreshold) continue;
+                    if (ms1Corr < Ms1CorrThreshold)
+                    {
+                        continue;
+                    }
                 }
 
                 var curScoreAndModifications = seqGraph.GetScoreAndModifications(_ms2Scorer);

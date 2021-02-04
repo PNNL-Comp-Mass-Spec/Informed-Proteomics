@@ -56,7 +56,9 @@ namespace InformedProteomics.Backend.SearchResults
             if (!ReadTargetAndDecoy(targetResultFilePath, decoyResultFilePath))
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
+                {
                     ErrorMessage = "ReadTargetAndDecoy returned false in FdrCalculator";
+                }
 
                 return;
             }
@@ -65,7 +67,10 @@ namespace InformedProteomics.Backend.SearchResults
             if (!CalculateQValues())
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
+                {
                     ErrorMessage = "CalculateQValues returned false";
+                }
+
                 return;
             }
 
@@ -73,7 +78,9 @@ namespace InformedProteomics.Backend.SearchResults
             if (!CalculatePepQValues())
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
+                {
                     ErrorMessage = "CalculatePepQValues returned false";
+                }
             }
         }
 
@@ -96,7 +103,9 @@ namespace InformedProteomics.Backend.SearchResults
             if (!AddTargetAndDecoyData(targetResults, decoyResults))
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
+                {
                     ErrorMessage = "AddTargetAndDecoy returned false in FdrCalculator";
+                }
 
                 return;
             }
@@ -105,7 +114,10 @@ namespace InformedProteomics.Backend.SearchResults
             if (!CalculateQValues())
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
+                {
                     ErrorMessage = "CalculateQValues returned false";
+                }
+
                 return;
             }
 
@@ -113,7 +125,9 @@ namespace InformedProteomics.Backend.SearchResults
             if (!CalculatePepQValues())
             {
                 if (string.IsNullOrWhiteSpace(ErrorMessage))
+                {
                     ErrorMessage = "CalculatePepQValues returned false";
+                }
             }
         }
 
@@ -201,9 +215,13 @@ namespace InformedProteomics.Backend.SearchResults
             {
                 var result = distinctSorted[i];
                 if (result.ProteinName.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix))
+                {
                     numDecoy++;
+                }
                 else
+                {
                     numTarget++;
+                }
 
                 fdr[i] = Math.Min(numDecoy / (double)numTarget, 1.0);
             }
@@ -214,7 +232,9 @@ namespace InformedProteomics.Backend.SearchResults
             {
                 qValue[i] = Math.Min(qValue[i + 1], fdr[i]);
                 if (qValue[i] <= 0.01)
+                {
                     ++NumPSMs;
+                }
             }
 
             for (var i = 0; i < distinctSorted.Length; i++)
@@ -230,7 +250,9 @@ namespace InformedProteomics.Backend.SearchResults
                 foreach (var item in searchResults)
                 {
                     if (resultIDsWithQValue.Contains(item.ResultID))
+                    {
                         continue;
+                    }
 
                     // Set the QValue and PepQValue to 10 since those values are not accurate for results with rank 2 or higher
                     item.QValue = UNDEFINED_QVALUE;
@@ -276,9 +298,13 @@ namespace InformedProteomics.Backend.SearchResults
             {
                 var row = distinctSorted[i];
                 if (row.ProteinName.StartsWith(FastaDatabaseConstants.DecoyProteinPrefix))
+                {
                     numDecoy++;
+                }
                 else
+                {
                     numTarget++;
+                }
 
                 fdr[i] = Math.Min(numDecoy / (double)numTarget, 1.0);
                 peptide[i] = row.SequenceWithEnds;
@@ -290,7 +316,9 @@ namespace InformedProteomics.Backend.SearchResults
             {
                 pepQValue[i] = Math.Min(pepQValue[i + 1], fdr[i]);
                 if (pepQValue[i] <= 0.01)
+                {
                     ++NumPeptides;
+                }
             }
 
             var annotationToPepQValue = new Dictionary<string, double>();
@@ -309,7 +337,7 @@ namespace InformedProteomics.Backend.SearchResults
 
         private bool ReadTargetAndDecoy(string targetResultFilePath, string decoyResultFilePath)
         {
-            var errorBase = "Cannot compute FDR Scores; ";
+            const string errorBase = "Cannot compute FDR Scores; ";
 
             if (!File.Exists(targetResultFilePath))
             {
@@ -331,7 +359,7 @@ namespace InformedProteomics.Backend.SearchResults
 
         private bool AddTargetAndDecoyData(IReadOnlyCollection<DatabaseSearchResultData> targetResults, IReadOnlyCollection<DatabaseSearchResultData> decoyResults)
         {
-            var errorBase = "Cannot compute FDR Scores; ";
+            const string errorBase = "Cannot compute FDR Scores; ";
             if (targetResults == null || targetResults.Count < 1)
             {
                 ErrorMessage = errorBase + "target results file is empty";

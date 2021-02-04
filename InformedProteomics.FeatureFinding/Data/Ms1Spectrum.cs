@@ -42,7 +42,10 @@ namespace InformedProteomics.FeatureFinding.Data
             {
                 var sIndex = (ushort)index;
                 for (var i = 0; i < Peaks.Length; i++)
+                {
                     Peaks[i] = new Ms1Peak(peaks[i].Mz, peaks[i].Intensity, i) { Ms1SpecIndex = sIndex };
+                }
+
                 MedianIntensity = Peaks.Select(p => p.Intensity).Median();
                 PreArrangeLocalMzWindows();
             }
@@ -62,7 +65,10 @@ namespace InformedProteomics.FeatureFinding.Data
             var maxMz = mz + tolTh;
 
             var index = Array.BinarySearch(Peaks, new Ms1Peak(minMz, 0, 0));
-            if (index < 0) index = ~index;
+            if (index < 0)
+            {
+                index = ~index;
+            }
 
             var bestPeakIndex = -1;
             var bestIntensity = 0.0;
@@ -70,7 +76,11 @@ namespace InformedProteomics.FeatureFinding.Data
             var i = index;
             while (i >= 0 && i < Peaks.Length)
             {
-                if (Peaks[i].Mz >= maxMz) break;
+                if (Peaks[i].Mz >= maxMz)
+                {
+                    break;
+                }
+
                 if (Peaks[i].Intensity > bestIntensity)
                 {
                     bestIntensity = Peaks[i].Intensity;
@@ -159,17 +169,26 @@ namespace InformedProteomics.FeatureFinding.Data
                 var binCenterMz = MinMz + MzWindowSize * binIdx;
 
                 intensities[0][binIdx].Add(Peaks[i].Intensity);
-                if (i < _peakStartIndex[0][binIdx]) _peakStartIndex[0][binIdx] = i;
+                if (i < _peakStartIndex[0][binIdx])
+                {
+                    _peakStartIndex[0][binIdx] = i;
+                }
 
                 if (Peaks[i].Mz < binCenterMz)
                 {
                     intensities[1][binIdx].Add(Peaks[i].Intensity);
-                    if (i < _peakStartIndex[1][binIdx]) _peakStartIndex[1][binIdx] = i;
+                    if (i < _peakStartIndex[1][binIdx])
+                    {
+                        _peakStartIndex[1][binIdx] = i;
+                    }
                 }
                 else if (binIdx < numberOfBins - 1) // skip this at the rightmost bin
                 {
                     intensities[1][binIdx + 1].Add(Peaks[i].Intensity);
-                    if (i < _peakStartIndex[1][binIdx + 1]) _peakStartIndex[1][binIdx + 1] = i;
+                    if (i < _peakStartIndex[1][binIdx + 1])
+                    {
+                        _peakStartIndex[1][binIdx + 1] = i;
+                    }
                 }
             }
 
@@ -177,7 +196,10 @@ namespace InformedProteomics.FeatureFinding.Data
             {
                 for (var binIdx = 0; binIdx < numberOfBins; binIdx++)
                 {
-                    if (intensities[i][binIdx].Count < 1) continue;
+                    if (intensities[i][binIdx].Count < 1)
+                    {
+                        continue;
+                    }
 
                     _peakRanking[i][binIdx] = GetRankings(intensities[i][binIdx].ToArray(), out var medianIntensity, out var highestIntensity);
                     _medianIntensity[i][binIdx] = medianIntensity;
@@ -307,7 +329,10 @@ namespace InformedProteomics.FeatureFinding.Data
         {
             for (var i = 0; i < targetEnvelope.Length; i++)
             {
-                if (peaks[i] != null && peaks[i].Active) targetEnvelope[i] += peaks[i].Intensity;
+                if (peaks[i]?.Active == true)
+                {
+                    targetEnvelope[i] += peaks[i].Intensity;
+                }
             }
         }
 
@@ -319,13 +344,15 @@ namespace InformedProteomics.FeatureFinding.Data
 
             for (var i = 0; i < theoreticalEnvelopePdf.Length; i++)
             {
-                if (isotopePeaks[i] != null && isotopePeaks[i].Active)
+                if (isotopePeaks[i]?.Active == true)
+                {
                     s2 += isotopePeaks[i].Intensity;
+                }
             }
             for (var i = 0; i < theoreticalEnvelopePdf.Length; i++)
             {
                 var p = theoreticalEnvelopePdf[i];
-                var q = (isotopePeaks[i] != null && isotopePeaks[i].Active) ? isotopePeaks[i].Intensity / s2 : 0;
+                var q = (isotopePeaks[i]?.Active == true) ? isotopePeaks[i].Intensity / s2 : 0;
                 x += ((p - q) * (p - q)) / (p + q);
             }
 
@@ -343,7 +370,10 @@ namespace InformedProteomics.FeatureFinding.Data
             for (var i = 0; i < theoreticalEnvelope.Length; i++)
             {
                 m1 += theoreticalEnvelope[i];
-                if (isotopePeaks[i] != null && isotopePeaks[i].Active) m2 += isotopePeaks[i].Intensity;
+                if (isotopePeaks[i]?.Active == true)
+                {
+                    m2 += isotopePeaks[i].Intensity;
+                }
             }
 
             m1 /= theoreticalEnvelope.Length;
@@ -357,13 +387,16 @@ namespace InformedProteomics.FeatureFinding.Data
             for (var i = 0; i < theoreticalEnvelope.Length; i++)
             {
                 var d1 = theoreticalEnvelope[i] - m1;
-                var d2 = (isotopePeaks[i] != null && isotopePeaks[i].Active) ? isotopePeaks[i].Intensity - m2 : -m2;
+                var d2 = (isotopePeaks[i]?.Active == true) ? isotopePeaks[i].Intensity - m2 : -m2;
                 cov += d1 * d2;
                 s1 += d1 * d1;
                 s2 += d2 * d2;
             }
 
-            if (s1 <= 0 || s2 <= 0) return 0;
+            if (s1 <= 0 || s2 <= 0)
+            {
+                return 0;
+            }
 
             return cov < 0 ? 0d : cov / Math.Sqrt(s1 * s2);
         }
@@ -374,17 +407,22 @@ namespace InformedProteomics.FeatureFinding.Data
 
             for (var i = 0; i < theoreticalEnvelopePdf.Length; i++)
             {
-                if (isotopePeaks[i] != null && isotopePeaks[i].Active)
+                if (isotopePeaks[i]?.Active == true)
+                {
                     s2 += isotopePeaks[i].Intensity;
+                }
             }
 
-            if (!(s2 > 0)) return IsotopeEnvelope.MaxBhattacharyyaDistance;
+            if (!(s2 > 0))
+            {
+                return IsotopeEnvelope.MaxBhattacharyyaDistance;
+            }
 
             var bc = 0d;
             for (var i = 0; i < theoreticalEnvelopePdf.Length; i++)
             {
                 var p = theoreticalEnvelopePdf[i];
-                var q = (isotopePeaks[i] != null && isotopePeaks[i].Active) ? isotopePeaks[i].Intensity / s2 : 0;
+                var q = (isotopePeaks[i]?.Active == true) ? isotopePeaks[i].Intensity / s2 : 0;
                 bc += Math.Sqrt(p * q);
             }
 
@@ -409,17 +447,27 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public double GetRankSumTestPValue(Ms1Peak[] peaks, int envelopeSize)
         {
-            if (PeakRanking == null) return 1.0d;
+            if (PeakRanking == null)
+            {
+                return 1.0d;
+            }
 
             // calculate rankSum test score
             var rankSum = 0;
             var nRankSum = 0;
             for (var i = 0; i < envelopeSize; i++)
             {
-                if (peaks[i] == null || !peaks[i].Active) continue;
+                if (peaks[i] == null || !peaks[i].Active)
+                {
+                    continue;
+                }
 
                 var localIndex = peaks[i].IndexInSpectrum - PeakStartIndex;
-                if (localIndex >= PeakCount || localIndex < 0) continue;
+                if (localIndex >= PeakCount || localIndex < 0)
+                {
+                    continue;
+                }
+
                 rankSum += PeakRanking[localIndex];
                 nRankSum++;
             }
@@ -430,10 +478,13 @@ namespace InformedProteomics.FeatureFinding.Data
 
         public double GetPoissonTestPValue(Ms1Peak[] peaks, int envelopeSize)
         {
-            if (PeakRanking == null) return 1.0d;
+            if (PeakRanking == null)
+            {
+                return 1.0d;
+            }
 
             var intensePeakThreshold = HighestIntensity * 0.1;
-            var numberOfMatchedIsotopePeaks = peaks.Count(p => p != null && p.Active && p.Intensity > intensePeakThreshold);
+            var numberOfMatchedIsotopePeaks = peaks.Count(p => p?.Active == true && p.Intensity > intensePeakThreshold);
             var numberOfPossiblePeaks = (int)Math.Ceiling(100 * (MaxMz - MinMz));
 
             // calculate poisson test score

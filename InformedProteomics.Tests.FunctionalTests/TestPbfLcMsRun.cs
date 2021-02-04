@@ -243,7 +243,10 @@ namespace InformedProteomics.Tests.FunctionalTests
                 //    Assert.True(xic1[i].Equals(xic2[i]));
                 //}
 
-                if (numPeptides == 100000) break;
+                if (numPeptides == 100000)
+                {
+                    break;
+                }
             }
             sw.Stop();
 

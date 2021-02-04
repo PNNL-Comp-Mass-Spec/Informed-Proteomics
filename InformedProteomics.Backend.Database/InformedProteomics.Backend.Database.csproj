@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net462;net472;netstandard2.0</TargetFrameworks>
     <RootNamespace>InformedProteomics.Backend.Database</RootNamespace>
@@ -19,14 +19,11 @@
     <Copyright>Copyright @ PNNL 2017</Copyright>
     <Title>InformedProteomics.Backend.Database</Title>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="ProteinFileReader" Version="1.3.1" />
+    <PackageReference Include="ProteinFileReader" Version="2.0.1" />
     <PackageReference Include="SAIS-CSharp" Version="1.0.0" />
   </ItemGroup>
-
 </Project>

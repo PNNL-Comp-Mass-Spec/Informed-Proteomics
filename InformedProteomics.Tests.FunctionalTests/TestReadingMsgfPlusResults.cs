@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace InformedProteomics.Tests.FunctionalTests
 {
     [TestFixture]
-    class TestReadingMsgfPlusResults
+    internal class TestReadingMsgfPlusResults
     {
         [Test]
         [Category("Local_Testing")]

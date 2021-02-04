@@ -71,7 +71,9 @@ namespace InformedProteomics.TopDown.Execution
         private void ReportOverallProgress(object searchObj)
         {
             if (!(searchObj is IcTopDownLauncher searchClass))
+            {
                 return;
+            }
 
             var progData = searchClass.searchProgressData;
             var timeElapsed = searchClass.searchStopwatch.Elapsed;
@@ -137,7 +139,7 @@ namespace InformedProteomics.TopDown.Execution
             // Retrieve the list of MS2 scans
             _ms2ScanNums = _run.GetScanNumbers(2).ToList();
 
-            if (Options.ScanNumbers != null && Options.ScanNumbers.Any())
+            if (Options.ScanNumbers?.Any() == true)
             {
                 // Filter the MS2 scans using ScanNumbers
                 _ms2ScanNums = _ms2ScanNums.Intersect(Options.ScanNumbers).ToList();
@@ -149,7 +151,11 @@ namespace InformedProteomics.TopDown.Execution
             _isolationWindowTargetMz = new double[_run.MaxLcScan + 1];
             foreach (var ms2Scan in _ms2ScanNums)
             {
-                if (!(_run.GetSpectrum(ms2Scan) is ProductSpectrum ms2Spec)) continue;
+                if (!(_run.GetSpectrum(ms2Scan) is ProductSpectrum ms2Spec))
+                {
+                    continue;
+                }
+
                 _isolationWindowTargetMz[ms2Scan] = ms2Spec.IsolationWindow.IsolationWindowTargetMz;
             }
 
@@ -164,7 +170,7 @@ namespace InformedProteomics.TopDown.Execution
             targetDb.Read();
 
             ISequenceFilter ms1Filter;
-            if (Options.ScanNumbers != null && Options.ScanNumbers.Any())
+            if (Options.ScanNumbers?.Any() == true)
             {
                 ms1Filter = new SelectedMsMsFilter(Options.ScanNumbers);
             }
@@ -218,7 +224,10 @@ namespace InformedProteomics.TopDown.Execution
                     OnStatusEvent("Reading MS-Align+ results...");
                     ms1Filter = new MsDeconvFilter(_run, Options.PrecursorIonTolerance, Options.FeatureFilePath);
                 }
-                else ms1Filter = null; //new Ms1FeatureMatrix(_run);
+                else
+                {
+                    ms1Filter = null; //new Ms1FeatureMatrix(_run);
+                }
             }
 
             sw.Stop();
@@ -545,7 +554,10 @@ namespace InformedProteomics.TopDown.Execution
                 foreach (var tagSequenceMatch in tagSeqMatches)
                 {
                     var offset = _tagSearchEngine.FastaDatabase.GetOffset(tagSequenceMatch.ProteinName);
-                    if (offset == null) continue;
+                    if (offset == null)
+                    {
+                        continue;
+                    }
 
                     var sequence = tagSequenceMatch.Sequence;
                     var numNTermCleavages = tagSequenceMatch.TagMatch.StartIndex;
@@ -604,7 +616,7 @@ namespace InformedProteomics.TopDown.Execution
 
             Parallel.ForEach(annotationsAndOffsets, pfeOptions, annotationAndOffset =>
             {
-                if (cancellationToken != null && cancellationToken.Value.IsCancellationRequested)
+                if (cancellationToken?.IsCancellationRequested == true)
                 {
                     //return matches;
                     return;
@@ -632,7 +644,9 @@ namespace InformedProteomics.TopDown.Execution
             var tempNumProteins = Interlocked.Increment(ref numProteins) - 1;
 
             if (estimatedProteins < 1)
+            {
                 estimatedProteins = 1;
+            }
 
             progData.StatusInternal = string.Format("Processing, {0} {1} done, {2:#0.0}% complete, {3:f1} sec elapsed",
                 tempNumProteins,
@@ -644,16 +658,26 @@ namespace InformedProteomics.TopDown.Execution
             int secondsThreshold;
 
             if (sw.Elapsed.TotalMinutes < 2)
+            {
                 secondsThreshold = 15;      // Every 15 seconds
+            }
             else if (sw.Elapsed.TotalMinutes < 5)
+            {
                 secondsThreshold = 30;      // Every 30 seconds
+            }
             else if (sw.Elapsed.TotalMinutes < 20)
+            {
                 secondsThreshold = 60;      // Every 1 minute
+            }
             else
+            {
                 secondsThreshold = 300;     // Every 5 minutes
+            }
 
             if (DateTime.UtcNow.Subtract(lastUpdate).TotalSeconds < secondsThreshold)
+            {
                 return;
+            }
 
             lastUpdate = DateTime.UtcNow;
 
@@ -662,9 +686,13 @@ namespace InformedProteomics.TopDown.Execution
             {
                 var numMatches = GetNumberOfMatches(matches);
                 if (numMatches == 1)
+                {
                     matchCountStats = ", 1 match";
+                }
                 else
+                {
                     matchCountStats = string.Format(", {0} matches", numMatches);
+                }
             }
             else
             {
@@ -701,11 +729,18 @@ namespace InformedProteomics.TopDown.Execution
             var seqGraph = SequenceGraph.CreateGraph(Options.AminoAcidSet, AminoAcid.ProteinNTerm, proteinSequence,
                 AminoAcid.ProteinCTerm);
 
-            if (seqGraph == null) return; // No matches will be found without a sequence graph.
+            if (seqGraph == null)
+            {
+                return; // No matches will be found without a sequence graph.
+            }
 
             for (var numNTermCleavages = 0; numNTermCleavages <= maxNumNTermCleavages; numNTermCleavages++)
             {
-                if (numNTermCleavages > 0) seqGraph.CleaveNTerm();
+                if (numNTermCleavages > 0)
+                {
+                    seqGraph.CleaveNTerm();
+                }
+
                 var numProteoforms = seqGraph.GetNumProteoformCompositions();
                 var modCombs = seqGraph.GetModificationCombinations();
                 for (var modIndex = 0; modIndex < numProteoforms; modIndex++)
@@ -714,7 +749,10 @@ namespace InformedProteomics.TopDown.Execution
                     var proteinCompositionWithH2O = seqGraph.GetSinkSequenceCompositionWithH2O();
                     var sequenceMass = proteinCompositionWithH2O.Mass;
 
-                    if (sequenceMass < Options.MinSequenceMass || sequenceMass > Options.MaxSequenceMass) continue;
+                    if (sequenceMass < Options.MinSequenceMass || sequenceMass > Options.MaxSequenceMass)
+                    {
+                        continue;
+                    }
 
                     var modCombinations = modCombs[modIndex];
                     var ms2ScanNums = Options.ScanNumbers ?? sequenceFilter.GetMatchingMs2ScanNums(sequenceMass);
@@ -725,10 +763,17 @@ namespace InformedProteomics.TopDown.Execution
 
                     Parallel.ForEach(ms2ScanNums, pfeOptions, ms2ScanNum =>
                     {
-                        if (ms2ScanNum > _ms2ScanNums.Last() || ms2ScanNum < _ms2ScanNums.First()) return;
+                        if (ms2ScanNum > _ms2ScanNums.Last() || ms2ScanNum < _ms2ScanNums.First())
+                        {
+                            return;
+                        }
 
                         var isoTargetMz = _isolationWindowTargetMz[ms2ScanNum];
-                        if (!(isoTargetMz > 0)) return;
+                        if (!(isoTargetMz > 0))
+                        {
+                            return;
+                        }
+
                         var charge = (int)Math.Round(sequenceMass / (isoTargetMz - Constants.Proton));
 
                         //var scorer = _ms2ScorerFactory2.GetScorer(ms2ScanNum, sequenceMass, charge, Options.ActivationMethod);
@@ -755,10 +800,17 @@ namespace InformedProteomics.TopDown.Execution
                             foreach (var featureId in featureIds)
                             {
                                 var scanRange = filter.Ms1FtIndexToScanRange[featureId];
-                                if (ms2ScanNum >= scanRange.Item1 && ms2ScanNum <= scanRange.Item2) ms2FeatureIds.Add(featureId);
+                                if (ms2ScanNum >= scanRange.Item1 && ms2ScanNum <= scanRange.Item2)
+                                {
+                                    ms2FeatureIds.Add(featureId);
+                                }
                             }
                         }
-                        else ms2FeatureIds = featureIds;
+                        else
+                        {
+                            ms2FeatureIds = featureIds;
+                        }
+
                         var prsm = new DatabaseSequenceSpectrumMatch(sequence, pre, post, ms2ScanNum, offset, nTermCleavages,
                             modCombinations, precursorIon, score, isDecoy, featureId: Math.Max(ms2FeatureIds.FirstOrDefault(), 1));
 
@@ -789,7 +841,10 @@ namespace InformedProteomics.TopDown.Execution
                     {
                         var minScore = existingMatches.Min.Score;
                         if (!(prsm.Score > minScore))
+                        {
                             return;
+                        }
+
                         existingMatches.Add(prsm);
                         existingMatches.Remove(existingMatches.Min);
                     }
@@ -873,7 +928,9 @@ namespace InformedProteomics.TopDown.Execution
 
                     _cachedScoreDistributions = new LinkedList<Tuple<double, ScoreDistribution>>[_run.MaxLcScan + 1];
                     foreach (var scanNum in _ms2ScanNums)
+                    {
                         _cachedScoreDistributions[scanNum] = new LinkedList<Tuple<double, ScoreDistribution>>();
+                    }
                 }
 
                 currentTask = "Instantiate InformedTopDownScorer";
@@ -886,13 +943,19 @@ namespace InformedProteomics.TopDown.Execution
                 {
                     var prsms = sortedMatches[scanNum];
                     if (prsms == null)
+                    {
                         continue;
+                    }
 
                     if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec))
+                    {
                         continue;
+                    }
 
                     if (spec.Peaks.Length == 0)
+                    {
                         continue;
+                    }
 
                     currentTask = "Looping over PRSMs for scan " + scanNum;
 
@@ -923,7 +986,9 @@ namespace InformedProteomics.TopDown.Execution
                         if (match.Score > CompositeScorer.ScoreParam.Cutoff)
                         {
                             if (matches[scanNum] == null)
+                            {
                                 matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
+                            }
 
                             matches[scanNum].AddLast(match);
                         }
@@ -932,7 +997,9 @@ namespace InformedProteomics.TopDown.Execution
                     }
 
                     if (matches[scanNum] != null)
+                    {
                         estimatedSequences += matches[scanNum].Count;
+                    }
                 }
 
                 currentTask = "Parallel.ForEach";
@@ -969,7 +1036,10 @@ namespace InformedProteomics.TopDown.Execution
                         currentTask = "Calling GetMs2ScoringGraph " + currentIteration;
 
                         var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
-                        if (graph == null) continue;
+                        if (graph == null)
+                        {
+                            continue;
+                        }
 
                         currentTask = "Calling ComputeGeneratingFunction " + currentIteration;
 
@@ -1029,7 +1099,9 @@ namespace InformedProteomics.TopDown.Execution
             {
                 var outputFile = new FileInfo(targetOutputFilePath);
                 if (!outputFile.Exists || outputFile.Length == 0)
+                {
                     return false;
+                }
 
                 using (var reader = new StreamReader(new FileStream(outputFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
                 {
@@ -1039,16 +1111,22 @@ namespace InformedProteomics.TopDown.Execution
 
                         var dataLine = reader.ReadLine();
                         if (string.IsNullOrWhiteSpace(dataLine))
+                        {
                             continue;
+                        }
 
                         resultCount++;
                     }
 
                     if (resultCount > 1)
+                    {
                         return true;
+                    }
 
                     if (resultCount == 1)
+                    {
                         ReportWarning("Results file only has a header line; will re-generate " + targetOutputFilePath);
+                    }
 
                     ReportWarning("Results file is empty: " + targetOutputFilePath);
                 }
@@ -1082,7 +1160,9 @@ namespace InformedProteomics.TopDown.Execution
             foreach (var scanNum in _ms2ScanNums)
             {
                 if (!matchesByScan.TryGetValue(scanNum, out var matches))
+                {
                     continue;
+                }
 
                 foreach (var match in matches)
                 {
@@ -1127,10 +1207,14 @@ namespace InformedProteomics.TopDown.Execution
             OnErrorEvent(errMsg, ex);
 
             if (!throwException)
+            {
                 return;
+            }
 
             if (ex == null)
+            {
                 throw new Exception(errMsg);
+            }
 
             throw new Exception(errMsg, ex);
         }

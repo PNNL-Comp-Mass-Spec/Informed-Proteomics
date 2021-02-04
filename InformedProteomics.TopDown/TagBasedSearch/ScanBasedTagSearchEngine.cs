@@ -129,8 +129,15 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
                 foreach (var matchedTag in matchedTagSet.Tags)
                 {
-                    if (matchedTag.Length < _minMatchedTagLength) continue;
-                    if (matchedTag.NTermFlankingMass == null && matchedTag.CTermFlankingMass == null) continue;
+                    if (matchedTag.Length < _minMatchedTagLength)
+                    {
+                        continue;
+                    }
+
+                    if (matchedTag.NTermFlankingMass == null && matchedTag.CTermFlankingMass == null)
+                    {
+                        continue;
+                    }
 
                     var matches = tagFinder.FindMatches(matchedTag).ToArray();
                     //var prevScore = double.NegativeInfinity;
@@ -200,7 +207,11 @@ namespace InformedProteomics.TopDown.TagBasedSearch
             foreach (var tag in tags)
             {
                 var matchedIndices = searchableDb.FindAllMatchedSequenceIndices(tag.Sequence).ToArray();
-                if (matchedIndices.Length > MaxNumProteinMatchesPerTag) continue;
+                if (matchedIndices.Length > MaxNumProteinMatchesPerTag)
+                {
+                    continue;
+                }
+
                 foreach (var index in matchedIndices)
                 {
                     var proteinName = fastaDb.GetProteinName(index);

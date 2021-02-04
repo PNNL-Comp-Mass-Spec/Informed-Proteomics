@@ -8,7 +8,7 @@ using PRISM;
 
 namespace MSPathFinder
 {
-    internal class Program
+    internal static class Program
     {
         public const string Name = "MSPathFinder";
         public static string Version

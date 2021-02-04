@@ -54,15 +54,21 @@ namespace InformedProteomics.Test
 
                 int tableCount = 1;
                 if (_precursorCharge > 0)
+                {
                     tableCount = _precursorCharge;
+                }
 
                 var offsetFrequencyTables = new PrecursorOffsetFrequencyTable[tableCount];
                 for (int i = 0; i < tableCount; i++)
                 {
                     if (_precursorCharge > 0)
+                    {
                         offsetFrequencyTables[i] = new PrecursorOffsetFrequencyTable(_searchWidth/(i+1), i+1, _binWidth/(i+1));
+                    }
                     else
+                    {
                         offsetFrequencyTables[i] = new PrecursorOffsetFrequencyTable(_searchWidth, i+1, _binWidth);
+                    }
                 }
 
                 for (int i = 0; i < txtFiles.Count; i++)
@@ -171,7 +177,9 @@ namespace InformedProteomics.Test
                             offsetFrequencyList.Add(offsetFrequencyTables[i][j].GetProbabilities().ToList());
                             outFile.Write("{0}", (j+1));
                             if (j != 0)
+                            {
                                 outFile.Write("\t");
+                            }
                         }
                         outFile.WriteLine();
                         for (int j = 0; j < offsetFrequencyList.First().Count; j++)
@@ -183,7 +191,9 @@ namespace InformedProteomics.Test
                             {
                                 outFile.Write(offsetFrequencyList[k][j].Prob);
                                 if (k != offsetFrequencyList.Count-1)
+                                {
                                     outFile.Write("\t");
+                                }
                             }
                             outFile.WriteLine();
                         }

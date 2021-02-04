@@ -27,14 +27,34 @@ namespace InformedProteomics.Scoring.TopDown
             var binNumber = _mzComparer.GetBinNumber(mass);
             if (_padZeroMassBin)
             {
-                if (binNumber == 0) return 0;
-                if (binNumber < _minBinIndex) return 1;
-                if (binNumber >= _maxBinIndex) return NumberOfBins - 1;
+                if (binNumber == 0)
+                {
+                    return 0;
+                }
+
+                if (binNumber < _minBinIndex)
+                {
+                    return 1;
+                }
+
+                if (binNumber >= _maxBinIndex)
+                {
+                    return NumberOfBins - 1;
+                }
+
                 return binNumber - _minBinIndex + 1;
             }
 
-            if (binNumber < _minBinIndex) return 0;
-            if (binNumber >= _maxBinIndex) return NumberOfBins - 1;
+            if (binNumber < _minBinIndex)
+            {
+                return 0;
+            }
+
+            if (binNumber >= _maxBinIndex)
+            {
+                return NumberOfBins - 1;
+            }
+
             return binNumber - _minBinIndex;
         }
 
@@ -60,7 +80,11 @@ namespace InformedProteomics.Scoring.TopDown
         {
             if (_padZeroMassBin)
             {
-                if (effectiveBinNumber == 0) return 0;
+                if (effectiveBinNumber == 0)
+                {
+                    return 0;
+                }
+
                 return effectiveBinNumber + _minBinIndex - 1;
             }
             return effectiveBinNumber + _minBinIndex;

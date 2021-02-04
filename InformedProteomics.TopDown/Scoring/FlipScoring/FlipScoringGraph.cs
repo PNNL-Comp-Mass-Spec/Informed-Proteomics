@@ -34,9 +34,9 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <summary>
         /// Initializes a new instance of the <see cref="FlipScoringGraph" />.
         /// </summary>
+        /// <param name="massBins">The mass bins for constructing the nodes of the graph.</param>
         /// <param name="nTerminalNodes">Node scores for nTerminal ions.</param>
         /// <param name="cTerminalNodes">Node scores for cTerminal ions.</param>
-        /// <param name="massBins">The mass bins for constructing the nodes of the graph.</param>
         /// <param name="edges">Mapping between sink node -> graph edge.</param>
         public FlipScoringGraph(
                                 IMassBinning massBins,
@@ -72,7 +72,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         }
 
         /// <summary>
-        ///
+        ///Get edge score
         /// </summary>
         /// <param name="sourceMassBin"></param>
         /// <param name="sinkMassBin"></param>

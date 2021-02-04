@@ -76,7 +76,10 @@ namespace InformedProteomics.Scoring.BottomUp
             var maxMz = mz + tolTh;
 
             var index = Array.BinarySearch(Peaks, new RankedPeak((minMz + maxMz) / 2, 0, 0));
-            if (index < 0) index = ~index;
+            if (index < 0)
+            {
+                index = ~index;
+            }
 
             RankedPeak bestPeak = null;
             var bestIntensity = 0.0;
@@ -85,7 +88,11 @@ namespace InformedProteomics.Scoring.BottomUp
             var i = index - 1;
             while (i >= 0 && i < Peaks.Length)
             {
-                if (Peaks[i].Mz <= minMz) break;
+                if (Peaks[i].Mz <= minMz)
+                {
+                    break;
+                }
+
                 if (Peaks[i].Intensity > bestIntensity)
                 {
                     bestIntensity = Peaks[i].Intensity;
@@ -98,7 +105,11 @@ namespace InformedProteomics.Scoring.BottomUp
             i = index;
             while (i >= 0 && i < Peaks.Length)
             {
-                if (Peaks[i].Mz >= maxMz) break;
+                if (Peaks[i].Mz >= maxMz)
+                {
+                    break;
+                }
+
                 if (Peaks[i].Intensity > bestIntensity)
                 {
                     bestIntensity = Peaks[i].Intensity;

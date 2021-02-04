@@ -30,7 +30,9 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             var dataFile = new FileInfo(filePath);
             if (!dataFile.Exists)
+            {
                 throw new FileNotFoundException("Thermo .raw file not found: " + filePath, dataFile.FullName);
+            }
 
             FilePath = filePath;
 
@@ -68,7 +70,10 @@ namespace InformedProteomics.Backend.MassSpecData
                     ConsoleMsgUtils.ShowWarning(string.Format("[Warning] Ignore corrupted spectrum Scan={0}", scanNum));
                 }
 
-                if (spec != null) yield return spec;
+                if (spec != null)
+                {
+                    yield return spec;
+                }
             }
         }
 
@@ -109,7 +114,9 @@ namespace InformedProteomics.Backend.MassSpecData
             get
             {
                 if (string.IsNullOrEmpty(_checkSum))
+                {
                     ComputeChecksum();
+                }
 
                 return _checkSum;
             }
@@ -138,7 +145,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
 
                 var data = _rawFileReader.GetCentroidStream(scanNum, false);
-                if (data.Masses != null && data.Masses.Length > 0)
+                if (data.Masses?.Length > 0)
                 {
                     // Always get the high-res centroid information if we can
                     peaks.Capacity = data.Masses.Length + 2;
@@ -178,12 +185,14 @@ namespace InformedProteomics.Backend.MassSpecData
             var msLevel = ReadMsLevel(scanNum);
 
             if (msLevel == 1)
+            {
                 return new Spectrum(peaks, scanNum)
                 {
                     ElutionTime = elutionTime,
                     TotalIonCurrent = scanStats.TIC,
                     NativeId = nativeId,
                 };
+            }
 
             var isolationWindow = ReadPrecursorInfo(scanNum);
 
@@ -217,7 +226,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>precursor information</returns>
         public IsolationWindow ReadPrecursorInfo(int scanNum)
         {
-            if (ReadMsLevel(scanNum) <= 1) return null;
+            if (ReadMsLevel(scanNum) <= 1)
+            {
+                return null;
+            }
 
             // Get precursor info
             var preInfo = ReadPrecursorData(scanNum);
@@ -262,7 +274,9 @@ namespace InformedProteomics.Backend.MassSpecData
         public int ReadMsLevel(int scanNum)
         {
             if (_msLevel.TryGetValue(scanNum, out var msLevel))
+            {
                 return msLevel;
+            }
 
             var scanFilter = GetScanFilter(scanNum);
             _msLevel[scanNum] = (int) scanFilter.MSOrder; // MSOrder generally matches MSLevel
@@ -283,6 +297,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly IRawDataPlus _rawFileReader;
 
         private IScanFilter _cachedScanFilter = null;
+
         private int _cachedScanFilterScanNumber = -1;
 
         private readonly int _minLcScan;
@@ -311,7 +326,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns></returns>
         private PrecursorInfo ReadPrecursorData(int scanNum)
         {
-            if (ReadMsLevel(scanNum) == 1) return null;
+            if (ReadMsLevel(scanNum) == 1)
+            {
+                return null;
+            }
 
             var scanFilter = GetScanFilter(scanNum);
             var reactions = scanFilter.MassCount;
@@ -355,14 +373,18 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 preInfo.MonoisotopicMz = Convert.ToDouble(extras.Values[monoMzIndex]);
                 if (Math.Abs(preInfo.MonoisotopicMz.Value) < float.Epsilon)
+                {
                     preInfo.MonoisotopicMz = null;
+                }
             }
 
             if (chargeIndex >= 0)
             {
                 preInfo.Charge = Convert.ToInt32(extras.Values[chargeIndex]);
                 if (preInfo.Charge == 0)
+                {
                     preInfo.Charge = null;
+                }
             }
 
             if (preInfo.MonoisotopicMz < float.Epsilon && preInfo.Charge == 0)
@@ -458,7 +480,10 @@ namespace InformedProteomics.Backend.MassSpecData
         private IScanFilter GetScanFilter(int scanNum)
         {
             if (_cachedScanFilter == null || _cachedScanFilterScanNumber != scanNum)
+            {
                 _cachedScanFilter = _rawFileReader.GetFilterForScanNumber(scanNum);
+                _cachedScanFilterScanNumber = scanNum;
+            }
 
             return _cachedScanFilter;
         }

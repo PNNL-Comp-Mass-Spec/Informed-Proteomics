@@ -393,9 +393,13 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 string streamsCmdLine;
                 if (assemblyFile.DirectoryName == null)
+                {
                     streamsCmdLine = "streams -d *";
+                }
                 else
+                {
                     streamsCmdLine = "streams -d \"" + Path.Combine(assemblyFile.DirectoryName, "*") + "\"";
+                }
 
                 var msg =
                     "Invalid Assembly: \"" + assemblyFile.FullName + "\"\n" +
@@ -561,12 +565,14 @@ namespace InformedProteomics.Backend.MassSpecData
                     // Do nothing...
                 }
             }
+
             if (byVersion.Count > 0)
             {
                 // Reverse sort the list
                 byVersion.Sort((x, y) => y.Item1.CompareTo(x.Item1));
                 var subFoldersOrig = possibleInstallDirs.ToArray();
-                possibleInstallDirs = byVersion.Select(x => x.Item2).ToList();
+                possibleInstallDirs = byVersion.ConvertAll(x => x.Item2);
+
                 // Guarantee that any folder where we couldn't parse a version is in the list, but at the end.
                 foreach (var folder in subFoldersOrig)
                 {
@@ -580,7 +586,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 // Sorting by version failed, try the old method.
                 // reverse the sort order - this should give us the highest installed version of ProteoWizard first
-                possibleInstallDirs.Sort((x, y) => string.Compare(y.FullName, x.FullName, StringComparison.Ordinal));
+                possibleInstallDirs.Sort((x, y) => string.CompareOrdinal(y.FullName, x.FullName));
             }
 
             foreach (var folder in possibleInstallDirs)
@@ -650,8 +656,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Constructor
         /// </summary>
         /// <param name="filePath"></param>
-        /// <remarks>To avoid assembly resolving errors, the ProteoWizardAssemblyResolver should be added as an AssemblyResolve event handler, as follows:
-        /// <code>AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;</code>
+        /// <remarks>
+        /// To avoid assembly resolving errors, the ProteoWizardAssemblyResolver should be added as an AssemblyResolve event handler, as follows:
+        /// AppDomain.CurrentDomain.AssemblyResolve += ProteoWizardReader.ProteoWizardAssemblyResolver;
         /// </remarks>
         public ProteoWizardReaderImplementation(string filePath)
         {
@@ -938,7 +945,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     var driftCvParam = s.cvParam(CVID.MS_ion_mobility_drift_time);
                     // No conversion: CV dictates only valid units of 'millisecond'
-                    driftTime = (double) driftCvParam.value;
+                    driftTime = (double)driftCvParam.value;
                 }
             }
             if (msLevel > 1)

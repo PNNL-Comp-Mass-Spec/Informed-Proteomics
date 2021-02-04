@@ -45,17 +45,26 @@ namespace InformedProteomics.FeatureFinding.Scoring
                 var binIdx = binNum - _minBinNum;
 
                 intensities[0][binIdx].Add(peaks[i].Intensity);
-                if (i < _peakStartIndex[0][binIdx]) _peakStartIndex[0][binIdx] = i;
+                if (i < _peakStartIndex[0][binIdx])
+                {
+                    _peakStartIndex[0][binIdx] = i;
+                }
 
                 if (peaks[i].Mz < binMzAverage)
                 {
                     intensities[1][binIdx].Add(peaks[i].Intensity);
-                    if (i < _peakStartIndex[1][binIdx]) _peakStartIndex[1][binIdx] = i;
+                    if (i < _peakStartIndex[1][binIdx])
+                    {
+                        _peakStartIndex[1][binIdx] = i;
+                    }
                 }
                 else if (binNum < _maxBinNum) // skip this at the rightmost bin
                 {
                     intensities[1][binIdx + 1].Add(peaks[i].Intensity);
-                    if (i < _peakStartIndex[1][binIdx + 1]) _peakStartIndex[1][binIdx + 1] = i;
+                    if (i < _peakStartIndex[1][binIdx + 1])
+                    {
+                        _peakStartIndex[1][binIdx + 1] = i;
+                    }
                 }
             }
 
@@ -63,7 +72,10 @@ namespace InformedProteomics.FeatureFinding.Scoring
             {
                 for (var binIdx = 0; binIdx < numberOfBins; binIdx++)
                 {
-                    if (intensities[i][binIdx].Count < 1) continue;
+                    if (intensities[i][binIdx].Count < 1)
+                    {
+                        continue;
+                    }
 
                     _peakRanking[i][binIdx] = GetRankings(intensities[i][binIdx].ToArray(), out _);
                 }
@@ -73,14 +85,24 @@ namespace InformedProteomics.FeatureFinding.Scoring
         public bool CheckChargeState(ObservedIsotopeEnvelope envelope)
         {
             var checkCharge = envelope.Charge;
-            if (checkCharge > 20) return true; //high charge (> +20), just pass
+            if (checkCharge > 20)
+            {
+                return true; //high charge (> +20), just pass
+            }
 
             var peakStartIndex = envelope.MinMzPeak.IndexInSpectrum;
             var peakEndIndex = envelope.MaxMzPeak.IndexInSpectrum;
             var nPeaks = peakEndIndex - peakStartIndex + 1;
 
-            if (nPeaks < 10) return false;
-            if (envelope.NumberOfPeaks > nPeaks * 0.7) return true;
+            if (nPeaks < 10)
+            {
+                return false;
+            }
+
+            if (envelope.NumberOfPeaks > nPeaks * 0.7)
+            {
+                return true;
+            }
 
             var tolerance = new Tolerance(5);
             var threshold = nPeaks * 0.5;
@@ -97,14 +119,25 @@ namespace InformedProteomics.FeatureFinding.Scoring
                 {
                     var deltaMz = Spectrum.Peaks[j].Mz - Spectrum.Peaks[i].Mz;
 
-                    if (deltaMz > maxDeltaMz) break;
+                    if (deltaMz > maxDeltaMz)
+                    {
+                        break;
+                    }
+
                     for (var c = Math.Round(1 / (deltaMz + mzTol)); c <= Math.Round(1 / (deltaMz - mzTol)); c++)
                     {
-                        if (c < minCheckCharge || c > maxCheckCharge) continue;
+                        if (c < minCheckCharge || c > maxCheckCharge)
+                        {
+                            continue;
+                        }
+
                         var k = (int)c - minCheckCharge;
                         nChargeGaps[k]++;
 
-                        if (nChargeGaps[k] + 1 > threshold && nChargeGaps[k] + 1 > 1.25 * envelope.NumberOfPeaks) return false;
+                        if (nChargeGaps[k] + 1 > threshold && nChargeGaps[k] + 1 > 1.25 * envelope.NumberOfPeaks)
+                        {
+                            return false;
+                        }
                     }
                 }
             }
@@ -144,13 +177,21 @@ namespace InformedProteomics.FeatureFinding.Scoring
             var nRankSum = 0;
             for (var i = 0; i < envelope.Size; i++)
             {
-                if (envelope.Peaks[i] == null || !envelope.Peaks[i].Active) continue;
+                if (envelope.Peaks[i] == null || !envelope.Peaks[i].Active)
+                {
+                    continue;
+                }
+
                 ret.NumberOfMatchedIsotopePeaks++;
 
                 //if (isotopeList[i].Ratio > RelativeIntensityThresholdForRankSum)
                 //{
                 var localIndex = envelope.Peaks[i].IndexInSpectrum - peakStartIndex;
-                if (localIndex >= rankings.Length || localIndex < 0) continue;
+                if (localIndex >= rankings.Length || localIndex < 0)
+                {
+                    continue;
+                }
+
                 rankSum += rankings[localIndex];
                 nRankSum++;
                 //}

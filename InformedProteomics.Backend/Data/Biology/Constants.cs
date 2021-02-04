@@ -5,7 +5,7 @@ namespace InformedProteomics.Backend.Data.Biology
     /// <summary>
     /// Common constants
     /// </summary>
-    public class Constants
+    public static class Constants
     {
         /// <summary>
         /// Convert between nominal mass and monoisotopic mass with minimal error

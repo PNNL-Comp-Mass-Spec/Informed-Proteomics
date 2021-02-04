@@ -34,10 +34,14 @@ namespace InformedProteomics.Test
                     for (var r = 0; r <= ranks; r++)
                     {
                         if (r < 4 || r > ranks - 4)
+                        {
                             Console.WriteLine(@"Charge: {0}, Ion Type: {1}, Rank: {2}, Score: {3:F4}",
                                 charge, ionType.Name, r, rankScorer.GetScore(ionType, r, charge, 0.0));
+                        }
                         else if (r == 4)
+                        {
                             Console.WriteLine("  ...");
+                        }
                     }
                     Console.WriteLine();
                 }

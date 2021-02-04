@@ -54,9 +54,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 {
                     var it = ionType;
                     if (_combineCharges)
+                    {
                         it = ReducedChargeIonType(ionType);
+                    }
+
                     if (!ionTypeFound.ContainsKey(it))
+                    {
                         ionTypeFound.Add(it, false);
+                    }
 
                     var cleavagePoints = ionType.BaseIonType.IsPrefix ? prefixes : suffixes;
 
@@ -71,7 +76,11 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                 {
                     var found = 0;
                     const int total = 1;
-                    if (ionTypeFound[key]) found = 1;
+                    if (ionTypeFound[key])
+                    {
+                        found = 1;
+                    }
+
                     AddIonProbability(new Probability<IonType>(key, found, total));
                 }
             }
@@ -115,18 +124,28 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         {
             var name = probability.Label;
             if (_ionFrequencies.ContainsKey(name))
+            {
                 _ionFrequencies[name] += probability;
+            }
             else
+            {
                 _ionFrequencies.Add(name, probability);
+            }
         }
 
         private IonType ReducedChargeIonType(IonType ionType)
         {
             var name = ionType.Name;
             if (ionType.Charge > 1 && ionType.Charge < 10)
+            {
                 name = name.Remove(1, 1);
+            }
+
             if (ionType.Charge >= 10)
+            {
                 name = name.Remove(1, 2);
+            }
+
             return _ionTypeFactory.GetIonType(name);
         }
 

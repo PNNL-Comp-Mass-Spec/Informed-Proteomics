@@ -30,7 +30,11 @@ namespace InformedProteomics.TopDown.Scoring
         public int GetXicCorrScore(int charge, int correlationIntegerRawScore)
         {
             var t = _xicCorrScore[charge];
-            if (t == null) return 0;
+            if (t == null)
+            {
+                return 0;
+            }
+
             return t[correlationIntegerRawScore];
         }
     }

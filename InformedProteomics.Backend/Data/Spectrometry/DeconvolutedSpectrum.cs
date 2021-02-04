@@ -30,7 +30,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                                       ms2Spec.IsolationWindow.Charge);
             }
             else
+            {
                 ActivationMethod = ActivationMethod.Unknown;
+            }
 
             StorePeaks(peaks);
         }

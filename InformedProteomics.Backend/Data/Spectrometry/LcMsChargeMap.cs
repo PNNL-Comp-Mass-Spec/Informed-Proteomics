@@ -30,7 +30,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             foreach (var ms2ScanNum in _run.GetScanNumbers(2))
             {
                 var isoWindow = _run.GetIsolationWindow(ms2ScanNum);
-                if (isoWindow != null) _scanToIsolationWindow.Add(ms2ScanNum, isoWindow);
+                if (isoWindow != null)
+                {
+                    _scanToIsolationWindow.Add(ms2ScanNum, isoWindow);
+                }
             }
 
             _tolerance = tolerance;
@@ -50,7 +53,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public List<int> GetMatchingFeatureIds(double sequenceMass)
         {
             var massBinNum = GetBinNumber(sequenceMass);
-            if (_binToFeatureMap.TryGetValue(massBinNum, out var featureIds)) return featureIds;
+            if (_binToFeatureMap.TryGetValue(massBinNum, out var featureIds))
+            {
+                return featureIds;
+            }
 
             return new List<int>();
         }
@@ -63,7 +69,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
             var massBinNum = GetBinNumber(sequenceMass);
-            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out var ms2ScanNums)) return ms2ScanNums;
+            if (_sequenceMassBinToScanNumsMap.TryGetValue(massBinNum, out var ms2ScanNums))
+            {
+                return ms2ScanNums;
+            }
 
             return new int[0];
         }
@@ -75,7 +84,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns></returns>
         public IEnumerable<double> GetMatchingMass(int ms2ScanNum)
         {
-            if (_scanNumToMassBin.TryGetValue(ms2ScanNum, out var massBinNums)) return massBinNums.Select(s => _comparer.GetMzAverage(s));
+            if (_scanNumToMassBin.TryGetValue(ms2ScanNum, out var massBinNums))
+            {
+                return massBinNums.Select(s => _comparer.GetMzAverage(s));
+            }
+
             return new double[0];
         }
 
@@ -128,9 +141,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="maxCharge"></param>
         public void SetMatches(int featureId, double monoIsotopicMass, int minScanNum, int maxScanNum, int repScanNum, int minCharge, int maxCharge)
         {
-            if (minScanNum < _run.MinLcScan) minScanNum = _run.MinLcScan;
-            if (maxScanNum > _run.MaxLcScan) maxScanNum = _run.MaxLcScan;
-            if (repScanNum < minScanNum && repScanNum > maxScanNum) return;
+            if (minScanNum < _run.MinLcScan)
+            {
+                minScanNum = _run.MinLcScan;
+            }
+
+            if (maxScanNum > _run.MaxLcScan)
+            {
+                maxScanNum = _run.MaxLcScan;
+            }
+
+            if (repScanNum < minScanNum && repScanNum > maxScanNum)
+            {
+                return;
+            }
 
             // Keys are elution time, values are scan number
             var registeredMs2Scans = new List<KeyValuePair<double, int>>();

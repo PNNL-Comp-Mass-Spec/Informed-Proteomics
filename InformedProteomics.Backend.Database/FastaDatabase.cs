@@ -62,10 +62,14 @@ namespace InformedProteomics.Backend.Database
         public FastaDatabase(string databaseFilePath, bool isDecoy = false)
         {
             if (string.IsNullOrWhiteSpace(databaseFilePath))
+            {
                 throw new FileNotFoundException("Null or empty string passed to FastaDatabase");
+            }
 
             if (!File.Exists(databaseFilePath))
+            {
                 throw new FileNotFoundException("File not found: " + databaseFilePath);
+            }
 
             if (!FastaDatabaseConstants.ValidFASTAExtension(databaseFilePath))
             {
@@ -110,7 +114,9 @@ namespace InformedProteomics.Backend.Database
 
             var decoyDatabasePath = GetDecoyDatabasePath(enzyme, shuffle);
             if (!File.Exists(decoyDatabasePath))
+            {
                 CreateDecoyDatabase(enzyme, shuffle);
+            }
 
             return new FastaDatabase(decoyDatabasePath, true);
         }
@@ -132,7 +138,9 @@ namespace InformedProteomics.Backend.Database
             }
 
             if (!reader.OpenFile(_databaseFilePath))
+            {
                 return;
+            }
 
             var decoyDatabaseFileName = GetDecoyDatabasePath(enzyme, shuffle);
 
@@ -166,7 +174,7 @@ namespace InformedProteomics.Backend.Database
                         for (var i = sequence.Length - 1; i >= 0; i--)
                         {
                             var residue = sequence[i];
-                            if (enzyme != null && enzyme.Residues.Length > 0 && enzyme.IsCleavable(residue) && decoySequence.Length > 0)
+                            if (enzyme?.Residues.Length > 0 && enzyme.IsCleavable(residue) && decoySequence.Length > 0)
                             {
                                 var residueToBeReplaced = decoySequence[decoySequence.Length - 1];
                                 decoySequence.Remove(decoySequence.Length - 1, 1);
@@ -240,9 +248,14 @@ namespace InformedProteomics.Backend.Database
         public void Read()
         {
             if (!ReadSeqFile())
+            {
                 throw new FormatException("Error while reading " + _seqFilePath);
+            }
+
             if (!ReadAnnoFile())
+            {
                 throw new FormatException("Error while reading " + _annoFilePath);
+            }
         }
 
         /// <summary>
@@ -280,7 +293,11 @@ namespace InformedProteomics.Backend.Database
         /// <returns></returns>
         public byte[] GetSequence()
         {
-            if (_sequence == null) Read();
+            if (_sequence == null)
+            {
+                Read();
+            }
+
             return _sequence;
         }
 
@@ -305,10 +322,14 @@ namespace InformedProteomics.Backend.Database
             if (!shuffle)
             {
                 // Reverse the sequences
-                if (enzyme != null && enzyme.Residues.Length > 0)
+                if (enzyme?.Residues.Length > 0)
+                {
                     newExtension = ".icdecoy." + new string(enzyme.Residues) + ".fasta";
+                }
                 else
+                {
                     newExtension = DecoyDatabaseFileExtension;
+                }
             }
             else
             {
@@ -328,7 +349,9 @@ namespace InformedProteomics.Backend.Database
         {
             var offsetKey = GetOffsetKey(offset);
             if (_names.TryGetValue(offsetKey, out var proteinName))
+            {
                 return proteinName;
+            }
 
             return "UnknownProtein_Offset" + offset;
         }
@@ -343,7 +366,9 @@ namespace InformedProteomics.Backend.Database
             var offsetKey = GetOffsetKey(offset);
 
             if (_descriptions.TryGetValue(offsetKey, out var proteinDescription))
+            {
                 return proteinDescription;
+            }
 
             return "Unknown description, Offset " + offset;
         }
@@ -356,7 +381,10 @@ namespace InformedProteomics.Backend.Database
         public long? GetOffset(string name)
         {
             if (!_nameToOffset.TryGetValue(name, out var offset))
+            {
                 return null;
+            }
+
             return offset;
         }
 
@@ -367,7 +395,11 @@ namespace InformedProteomics.Backend.Database
         /// <returns></returns>
         public string GetProteinDescription(string name)
         {
-            if (!_nameToOffset.TryGetValue(name, out var offset)) return null;
+            if (!_nameToOffset.TryGetValue(name, out var offset))
+            {
+                return null;
+            }
+
             var offsetKey = GetOffsetKey(offset);
             return _descriptions[offsetKey];
         }
@@ -379,7 +411,11 @@ namespace InformedProteomics.Backend.Database
         /// <returns></returns>
         public int GetProteinLength(string name)
         {
-            if (_nameToLength.TryGetValue(name, out var length)) return length;
+            if (_nameToLength.TryGetValue(name, out var length))
+            {
+                return length;
+            }
+
             return -1;
         }
 
@@ -390,7 +426,10 @@ namespace InformedProteomics.Backend.Database
         /// <returns></returns>
         public string GetProteinSequence(string name)
         {
-            if (!_nameToOffset.TryGetValue(name, out var offset)) return null;
+            if (!_nameToOffset.TryGetValue(name, out var offset))
+            {
+                return null;
+            }
 
             var length = _nameToLength[name];
             return GetProteinSequence(offset, length);
@@ -446,7 +485,9 @@ namespace InformedProteomics.Backend.Database
         {
             var dataFile = new FileInfo(filePath);
             if (dataFile.Length < 2 * sizeof(int))
+            {
                 return false;
+            }
 
             using (var fs = new FileStream(dataFile.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var reader = new BinaryReader(fs))
@@ -455,11 +496,15 @@ namespace InformedProteomics.Backend.Database
 
                 var fileFormatId = reader.ReadInt32();
                 if (fileFormatId != FileFormatId)
+                {
                     return false;
+                }
 
                 var lastWriteTimeHash = reader.ReadInt32();
                 if (lastWriteTimeHash == code)
+                {
                     return true;
+                }
             }
 
             return false;
@@ -469,7 +514,9 @@ namespace InformedProteomics.Backend.Database
         {
             var dataFile = new FileInfo(filePath);
             if (dataFile.Length < 1)
+            {
                 return false;
+            }
 
             var lastLine = string.Empty;
 
@@ -483,19 +530,27 @@ namespace InformedProteomics.Backend.Database
             }
 
             if (string.IsNullOrWhiteSpace(lastLine))
+            {
                 return false;
+            }
 
             var token = lastLine.Split(FastaDatabaseConstants.AnnotationDelimiter);
             if (token.Length != 2)
+            {
                 return false;
+            }
 
             var fileFormatId = Convert.ToInt32(token[0]);
             if (fileFormatId != FileFormatId)
+            {
                 return false;
+            }
 
             var lastWriteTimeHash = Convert.ToInt32(token[1]);
             if (lastWriteTimeHash == code)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -526,7 +581,9 @@ namespace InformedProteomics.Backend.Database
 
             var diFolder = dbFile.Directory;
             if (diFolder == null)
+            {
                 return;
+            }
 
             var fileNamesToDelete = new List<string>
             {
@@ -562,10 +619,14 @@ namespace InformedProteomics.Backend.Database
         private void GenerateMetaFiles()
         {
             if (File.Exists(_seqFilePath))
+            {
                 File.Delete(_seqFilePath);
+            }
 
             if (File.Exists(_annoFilePath))
+            {
                 File.Delete(_annoFilePath);
+            }
 
             // Keys are protein name
             // Values track the number of times the name has been encountered, the number of residues, and a SHA1 hash of the residues
@@ -577,7 +638,9 @@ namespace InformedProteomics.Backend.Database
                 // Read
                 var reader = new FastaFileReader();
                 if (!reader.OpenFile(_databaseFilePath))
+                {
                     return;
+                }
 
                 long offset = 0;
                 while (reader.ReadNextProteinEntry())
@@ -660,7 +723,10 @@ namespace InformedProteomics.Backend.Database
                 {
                     var token = s.Split(FastaDatabaseConstants.AnnotationDelimiter);
                     if (token.Length < 4)
+                    {
                         break;
+                    }
+
                     var offset = long.Parse(token[0]);
                     _offsetList.Add(offset);
                     var length = int.Parse(token[1]);
