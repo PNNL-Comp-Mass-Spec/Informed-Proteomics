@@ -210,8 +210,6 @@ namespace InformedProteomics.Backend.FeatureFindingResults
             /// <summary>
             /// Constructor: Create the mapping
             /// </summary>
-            [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
-            // ReSharper disable once MemberCanBeProtected.Local
             public Ms1FtEntryMap()
             {
                 Map(x => x.FeatureId).Index(ColumnCount++).Name("FeatureID");
@@ -242,7 +240,6 @@ namespace InformedProteomics.Backend.FeatureFindingResults
             /// <summary>
             /// Constructor: Create the mapping, inheriting the base mapping
             /// </summary>
-            [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
             public Ms1FtExtendedEntryMap()
             {
                 //References<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>(x => x.ExtendedData); // Not working, but should (in theory) provide the same result

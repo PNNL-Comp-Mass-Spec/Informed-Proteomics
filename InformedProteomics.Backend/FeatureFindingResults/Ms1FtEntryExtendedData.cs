@@ -91,7 +91,6 @@ namespace InformedProteomics.Backend.FeatureFindingResults
             /// <summary>
             /// Constructor: Create the mapping
             /// </summary>
-            [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
             public Ms1FtEntryExtendedDataMap()
             {
                 ColumnCount = new Ms1FtEntry.Ms1FtEntryMap().GetColumnCount;
