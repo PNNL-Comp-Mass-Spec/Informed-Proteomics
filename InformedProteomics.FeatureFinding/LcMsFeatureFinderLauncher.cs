@@ -100,9 +100,11 @@ namespace InformedProteomics.FeatureFinding
                     var returnCode = ProcessFile(fileName);
                     if (returnCode != 0)
                     {
-                        ConsoleMsgUtils.ShowWarning(string.Format("  error code {0} for {1}", returnCode, Path.GetFileName(fileName)));
+                        ConsoleMsgUtils.ShowWarning("  error code {0} for {1}", returnCode, Path.GetFileName(fileName));
                         errorCount++;
                     }
+
+                    Console.WriteLine();
                 }
             }
 

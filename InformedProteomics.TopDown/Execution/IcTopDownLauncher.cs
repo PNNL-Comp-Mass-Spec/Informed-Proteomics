@@ -118,14 +118,15 @@ namespace InformedProteomics.TopDown.Execution
             // Output a progress message every 5 minutes...
             progReportTimer = new Timer(ReportOverallProgress, this, 0, 1000 * 60 * 5);
 
+
             if (string.Equals(Path.GetExtension(Options.SpecFilePath), ".pbf", StringComparison.InvariantCultureIgnoreCase))
             {
-                UpdateStatus("Reading pbf file...", progData);
+                UpdateStatus("Reading pbf file " + specFileName, progData);
                 progData.StepRange(1.0, "Reading spectra file");
             }
             else
             {
-                UpdateStatus("Creating and loading pbf file...", progData);
+                UpdateStatus("Creating and/or reading pbf file for " + specFileName, progData);
                 progData.StepRange(5.0, "Reading spectra file");
             }
 
@@ -172,6 +173,7 @@ namespace InformedProteomics.TopDown.Execution
             ISequenceFilter ms1Filter;
             if (Options.ScanNumbers?.Any() == true)
             {
+                OnStatusEvent("Filtering MS1 data using the specified scan numbers");
                 ms1Filter = new SelectedMsMsFilter(Options.ScanNumbers);
             }
             else if (string.IsNullOrWhiteSpace(Options.FeatureFilePath))
@@ -200,7 +202,7 @@ namespace InformedProteomics.TopDown.Execution
                 }
                 sw.Reset();
                 sw.Start();
-                OnStatusEvent("Reading ProMex results...");
+                OnStatusEvent("Reading ProMex results from " + Path.GetFileName(ms1FtFilePath));
                 ms1Filter = new Ms1FtFilter(_run, Options.PrecursorIonTolerance, ms1FtFilePath, -10);
             }
             else
@@ -211,21 +213,22 @@ namespace InformedProteomics.TopDown.Execution
                 var extension = Path.GetExtension(Options.FeatureFilePath);
                 if (extension.Equals(".csv", StringComparison.OrdinalIgnoreCase))
                 {
-                    OnStatusEvent("Reading ICR2LS/Decon2LS results...");
+                    OnStatusEvent("Reading ICR2LS/Decon2LS results from " + featureFileName);
                     ms1Filter = new IsosFilter(_run, Options.PrecursorIonTolerance, Options.FeatureFilePath);
                 }
                 else if (extension.Equals(".ms1ft", StringComparison.OrdinalIgnoreCase))
                 {
-                    OnStatusEvent("Reading ProMex results...");
+                    OnStatusEvent("Reading ProMex results from " + featureFileName);
                     ms1Filter = new Ms1FtFilter(_run, Options.PrecursorIonTolerance, Options.FeatureFilePath, -10);
                 }
                 else if (extension.Equals(".msalign", StringComparison.OrdinalIgnoreCase))
                 {
-                    OnStatusEvent("Reading MS-Align+ results...");
+                    OnStatusEvent("Reading MS-Align+ results from " + featureFileName);
                     ms1Filter = new MsDeconvFilter(_run, Options.PrecursorIonTolerance, Options.FeatureFilePath);
                 }
                 else
                 {
+                    OnStatusEvent("Note: MS1 feature filter is not defined");
                     ms1Filter = null; //new Ms1FeatureMatrix(_run);
                 }
             }
@@ -340,7 +343,7 @@ namespace InformedProteomics.TopDown.Execution
             }
             else if (validDecoyResults)
             {
-                OnWarningEvent(string.Format("Decoy results file '{0}' exists; skipping decoy search.", decoyOutputFilePath));
+                OnWarningEvent(string.Format("Decoy results file  '{0}' exists; skipping decoy search.", decoyOutputFilePath));
             }
 
             progData.StepRange(100.0, "Writing combined results file");

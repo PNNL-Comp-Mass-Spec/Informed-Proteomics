@@ -51,28 +51,31 @@ namespace InformedProteomics.FeatureFinding
 
         public void Display()
         {
-            Console.WriteLine("InputPath    {0}", InputPath);
-            Console.WriteLine("OutputPath   {0}", OutputPath);
+            Console.WriteLine("{0,-14} {1}", "InputPath:", InputPath);
+            Console.WriteLine("{0,-14} {1}", "OutputPath:", OutputPath);
 
             if (string.IsNullOrEmpty(ExistingFeaturesFilePath))
             {
-                Console.WriteLine("MinMass     {0,7:N0} Da", MinSearchMass);
-                Console.WriteLine("MaxMass     {0,7:N0} Da", MaxSearchMass);
-                Console.WriteLine("MinCharge    {0,2}", MinSearchCharge);
-                Console.WriteLine("MaxCharge    {0,2}", MaxSearchCharge);
+                Console.WriteLine("{0,-14} {1:N0} Da", "MinMass:", MinSearchMass);
+                Console.WriteLine("{0,-14} {1:N0} Da", "MaxMass:", MaxSearchMass);
+                Console.WriteLine("{0,-14} {1}", "MinCharge:", MinSearchCharge);
+                Console.WriteLine("{0,-14} {1}", "MaxCharge:", MaxSearchCharge);
 
-                Console.WriteLine("FeatureMap   {0}", FeatureMapImage);
+                Console.WriteLine("{0,-14} {1}", "FeatureMap:", FeatureMapImage);
 
-                Console.WriteLine("ScoreReport  {0}", ScoreReport);
+                Console.WriteLine("{0,-14} {1}", "ScoreReport:", ScoreReport);
 
-                Console.WriteLine("LikelihoodRatioThreshold {0}", LikelihoodScoreThreshold);
+                Console.WriteLine("{0,-14} {1}", "MaxThreads:", MaxThreads);
 
-                Console.WriteLine("MaxThreads   {0}", MaxThreads);
+                Console.WriteLine("{0,-14} {1}", "LikelihoodRatioThreshold:", LikelihoodScoreThreshold);
+
             }
             else
             {
-                Console.WriteLine("MS1 features file {0}", ExistingFeaturesFilePath);
+                Console.WriteLine("{0} {1}", "MS1 features file:", ExistingFeaturesFilePath);
             }
+
+            Console.WriteLine();
         }
 
         protected int GetOptimalMaxThreads(int userMaxThreads)
