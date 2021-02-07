@@ -95,7 +95,7 @@ namespace InformedProteomics.FeatureFinding
 
             foreach (var fileName in fileEntries)
             {
-                if ((MsRawFile(fileName) && !HasExistingPbfFile(fileName)) || MsPbfFile(fileName))
+                if (MsRawFile(fileName) && !HasExistingPbfFile(fileName) || MsPbfFile(fileName))
                 {
                     var returnCode = ProcessFile(fileName);
                     if (returnCode != 0)
