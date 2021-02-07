@@ -116,23 +116,7 @@ namespace InformedProteomics.FeatureFinding
             var types = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
             types.Remove(".pbf");
 
-            // Only supposed to affect execution when running on a directory; however having this test here will affect single file execution
-            // i.e., if run with a raw file as input when a .pbf file exists for the dataset, this will return false, and kill the run erroneously.
-            //var pbfFilePath = MassSpecDataReaderFactory.ChangeExtension(specFilePath, "pbf");
-            //if (File.Exists(pbfFilePath)) return false;
-
             return types.Any(ext => specFilePath.ToLower().EndsWith(ext));
-            /*
-            Console.WriteLine("--------------");
-            Console.WriteLine(specFilePath);
-            Console.WriteLine(types.Select(ext => specFilePath.ToLower().EndsWith(ext)).Any(x => x == true));
-            foreach (var x in types.Select(ext => specFilePath.ToLower().EndsWith(ext)))
-            {
-                Console.WriteLine(x);
-            }
-
-            Console.WriteLine("--------------");
-            */
         }
 
         private bool HasExistingPbfFile(string path)
@@ -295,7 +279,7 @@ namespace InformedProteomics.FeatureFinding
 
                         foreach (var envelope in feature.EnumerateEnvelopes())
                         {
-                            //var mostAbuIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
+                            //var mostAbundantIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
                             var mostAbuPeak = envelope.Peaks[mostAbuIdx];
                             if (mostAbuPeak == null || !mostAbuPeak.Active)
                             {
