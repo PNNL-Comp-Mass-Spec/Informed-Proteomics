@@ -61,13 +61,15 @@ namespace PbfGen
 
             if (string.IsNullOrWhiteSpace(OutputDir))
             {
-                PrintError("Invalid output file directory: " + OutputDir);
+                ShowError("Invalid output file directory: " + OutputDir);
                 return false;
             }
 
+            Console.WriteLine("{0,-18} {1}", "Output Directory:", OutputDir);
+
             if (EndScan < StartScan && EndScan > -1)
             {
-                PrintError($"End scan ({EndScan}) must not be less than start scan ({StartScan})!");
+                ShowError($"End scan ({EndScan}) must not be less than start scan ({StartScan})!");
                 return false;
             }
 
@@ -75,7 +77,7 @@ namespace PbfGen
             {
                 if (File.Exists(OutputDir) && !File.GetAttributes(OutputDir).HasFlag(FileAttributes.Directory))
                 {
-                    PrintError("OutputDir \"" + OutputDir + "\" is not a directory!");
+                    ShowError("OutputDir \"" + OutputDir + "\" is not a directory!");
                     return false;
                 }
                 Directory.CreateDirectory(OutputDir);
@@ -84,13 +86,23 @@ namespace PbfGen
             return true;
         }
 
-        private static void PrintError(string errorMessage)
+
+        private static void ShowError(string errorMessage)
+        {
+            ShowErrorOrWarning(errorMessage);
+        }
+
+        private static void ShowWarning(string message)
+        {
+            ShowErrorOrWarning(message, string.Empty);
+        }
+
+        private static void ShowErrorOrWarning(string message, string messagePrefix = "Error: ")
         {
             Console.WriteLine();
-            Console.WriteLine("----------------------------------------------------------");
-            Console.WriteLine("Error: " + errorMessage);
-            Console.WriteLine("----------------------------------------------------------");
-            Console.WriteLine();
+            ConsoleMsgUtils.ShowWarning("{0}\n{1}{2}\n{0}",
+                "----------------------------------------------------------",
+                messagePrefix, message);
         }
     }
 }

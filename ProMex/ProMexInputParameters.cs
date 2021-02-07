@@ -71,13 +71,13 @@ namespace ProMex
 
             if (MinSearchMass > MaxSearchMass)
             {
-                PrintError("minMass must be less than maxMass!");
+                ShowError("minMass must be less than maxMass!");
                 return false;
             }
 
             if (MinSearchCharge > MaxSearchCharge)
             {
-                PrintError("minCharge must be less than maxCharge!");
+                ShowError("minCharge must be less than maxCharge!");
                 return false;
             }
 
@@ -86,13 +86,23 @@ namespace ProMex
             return true;
         }
 
-        private static void PrintError(string errorMessage)
+
+        private static void ShowError(string errorMessage)
+        {
+            ShowErrorOrWarning(errorMessage);
+        }
+
+        private static void ShowWarning(string message)
+        {
+            ShowErrorOrWarning(message, string.Empty);
+        }
+
+        private static void ShowErrorOrWarning(string message, string messagePrefix = "Error: ")
         {
             Console.WriteLine();
-            Console.WriteLine("----------------------------------------------------------");
-            Console.WriteLine("Error: " + errorMessage);
-            Console.WriteLine("----------------------------------------------------------");
-            Console.WriteLine();
+            ConsoleMsgUtils.ShowWarning("{0}\n{1}{2}\n{0}",
+                "----------------------------------------------------------",
+                messagePrefix, message);
         }
     }
 }

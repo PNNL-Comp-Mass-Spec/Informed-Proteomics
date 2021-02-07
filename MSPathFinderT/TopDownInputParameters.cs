@@ -210,7 +210,7 @@ namespace MSPathFinderT
             // Spec file path validation
             if (string.IsNullOrWhiteSpace(SpecFilePath))
             {
-                PrintError("Missing parameter for spectrum file path");
+                ShowError("Missing parameter for spectrum file path");
                 return false;
             }
 
@@ -242,18 +242,18 @@ namespace MSPathFinderT
             // Database path validation
             if (string.IsNullOrWhiteSpace(DatabaseFilePath))
             {
-                PrintError("Missing parameter for database file path");
+                ShowError("Missing parameter for database file path");
                 return false;
             }
             if (!File.Exists(DatabaseFilePath))
             {
-                PrintError("File not found: " + DatabaseFilePath);
+                ShowError("File not found: " + DatabaseFilePath);
                 return false;
             }
 
             if (!FastaDatabaseConstants.ValidFASTAExtension(DatabaseFilePath))
             {
-                PrintError("Invalid extension for the database file path (" + Path.GetExtension(DatabaseFilePath) + ")");
+                ShowError("Invalid extension for the database file path (" + Path.GetExtension(DatabaseFilePath) + ")");
                 return false;
             }
 
@@ -267,7 +267,7 @@ namespace MSPathFinderT
 
             if (string.IsNullOrWhiteSpace(OutputDir))
             {
-                PrintError("Invalid output file directory: " + OutputDir);
+                ShowError("Invalid output file directory: " + OutputDir);
                 return false;
             }
 
@@ -275,7 +275,7 @@ namespace MSPathFinderT
             {
                 if (File.Exists(OutputDir) && !File.GetAttributes(OutputDir).HasFlag(FileAttributes.Directory))
                 {
-                    PrintError("OutputDir \"" + OutputDir + "\" is not a directory!");
+                    ShowError("OutputDir \"" + OutputDir + "\" is not a directory!");
                     return false;
                 }
                 Directory.CreateDirectory(OutputDir);
@@ -302,14 +302,14 @@ namespace MSPathFinderT
             {
                 if (!File.Exists(ModsFilePath))
                 {
-                    PrintError("Modifications file not found: " + ModsFilePath);
+                    ShowError("Modifications file not found: " + ModsFilePath);
                     return false;
                 }
 
                 var errorMessage = LoadModsFile(ModsFilePath);
                 if (!string.IsNullOrWhiteSpace(errorMessage))
                 {
-                    PrintError(errorMessage);
+                    ShowError(errorMessage);
                     return false;
                 }
             }
@@ -317,7 +317,7 @@ namespace MSPathFinderT
             // Scans file validation
             if (!string.IsNullOrWhiteSpace(ScansFilePath) && !File.Exists(ScansFilePath))
             {
-                PrintError("Scans File not found: " + ScansFilePath);
+                ShowError("Scans File not found: " + ScansFilePath);
                 return false;
             }
             try
@@ -325,13 +325,13 @@ namespace MSPathFinderT
                 var errorMessage = LoadScansFile(ScansFilePath);
                 if (!string.IsNullOrWhiteSpace(errorMessage))
                 {
-                    PrintError(errorMessage);
+                    ShowError(errorMessage);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                PrintError("Exception parsing the file for parameter -scansFile: " + ex.Message);
+                ShowError("Exception parsing the file for parameter -scansFile: " + ex.Message);
                 return false;
             }
 
@@ -346,40 +346,52 @@ namespace MSPathFinderT
                 !Path.GetExtension(FeatureFilePath).Equals(".ms1ft", StringComparison.OrdinalIgnoreCase) &&
                 !Path.GetExtension(FeatureFilePath).Equals(".msalign", StringComparison.OrdinalIgnoreCase))
             {
-                PrintError("Invalid extension for the Feature file path (" + Path.GetExtension(FeatureFilePath) + ")");
+                ShowError("Invalid extension for the Feature file path (" + Path.GetExtension(FeatureFilePath) + ")");
                 return false;
             }
 
             if (MinSequenceLength > MaxSequenceLength)
             {
-                PrintError("MinPrecursorCharge (" + MinPrecursorIonCharge + ") is larger than MaxPrecursorCharge (" + MaxPrecursorIonCharge + ")!");
+                ShowError("MinPrecursorCharge (" + MinPrecursorIonCharge + ") is larger than MaxPrecursorCharge (" + MaxPrecursorIonCharge + ")!");
                 return false;
             }
 
             if (MinProductIonCharge > MaxProductIonCharge)
             {
-                PrintError("MinFragmentCharge (" + MinProductIonCharge + ") is larger than MaxFragmentCharge (" + MaxProductIonCharge + ")!");
+                ShowError("MinFragmentCharge (" + MinProductIonCharge + ") is larger than MaxFragmentCharge (" + MaxProductIonCharge + ")!");
                 return false;
             }
 
             if (MinSequenceMass > MaxSequenceMass)
             {
-                PrintError("MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!");
+                ShowError("MinSequenceMassInDa (" + MinSequenceMass + ") is larger than MaxSequenceMassInDa (" + MaxSequenceMass + ")!");
                 return false;
             }
 
             MaxNumThreads = GetOptimalMaxThreads(MaxNumThreads);
 
             return true;
+
         }
 
-        private static void PrintError(string errorMessage, Exception ex = null)
+
+        private static void ShowError(string errorMessage, Exception ex = null)
+        {
+            ShowErrorOrWarning(errorMessage, ex);
+        }
+
+        private static void ShowWarning(string message)
+        {
+            ShowErrorOrWarning(message, null, string.Empty);
+        }
+
+        private static void ShowErrorOrWarning(string message, Exception ex = null, string messagePrefix = "Error: ")
         {
             Console.WriteLine();
-            ConsoleMsgUtils.ShowWarning(
-                "----------------------------------------------------------\n" +
-                "Error: " + errorMessage + "\n" +
-                "----------------------------------------------------------");
+            ConsoleMsgUtils.ShowWarning("{0}\n{1}{2}\n{0}",
+                "----------------------------------------------------------",
+                messagePrefix, message);
+
 
             if (ex != null)
             {
@@ -495,7 +507,7 @@ namespace MSPathFinderT
             }
             catch (Exception ex)
             {
-                PrintError(string.Format("Exception examining the file or directory path ({0}): {1}", fileOrDirectoryPath, ex.Message), ex);
+                ShowError(string.Format("Exception examining the file or directory path ({0}): {1}", fileOrDirectoryPath, ex.Message), ex);
             }
 
             // Use the file or directory path as-is
@@ -643,7 +655,7 @@ namespace MSPathFinderT
             }
             catch (Exception ex)
             {
-                PrintError("Exception extracting dynamic and static mod information from the MSPathFinder parameter file", ex);
+                ShowError("Exception extracting dynamic and static mod information from the MSPathFinder parameter file", ex);
                 return false;
             }
         }
@@ -665,7 +677,7 @@ namespace MSPathFinderT
                             // Static (fixed) mod is listed as dynamic
                             // Abort the analysis since the parameter file is misleading and needs to be fixed
                             const string errMsg = "Static mod definition contains ',opt,'; update the param file to have ',fix,' or change to 'DynamicMod='";
-                            PrintError(errMsg + "\n" + staticMod);
+                            ShowError(errMsg + "\n" + staticMod);
                             return false;
                         }
 
@@ -686,7 +698,7 @@ namespace MSPathFinderT
                             // Dynamic (optional) mod is listed as static
                             // Abort the analysis since the parameter file is misleading and needs to be fixed
                             const string errMsg = "Dynamic mod definition contains ',fix,'; update the param file to have ',opt,' or change to 'StaticMod='";
-                            PrintError(errMsg + "\n" + dynamicMod);
+                            ShowError(errMsg + "\n" + dynamicMod);
                             return false;
                         }
 
@@ -704,7 +716,7 @@ namespace MSPathFinderT
             }
             catch (Exception ex)
             {
-                PrintError("Exception storing dynamic and static mod information loaded from the MSPathFinder parameter file", ex);
+                ShowError("Exception storing dynamic and static mod information loaded from the MSPathFinder parameter file", ex);
                 return false;
             }
         }
@@ -815,7 +827,7 @@ namespace MSPathFinderT
 
         private static void ErrorEventHandler(string errorMessage, Exception ex)
         {
-            PrintError(errorMessage, ex);
+            ShowError(errorMessage, ex);
         }
 
         private static void WarningEventHandler(string warningMessage)

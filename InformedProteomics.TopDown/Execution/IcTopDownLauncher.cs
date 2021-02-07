@@ -118,6 +118,7 @@ namespace InformedProteomics.TopDown.Execution
             // Output a progress message every 5 minutes...
             progReportTimer = new Timer(ReportOverallProgress, this, 0, 1000 * 60 * 5);
 
+            var specFileName = Path.GetFileName(Options.SpecFilePath);
 
             if (string.Equals(Path.GetExtension(Options.SpecFilePath), ".pbf", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -207,6 +208,8 @@ namespace InformedProteomics.TopDown.Execution
             }
             else
             {
+                var featureFileName = Path.GetFileName(Options.FeatureFilePath);
+
                 progData.StepRange(progData.MaxPercentage + 1);
                 sw.Reset();
                 sw.Start();
@@ -313,11 +316,11 @@ namespace InformedProteomics.TopDown.Execution
                     Options.MaxSequenceMass, Options.MinProductIonCharge, Options.MaxProductIonCharge);
             }
 
-            var specFileName = MassSpecDataReaderFactory.RemoveExtension(Path.GetFileName(Options.SpecFilePath));
-            var targetOutputFilePath = Path.Combine(Options.OutputDir, specFileName + TargetFileNameEnding);
-            var decoyOutputFilePath = Path.Combine(Options.OutputDir, specFileName + DecoyFileNameEnding);
-            var tdaOutputFilePath = Path.Combine(Options.OutputDir, specFileName + TdaFileNameEnding);
-            var mzidOutputFilePath = Path.Combine(Options.OutputDir, specFileName + MzidFileNameEnding);
+            var datasetName = MassSpecDataReaderFactory.RemoveExtension(Path.GetFileName(Options.SpecFilePath));
+            var targetOutputFilePath = Path.Combine(Options.OutputDir, datasetName + TargetFileNameEnding);
+            var decoyOutputFilePath = Path.Combine(Options.OutputDir, datasetName + DecoyFileNameEnding);
+            var tdaOutputFilePath = Path.Combine(Options.OutputDir, datasetName + TdaFileNameEnding);
+            var mzidOutputFilePath = Path.Combine(Options.OutputDir, datasetName + MzidFileNameEnding);
 
             progData.StepRange(progData.MaxPercentage + (98 - progData.MaxPercentage) / 2.0, "Running Target search");
             List<DatabaseSearchResultData> targetSearchResults = null;
