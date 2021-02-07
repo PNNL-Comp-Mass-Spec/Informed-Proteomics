@@ -41,6 +41,12 @@ namespace MSPathFinderT
             try
             // #endif
             {
+                // Example text:  MSPathFinderT version 1.1.7706 (February 5, 2021)
+                // (the build date is computed automatically)
+
+                Console.WriteLine(Name + " " + Version);
+                Console.WriteLine();
+
                 var osVersionInfo = new OSVersionInfo();
                 if (osVersionInfo.GetOSVersion().IndexOf("windows", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
