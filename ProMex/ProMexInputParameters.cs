@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using InformedProteomics.FeatureFinding;
 using PRISM;
 
@@ -9,42 +11,70 @@ namespace ProMex
     {
         // Ignore Spelling: pbf, Da, heatmap, csv
 
-        [Option("i", ArgPosition = 1, Required = true, HelpText = "Input file or input folder; supports .pbf, .mzML, and several vendor formats (see documentation)", HelpShowsDefault = false)]
+        [Option("i", "s", ArgPosition = 1, Required = true,
+            HelpText = "Input file or input directory; supports .pbf, .mzML, and several vendor formats (see documentation)",
+            HelpShowsDefault = false)]
         public override string InputPath { get; set; }
 
-        [Option("o", HelpText = "Output directory. (Default: directory containing input file)", HelpShowsDefault = false)]
+        [Option("o",
+            HelpText = "Output directory. (Default: directory containing input file)",
+            HelpShowsDefault = false)]
         public override string OutputPath { get; set; }
 
-        [Option("minCharge", HelpText = "Minimum charge state", Min = 1, Max = 60)]
+        [Option("minCharge",
+            HelpText = "Minimum charge state", Min = 1, Max = 60)]
         public override int MinSearchCharge { get; set; }
 
-        [Option("maxCharge", HelpText = "Maximum charge state", Min = 1, Max = 60)]
+        [Option("maxCharge",
+            HelpText = "Maximum charge state", Min = 1, Max = 60)]
         public override int MaxSearchCharge { get; set; }
 
-        [Option("minMass", HelpText = "Minimum mass in Da", Min = 600, Max = 100000)]
+        [Option("minMass",
+            HelpText = "Minimum mass in Da", Min = 600, Max = 100000)]
         public override double MinSearchMass { get; set; }
 
-        [Option("maxMass", HelpText = "Maximum mass in Da", Min = 600, Max = 100000)]
+        [Option("maxMass",
+            HelpText = "Maximum mass in Da", Min = 600, Max = 100000)]
         public override double MaxSearchMass { get; set; }
 
-        [Option("featureMap", HelpText = "Output the feature heatmap")]
+        [Option("featureMap",
+            HelpText = "Output the feature heatmap")]
         public override bool FeatureMapImage { get; set; }
 
-        [Option("score", HelpText = "Output extended scoring information")]
+        [Option("score",
+            HelpText = "Output extended scoring information")]
         public override bool ScoreReport { get; set; }
 
-        [Option("maxThreads", HelpText = "Max number of threads to use (Default: 0 (automatically determine the number of threads to use))", HelpShowsDefault = false, Min = 0)]
+        [Option("maxThreads", Min = 0,
+            HelpText = "Max number of threads to use (Default: 0 (automatically determine the number of threads to use))",
+            HelpShowsDefault = false)]
         public override int MaxThreads { get; set; }
 
-        [Option("csv", HelpText = "Also write feature data to a CSV file")]
+        [Option("csv",
+            HelpText = "Also write feature data to a CSV file")]
         public override bool CsvOutput { get; set; }
 
-        [Option("scoreTh", HelpText = "Likelihood score threshold")]
+        [Option("scoreTh", "scoreThreshold",
+            HelpText = "Likelihood score threshold")]
         public override double LikelihoodScoreThreshold { get; set; }
 
-        [Option("ms1ft", HelpText = "ms1ft format feature file path (use '.' to infer the name from the pbf file)", HelpShowsDefault = false)]
+        [Option("ms1ft",
+            HelpText = "ms1ft format feature file to create graphics files for (the .pbf file must be included in the same directory); " +
+                       "use '.' to infer the name from the pbf file",
+            HelpShowsDefault = false)]
         public override string ExistingFeaturesFilePath { get; set; }
 
+        /// <summary>
+        /// Source dataset file or directory paths
+        /// </summary>
+        /// <remarks>
+        /// This list is populated by the call to Validate
+        /// </remarks>
+        public List<FileSystemInfo> SourceDatasetPaths { get; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ProMexInputParameters() : base()
         {
             //InputPath = string.Empty;
@@ -59,14 +89,96 @@ namespace ProMex
             //LikelihoodScoreThreshold = -10;
             //MaxThreads = 0;
             //ExistingFeaturesFilePath = string.Empty;
+
+            SourceDatasetPaths = new List<FileSystemInfo>();
         }
 
         public bool Validate()
         {
-            if (!File.Exists(InputPath) && !Directory.Exists(InputPath))
+            var defaultOutputDirectoryPath = string.Empty;
+            SourceDatasetPaths.Clear();
+
+            if (InputPath.Contains("*") || InputPath.Contains("?"))
             {
-                PrintError("File not found: " + InputPath);
-                return false;
+                // InputPath has wildcards
+                // Validate each matching file or directory
+
+                var cleanPath = InputPath.Replace('*', '_').Replace('?', '_');
+                var lastSlash = InputPath.LastIndexOf(Path.DirectorySeparatorChar);
+
+                string wildcardSpec;
+                if (lastSlash >= 0)
+                {
+                    wildcardSpec = InputPath.Substring(lastSlash + 1);
+                }
+                else
+                {
+                    wildcardSpec = InputPath;
+                }
+
+                var sourcePathInfo = new FileInfo(cleanPath);
+                var workingDirectory = sourcePathInfo.Directory ?? new DirectoryInfo(".");
+
+                var matchingFiles = workingDirectory.GetFiles(wildcardSpec).ToList();
+                if (matchingFiles.Count > 0)
+                {
+                    Console.WriteLine("Finding dataset files that match " + InputPath);
+                    foreach (var datasetFile in matchingFiles)
+                    {
+                        ShowDebug(PathUtils.CompactPathString(datasetFile.FullName, 80), 0);
+                        SourceDatasetPaths.Add(datasetFile);
+                        defaultOutputDirectoryPath = workingDirectory.FullName;
+                    }
+
+                    Console.WriteLine();
+                }
+                else
+                {
+                    var matchingDirectories = workingDirectory.GetDirectories(wildcardSpec).ToList();
+                    if (matchingDirectories.Count > 0)
+                    {
+                        Console.WriteLine("Finding dataset directories that match " + InputPath);
+                        foreach (var datasetDirectory in matchingDirectories)
+                        {
+                            ShowDebug(PathUtils.CompactPathString(datasetDirectory.FullName, 80), 0);
+                            SourceDatasetPaths.Add(datasetDirectory);
+                            defaultOutputDirectoryPath = workingDirectory.FullName;
+                        }
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        ShowWarning(string.Format(
+                            "No files or directories matched '{0}' in directory {1}", wildcardSpec, workingDirectory.FullName));
+
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                if (File.Exists(InputPath))
+                {
+                    var datasetFile = new FileInfo(InputPath);
+                    SourceDatasetPaths.Add(datasetFile);
+                    defaultOutputDirectoryPath = datasetFile.DirectoryName ?? ".";
+                }
+                else if (Directory.Exists(InputPath))
+                {
+                    var datasetDirectory = new DirectoryInfo(InputPath);
+                    SourceDatasetPaths.Add(datasetDirectory);
+                    defaultOutputDirectoryPath = datasetDirectory.FullName;
+                }
+                else
+                {
+                    ShowError("File not found: " + InputPath);
+                    return false;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(OutputPath))
+            {
+                OutputPath = defaultOutputDirectoryPath;
             }
 
             if (MinSearchMass > MaxSearchMass)
@@ -86,6 +198,10 @@ namespace ProMex
             return true;
         }
 
+        private static void ShowDebug(string message, int emptyLinesBeforeMessage = 1)
+        {
+            ConsoleMsgUtils.ShowDebugCustom(message, emptyLinesBeforeMessage: emptyLinesBeforeMessage);
+        }
 
         private static void ShowError(string errorMessage)
         {

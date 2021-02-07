@@ -18,18 +18,26 @@ namespace MSPathFinderT
     {
         // Ignore Spelling: ic, tda, tol, frag, Da
 
-        [Option("s", "specFile", ArgPosition = 1, Required = true, HelpText = "Spectrum File (*.raw)", HelpShowsDefault = false)]
+        [Option("i", "s", "specFile", ArgPosition = 1, Required = true,
+            HelpText = "Spectrum File (.raw or .pbf)",
+            HelpShowsDefault = false)]
         public override string SpecFilePath { get; set; }
 
-        public IEnumerable<string> SpecFilePaths { get; set; }
+        public List<FileSystemInfo> SpecFilePaths { get; }
 
-        [Option("d", "database", Required = true, HelpText = "Database File (*.fasta or *.fa or *.faa)", HelpShowsDefault = false)]
+        [Option("d", "database", Required = true,
+            HelpText = "Database File (*.fasta or *.fa or *.faa)",
+            HelpShowsDefault = false)]
         public override string DatabaseFilePath { get; set; }
 
-        [Option("o", "outputDir", HelpText = "Output Directory", HelpShowsDefault = false)]
+        [Option("o", "outputDir",
+            HelpText = "Output Directory",
+            HelpShowsDefault = false)]
         public override string OutputDir { get; set; }
 
-        [Option("m", "searchMode", Min = 0, Max = 2, HelpText = "Search Mode (old format) (0: multiple internal cleavages, 1: single internal cleavage, 2: no internal cleavage)", Hidden = true)]
+        [Option("m", "searchMode", Min = 0, Max = 2,
+            HelpText = "Search Mode (old format) (0: multiple internal cleavages, 1: single internal cleavage, 2: no internal cleavage)",
+            Hidden = true)]
         [Obsolete("Use InternalCleavageMode")]
         public override int SearchModeInt
         {
@@ -64,16 +72,20 @@ namespace MSPathFinderT
             }
         }
 
-        [Option("ic", HelpText = "Search Mode")]
+        [Option("ic",
+            HelpText = "Search Mode")]
         public override InternalCleavageType InternalCleavageMode { get; set; }
 
-        [Option("tagSearch", HelpText = "Include Tag-based Search (use true or false;\nor use '0' for false or '1' for true)")]
+        [Option("tagSearch",
+            HelpText = "Include Tag-based Search (use true or false;\nor use '0' for false or '1' for true)")]
         public override bool TagBasedSearch { get; set; }
 
-        [Option("n", "NumMatchesPerSpec", "MatchesPerSpectrumToReport", HelpText = "Number of results to report for each mass spectrum")]
+        [Option("n", "NumMatchesPerSpec", "MatchesPerSpectrumToReport",
+            HelpText = "Number of results to report for each mass spectrum")]
         public override int MatchesPerSpectrumToReport { get; set; }
 
-        [Option("IncludeDecoy", "IncludeDecoys", "IncludeDecoyResults", HelpText = "Include decoy results in the _IcTda.tsv file")]
+        [Option("IncludeDecoy", "IncludeDecoys", "IncludeDecoyResults",
+            HelpText = "Include decoy results in the _IcTda.tsv file")]
         public override bool IncludeDecoyResults { get; set; }
 
         [Option("mod",
@@ -81,7 +93,8 @@ namespace MSPathFinderT
                        "Modifications can alternatively be defined in a parameter file, as specified by /ParamFile or -ParamFile\n" +
                        "Modifications defined using the -mod switch take precedence over modifications defined in a parameter file\n" +
                        "(Default: empty string, meaning no modifications)",
-            HelpShowsDefault = false)]
+            HelpShowsDefault = false
+            )]
         public string ModsFilePath { get; set; }
 
         // ReSharper disable once UnusedMember.Global
@@ -131,57 +144,76 @@ namespace MSPathFinderT
         /// <remarks>This can alternatively be set using TdaInt</remarks>
         public override DatabaseSearchMode TargetDecoySearchMode { get; set; }
 
-        [Option("t", "precursorTol", "PMTolerance", /*Min = 1,*/ HelpText = "Precursor Tolerance (in PPM)")]
+        [Option("t", "precursorTol", "PMTolerance", /*Min = 1,*/
+            HelpText = "Precursor Tolerance (in PPM)")]
         public override double PrecursorIonTolerancePpm
         {
             get => PrecursorIonTolerance.GetValue();
             set => PrecursorIonTolerance = new Tolerance(value);
         }
 
-        [Option("f", "fragmentTol", "FragTolerance", /*Min = 1,*/ HelpText = "Fragment Ion Tolerance (in PPM)")]
+        [Option("f", "fragmentTol", "FragTolerance", /*Min = 1,*/
+            HelpText = "Fragment Ion Tolerance (in PPM)")]
         public override double ProductIonTolerancePpm
         {
             get => ProductIonTolerance.GetValue();
             set => ProductIonTolerance = new Tolerance(value);
         }
 
-        [Option("minLength", Min = 0, HelpText = "Minimum Sequence Length")]
+        [Option("minLength", Min = 0,
+            HelpText = "Minimum Sequence Length")]
         public override int MinSequenceLength { get; set; }
 
-        [Option("maxLength", Min = 0, HelpText = "Maximum Sequence Length")]
+        [Option("maxLength", Min = 0,
+            HelpText = "Maximum Sequence Length")]
         public override int MaxSequenceLength { get; set; }
 
-        [Option("minCharge", Min = 1, HelpText = "Minimum precursor ion charge")]
+        [Option("minCharge", Min = 1,
+            HelpText = "Minimum precursor ion charge")]
         public override int MinPrecursorIonCharge { get; set; }
 
-        [Option("maxCharge", Min = 1, HelpText = "Maximum precursor ion charge")]
+        [Option("maxCharge", Min = 1,
+            HelpText = "Maximum precursor ion charge")]
         public override int MaxPrecursorIonCharge { get; set; }
 
-        [Option("minFragCharge", Min = 1, HelpText = "Minimum fragment ion charge")]
+        [Option("minFragCharge", Min = 1,
+            HelpText = "Minimum fragment ion charge")]
         public override int MinProductIonCharge { get; set; }
 
-        [Option("maxFragCharge", Min = 1, HelpText = "Maximum fragment ion charge")]
+        [Option("maxFragCharge", Min = 1,
+            HelpText = "Maximum fragment ion charge")]
         public override int MaxProductIonCharge { get; set; }
 
-        [Option("minMass", /*Min = 1,*/ HelpText = "Minimum sequence mass in Da")]
+        [Option("minMass", /*Min = 1,*/
+            HelpText = "Minimum sequence mass in Da")]
         public override double MinSequenceMass { get; set; }
 
-        [Option("maxMass", /*Min = 1,*/ HelpText = "Maximum sequence mass in Da")]
+        [Option("maxMass", /*Min = 1,*/
+            HelpText = "Maximum sequence mass in Da")]
         public override double MaxSequenceMass { get; set; }
 
-        [Option("feature", HelpText = "*.ms1ft, *_isos.csv, or *.msalign (Default: Run ProMex)", HelpShowsDefault = false)]
+        [Option("feature",
+            HelpText = ".ms1ft, _isos.csv, or .msalign feature file (typically the results from ProMex); " +
+                       "leave blank/undefined if processing multiple input files",
+            HelpShowsDefault = false)]
         public override string FeatureFilePath { get; set; }
 
-        [Option("threads", Min = 0, HelpText = "Maximum number of threads, or 0 to set automatically")]
+        [Option("threads", Min = 0,
+            HelpText = "Maximum number of threads, or 0 to set automatically")]
         public override int MaxNumThreads { get; set; }
 
-        [Option("act", "ActivationMethod", HelpText = "Activation Method")]
+        [Option("act", "ActivationMethod",
+            HelpText = "Activation Method")]
         public override ActivationMethod ActivationMethod { get; set; }
 
-        [Option("scansFile", HelpText = "Text file with MS2 scans to process", HelpShowsDefault = false)]
+        [Option("scansFile",
+            HelpText = "Optional text file with MS2 scans to process (tab, comma, or space separated); " +
+                       "any integer in the file is assumed to be a scan number to process",
+            HelpShowsDefault = false)]
         public string ScansFilePath { get; set; }
 
-        [Option("flip", HelpText = "If specified, FLIP scoring code will be used\n(supports UVPD spectra)")]
+        [Option("flip",
+            HelpText = "If specified, FLIP scoring code will be used\n(supports UVPD spectra)")]
         public bool UseFLIP { get; set; }
 
         /// <summary>
@@ -197,6 +229,8 @@ namespace MSPathFinderT
         {
             ScansFilePath = string.Empty;
             UseFLIP = false;
+
+            SpecFilePaths = new List<FileSystemInfo>();
         }
 
         /// <summary>
@@ -207,6 +241,9 @@ namespace MSPathFinderT
         /// <remarks>Will also load dynamic and static modifications from the parameter file, if defined</remarks>
         public bool Validate(string parameterFilePath)
         {
+            var defaultOutputDirectoryPath = string.Empty;
+            SpecFilePaths.Clear();
+
             // Spec file path validation
             if (string.IsNullOrWhiteSpace(SpecFilePath))
             {
@@ -214,30 +251,91 @@ namespace MSPathFinderT
                 return false;
             }
 
-            // Check for folder-type datasets, and replace specFilePath with the directory name if it is.
-            SpecFilePath = MassSpecDataReaderFactory.GetDatasetName(SpecFilePath);
-
-            var isDirectoryDataset = MassSpecDataReaderFactory.IsADirectoryDataset(SpecFilePath);
-
-            // This will be True if SpecFilePath is a directory that is NOT a supported folder-type dataset.
-            var specPathIsDirectory = Directory.Exists(SpecFilePath) && !isDirectoryDataset;
-
-            if (!File.Exists(SpecFilePath) && !specPathIsDirectory && !isDirectoryDataset)
+            if (SpecFilePath.Contains("*") || SpecFilePath.Contains("?"))
             {
-                PrintError("File not found: " + SpecFilePath);
-                return false;
+                // SpecFilePath has wildcards
+                // Validate each matching file or directory
+
+                var cleanPath = SpecFilePath.Replace('*', '_').Replace('?', '_');
+                var lastSlash = SpecFilePath.LastIndexOf(Path.DirectorySeparatorChar);
+
+                string wildcardSpec;
+                if (lastSlash >= 0)
+                {
+                    wildcardSpec = SpecFilePath.Substring(lastSlash + 1);
+                }
+                else
+                {
+                    wildcardSpec = SpecFilePath;
+                }
+
+                var sourcePathInfo = new FileInfo(cleanPath);
+                var workingDirectory = sourcePathInfo.Directory ?? new DirectoryInfo(".");
+
+                var matchingFiles = workingDirectory.GetFiles(wildcardSpec).ToList();
+                if (matchingFiles.Count > 0)
+                {
+                    Console.WriteLine("Finding dataset files that match " + SpecFilePath);
+                    foreach (var datasetFile in matchingFiles)
+                    {
+                        ShowDebug(PathUtils.CompactPathString(datasetFile.FullName, 80), 0);
+                        var specFiles = ValidateSourceData(datasetFile.FullName, out _);
+                        if (specFiles.Count == 0)
+                            return false;
+
+                        SpecFilePaths.AddRange(specFiles);
+                        defaultOutputDirectoryPath = workingDirectory.FullName;
+                    }
+
+                    Console.WriteLine();
+                }
+                else
+                {
+                    var matchingDirectories = workingDirectory.GetDirectories(wildcardSpec).ToList();
+                    if (matchingDirectories.Count > 0)
+                    {
+                        Console.WriteLine("Finding dataset directories that match " + SpecFilePath);
+                        foreach (var datasetDirectory in matchingDirectories)
+                        {
+                            ShowDebug(PathUtils.CompactPathString(datasetDirectory.FullName, 80), 0);
+                            var specFiles = ValidateSourceData(datasetDirectory.FullName, out _);
+                            if (specFiles.Count == 0)
+                                return false;
+
+                            SpecFilePaths.AddRange(specFiles);
+                            defaultOutputDirectoryPath = workingDirectory.FullName;
+                        }
+
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        ShowWarning(string.Format(
+                            "No files or directories matched '{0}' in directory {1}", wildcardSpec, workingDirectory.FullName));
+
+                        return false;
+                    }
+                }
             }
-
-            // The extensions in this variable start with a period
-            var supportedFileExtensions = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
-
-            if (!specPathIsDirectory && !supportedFileExtensions.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any())
+            else
             {
-                PrintError("Invalid file extension for spectrum file (" + Path.GetExtension(SpecFilePath) + "): " + SpecFilePath);
-                return false;
-            }
+                var specFiles = ValidateSourceData(SpecFilePath, out var specPathIsDirectory);
+                if (specFiles.Count == 0)
+                    return false;
 
-            SpecFilePaths = GetSpecFilePaths(SpecFilePath);
+                SpecFilePaths.AddRange(specFiles);
+
+                if (specPathIsDirectory)
+                {
+                    var datasetDirectory = new DirectoryInfo(SpecFilePath);
+                    defaultOutputDirectoryPath = datasetDirectory.FullName;
+                }
+                else
+                {
+                    var datasetFile = new FileInfo(SpecFilePath);
+                    defaultOutputDirectoryPath = datasetFile.DirectoryName ?? ".";
+                }
+            }
 
             // Database path validation
             if (string.IsNullOrWhiteSpace(DatabaseFilePath))
@@ -260,9 +358,7 @@ namespace MSPathFinderT
             // Output directory validation
             if (string.IsNullOrWhiteSpace(OutputDir))
             {
-                // Must use "Path.GetFullPath" to return the absolute path when the source file is in the working directory
-                // But, it could cause problems with too-long paths.
-                OutputDir = specPathIsDirectory ? SpecFilePath : Path.GetDirectoryName(Path.GetFullPath(SpecFilePath));
+                OutputDir = defaultOutputDirectoryPath;
             }
 
             if (string.IsNullOrWhiteSpace(OutputDir))
@@ -336,11 +432,29 @@ namespace MSPathFinderT
             }
 
             // Feature file validation
-            if (!string.IsNullOrWhiteSpace(FeatureFilePath) && !File.Exists(FeatureFilePath))
+            if (!string.IsNullOrWhiteSpace(FeatureFilePath))
             {
-                PrintError("Feature File not found: " + FeatureFilePath);
-                return false;
+                if (FeatureFilePath.Contains("*") || FeatureFilePath.Contains("?"))
+                {
+                    // Feature file path has a wildcard; change to an empty string so that the file is auto-found
+                    FeatureFilePath = string.Empty;
+                }
+                else if (!File.Exists(FeatureFilePath))
+                {
+                    ShowError("Feature File not found: " + FeatureFilePath);
+                    return false;
+                }
+                else if (SpecFilePaths.Count > 0)
+                {
+                    ShowWarning(string.Format(
+                        "Processing multiple spectrum files, but a single feature file is defined:\n  {0}\n\n" +
+                        "You probably want to leave the feature file path undefined\n" +
+                        "by either not using the -feature switch or\n" +
+                        "by not including 'feature=FilePath' in the parameter file",
+                        FeatureFilePath));
+                }
             }
+
             if (!string.IsNullOrWhiteSpace(FeatureFilePath) &&
                 !Path.GetExtension(FeatureFilePath).Equals(".csv", StringComparison.OrdinalIgnoreCase) &&
                 !Path.GetExtension(FeatureFilePath).Equals(".ms1ft", StringComparison.OrdinalIgnoreCase) &&
@@ -374,6 +488,45 @@ namespace MSPathFinderT
 
         }
 
+        /// <summary>
+        /// Validate that the dataset is a valid mass spec dataset
+        /// </summary>
+        /// <param name="sourceDatasetPath">Path to a dataset file or directory</param>
+        /// <param name="specPathIsDirectory">Output: true if the specified path is a directory</param>
+        /// <returns>List of files to process; empty list if an error</returns>
+        private List<FileSystemInfo> ValidateSourceData(string sourceDatasetPath, out bool specPathIsDirectory)
+        {
+            // Check for folder-type datasets, and replace sourceDatasetPath with the directory name if it is.
+            sourceDatasetPath = MassSpecDataReaderFactory.GetDatasetName(sourceDatasetPath);
+
+            var isDirectoryDataset = MassSpecDataReaderFactory.IsADirectoryDataset(sourceDatasetPath);
+
+            // This will be True if sourceDatasetPath is a directory that is NOT a supported folder-type dataset.
+            specPathIsDirectory = Directory.Exists(sourceDatasetPath) && !isDirectoryDataset;
+
+            if (!File.Exists(sourceDatasetPath) && !specPathIsDirectory && !isDirectoryDataset)
+            {
+                ShowError("File not found: " + sourceDatasetPath);
+                return new List<FileSystemInfo>();
+            }
+
+            // The extensions in this variable start with a period
+            var supportedFileExtensions = MassSpecDataReaderFactory.MassSpecDataTypeFilterList;
+
+            if (!specPathIsDirectory && !supportedFileExtensions.Select(ext => sourceDatasetPath.ToLower().EndsWith(ext)).Any())
+            {
+                ShowError("Invalid file extension for spectrum file (" + Path.GetExtension(sourceDatasetPath) + "): " + sourceDatasetPath);
+                return new List<FileSystemInfo>();
+            }
+
+            var specFiles = GetSpecFilePaths(sourceDatasetPath).ToList();
+            return specFiles;
+        }
+
+        private static void ShowDebug(string message, int emptyLinesBeforeMessage = 1)
+        {
+            ConsoleMsgUtils.ShowDebugCustom(message, emptyLinesBeforeMessage: emptyLinesBeforeMessage);
+        }
 
         private static void ShowError(string errorMessage, Exception ex = null)
         {
@@ -494,24 +647,32 @@ namespace MSPathFinderT
             return threads;
         }
 
-        private static IEnumerable<string> GetSpecFilePaths(string fileOrDirectoryPath)
+        private static IEnumerable<FileSystemInfo> GetSpecFilePaths(string fileOrDirectoryPath)
         {
             try
             {
-                if (Directory.Exists(fileOrDirectoryPath) &&
-                    !MassSpecDataReaderFactory.IsADirectoryDataset(fileOrDirectoryPath))
+                if (!Directory.Exists(fileOrDirectoryPath))
                 {
-                    // Process all .raw files in the given directory
-                    return Directory.GetFiles(fileOrDirectoryPath, "*.raw");
+                    // Assume a file
+                    return new[] { new FileInfo(fileOrDirectoryPath) };
                 }
+
+                var workingDirectory = new DirectoryInfo(fileOrDirectoryPath);
+
+                if (MassSpecDataReaderFactory.IsADirectoryDataset(fileOrDirectoryPath))
+                {
+                    return new[] { workingDirectory };
+                }
+
+                // Process all .raw files in the given directory
+                return workingDirectory.GetFiles("*.raw");
             }
             catch (Exception ex)
             {
                 ShowError(string.Format("Exception examining the file or directory path ({0}): {1}", fileOrDirectoryPath, ex.Message), ex);
+                return new List<FileInfo>();
             }
 
-            // Use the file or directory path as-is
-            return new[] { fileOrDirectoryPath };
         }
 
         /// <summary>

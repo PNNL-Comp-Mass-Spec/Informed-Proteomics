@@ -31,15 +31,9 @@ namespace MSPathFinderT
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
         private const uint EnableExtendedFlags = 0x0080;
 
-        // Ignore Spelling: endif
-
         public static int Main(string[] args)
         {
-            var errorCode = 0;
-
-            // #if (!DEBUG)
             try
-            // #endif
             {
                 // Example text:  MSPathFinderT version 1.1.7706 (February 5, 2021)
                 // (the build date is computed automatically)
@@ -77,7 +71,6 @@ namespace MSPathFinderT
                 var results = parser.ParseArgs(args);
                 if (!results.Success)
                 {
-                    // Wait for 1.5 seconds
                     System.Threading.Thread.Sleep(1500);
                     return -3;
                 }
@@ -86,34 +79,57 @@ namespace MSPathFinderT
                 {
                     parser.PrintHelp();
 
-                    // Wait for 1.5 seconds
                     System.Threading.Thread.Sleep(1500);
-
                     return -3;
                 }
-                var parameters = results.ParsedResults;
 
-                Console.WriteLine(Name + " " + Version);
-                parameters.Display(results.ParamFilePath);
+                var options = results.ParsedResults;
 
-                parameters.MaxNumNTermCleavages = 1; // max number of N-term cleavages
-                parameters.MaxNumCTermCleavages = 0; // max number of C-term cleavages
+                var errorCode = ProcessFiles(results, options);
 
-                FlipSwitch.Instance.SetUseFlipScoring(parameters.UseFLIP);
+                if (errorCode != 0)
+                    System.Threading.Thread.Sleep(1500);
 
-                foreach (var specFilePath in parameters.SpecFilePaths)
+                return errorCode;
+            }
+            catch (Exception ex)
+            {
+                ConsoleMsgUtils.ShowError("Exception while parsing the command line parameters", ex);
+                System.Threading.Thread.Sleep(1500);
+                return -5;
+            }
+        }
+
+        private static int ProcessFiles(CommandLineParser<TopDownInputParameters>.ParserResults results, TopDownInputParameters options)
+        {
+#if (!DISABLE_TRYCATCH)
+            try
+#endif
+            {
+                options.Display(results.ParamFilePath);
+
+                options.MaxNumNTermCleavages = 1; // max number of N-term cleavages
+                options.MaxNumCTermCleavages = 0; // max number of C-term cleavages
+
+                FlipSwitch.Instance.SetUseFlipScoring(options.UseFLIP);
+
+                var errorCode = 0;
+
+                foreach (var specFile in options.SpecFilePaths)
                 {
                     // Update the spec file path in the parameters for each search
-                    parameters.SpecFilePath = specFilePath;
-                    parameters.Write();
+                    options.SpecFilePath = specFile.FullName;
+                    options.Write();
 
-                    var topDownLauncher = new IcTopDownLauncher(parameters);
+                    var topDownLauncher = new IcTopDownLauncher(options);
                     topDownLauncher.ErrorEvent += TopDownLauncher_ErrorEvent;
                     topDownLauncher.WarningEvent += TopDownLauncher_WarningEvent;
                     topDownLauncher.StatusEvent += TopDownLauncher_StatusEvent;
                     topDownLauncher.ProgressUpdate += TopDownLauncher_ProgressUpdate;
 
                     var success = topDownLauncher.RunSearch();
+
+                    Console.WriteLine();
 
                     if (success)
                     {
@@ -123,7 +139,7 @@ namespace MSPathFinderT
                     // topDownLauncher returned false (not successful)
 
                     // NOTE: The DMS Analysis Manager looks for this text; do not change it
-                    var errorMsg = "Error processing " + Path.GetFileName(specFilePath) + ": ";
+                    var errorMsg = "Error processing " + specFile.Name + ": ";
 
                     if (string.IsNullOrWhiteSpace(topDownLauncher.ErrorMessage))
                     {
@@ -136,44 +152,27 @@ namespace MSPathFinderT
 
                     Console.WriteLine(errorMsg);
 
+                    if (errorCode != 0)
+                        continue;
+
+                    errorCode = -Math.Abs(errorMsg.GetHashCode());
+
                     if (errorCode == 0)
-                    {
-                        // This is the first error encountered; update the error code
-                        // (though we will continue processing the next file if there is one)
-                        errorCode = -Math.Abs(errorMsg.GetHashCode());
-                        if (errorCode == 0)
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            return errorCode;
-                        }
-                    }
+                        errorCode = -1;
                 }
+
+                return errorCode;
             }
-            // #if (!DEBUG)
+#if (!DISABLE_TRYCATCH)
             catch (Exception ex)
             {
                 // NOTE: The DMS Analysis Manager looks for this text; do not change it
-                ConsoleMsgUtils.ShowWarning("Exception while processing: " + ex.Message);
-                ConsoleMsgUtils.ShowWarning(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
-                errorCode = -Math.Abs(ex.Message.GetHashCode());
+                ConsoleMsgUtils.ShowError("Exception while processing", ex);
 
-                System.Threading.Thread.Sleep(1500);
-
-                if (errorCode == 0)
-                {
-                    return -1;
-                }
-                else
-                {
-                    return errorCode;
-                }
+                var errorCode = -Math.Abs(ex.Message.GetHashCode());
+                return errorCode == 0 ? -1 : errorCode;
             }
-            // #endif
-
-            return errorCode;
+#endif
         }
 
         private static void TopDownLauncher_ProgressUpdate(string progressMessage, float percentComplete)

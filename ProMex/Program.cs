@@ -25,8 +25,6 @@ namespace ProMex
 
         private static int Main(string[] args)
         {
-            LcMsFeatureFinderInputParameters parameters;
-
             try
             {
                 // Example text:  ProMex version 1.1.7706 (February 5, 2021)
@@ -42,7 +40,8 @@ namespace ProMex
                     SetConsoleMode(handle, EnableExtendedFlags);
                 }
 
-                //args = new string[] {"-i", @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf", "-minMass", "3000", "-maxMass", "30000"};
+                // Uncomment to debug
+                // args = new string[] {"-i", @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf", "-minMass", "3000", "-maxMass", "30000"};
 
                 var parser = new CommandLineParser<ProMexInputParameters>(Name, Version);
                 parser.UsageExamples.Add("To create a PNG of the features in an existing ms1ft file " +
@@ -52,9 +51,7 @@ namespace ProMex
 
                 if (!results.Success)
                 {
-                    // Wait for 1.5 seconds
                     System.Threading.Thread.Sleep(1500);
-
                     return -1;
                 }
 
@@ -62,54 +59,75 @@ namespace ProMex
                 {
                     parser.PrintHelp();
 
-                    // Wait for 1.5 seconds
                     System.Threading.Thread.Sleep(1500);
-
                     return -1;
                 }
 
-                parameters = results.ParsedResults;
+                var options = results.ParsedResults;
+
+                var errorCode = ProcessFiles(options);
+
+                if (errorCode != 0)
+                    System.Threading.Thread.Sleep(1500);
+
+                return errorCode;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Exception while parsing the command line parameters: " + ex.Message);
+                System.Threading.Thread.Sleep(1500);
                 return -5;
             }
+        }
 
-#if (!DEBUG)
+        private static int ProcessFiles(ProMexInputParameters options)
+        {
+#if (!DISABLE_TRYCATCH)
             try
             {
 #endif
+                if (options.SourceDatasetPaths.Count == 0)
+                {
+                    ConsoleMsgUtils.ShowWarning("Source dataset path(s) could not be determined; nothing to do");
+                    return -6;
+                }
 
-            // Example text:  ProMex version 1.0.6527 (November 14, 2017)
-            // (the build date is computed automatically)
-            Console.WriteLine("************ {0} {1} ************", Name, Version);
-            parameters.Display();
-            var launcher = new LcMsFeatureFinderLauncher(parameters);
-            int errorCode;
+                options.Display();
+                var launcher = new LcMsFeatureFinderLauncher(options);
+                var errorCount = 0;
 
-            if (string.IsNullOrWhiteSpace(parameters.ExistingFeaturesFilePath))
-            {
-                errorCode = launcher.Run();
-            }
-            else
-            {
-                errorCode = launcher.CreateFeatureMapImage(parameters.InputPath, parameters.ExistingFeaturesFilePath);
-            }
+                foreach (var datasetFilePath in options.SourceDatasetPaths)
+                {
+                    options.InputPath = datasetFilePath.FullName;
 
-            return errorCode;
-#if (!DEBUG)
+                    int errorCode;
+
+                    if (string.IsNullOrWhiteSpace(options.ExistingFeaturesFilePath))
+                    {
+                        errorCode = launcher.Run();
+                    }
+                    else
+                    {
+                        errorCode = launcher.CreateFeatureMapImage(options.InputPath, options.ExistingFeaturesFilePath);
+                    }
+
+                    if (errorCode != 0)
+                        errorCount++;
+
+                    Console.WriteLine();
+                }
+
+                return errorCount;
+
+#if (!DISABLE_TRYCATCH)
             }
             catch (Exception ex)
             {
                 // NOTE: The DMS Analysis Manager looks for this text; do not change it
-                Console.WriteLine("Exception while processing: " + ex.Message);
-                Console.WriteLine(ex.StackTrace);
-                var errorCode = -Math.Abs(ex.Message.GetHashCode());
-                if (errorCode == 0)
-                    return -1;
+                ConsoleMsgUtils.ShowError("Exception while processing", ex);
 
-                return errorCode;
+                var errorCode = -Math.Abs(ex.Message.GetHashCode());
+                return errorCode == 0 ? -1 : errorCode;
             }
 #endif
         }

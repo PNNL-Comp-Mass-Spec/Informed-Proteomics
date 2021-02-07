@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using InformedProteomics.Backend.MassSpecData;
 using PRISM;
@@ -28,8 +30,6 @@ namespace PbfGen
 
         public static int Main(string[] args)
         {
-            PbfGenInputParameters options;
-
             try
             {
                 // Example text:  PbfGen version 1.1.7706 (February 5, 2021)
@@ -64,9 +64,7 @@ namespace PbfGen
 
                 if (!results.Success)
                 {
-                    // Wait for 1.5 seconds
                     System.Threading.Thread.Sleep(1500);
-
                     return -1;
                 }
 
@@ -74,37 +72,65 @@ namespace PbfGen
                 {
                     parser.PrintHelp();
 
-                    // Wait for 1.5 seconds
                     System.Threading.Thread.Sleep(1500);
-
                     return -1;
                 }
 
-                options = results.ParsedResults;
+                var options = results.ParsedResults;
+
+                var errorCode = ProcessFiles(options);
+
+                if (errorCode != 0)
+                    System.Threading.Thread.Sleep(1500);
+
+                return errorCode;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception while parsing the command line parameters: " + ex.Message);
+                ConsoleMsgUtils.ShowError("Exception while parsing the command line parameters", ex);
+                System.Threading.Thread.Sleep(1500);
                 return -5;
             }
+        }
 
-#if (!DEBUG)
+        private static int ProcessFiles(PbfGenInputParameters options)
+        {
+#if (!DISABLE_TRYCATCH)
             try
 #endif
             {
-                var specFilePaths = new[] { options.SourcePath };
-                if (Directory.Exists(options.SourcePath) && !MassSpecDataReaderFactory.IsADirectoryDataset(options.SourcePath))
+                if (options.SourceDatasetPaths.Count == 0)
                 {
-                    specFilePaths = Directory.GetFiles(options.SourcePath, "*.raw"); // TODO: Support folders with other formats in them too...
+                    ConsoleMsgUtils.ShowWarning("Source dataset path(s) could not be determined; nothing to do");
+                    return -6;
                 }
 
-                foreach (var rawFilePath in specFilePaths)
+                var specFilePaths = new List<string>();
+                var scanRangeShown = false;
+
+                if (options.SourceDatasetPaths.First() is DirectoryInfo directoryBasedDataset)
                 {
-                    var pbfFileName = MassSpecDataReaderFactory.ChangeExtension(rawFilePath, PbfLcMsRun.FileExtensionConst);
+                    if (directoryBasedDataset.Exists && !MassSpecDataReaderFactory.IsADirectoryDataset(directoryBasedDataset.FullName))
+                    {
+                        // TODO: Support folders with other formats in them too...
+                        specFilePaths.AddRange(Directory.GetFiles(options.SourcePath, "*.raw"));
+                    }
+                }
+
+                if (specFilePaths.Count == 0)
+                {
+                    specFilePaths.AddRange(options.SourceDatasetPaths.Select(item => item.FullName));
+                }
+
+                foreach (var datasetFilePath in specFilePaths)
+                {
+                    Console.WriteLine();
+
+                    var pbfFileName = MassSpecDataReaderFactory.ChangeExtension(datasetFilePath, PbfLcMsRun.FileExtensionConst);
 
                     if (string.IsNullOrWhiteSpace(pbfFileName))
                     {
-                        Console.WriteLine("MassSpecDataReaderFactory.ChangeExtension could not determine the pbf filename for {0}", rawFilePath);
+                        ConsoleMsgUtils.ShowWarning("MassSpecDataReaderFactory.ChangeExtension could not determine the pbf filename for {0}", datasetFilePath);
                         continue;
                     }
 
@@ -112,26 +138,20 @@ namespace PbfGen
 
                     if (File.Exists(pbfFilePath) && PbfLcMsRun.CheckFileFormatVersion(pbfFilePath, out var isCurrent) && isCurrent)
                     {
-                        Console.WriteLine("{0} already exists.", pbfFilePath);
+                        Console.WriteLine("{0} already exists; will not re-generate", pbfFilePath);
                         continue;
                     }
 
-                    Console.WriteLine("Creating {0} from {1}", pbfFilePath, rawFilePath);
+                    Console.WriteLine("Creating {0}", pbfFilePath);
+                    Console.WriteLine("from     {0}", datasetFilePath);
 
-                    if (options.StartScan > 0 && options.EndScan > 0)
+                    if (!scanRangeShown)
                     {
-                        Console.WriteLine("Only including scans {0} to {1}", options.StartScan, options.EndScan);
-                    }
-                    else if (options.StartScan > 0)
-                    {
-                        Console.WriteLine("Only including scans {0} to the end", options.StartScan);
-                    }
-                    else if (options.EndScan > 0)
-                    {
-                        Console.WriteLine("Only including scans 1 to {0}", options.EndScan);
+                        ShowScanRange(options);
+                        scanRangeShown = true;
                     }
 
-                    var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(rawFilePath);
+                    var reader = MassSpecDataReaderFactory.GetMassSpecDataReader(datasetFilePath);
                     var progress = new Progress<ProgressData>(p =>
                     {
                         p.UpdateFrequencySeconds = 2;
@@ -146,29 +166,46 @@ namespace PbfGen
                     const bool keepDataReaderOpen = false;
 
                     var run = new PbfLcMsRun(
-                        rawFilePath, reader, pbfFilePath,
+                        datasetFilePath, reader, pbfFilePath,
                         precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold,
                         progress, keepDataReaderOpen, options.StartScan, options.EndScan);
 
                     Console.WriteLine();
                 }
 
+                Console.WriteLine();
                 Console.WriteLine("PbfFormatVersion: {0}", PbfLcMsRun.FileFormatId);
                 return 0;
             }
-#if (!DEBUG)
+#if (!DISABLE_TRYCATCH)
             catch (Exception ex)
             {
                 // NOTE: The DMS Analysis Manager looks for this text; do not change it
-                Console.WriteLine("Exception while processing: " + ex.Message);
-                Console.WriteLine(ex.StackTrace);
+                ConsoleMsgUtils.ShowError("Exception while processing", ex);
+
                 var errorCode = -Math.Abs(ex.Message.GetHashCode());
-                if (errorCode == 0)
-                    return -1;
-                else
-                    return errorCode;
+                return errorCode == 0 ? -1 : errorCode;
             }
 #endif
+        }
+
+        private static void ShowScanRange(PbfGenInputParameters options)
+        {
+            if (options.StartScan > 0 && options.EndScan > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Only including scans {0} to {1}", options.StartScan, options.EndScan);
+            }
+            else if (options.StartScan > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Only including scans {0} to the end", options.StartScan);
+            }
+            else if (options.EndScan > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Only including scans 1 to {0}", options.EndScan);
+            }
         }
     }
 }
