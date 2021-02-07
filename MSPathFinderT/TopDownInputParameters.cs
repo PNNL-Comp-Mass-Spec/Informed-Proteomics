@@ -444,7 +444,7 @@ namespace MSPathFinderT
                     ShowError("Feature File not found: " + FeatureFilePath);
                     return false;
                 }
-                else if (SpecFilePaths.Count > 0)
+                else if (SpecFilePaths.Count > 1)
                 {
                     ShowWarning(string.Format(
                         "Processing multiple spectrum files, but a single feature file is defined:\n  {0}\n\n" +
