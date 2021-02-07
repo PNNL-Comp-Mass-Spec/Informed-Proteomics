@@ -193,7 +193,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         return false;
                     }
 
-                    if (peakMz <= maxMz)    // find match, move to prev isotope
+                    if (peakMz <= maxMz)    // find match, move to previous isotope
                     {
                         peakIndex = i;
                         break;
@@ -222,7 +222,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         return false;
                     }
 
-                    if (peakMz >= minMz)    // find match, move to prev isotope
+                    if (peakMz >= minMz)    // find match, move to previous isotope
                     {
                         peakIndex = i;
                         break;
@@ -275,7 +275,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         peakIndex = i;
                         break;
                     }
-                    if (peakMz <= maxMz)    // find match, move to prev isotope
+                    if (peakMz <= maxMz)    // find match, move to previous isotope
                     {
                         var peak = Peaks[i];
                         if (observedPeaks[isotopeIndex] == null ||
@@ -308,7 +308,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         peakIndex = i;
                         break;
                     }
-                    if (peakMz >= minMz)    // find match, move to prev isotope
+                    if (peakMz >= minMz)    // find match, move to previous isotope
                     {
                         var peak = Peaks[i];
                         if (observedPeaks[isotopeIndex] == null ||
@@ -367,7 +367,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         peakIndex = i;
                         break;
                     }
-                    if (peakMz <= maxMz)    // find match, move to prev isotope
+                    if (peakMz <= maxMz)    // find match, move to previous isotope
                     {
                         var peak = Peaks[i];
                         if (observedPeaks[isotopeIndex] == null ||
@@ -400,7 +400,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                         peakIndex = i;
                         break;
                     }
-                    if (peakMz >= minMz)    // find match, move to prev isotope
+                    if (peakMz >= minMz)    // find match, move to previous isotope
                     {
                         var peak = Peaks[i];
                         if (observedPeaks[isotopeIndex] == null ||

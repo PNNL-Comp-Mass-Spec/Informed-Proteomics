@@ -19,6 +19,8 @@ namespace InformedProteomics.FeatureFinding
 {
     public class LcMsFeatureFinderLauncher
     {
+        // Ignore Spelling: pbf, Da, csv, mw, Xic
+
         private readonly LcMsFeatureLikelihood _likelihoodScorer;
 
         /// <summary>

@@ -11,6 +11,8 @@ namespace InformedProteomics.Scoring.TopDown
 {
     public class FilteredProteinMassBinning : IMassBinning
     {
+        // Ignore Spelling: foreach, aa
+
         public FilteredProteinMassBinning(AminoAcidSet aaSet, double maxProteinMass = 50000, int numBits = 27)
         {
             // _aminoAcidSet = aaSet;

@@ -5,6 +5,8 @@ namespace InformedProteomics.FeatureFinding
 {
     public class LcMsFeatureFinderInputParameters
     {
+        // Ignore Spelling: Da
+
         public virtual double MinSearchMass { get; set; }
 
         public virtual double MaxSearchMass { get; set; }

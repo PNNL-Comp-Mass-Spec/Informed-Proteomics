@@ -342,7 +342,8 @@ namespace InformedProteomics.Backend.MassSpecData
             if (specFileName.EndsWith(FileExtension, StringComparison.OrdinalIgnoreCase) ||
                 File.Exists(pbfPath) && CheckFileFormatVersion(pbfPath, out var isCurrent) && isCurrent)
             {
-                // Use regular construction
+                // The existing pbf file is valid; use it
+
                 if (!specFileName.EndsWith(FileExtension, StringComparison.OrdinalIgnoreCase))
                 {
                     specFileName = pbfPath;
@@ -356,6 +357,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 return;
             }
 
+            // Create a new pbf file
             BuildPbfFile(specFileName, msDataReader, pbfPath, tempPath, progress, keepDataReaderOpen, scanStart, scanEnd);
         }
 

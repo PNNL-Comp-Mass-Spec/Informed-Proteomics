@@ -9,6 +9,8 @@ namespace MSPathFinder
 {
     public class BottomUpInputParameters
     {
+        // Ignore Spelling: Tda, ntt, Frag
+
         public const string ParameterFileExtension = ".param";
 
         public IEnumerable<string> SpecFilePaths { get; set; }

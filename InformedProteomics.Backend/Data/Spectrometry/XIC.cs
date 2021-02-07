@@ -11,6 +11,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class Xic : List<XicPoint>
     {
+        // Ignore Spelling: Xic
+
         //public int Min { get; private set; }
         //public int Max { get; private set; }
 
