@@ -41,6 +41,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Properties\AssemblyInfoShared.cs">
+      <Link>Properties\AssemblyInfoShared.cs</Link>
+    </Compile>
     <Compile Include="Execution\DatabaseSequenceSpectrumMatch.cs" />
     <Compile Include="Execution\IcRescorer.cs" />
     <Compile Include="Execution\IcTopDownLauncher.cs" />

@@ -54,6 +54,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Properties\AssemblyInfoShared.cs">
+      <Link>Properties\AssemblyInfoShared.cs</Link>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="ProMexInputParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

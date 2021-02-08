@@ -37,6 +37,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Properties\AssemblyInfoShared.cs">
+      <Link>Properties\AssemblyInfoShared.cs</Link>
+    </Compile>
     <Compile Include="BottomUp\DummyScorer.cs" />
     <Compile Include="BottomUp\Partition.cs" />
     <Compile Include="BottomUp\ScoredSpectrum.cs" />

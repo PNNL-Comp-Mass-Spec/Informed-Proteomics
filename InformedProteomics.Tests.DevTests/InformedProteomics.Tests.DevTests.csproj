@@ -37,6 +37,9 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Properties\AssemblyInfoShared.cs">
+      <Link>Properties\AssemblyInfoShared.cs</Link>
+    </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Obsolete\TestEdrn.cs" />
     <Compile Include="Obsolete\TestPeptideCentricAnalysis.cs" />

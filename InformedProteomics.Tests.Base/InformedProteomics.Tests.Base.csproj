@@ -34,6 +34,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Properties\AssemblyInfoShared.cs">
+      <Link>Properties\AssemblyInfoShared.cs</Link>
+    </Compile>
     <Compile Include="FilePaths.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestFilePaths.cs" />
