@@ -75,7 +75,7 @@ namespace ProMex
         /// <summary>
         /// Constructor
         /// </summary>
-        public ProMexInputParameters() : base()
+        public ProMexInputParameters()
         {
             //InputPath = string.Empty;
             //OutputPath = string.Empty;
