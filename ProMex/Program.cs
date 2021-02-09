@@ -93,6 +93,7 @@ namespace ProMex
                 }
 
                 options.Display();
+
                 var launcher = new LcMsFeatureFinderLauncher(options);
                 var errorCount = 0;
 

@@ -165,6 +165,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 // These file extensions need to be lowercase due to LINQ queries of the form "types.Select(ext => SpecFilePath.ToLower().EndsWith(ext)).Any()"
                 var internalSupported = new List<string> { ".mzml", ".mzml.gz", ".pbf" };
+
                 if (_thermoRawAvailable)
                 {
                     internalSupported.Add(".raw");
