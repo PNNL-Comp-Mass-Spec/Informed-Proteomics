@@ -55,7 +55,7 @@ namespace InformedProteomics.FeatureFinding
                 Parameters.InputPath = MassSpecDataReaderFactory.NormalizeDatasetPath(Parameters.InputPath);
             }
 
-            var attr = File.GetAttributes(Parameters.InputPath);
+            var attr = File.GetAttributes(Parameters.InputPath ?? string.Empty);
             int errorCode;
 
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory &&
