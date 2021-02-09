@@ -26,7 +26,7 @@ namespace InformedProteomics.FeatureFinding.Graphics
         /// <param name="title">Plot title</param>
         /// <param name="minMass">Minimum mass</param>
         /// <param name="maxMass">Maximum mass</param>
-        public LcMsFeatureMap(ILcMsRun run, IList<LcMsFeature> features, string title, double minMass, double maxMass) :
+        public LcMsFeatureMap(ISpectrumAccessor run, IList<LcMsFeature> features, string title, double minMass, double maxMass) :
             this(features, title,
             minMass, maxMass,
             Math.Max(run.GetElutionTime(run.MinLcScan) - 5, 0),
