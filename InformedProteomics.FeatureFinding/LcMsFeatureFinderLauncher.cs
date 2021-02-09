@@ -265,8 +265,15 @@ namespace InformedProteomics.FeatureFinding
             Stream csvStream = new MemoryStream();
             if (Parameters.CsvOutput)
             {
+                var outputFile = new FileInfo(outCsvFilePath);
+                if (outputFile.Directory != null && !outputFile.Directory.Exists)
+                {
+                    outputFile.Directory.Create();
+                }
+
                 csvStream = new FileStream(outCsvFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             }
+
             using (var csvWriter = new StreamWriter(csvStream))
             {
                 if (Parameters.CsvOutput)

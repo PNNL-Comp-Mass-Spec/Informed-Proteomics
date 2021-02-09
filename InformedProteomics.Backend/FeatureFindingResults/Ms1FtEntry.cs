@@ -112,6 +112,12 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         /// <param name="writeExtendedData">if true, the data in <see cref="ExtendedData"/> will also be output to the .ms1ft file</param>
         public static void WriteToFile(string filePath, IEnumerable<Ms1FtEntry> features, bool writeExtendedData = false)
         {
+            var outputFile = new FileInfo(filePath);
+            if (outputFile.Directory != null && !outputFile.Directory.Exists)
+            {
+                outputFile.Directory.Create();
+            }
+
             using (var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)), CultureInfo.InvariantCulture))
             {
                 SetCsvWriterConfig(tsv.Configuration);

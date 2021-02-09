@@ -394,9 +394,16 @@ namespace InformedProteomics.Backend.MassSpecData
 
             try
             {
-                PbfFilePath = pbfPath;
+                var pbfFile = new FileInfo(pbfPath);
+                if (pbfFile.Directory != null && !pbfFile.Directory.Exists)
+                {
+                    pbfFile.Directory.Create();
+                }
+
+                PbfFilePath = pbfFile.FullName;
+
                 using (var writer =
-                    new BinaryWriter(File.Open(pbfPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
+                    new BinaryWriter(File.Open(pbfFile.FullName, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
                 {
                     WriteToPbf(msDataReader, writer, scanStart, scanEnd, progress);
                 }

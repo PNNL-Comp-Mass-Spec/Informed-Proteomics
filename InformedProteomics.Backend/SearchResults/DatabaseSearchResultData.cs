@@ -193,6 +193,12 @@ namespace InformedProteomics.Backend.SearchResults
         /// <param name="includeTdaScores">If FDR scores should be output also</param>
         public static void WriteResultsToFile(string filePath, IEnumerable<DatabaseSearchResultData> resultData, bool includeTdaScores = false)
         {
+            var outputFile = new FileInfo(filePath);
+            if (outputFile.Directory != null && !outputFile.Directory.Exists)
+            {
+                outputFile.Directory.Create();
+            }
+
             using (var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read)), CultureInfo.InvariantCulture))
             {
                 SetCsvWriterConfig(tsv.Configuration);
