@@ -48,6 +48,21 @@ Example command lines:
 ### Results viewer / GUI
 For viewing search results, you might want to consider [LCMS-Spectator](https://github.com/PNNL-Comp-Mass-Spec/LCMS-Spectator). It can also function as a GUI for running ProMex and MSPathFinder.
 
+## Running on Linux
+
+PbfGen, ProMex, and MSPathFinderT can be run on Linux using [Mono](https://www.mono-project.com/download/stable/)
+
+Example command lines:
+```
+mono PbfGen.exe -s *.raw
+mono PbfGen.exe -s *.mzML
+mono PbfGen.exe -s *.mzML.gz
+
+mono ProMex.exe -i *.pbf -minCharge 2 -maxCharge 60 -minMass 2000 -maxMass 50000 -score n -csv n -maxThreads 0
+
+mono MSPathFinder/MSPathFinderT.exe -s *.pbf -d ID_006407_8F27399B.fasta -o . -ParamFile MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage.txt
+```
+
 ## ProMex Syntax
 
 ```
@@ -186,7 +201,9 @@ Versions prior to February 1, 2019: If Thermo Finnigan MSFileReader is installed
 
 Versions after February 1, 2019: If running as a 64-bit program, reading from Thermo Finnigan .raw files is supported via the included RawFileReader dlls (no additional software install required).
 
-Several other formats are supported if an appropriate version of ProteoWizard is installed ([Download here](http://proteowizard.sourceforge.net/downloads.shtml), make sure the version downloaded matches system architecture)
+On Windows, several other formats are supported if an appropriate version of ProteoWizard is installed ([Download here](http://proteowizard.sourceforge.net/downloads.shtml), make sure the version downloaded matches system architecture)
+
+On Linux, supported input files are .raw, .mzML, and .mzML.gz
 
 ## MSPathFinder Parameter Files
 

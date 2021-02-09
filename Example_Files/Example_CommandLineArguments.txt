@@ -10,7 +10,9 @@ MSPathFinder\MSPathFinderT.exe -s C:\DMS_WorkDir1\*.pbf -d C:\DMS_Temp_Org\ID_00
 
 == Linux ==
 
-PbfGen does not work on Linux. Create the PBF files on a Windows machine then transfer to Linux for use by ProMex and MSPathFinderT
+mono PbfGen.exe -s *.raw
+mono PbfGen.exe -s *.mzML
+mono PbfGen.exe -s *.mzML.gz
 
 mono ProMex.exe -i *.pbf -minCharge 2 -maxCharge 60 -minMass 2000 -maxMass 50000 -score n -csv n -maxThreads 0
 
