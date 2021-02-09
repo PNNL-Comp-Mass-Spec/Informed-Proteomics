@@ -26,6 +26,8 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestProMex
     {
+        // Ignore Spelling: msgfdb, prsm, Lewy, Jungkap, Samwise, Dey, peptidomics, IMERblast, peptidome, LongSep, yufeng
+
         private string mFeatureMapPbfFile;
         private string mFeatureMapResultsFile;
 
@@ -572,7 +574,7 @@ namespace InformedProteomics.Test
                 Assert.Ignore("Skipping test {0} since folder not found: {1}", methodName, outFolderPath);
             }
 
-            //const string specFilePath = @"D:\MassSpecFiles\test\QC_Shew_Intact_4_01Jan15_Bane_C2-14-08-02RZ.raw";
+            // string specFilePath = @"D:\MassSpecFiles\test\QC_Shew_Intact_4_01Jan15_Bane_C2-14-08-02RZ.raw";
 
             const int minScanCharge = 2;
             const int maxScanCharge = 60;
@@ -677,7 +679,7 @@ namespace InformedProteomics.Test
                 matchCount++;
             }
 
-            Assert.AreEqual(matchCount, matchingScanNums.Count, "Found extra matching scan nums vs. what was expected");
+            Assert.AreEqual(matchCount, matchingScanNums.Count, "Found extra matching scan numbers vs. what was expected");
         }
 
         [Test]
@@ -688,7 +690,7 @@ namespace InformedProteomics.Test
             Utils.ShowStarting(methodName);
 
             const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf";
-            //const string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
+            // string rawFile = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
 
             if (!File.Exists(rawFile))
             {

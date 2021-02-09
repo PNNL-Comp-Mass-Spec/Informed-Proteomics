@@ -16,6 +16,8 @@ namespace InformedProteomics.FeatureFinding.Graphics
 {
     public class LcMsFeatureMap
     {
+        // Ignore Spelling: OxyPlot, png, lc, Da
+
         /// <summary>
         /// Constructor
         /// </summary>

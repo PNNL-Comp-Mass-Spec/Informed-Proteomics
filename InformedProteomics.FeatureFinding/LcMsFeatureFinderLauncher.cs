@@ -19,7 +19,7 @@ namespace InformedProteomics.FeatureFinding
 {
     public class LcMsFeatureFinderLauncher
     {
-        // Ignore Spelling: pbf, Da, csv, mw, Xic
+        // Ignore Spelling: pbf, Da, csv, mw, Xic png
 
         private readonly LcMsFeatureLikelihood _likelihoodScorer;
 
@@ -354,7 +354,7 @@ namespace InformedProteomics.FeatureFinding
         {
             if (SystemInfo.IsLinux)
             {
-                ConsoleMsgUtils.ShowWarning("Skipping creation of the LC/MS feature map PNG file since this is not supported on Linux");
+                ConsoleMsgUtils.ShowWarning("Skipping creation of the LC/MS feature map png file since this is not supported on Linux");
                 return;
             }
 
