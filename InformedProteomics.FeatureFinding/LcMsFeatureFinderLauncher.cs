@@ -352,6 +352,12 @@ namespace InformedProteomics.FeatureFinding
 
         private void CreateFeatureMapImage(LcMsRun run, string featuresFilePath, string imgFilePath)
         {
+            if (SystemInfo.IsLinux)
+            {
+                ConsoleMsgUtils.ShowWarning("Skipping creation of the LC/MS feature map PNG file since this is not supported on Linux");
+                return;
+            }
+
             var map = new LcMsFeatureMap(run, featuresFilePath, Math.Max(0, Parameters.MinSearchMass - 500), Parameters.MaxSearchMass);
             map.SaveImage(imgFilePath);
             Console.WriteLine(" - Feature map image output: {0}", imgFilePath);
