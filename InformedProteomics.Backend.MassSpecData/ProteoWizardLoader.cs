@@ -242,7 +242,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Try to sort by version, it properly handles the version rolling over powers of 10 (but string sorting does not)
-            var byVersion = new List<Tuple<System.Version, DirectoryInfo>>();
+            var byVersion = new List<Tuple<Version, DirectoryInfo>>();
             foreach (var folder in possibleInstallDirs)
             {
                 try
@@ -262,15 +262,15 @@ namespace InformedProteomics.Backend.MassSpecData
 
                     var versionSplit = versionString.Split('.');
 
-                    if (System.Version.TryParse(versionString, out var version))
+                    if (Version.TryParse(versionString, out var version))
                     {
                         // Old pre-Git SCM conversion install - only has 3 components
-                        byVersion.Add(new Tuple<System.Version, DirectoryInfo>(version, folder));
+                        byVersion.Add(new Tuple<Version, DirectoryInfo>(version, folder));
                     }
-                    else if (versionSplit.Length > 3 && System.Version.TryParse(string.Join(".", versionSplit.Take(versionSplit.Length - 1)), out var version2))
+                    else if (versionSplit.Length > 3 && Version.TryParse(string.Join(".", versionSplit.Take(versionSplit.Length - 1)), out var version2))
                     {
                         // Post-Git SCM conversion install - last section of the version is a Git hash, and will not parse
-                        byVersion.Add(new Tuple<System.Version, DirectoryInfo>(version2, folder));
+                        byVersion.Add(new Tuple<Version, DirectoryInfo>(version2, folder));
                     }
                 }
                 catch (Exception)
