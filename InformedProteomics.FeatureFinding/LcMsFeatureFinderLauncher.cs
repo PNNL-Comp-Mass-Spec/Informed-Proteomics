@@ -47,8 +47,13 @@ namespace InformedProteomics.FeatureFinding
         /// <remarks>Folder could either be a supported mass spec data folder, or a normal directory with several supported data files</remarks>
         public int Run()
         {
-            // Normalize the input path. Only affects paths to a file/folder in a folder-type dataset
-            Parameters.InputPath = MassSpecDataReaderFactory.NormalizeDatasetPath(Parameters.InputPath);
+            var fileExtension = Path.GetExtension(Parameters.InputPath);
+
+            if (!fileExtension.Equals(".pbf", StringComparison.OrdinalIgnoreCase))
+            {
+                // Normalize the input path. Only affects paths to a file/folder in a folder-type dataset
+                Parameters.InputPath = MassSpecDataReaderFactory.NormalizeDatasetPath(Parameters.InputPath);
+            }
 
             var attr = File.GetAttributes(Parameters.InputPath);
             int errorCode;
@@ -60,7 +65,7 @@ namespace InformedProteomics.FeatureFinding
             }
             else
             {
-                if (!MsRawFile(Parameters.InputPath) && !MsPbfFile(Parameters.InputPath))
+                if (!MsPbfFile(Parameters.InputPath) && !MsRawFile(Parameters.InputPath))
                 {
                     ShowErrorMessage("File extension not supported, " + Parameters.InputPath);
                     return -1;
@@ -146,6 +151,7 @@ namespace InformedProteomics.FeatureFinding
             }
 
             var baseName = Path.GetFileName(MassSpecDataReaderFactory.RemoveExtension(rawFile));
+
             var ms1FeaturesFilePath = Path.Combine(outDirectory, baseName + "." + FileExtension);
             var outCsvFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".csv");
             var pngFilePath = Path.Combine(outDirectory, baseName + "_" + FileExtension + ".png");
