@@ -1,0 +1,17 @@
+== Windows ==
+
+PbfGen\PbfGen.exe -s C:\DMS_WorkDir1\*.raw
+PbfGen\PbfGen.exe -s C:\DMS_WorkDir1\*.raw -start 4000 -end 4100
+
+ProMex\ProMex.exe -i C:\DMS_WorkDir1\*.pbf -minCharge 2 -maxCharge 60 -minMass 2000 -maxMass 50000 -score n -csv n -maxThreads 0
+
+MSPathFinder\MSPathFinderT.exe -s C:\DMS_WorkDir1\*.pbf -d C:\DMS_Temp_Org\ID_006407_8F27399B.fasta -o C:\DMS_WorkDir1 -ParamFile C:\DMS_WorkDir1\MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage.txt
+
+
+== Linux ==
+
+PbfGen does not work on Linux. Create the PBF files on a Windows machine then transfer to Linux for use by ProMex and MSPathFinderT
+
+mono ProMex.exe -i *.pbf -minCharge 2 -maxCharge 60 -minMass 2000 -maxMass 50000 -score n -csv n -maxThreads 0
+
+mono MSPathFinder/MSPathFinderT.exe -s *.pbf -d ID_006407_8F27399B.fasta -o . -ParamFile MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage.txt
