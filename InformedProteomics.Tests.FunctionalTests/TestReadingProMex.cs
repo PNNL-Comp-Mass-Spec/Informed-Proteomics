@@ -22,8 +22,8 @@ namespace InformedProteomics.Tests.FunctionalTests
         }
 
         [Test]
-        [TestCase(8472.3354, "4325,4372")]
-        [TestCase(10189.5639, "4763,4772,4773,4775,4783,4787,4789,4797,4867,4877,4885,4892,4938,4942,4943,4945")]
+        [TestCase(8472.3354, "326,373")]
+        [TestCase(10189.5639, "764,773,774,776,784,788,790,798,868,878,886,893,939,943,944,946")]
         public void TestReadingProMexFile(double massToFind, string expectedScanNumbers)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;

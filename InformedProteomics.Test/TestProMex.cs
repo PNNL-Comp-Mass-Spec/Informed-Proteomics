@@ -632,9 +632,9 @@ namespace InformedProteomics.Test
         }
 
         [Test]
-        [TestCase(6182.399, "4507,4509")]
-        [TestCase(10868.732, "4828")]
-        [TestCase(17804.0293, "4458,4478,4479,4502,4504")]
+        [TestCase(6182.399, "508,510")]
+        [TestCase(10868.732, "829")]
+        [TestCase(17804.0293, "459,479,480,503,505")]
         public void TestProMexFilter(double massToFind, string expectedScanNumbers)
         {
             var methodName = MethodBase.GetCurrentMethod().Name;
