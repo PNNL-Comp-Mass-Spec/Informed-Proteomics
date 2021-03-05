@@ -196,7 +196,7 @@ begin
   WizardForm.WelcomeLabel2.Visible := False;
 
   RichViewer.RTFText := '{\rtf1{\colortbl ;\red0\green0\blue255;} This will install ' + appname + ' version ' + appversion + ' on your computer.' + '\line \line \line ' +
-    '{\b NOTICE:}\line ' + 'Reading of some data files requires access to a {\b ' + GetInstallArch + '-bit} ProteoWizard or Thermo MSFileReader installation. Please install {\b ' +
-    GetInstallArch + '-bit} ProteoWizard and/or Thermo MSFileReader before using the program to avoid errors.' + '\line \line ' +
+    '{\b NOTICE:}\line ' + 'Reading of some data files requires access to a {\b ' + GetInstallArch + '-bit} ProteoWizard installation. Please install {\b ' +
+    GetInstallArch + '-bit} ProteoWizard before using the program to avoid errors.' + '\line \line ' +
     'See {\field{\*\fldinst HYPERLINK "https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/wiki/PBFGen-Usage" }{\fldrslt \b PBFGen Usage}} for details.' + '\line \line}';
 end;
