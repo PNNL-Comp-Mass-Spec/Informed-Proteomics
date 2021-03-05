@@ -28,7 +28,7 @@ namespace InformedProteomics.Backend.MassSpecData
         private StreamReader _fileReader;
         private XmlReader _xmlReaderForYield;
         private bool _reduceMemoryUsage;
-        private long _artificialScanNum = 1;
+        //private long _artificialScanNum = 1;
         private long _numSpectra = -1;
         private readonly IndexList _spectrumOffsets = new IndexList() { IndexType = IndexList.IndexListType.Spectrum };
         private readonly IndexList _chromatogramOffsets = new IndexList() { IndexType = IndexList.IndexListType.Chromatogram };
@@ -212,10 +212,16 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 var scanNum = _artificialScanNum++;
 
-                if (NativeIdConversion.TryGetScanNumberLong(idRef, out var num))
-                {
-                    scanNum = num;
-                }
+                // Converting the NativeId to a scan number is nice and all, but also problematic:
+                // * Waters .raw files have multiple functions (and spectra) per scan number, unless a filter is used to only select one function
+                // * Agilent datasets often have non-contiguous scan numbers (in NativeID)
+                // * UIMF datasets have multiple frames, and each frame has its own list of scans
+                // * Other examples undoubtedly exist
+                // Better to just rely on the "artificialScanNum", which will correspond to a 1-based index
+                //if (NativeIdConversion.TryGetScanNumberLong(idRef, out var num))
+                //{
+                //    scanNum = num;
+                //}
 
                 var item = new IndexItem(idRef, offset, scanNum);
                 AddMapForOffset(item);
@@ -652,7 +658,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Returns a single spectrum from the file
         /// </summary>
-        /// <param name="index"></param>
+        /// <param name="index">1-based index of the spectrum in the file</param>
         /// <param name="includePeaks"></param>
         /// <returns></returns>
         /// <remarks>If random access mode is turned on, this will respond quickly and use only as much memory as is needed to store the spectrum.
@@ -670,7 +676,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Read the specified spectrum from the file, optionally reading only the metadata
         /// </summary>
-        /// <param name="scanNum"></param>
+        /// <param name="scanNum">1-based index of the spectrum in the file</param>
         /// <param name="includePeaks"></param>
         /// <returns></returns>
         public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
@@ -690,7 +696,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             if (_reduceMemoryUsage)
             {
-                _artificialScanNum = 1;
+                //_artificialScanNum = 1;
                 if (!_haveMetaData)
                 {
                     ReadMzMl();
@@ -736,12 +742,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Read a single mass spectrum and return it.
         /// Causes all spectra in the file to be loaded into memory
         /// </summary>
-        /// <param name="index"></param>
+        /// <param name="index">1-based index of the spectrum in the file</param>
         private Spectrum ReadMassSpectrumNonRandom(int index)
         {
             if (!_allRead)
             {
-                _artificialScanNum = 1;
+                //_artificialScanNum = 1;
                 _reduceMemoryUsage = false; // They called this on a non-random access reader, now they suffer the consequences.
                 ReadMzMl();
             }
@@ -770,7 +776,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Read a single mass spectrum and return it.
         /// </summary>
-        /// <param name="index"></param>
+        /// <param name="index">1-based index of the spectrum in the file</param>
         /// <param name="includePeaks"></param>
         private Spectrum ReadMassSpectrumRandom(long index, bool includePeaks = true)
         {
@@ -1961,23 +1967,31 @@ namespace InformedProteomics.Backend.MassSpecData
                 throw new Exception("nativeID is empty for spectrum index " + index);
             }
 
-            int scanNum;
+            // Use the index (1-based) as a "scan number". It's the only reliable way to have the scan number be contiguous and have no duplicates
+            var scanNum = Convert.ToInt32(index) + 1;
 
+            // Converting the NativeId to a scan number is nice and all, but also problematic:
+            // * Waters .raw files have multiple functions (and spectra) per scan number, unless a filter is used to only select one function
+            // * Agilent datasets often have non-contiguous scan numbers (in NativeID)
+            // * UIMF datasets have multiple frames, and each frame has its own list of scans
+            // * Other examples undoubtedly exist
+            // Better to just rely on the "index + 1" as a 1-based index
             // If a random access reader, there is already a scan number stored, based on the order of the index. Use it instead.
-            if (_randomAccess)
-            {
-                scanNum = (int)(_spectrumOffsets.NativeToIdMap[nativeId]);
-            }
-            else
-            {
-                scanNum = (int)(_artificialScanNum++);
-                // Interpret the NativeID (if the format has an interpreter) and use it instead of the artificial number.
-                // TODO: Better handling than the artificial ID for other nativeIDs (ones currently not supported)
-                if (NativeIdConversion.TryGetScanNumberInt(nativeId, out var num))
-                {
-                    scanNum = num;
-                }
-            }
+            //if (_randomAccess)
+            //{
+            //    scanNum = (int)(_spectrumOffsets.NativeToIdMap[nativeId]);
+            //}
+            //else
+            //{
+            //    //scanNum = (int)(_artificialScanNum++);
+            //    scanNum = Convert.ToInt32(index) + 1;
+            //    // Interpret the NativeID (if the format has an interpreter) and use it instead of the artificial number.
+            //    // TODO: Better handling than the artificial ID for other nativeIDs (ones currently not supported)
+            //    if (NativeIdConversion.TryGetScanNumberInt(nativeId, out var num))
+            //    {
+            //        scanNum = num;
+            //    }
+            //}
 
             var defaultArraySize = Convert.ToInt32(reader.GetAttribute("defaultArrayLength"));
             reader.ReadStartElement("spectrum"); // Throws exception if we are not at the "spectrum" tag.
