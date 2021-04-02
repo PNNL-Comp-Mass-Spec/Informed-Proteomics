@@ -1307,6 +1307,17 @@ namespace InformedProteomics.Backend.MassSpecData
                 return;
             }
             // Handle disposal of allocated object correctly
+
+            if (!_isGzipped || _randomAccess) // can't reset the position on a gzipped file...
+            {
+                if (_fileReader.BaseStream.Position > 0)
+                {
+                    // Reset to beginning of file.
+                    _fileReader.DiscardBufferedData();
+                    _fileReader.BaseStream.Position = 0;
+                }
+            }
+
             var reader = XmlReader.Create(_fileReader, _xSettings);
             // Guarantee a move to the root node
             reader.MoveToContent();
