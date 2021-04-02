@@ -765,7 +765,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Read a single mass spectrum and return it.
         /// Causes all spectra in the file to be loaded into memory
         /// </summary>
-        /// <param name="index">1-based index of the spectrum in the file</param>
+        /// <param name="index">
+        /// 1-based index of the spectrum in the file
+        /// Using index = 1 will return the first spectrum in the file, regardless of its actual scan number
+        /// </param>
         private Spectrum ReadMassSpectrumNonRandom(int index)
         {
             if (!_allRead)
@@ -774,8 +777,16 @@ namespace InformedProteomics.Backend.MassSpecData
                 _reduceMemoryUsage = false; // They called this on a non-random access reader, now they suffer the consequences.
                 ReadMzMl();
             }
-            return _spectra[index];
+
+            if (index == 0)
+            {
+                Console.WriteLine("Warning: the index argument for method ReadMassSpectrumNonRandom is 1-based");
+                return null;
+            }
+
+            return _spectra[index - 1];
         }
+
         #endregion
 
         #region Interface Helper Functions: Random Access
