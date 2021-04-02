@@ -17,6 +17,9 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </summary>
     public sealed class MzMLReader : IMassSpecDataReader
     {
+        // Ignore Spelling: foreach
+        // Ignore Spelling: readonly
+
         #region Private Members
 
         private readonly string _filePath;
@@ -156,15 +159,38 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// This class tracks byte offsets for spectra and chromatograms
+        /// </summary>
         private class IndexList
         {
             private long _artificialScanNum = 1;
             public class IndexItem // A struct would be faster, but it can also be a pain since it is a value type
             {
+                /// <summary>
+                /// NativeID
+                /// </summary>
                 public readonly string Ref;
+
+                /// <summary>
+                /// Byte offset
+                /// </summary>
                 public readonly long Offset;
+
+                /// <summary>
+                /// Scan number (1-based) or Chromatogram number (1-based)
+                /// </summary>
+                /// <remarks>
+                /// Even if the first scan in a file has scan number = 200, the value stored here will be 1
+                /// </remarks>
                 public readonly long IdNum;
 
+                /// <summary>
+                /// Constructor
+                /// </summary>
+                /// <param name="idRef">NativeID, e.g. controllerType=0 controllerNumber=1 scan=1</param>
+                /// <param name="offset">Byte offset</param>
+                /// <param name="idNum">Scan number (1-based) or Chromatogram number (1-based)</param>
                 public IndexItem(string idRef, long offset, long idNum)
                 {
                     Ref = idRef;
@@ -191,37 +217,65 @@ namespace InformedProteomics.Backend.MassSpecData
                 Unknown,
             }
 
+            /// <summary>
+            /// Spectrum offset info, in the order that it was read from the .mzML file
+            /// </summary>
             public List<IndexItem> Offsets { get; } = new List<IndexItem>();
 
             // Unused
             // private readonly Dictionary<string, long> OffsetsMapNative = new Dictionary<string, long>();
 
+            /// <summary>
+            /// Keys in this dictionary are artificial scan number
+            /// Values are file offsets, in bytes
+            /// </summary>
             public readonly Dictionary<long, long> OffsetsMapInt = new Dictionary<long, long>();
 
             // Unused
             // private readonly Dictionary<long, string> IdToNativeMap = new Dictionary<long, string>();
 
+
+            /// <summary>
+            /// Keys are NativeID
+            /// Values are artificial scan number
+            /// </summary>
             public readonly Dictionary<string, long> NativeToIdMap = new Dictionary<string, long>();
 
+            // Unused
+            // private readonly Dictionary<long, long> ActualScanToIdMap = new Dictionary<long, long>();
+
+            /// <summary>
+            /// Store the offset info in the dictionaries
+            /// </summary>
+            /// <param name="idRef">NativeID</param>
+            /// <param name="offset">Byte offset, as text</param>
             public void AddOffset(string idRef, string offset)
             {
                 AddOffset(idRef, long.Parse(offset));
             }
 
+            /// <summary>
+            /// Store the offset info in the dictionaries
+            /// </summary>
+            /// <param name="idRef">NativeID</param>
+            /// <param name="offset">Byte offset, as a long</param>
             public void AddOffset(string idRef, long offset)
             {
                 var scanNum = _artificialScanNum++;
 
-                // Converting the NativeId to a scan number is nice and all, but also problematic:
+                // Try to convert the NativeId to a scan number
+                // This is straightforward for Thermo datasets, but can be problematic for others
                 // * Waters .raw files have multiple functions (and spectra) per scan number, unless a filter is used to only select one function
                 // * Agilent datasets often have non-contiguous scan numbers (in NativeID)
                 // * UIMF datasets have multiple frames, and each frame has its own list of scans
-                // * Other examples undoubtedly exist
-                // Better to just rely on the "artificialScanNum", which will correspond to a 1-based index
-                //if (NativeIdConversion.TryGetScanNumberLong(idRef, out var num))
-                //{
-                //    scanNum = num;
-                //}
+                //
+                // if (NativeIdConversion.TryGetScanNumberLong(idRef, out var actualScanNumber))
+                // {
+                //     if (!ActualScanToIdMap.ContainsKey(actualScanNumber))
+                //     {
+                //         ActualScanToIdMap.Add(actualScanNumber, scanNum);
+                //     }
+                // }
 
                 var item = new IndexItem(idRef, offset, scanNum);
                 AddMapForOffset(item);
@@ -416,14 +470,27 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private readonly Dictionary<string, List<Param>> _referenceableParamGroups = new Dictionary<string, List<Param>>();
 
+        /// <summary>
+        /// Selected Ion m/z
+        /// </summary>
         private class SelectedIon
         {
+            /// <summary>
+            /// Selected Ion m/z
+            /// </summary>
             public double SelectedIonMz;
+
+            /// <summary>
+            /// Selected Ion charge
+            /// </summary>
             public int Charge;
 
             // ReSharper disable once NotAccessedField.Local
             public int OldCharge;
 
+            /// <summary>
+            /// Constructor
+            /// </summary>
             public SelectedIon()
             {
                 SelectedIonMz = 0.0;
@@ -499,11 +566,14 @@ namespace InformedProteomics.Backend.MassSpecData
 
         #region Constructor
         /// <summary>
-        /// Initialize a MzMlReader object
+        /// Initialize a MzMLReader object
         /// </summary>
         /// <param name="filePath">Path to mzML file</param>
         /// <param name="randomAccess">If mzML reader should be configured for random access</param>
-        /// <param name="tryReducingMemoryUsage">If mzML reader should try to avoid reading all spectra into memory. This will reduce memory usage for a non-random access MzMLReader, as long as ReadMassSpectrum(int) isn't used.</param>
+        /// <param name="tryReducingMemoryUsage">
+        /// If mzML reader should try to avoid reading all spectra into memory.
+        /// This will reduce memory usage for a non-random access MzMLReader, as long as ReadMassSpectrum(int) isn't used.
+        /// </param>
         public MzMLReader(string filePath, bool randomAccess = false, bool tryReducingMemoryUsage = true)
         {
             _filePath = filePath;
@@ -609,9 +679,9 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Try to make the reader random access capable
+        /// Re-opens the file using random access
         /// </summary>
-        /// <returns>true if is random access capable, false if not</returns>
+        /// <returns>true if successful, exception if an error</returns>
         public bool TryMakeRandomAccessCapable()
         {
             _randomAccess = true;
@@ -665,9 +735,9 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Returns all mass spectra.
-        /// Uses "yield return" to allow processing one spectra at a time if called from a foreach loop statement.
+        /// ReadAllSpectraNonRandom and ReadAllSpectraRandom use "yield return" to allow processing one spectra at a time if called from a foreach loop statement.
         /// </summary>
-        /// <param name="includePeaks">Only used for random-access capable reading</param>
+        /// <param name="includePeaks">true to include peak data; only used for random-access capable reading</param>
         /// <returns>all spectra</returns>
         public IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true)
         {
@@ -679,18 +749,34 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
+        /// <para>
         /// Returns a single spectrum from the file
+        /// </para>
+        /// <para>
+        /// If Random access is disabled, this method calls method ReadMassSpectrumNonRandom
+        /// That will cause all spectra in the file to be loaded into memory
+        /// </para>
         /// </summary>
-        /// <param name="index">1-based index of the spectrum in the file</param>
-        /// <param name="includePeaks"></param>
-        /// <returns></returns>
-        /// <remarks>If random access mode is turned on, this will respond quickly and use only as much memory as is needed to store the spectrum.
-        /// If random access mode is off, this will cause the memory usage reducing mode to shut of, and all spectra will be read into memory.</remarks>
+        /// <param name="index">
+        /// 1-based index of the spectrum in the file
+        /// Using index = 1 will return the first spectrum in the file, regardless of its actual scan number
+        /// </param>
+        /// <param name="includePeaks">true to include peak data (ignored if _randomAccess is false)</param>
+        /// <returns>Mass spectrum</returns>
+        /// <remarks>
+        /// <para>
+        /// To enable random access, either set randomAccess to true when instantiating the MzMLReader class, or call TryMakeRandomAccessCapable
+        /// </para>
+        /// <para>
+        /// If random access mode is turned on, this will respond quickly and use only as much memory as is needed to store the spectrum.
+        /// If random access mode is off, this will cause the memory usage reducing mode to shut off, and all spectra will be read into memory.
+        /// </para>
+        /// </remarks>
         public Spectrum ReadMassSpectrum(int index, bool includePeaks = true)
         {
-            // Proper functionality when not random access
             if (!_randomAccess)
             {
+                // Proper functionality when not random access
                 return ReadMassSpectrumNonRandom(index);
             }
             return ReadMassSpectrumRandom(index, includePeaks);
@@ -699,7 +785,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Read the specified spectrum from the file, optionally reading only the metadata
         /// </summary>
-        /// <param name="scanNum">1-based index of the spectrum in the file</param>
+        /// <param name="scanNum">
+        /// 1-based index of the spectrum in the file
+        /// Using index = 1 will return the first spectrum in the file, regardless of its actual scan number
+        /// </param>
         /// <param name="includePeaks"></param>
         /// <returns></returns>
         public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
@@ -794,6 +883,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Read all mass spectra in the file, using random access
         /// Uses "yield return" to use less memory when called from a "foreach" statement
         /// </summary>
+        /// <param name="includePeaks">true to include peak data</param>
         /// <returns></returns>
         private IEnumerable<Spectrum> ReadAllSpectraRandom(bool includePeaks = true)
         {
@@ -810,7 +900,10 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Read a single mass spectrum and return it.
         /// </summary>
-        /// <param name="index">1-based index of the spectrum in the file</param>
+        /// <param name="index">
+        /// 1-based index of the spectrum in the file
+        /// Using index = 1 will return the first spectrum in the file, regardless of its actual scan number
+        /// </param>
         /// <param name="includePeaks"></param>
         private Spectrum ReadMassSpectrumRandom(long index, bool includePeaks = true)
         {
@@ -2008,6 +2101,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single spectrum element</param>
         /// <param name="includePeaks">Whether to read binary data arrays</param>
+        /// <remarks>If the data is not centroided, this method uses InformedProteomics.Backend.Utils.Centroider to find peaks</remarks>
         private Spectrum ReadSpectrum(XmlReader reader, bool includePeaks = true)
         {
             reader.MoveToContent();
@@ -2026,7 +2120,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 throw new Exception("nativeID is empty for spectrum index " + index);
             }
 
-            // Use the index (1-based) as a "scan number". It's the only reliable way to have the scan number be contiguous and have no duplicates
+            // Use the index (0-based) as a "scan number" (the first spectrum in the file typically has scan number = 1)
+            // It's the only reliable way to have the scan number be contiguous and have no duplicates
             var scanNum = Convert.ToInt32(index) + 1;
 
             // Converting the NativeId to a scan number is nice and all, but also problematic:
