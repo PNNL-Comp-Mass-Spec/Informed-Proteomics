@@ -844,19 +844,31 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Close and cleanup file handles
+        /// Close the file handles and cleanup any temp files
         /// </summary>
         public void Dispose()
         {
-            Close();
-            Cleanup();
+            Dispose(true);
         }
 
         /// <summary>
-        /// Close and cleanup file handles
+        /// Close the file handles and cleanup any temp files
         /// </summary>
         ~MzMLReader()
         {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Dispose, with a decreased chance of issues/failure
+        /// </summary>
+        /// <param name="disposing"></param>
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                GC.SuppressFinalize(this);
+            }
             Close();
             Cleanup();
         }
