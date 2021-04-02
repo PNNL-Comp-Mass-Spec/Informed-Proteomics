@@ -228,26 +228,45 @@ namespace InformedProteomics.Backend.MassSpecData
                 Offsets.Add(item);
             }
 
-            private void AddMapForOffset(IndexItem offset)
+            private void AddMapForOffset(IndexItem item)
             {
                 if (IndexType == IndexListType.Chromatogram)
                 {
-                    return;
+                    // Update the dictionaries, but only if the key is not yet defined
+                    AddMapForOffset(item, true);
                 }
+                else
+                {
+                    // Update the dictionaries
+                    // If a duplicate key exists an exception will be thrown
+                    AddMapForOffset(item, false);
+                }
+            }
 
-                // OffsetsMapNative.Add(offset.Ref, offset.Offset);
+            private void AddMapForOffset(IndexItem item, bool skipDuplicateKeys)
+            {
+                // if (!skipDuplicateKeys || !OffsetsMapNative.ContainsKey(item.Ref))
+                // {
+                //     OffsetsMapNative.Add(item.Ref, item.Offset);
+                // }
 
                 // This won't be sufficient until there is a valid parser for all forms of NativeID.
                 // Using artificial scan number for now.
-                OffsetsMapInt.Add(offset.IdNum, offset.Offset);
-                // IdToNativeMap.Add(offset.IdNum, offset.Ref);
-                NativeToIdMap.Add(offset.Ref, offset.IdNum);
+
+                OffsetsMapInt.Add(item.IdNum, item.Offset);
+                // IdToNativeMap.Add(item.IdNum, item.Ref);
+
+                if (!skipDuplicateKeys || !NativeToIdMap.ContainsKey(item.Ref))
+                {
+                    NativeToIdMap.Add(item.Ref, item.IdNum);
+                }
+
                 /*if (IndexType == IndexListType.Spectrum)
                 {
-                    long id = Int64.Parse(offset.Ref.Substring(offset.Ref.LastIndexOfAny(new char[] {'=', 'F'}) + 1));
-                    OffsetsMapInt.Add(id, offset.Offset);
-                    IdNativeMap.Add(id, offset.Ref);
-                    offset.IdNum = id;
+                    long id = Int64.Parse(item.Ref.Substring(item.Ref.LastIndexOfAny(new char[] {'=', 'F'}) + 1));
+                    OffsetsMapInt.Add(id, item.Offset);
+                    IdNativeMap.Add(id, item.Ref);
+                    item.IdNum = id;
                 }*/
             }
 
@@ -257,9 +276,9 @@ namespace InformedProteomics.Backend.MassSpecData
                 OffsetsMapInt.Clear();
                 // IdToNativeMap.Clear();
                 NativeToIdMap.Clear();
-                foreach (var offset in Offsets)
+                foreach (var offsetItem in Offsets)
                 {
-                    AddMapForOffset(offset);
+                    AddMapForOffset(offsetItem);
                 }
             }
         }
