@@ -931,5 +931,16 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             }
             return bestPeakIndex;
         }
+
+        /// <summary>
+        /// Change this spectrum's scan number
+        /// </summary>
+        /// <param name="newScanNumber"></param>
+        /// <remarks>This method is used by InformedProteomics.Backend.MassSpecData.PbfLcMsRun</remarks>
+        // ReSharper disable once UnusedMember.Global
+        public void OverrideScanNumber(int newScanNumber)
+        {
+            ScanNum = newScanNumber;
+        }
     }
 }

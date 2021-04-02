@@ -386,6 +386,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 msDataReader = MassSpecDataReaderFactory.GetMassSpecDataReader(specFileName);
             }
+
             NumSpectra = msDataReader.NumSpectra;
             RawFilePath = specFileName;
             NativeIdFormat = msDataReader.NativeIdFormat;
@@ -1639,6 +1640,8 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             long counter = 0;
+            var useVirtualScanNumbers = false;
+
             progressData.StepRange(42.9, "Writing spectra data"); // SpecData: Approximately 43% of total file size
             foreach (var spec in msDataReader.ReadAllSpectra())
             {
@@ -1654,6 +1657,16 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 progressData.Report(counter, countTotal);
                 counter++;
+
+                if (useVirtualScanNumbers)
+                {
+                    spec.OverrideScanNumber(MaxLcScan + 1);
+                }
+                else if (_scanNumToSpecOffset.ContainsKey(spec.ScanNum))
+                {
+                    useVirtualScanNumbers = true;
+                    spec.OverrideScanNumber(MaxLcScan + 1);
+                }
 
                 // Store offset, and write spectrum now
                 _scanNumToSpecOffset.Add(spec.ScanNum, writer.BaseStream.Position);
@@ -1699,14 +1712,17 @@ namespace InformedProteomics.Backend.MassSpecData
                         maxMs1Mz = maxMz;
                     }
                 }
+
                 if (spec.ScanNum < MinLcScan)
                 {
                     MinLcScan = spec.ScanNum;
                 }
+
                 if (MaxLcScan < spec.ScanNum)
                 {
                     MaxLcScan = spec.ScanNum;
                 }
+
                 scanMetadata.Add(new ScanMetadata(spec.ScanNum, spec.MsLevel, spec.ElutionTime));
             }
 
