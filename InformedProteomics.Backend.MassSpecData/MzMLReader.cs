@@ -894,7 +894,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             var stream = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1);
             var testPos = stream.Length;
-            //stream.Position = testPos; // 300 bytes from the end of the file - should be enough
+
             var streamReader = new StreamReader(stream, Encoding.UTF8, true, 65536);
             streamReader.DiscardBufferedData();
             var haveOffset = false;
@@ -920,7 +920,6 @@ namespace InformedProteomics.Backend.MassSpecData
                         var rewindBy = _encoding.GetByteCount(stringBuffer.Substring(endOfString));
                         stringBuffer = stringBuffer.Substring(0, endOfString);
                         stream.Seek(-rewindBy, SeekOrigin.Current);
-                        //file.Position = bufEnd - rewindBy;
                     }
 
                     var found = stringBuffer.IndexOf("<indexListOffset", StringComparison.OrdinalIgnoreCase);
@@ -967,7 +966,6 @@ namespace InformedProteomics.Backend.MassSpecData
                             var rewindBy = _encoding.GetByteCount(stringBuffer.Substring(endOfString));
                             stringBuffer = stringBuffer.Substring(0, endOfString);
                             stream.Seek(-rewindBy, SeekOrigin.Current);
-                            //file.Position = bufEnd - rewindBy;
                         }
 
                         var found = stringBuffer.IndexOf("<indexList ", StringComparison.OrdinalIgnoreCase);
@@ -1018,8 +1016,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 try
                 {
-                    var testPos = stream.Length - 500;
-                    stream.Position = testPos;
+                    stream.Position = stream.Length - 500;
                     streamReader.DiscardBufferedData();
                     var data = streamReader.ReadToEnd();
                     var pos = data.IndexOf("<fileChecksum", StringComparison.OrdinalIgnoreCase);
@@ -1075,7 +1072,6 @@ namespace InformedProteomics.Backend.MassSpecData
                         var rewindBy = _encoding.GetByteCount(stringBuffer.Substring(endOfString));
                         stringBuffer = stringBuffer.Substring(0, endOfString);
                         file.Seek(-rewindBy, SeekOrigin.Current);
-                        //file.Position = bufEnd - rewindBy;
                     }
 
                     var searchPoint = 0;
@@ -1537,7 +1533,7 @@ namespace InformedProteomics.Backend.MassSpecData
             reader.MoveToContent();
             //int count = Convert.ToInt32(reader.GetAttribute("count"));
             reader.ReadStartElement("sourceFileList"); // Throws exception if we are not at the "sourceFileList" tag.
-            //while (reader.ReadState == ReadState.Interactive && _instrument == Instrument.Unknown)
+
             while (reader.ReadState == ReadState.Interactive && (_nativeIdFormat == CV.CVID.CVID_Unknown || _nativeFormat == CV.CVID.CVID_Unknown))
             {
                 // Handle exiting out properly at EndElement tags
@@ -2167,7 +2163,6 @@ namespace InformedProteomics.Backend.MassSpecData
             reader.Dispose();
 
             // Process the spectrum data
-            var scan = new ScanData();
             Spectrum spectrum;
             var mzs = new BinaryDataArray();
             var intensities = new BinaryDataArray();
@@ -2192,6 +2187,8 @@ namespace InformedProteomics.Backend.MassSpecData
                 mzs.Data = centroidedMzs;
                 intensities.Data = centroidedIntensities;
             }
+
+            ScanData scan;
             if (scans.Count == 1)
             {
                 scan = scans[0];
@@ -2200,6 +2197,10 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 // TODO: Should do something else to appropriately handle combinations...
                 scan = scans[0];
+            }
+            else
+            {
+                scan = new ScanData();
             }
 
             if (is_ms_ms)
