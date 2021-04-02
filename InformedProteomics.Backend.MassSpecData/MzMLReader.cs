@@ -499,7 +499,8 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private void ConfigureFileHandles()
         {
-            _file?.Close();
+            _file?.Dispose();
+
 
             // Set a very large read buffer, it does decrease the read times for uncompressed files.
             _file = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536);
@@ -807,9 +808,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         public void Close()
         {
-            _xmlReaderForYield?.Close();
-            _fileReader?.Close();
-            _file?.Close();
+            _xmlReaderForYield?.Dispose();
+            _fileReader?.Dispose();
+            _file?.Dispose();
         }
 
         /// <summary>
@@ -900,7 +901,7 @@ namespace InformedProteomics.Backend.MassSpecData
                             var reader2 = reader.ReadSubtree(); // Get past root element problems
                             reader2.MoveToContent();
                             _indexListOffset = reader2.ReadElementContentAsLong();
-                            reader2.Close();
+                            reader2.Dispose();
                         }
                         haveOffset = true;
                     }
@@ -1190,7 +1191,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
             _haveIndex = true;
-            reader.Close();
+            reader.Dispose();
         }
 
         /// <summary>
@@ -1242,7 +1243,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
         }
         #endregion
 
@@ -1433,7 +1434,7 @@ namespace InformedProteomics.Backend.MassSpecData
                             break;
                     }
                 }
-                reader.Close();
+                reader.Dispose();
             } */
             if (!_reduceMemoryUsage)
             {
@@ -1441,11 +1442,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 // reader is the root if it is not an indexed mzML file.
                 if (indexReader == null)
                 {
-                    reader.Close();
+                    reader.Dispose();
                 }
                 else
                 {
-                    indexReader.Close();
+                    indexReader.Dispose();
                 }
             }
         }
@@ -1489,7 +1490,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
         }
 
         /// <summary>
@@ -1700,7 +1701,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                 break;
                         }
                     }
-                    innerReader.Close();
+                    innerReader.Dispose();
                     reader.Read();
                 }
                 else
@@ -1708,7 +1709,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     reader.Read();
                 }
             }
-            reader.Close();
+            reader.Dispose();
         }
 
         /// <summary>
@@ -1764,7 +1765,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                 break;
                         }
                     }
-                    innerReader.Close();
+                    innerReader.Dispose();
                     reader.Read();
                     if (string.IsNullOrWhiteSpace(id))
                     {
@@ -1780,7 +1781,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     reader.Read();
                 }
             }
-            reader.Close();
+            reader.Dispose();
         }
 
         /// <summary>
@@ -1801,7 +1802,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 UnitName = reader.GetAttribute("unitName")
             };
 
-            reader.Close();
+            reader.Dispose();
             return cvParam;
         }
 
@@ -1822,7 +1823,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 UnitName = reader.GetAttribute("unitName")
             };
 
-            reader.Close();
+            reader.Dispose();
             return userParam;
         }
         #endregion
@@ -1885,7 +1886,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
         }
 
         /// <summary>
@@ -1901,7 +1902,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 // randomAccess: We only read to this point for the count of spectra.
                 // We only want to read for offsets if we weren't able to get valid offsets from an index
-                //reader.Close(); // Closing can be slow for a subtree...
+                //reader.Dispose(); // Closing can be slow for a subtree...
                 if (!_haveIndex)
                 {
                     ReadRunForOffsets();
@@ -1938,7 +1939,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     reader.Skip();
                 }
             }
-            reader.Close();
+            reader.Dispose();
         }
         #endregion
 
@@ -2129,7 +2130,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
 
             // Process the spectrum data
             var scan = new ScanData();
@@ -2296,7 +2297,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
         }
 
         /// <summary>
@@ -2373,7 +2374,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
             return scans;
         }
 
@@ -2481,7 +2482,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
             return scan;
         }
 
@@ -2518,7 +2519,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
             return precursors;
         }
 
@@ -2597,7 +2598,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                     break;
                             }
                         }
-                        innerReader.Close();
+                        innerReader.Dispose();
                         reader.Read(); // "selectedIon" might not have child nodes
                         // We will either consume the EndElement, or the same element that was passed to ReadSpectrum (in case of no child nodes)
                         break;
@@ -2705,7 +2706,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                     break;
                             }
                         }
-                        innerReader.Close();
+                        innerReader.Dispose();
                         reader.Read(); // "selectedIon" might not have child nodes
 
                         if (activationMethods.Count > 1 && activationMethods.Contains(ActivationMethod.ETD))
@@ -2723,7 +2724,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
             return precursor;
         }
 
@@ -2804,7 +2805,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                     break;
                             }
                         }
-                        innerReader.Close();
+                        innerReader.Dispose();
                         ions.Add(ion);
                         reader.Read(); // "selectedIon" might not have child nodes
                         // We will either consume the EndElement, or the same element that was passed to ReadSpectrum (in case of no child nodes)
@@ -2814,7 +2815,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
             return ions;
         }
 
@@ -2852,8 +2853,8 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
             return bdaList;
+            reader.Dispose();
         }
 
         /// <summary>
@@ -3042,7 +3043,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            reader.Close();
+            reader.Dispose();
             return bda;
         }
 
