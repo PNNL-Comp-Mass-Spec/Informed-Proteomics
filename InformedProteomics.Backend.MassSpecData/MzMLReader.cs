@@ -520,35 +520,38 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             _file?.Dispose();
 
+            var sourceFile = new FileInfo(_filePath);
+            if (!sourceFile.Exists)
+                throw new FileNotFoundException(".mzML file not found", _filePath);
 
             // Set a very large read buffer, it does decrease the read times for uncompressed files.
-            _file = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536);
+            _file = new FileStream(sourceFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 65536);
 
             /*****************************************************************************************************************************************************
              * TODO: Change how the file handles are used for safety purposes - open up each time, or what?
              *****************************************************************************************************************************************************/
 
-            if (_filePath.EndsWith(".mzML.gz", StringComparison.OrdinalIgnoreCase))
+            if (sourceFile.Name.Trim().EndsWith(".mzML.gz", StringComparison.OrdinalIgnoreCase))
             {
                 _isGzipped = true;
-                var file = new GZipStream(_file, CompressionMode.Decompress);
+                var zipStreamFile = new GZipStream(_file, CompressionMode.Decompress);
                 if (!_randomAccess)
                 {
-                    _file = file;
+                    _file = zipStreamFile;
                 }
                 else
                 {
                     // Unzip the file to the temp path
-                    _unzippedFilePath = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(_filePath));
+                    _unzippedFilePath = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(sourceFile.Name));
                     using (_file)
-                    using (file)
+                    using (zipStreamFile)
                     using (
                         var tempFile = new FileStream(_unzippedFilePath, FileMode.Create, FileAccess.ReadWrite,
                             FileShare.None, 65536))
                     {
-                        file.CopyTo(tempFile/*, 65536*/);
+                        zipStreamFile.CopyTo(tempFile/*, 65536*/);
                     }
-                    _file = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536);
+                    _file = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 65536);
                 }
             }
             _fileReader = new StreamReader(_file, Encoding.UTF8, true, 65536);
@@ -2860,8 +2863,8 @@ namespace InformedProteomics.Backend.MassSpecData
         private IEnumerable<BinaryDataArray> ReadBinaryDataArrayList(XmlReader reader, int defaultArrayLength)
         {
             reader.MoveToContent();
-            // var bdArrays = Convert.ToInt32(reader.GetAttribute("count"));
-            var bdaList = new List<BinaryDataArray>();
+            // var binaryDataArrays = Convert.ToInt32(reader.GetAttribute("count"));
+            var binaryData = new List<BinaryDataArray>();
             reader.ReadStartElement("binaryDataArrayList"); // Throws exception if we are not at the "binaryDataArrayList" tag.
             while (reader.ReadState == ReadState.Interactive)
             {
@@ -2876,7 +2879,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     case "binaryDataArray":
                         // Schema requirements: two to many instances of this element
-                        bdaList.Add(ReadBinaryDataArray(reader.ReadSubtree(), defaultArrayLength));
+                        binaryData.Add(ReadBinaryDataArray(reader.ReadSubtree(), defaultArrayLength));
                         reader.ReadEndElement(); // "SpectrumIdentificationItem" must have child nodes
                         break;
                     default:
@@ -2884,8 +2887,8 @@ namespace InformedProteomics.Backend.MassSpecData
                         break;
                 }
             }
-            return bdaList;
             reader.Dispose();
+            return binaryData;
         }
 
         /// <summary>
@@ -2898,7 +2901,10 @@ namespace InformedProteomics.Backend.MassSpecData
         private BinaryDataArray ReadBinaryDataArray(XmlReader reader, int defaultLength)
         {
             reader.MoveToContent();
-            var bda = new BinaryDataArray { ArrayLength = defaultLength };
+            var bda = new BinaryDataArray
+            {
+                ArrayLength = defaultLength
+            };
             // var encLength = Convert.ToInt32(reader.GetAttribute("encodedLength"));
             var arrLength = Convert.ToInt32(reader.GetAttribute("arrayLength")); // Override the default; if non-existent, should get 0
             if (arrLength > 0)
