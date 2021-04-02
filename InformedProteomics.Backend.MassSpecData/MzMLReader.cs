@@ -851,9 +851,15 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         public void Cleanup()
         {
-            if (_randomAccess && _isGzipped)
+            if (_randomAccess && _isGzipped && File.Exists(_unzippedFilePath))
             {
-                File.Delete(_unzippedFilePath);
+                try
+                {
+                    File.Delete(_unzippedFilePath);
+                }
+                // ReSharper disable once EmptyGeneralCatchClause
+                catch
+                { } // We failed, it's not optimal, but it's okay.
             }
         }
 
