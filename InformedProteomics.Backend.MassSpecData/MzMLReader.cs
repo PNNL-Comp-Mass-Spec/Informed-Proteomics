@@ -892,7 +892,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         private void ReadIndexFromEnd()
         {
-            var stream = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 1);
+            var stream = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1);
             var testPos = stream.Length;
             //stream.Position = testPos; // 300 bytes from the end of the file - should be enough
             var streamReader = new StreamReader(stream, Encoding.UTF8, true, 65536);
