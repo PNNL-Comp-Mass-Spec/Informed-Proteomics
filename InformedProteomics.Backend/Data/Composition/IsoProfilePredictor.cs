@@ -54,7 +54,7 @@ namespace InformedProteomics.Backend.Data.Composition
                 exponents[i] = Math.Exp(means[i]);
             }
 
-            // This assumes that the envelop is uni-modal.
+            // This assumes that the envelope is uni-modal.
             var maxHeight = 0.0;
             var isotopeIndex = 0;
             var mostIntenseIsotopomerIndex = -1;

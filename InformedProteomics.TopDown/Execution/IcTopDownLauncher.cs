@@ -24,7 +24,7 @@ namespace InformedProteomics.TopDown.Execution
 {
     public class IcTopDownLauncher : EventNotifier
     {
-        // Ignore Spelling: deconvolute, deconvoluted, ic, Nums, pbf
+        // Ignore Spelling: deconvolute, deconvoluted, ic, Nums, pbf, Pre
 
         private const bool USE_PARALLEL_FOREACH = true;
 
@@ -239,7 +239,7 @@ namespace InformedProteomics.TopDown.Execution
             sw.Stop();
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
 
-            // pre-generate deconvoluted spectra for scoring
+            // Pre-generate deconvoluted spectra for scoring
             _massBinComparer = new FilteredProteinMassBinning(Options.AminoAcidSet, Options.MaxSequenceMass + 1000);
 
             //this.fragmentScorerFactory = new CompositionScorerFactory(_run, true);

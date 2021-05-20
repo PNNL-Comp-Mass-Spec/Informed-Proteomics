@@ -16,7 +16,7 @@ namespace MSPathFinderT
 {
     public class TopDownInputParameters : MsPfParameters
     {
-        // Ignore Spelling: ic, tda, tol, frag, Da
+        // Ignore Spelling: Da, frag, hyperthreaded, ic, tda, tol, wildcards
 
         [Option("i", "s", "specFile", ArgPosition = 1, Required = true,
             HelpText = "Spectrum File (.raw or .pbf)",

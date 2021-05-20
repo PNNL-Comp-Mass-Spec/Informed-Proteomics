@@ -16,7 +16,7 @@ namespace InformedProteomics.Backend.SearchResults
     /// </summary>
     public class DatabaseSearchResultData
     {
-        // Ignore Spelling: Dehydro, desc
+        // Ignore Spelling: Dehydro, desc, pre
 
         /// <summary>
         /// Scan number
