@@ -800,6 +800,7 @@ namespace InformedProteomics.TopDown.Execution
                         var pre = nTermCleavages == 0 ? annotation[0] : annotation[nTermCleavages + 1];
                         var post = annotation[annotation.Length - 1];
 
+                        // MS1 FeatureIds for MS2 scans
                         var ms2FeatureIds = new List<int>();
                         if (filter != null)
                         {
@@ -1083,6 +1084,7 @@ namespace InformedProteomics.TopDown.Execution
 
                 var matchesToStore = new List<DatabaseSequenceSpectrumMatch>();
                 double comparisonSpecEValue = -1;
+                var ms1FeatureId = 0;
 
                 for (var i = 0; i < matchesForScan.Count; i++)
                 {
@@ -1091,6 +1093,11 @@ namespace InformedProteomics.TopDown.Execution
                     if (matchesToStore.Count < Options.MatchesPerSpectrumToReport)
                     {
                         continue;
+                    }
+
+                    if (ms1FeatureId == 0 && matchesForScan[i].FeatureId > 0)
+                    {
+                        ms1FeatureId = matchesForScan[i].FeatureId;
                     }
 
                     if (i == matchesForScan.Count - 1)
@@ -1109,6 +1116,15 @@ namespace InformedProteomics.TopDown.Execution
                     {
                         // Scores are sufficiently different
                         break;
+                    }
+                }
+
+                // If any of the matches have a FeatureId of 0, change it to ms1FeatureId
+                foreach (var match in matchesToStore)
+                {
+                    if (match.FeatureId == 0)
+                    {
+                        match.UpdateFeatureId(ms1FeatureId);
                     }
                 }
 

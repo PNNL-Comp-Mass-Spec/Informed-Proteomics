@@ -46,7 +46,7 @@ namespace InformedProteomics.TopDown.Execution
 
         public int NumMatchedFragments { get; internal set; }
 
-        public int FeatureId { get; }
+        public int FeatureId { get; private set; }
 
         public AminoAcid NTerm => Pre == '-' ? AminoAcid.ProteinNTerm : AminoAcid.PeptideNTerm;
 
@@ -55,6 +55,11 @@ namespace InformedProteomics.TopDown.Execution
         public int CompareTo(DatabaseSequenceSpectrumMatch other)
         {
             return Score.CompareTo(other.Score);
+        }
+
+        public void UpdateFeatureId(int ms1FeatureId)
+        {
+            FeatureId = ms1FeatureId;
         }
     }
 }
