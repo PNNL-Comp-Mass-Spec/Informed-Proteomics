@@ -80,6 +80,10 @@ namespace MSPathFinderT
             HelpText = "Include Tag-based Search (use true or false;\nor use '0' for false or '1' for true)")]
         public override bool TagBasedSearch { get; set; }
 
+        [Option("memMatches", "MatchesPerSpectrumToKeepInMemory",
+            HelpText = "Number of matches to keep in memory; these matches are used when computing spectral E-values")]
+        public override int MatchesPerSpectrumToKeepInMemory { get; set; }
+
         [Option("n", "NumMatchesPerSpec", "MatchesPerSpectrumToReport",
             HelpText = "Number of results to report for each mass spectrum")]
         public override int MatchesPerSpectrumToReport { get; set; }
@@ -143,6 +147,10 @@ namespace MSPathFinderT
         /// </summary>
         /// <remarks>This can alternatively be set using TdaInt</remarks>
         public override DatabaseSearchMode TargetDecoySearchMode { get; set; }
+
+        [Option("overwrite", "OverwriteExistingResults",
+            HelpText = "Overwrite existing results. If false (default), looks for files _IcTarget.tsv and _IcDecoy.tsv and uses the results in the files if found")]
+        public override bool OverwriteExistingResults { get; set; }
 
         [Option("t", "precursorTol", "PMTolerance", /*Min = 1,*/
             HelpText = "Precursor Tolerance (in PPM)")]
@@ -484,6 +492,11 @@ namespace MSPathFinderT
 
             MaxNumThreads = GetOptimalMaxThreads(MaxNumThreads);
 
+            if (MatchesPerSpectrumToReport >= MatchesPerSpectrumToKeepInMemory)
+            {
+                MatchesPerSpectrumToKeepInMemory = MatchesPerSpectrumToReport + 1;
+            }
+
             return true;
 
         }
@@ -571,23 +584,26 @@ namespace MSPathFinderT
             Console.WriteLine("{0,-28} {1}", "OutputDir:", OutputDir);
             Console.WriteLine();
 
-            Console.WriteLine("{0,-28} {1}", "MaxThreads:", MaxNumThreads);
-            Console.WriteLine("{0,-28} {1}", "InternalCleavageMode:", InternalCleavageMode);
-            Console.WriteLine("{0,-28} {1}", "Tag-based search:", TagBasedSearch);
-            Console.WriteLine("{0,-28} {1}", "Tda:", TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString());
-            Console.WriteLine("{0,-28} {1}", "PrecursorIonTolerancePpm:", PrecursorIonTolerancePpm);
-            Console.WriteLine("{0,-28} {1}", "ProductIonTolerancePpm:", ProductIonTolerancePpm);
-            Console.WriteLine("{0,-28} {1}", "MinSequenceLength:", MinSequenceLength);
-            Console.WriteLine("{0,-28} {1}", "MaxSequenceLength:", MaxSequenceLength);
-            Console.WriteLine("{0,-28} {1}", "MinPrecursorIonCharge:", MinPrecursorIonCharge);
-            Console.WriteLine("{0,-28} {1}", "MaxPrecursorIonCharge:", MaxPrecursorIonCharge);
-            Console.WriteLine("{0,-28} {1}", "MinProductIonCharge:", MinProductIonCharge);
-            Console.WriteLine("{0,-28} {1}", "MaxProductIonCharge:", MaxProductIonCharge);
-            Console.WriteLine("{0,-28} {1}", "MinSequenceMass:", MinSequenceMass);
-            Console.WriteLine("{0,-28} {1}", "MaxSequenceMass:", MaxSequenceMass);
-            Console.WriteLine("{0,-28} {1}", "MatchesPerSpectrumToReport:", MatchesPerSpectrumToReport);
-            Console.WriteLine("{0,-28} {1}", "IncludeDecoyResults:", IncludeDecoyResults);
-            Console.WriteLine("{0,-28} {1}", "MaxDynamicModificationsPerSequence:", MaxDynamicModificationsPerSequence);
+            Console.WriteLine("{0,-29} {1}", "MaxThreads:", MaxNumThreads);
+            Console.WriteLine("{0,-29} {1}", "InternalCleavageMode:", InternalCleavageMode);
+            Console.WriteLine("{0,-29} {1}", "Tag-based search:", TagBasedSearch);
+            Console.WriteLine("{0,-29} {1}", "Tda:", TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString());
+            Console.WriteLine("{0,-29} {1}", "PrecursorIonTolerancePpm:", PrecursorIonTolerancePpm);
+            Console.WriteLine("{0,-29} {1}", "ProductIonTolerancePpm:", ProductIonTolerancePpm);
+            Console.WriteLine("{0,-29} {1}", "MinSequenceLength:", MinSequenceLength);
+            Console.WriteLine("{0,-29} {1}", "MaxSequenceLength:", MaxSequenceLength);
+            Console.WriteLine("{0,-29} {1}", "MinPrecursorIonCharge:", MinPrecursorIonCharge);
+            Console.WriteLine("{0,-29} {1}", "MaxPrecursorIonCharge:", MaxPrecursorIonCharge);
+            Console.WriteLine("{0,-29} {1}", "MinProductIonCharge:", MinProductIonCharge);
+            Console.WriteLine("{0,-29} {1}", "MaxProductIonCharge:", MaxProductIonCharge);
+            Console.WriteLine("{0,-29} {1}", "MinSequenceMass:", MinSequenceMass);
+            Console.WriteLine("{0,-29} {1}", "MaxSequenceMass:", MaxSequenceMass);
+            Console.WriteLine("{0,-29} {1}", "MatchesPerSpectrumToReport:", MatchesPerSpectrumToReport);
+            Console.WriteLine("{0,-29} {1}", "MatchesPerSpecToKeepInMemory:", MatchesPerSpectrumToKeepInMemory);
+            Console.WriteLine("{0,-29} {1}", "IncludeDecoyResults:", IncludeDecoyResults);
+            Console.WriteLine("{0,-29} {1}", "MaxDynamicModsPerSequence:", MaxDynamicModificationsPerSequence);
+            Console.WriteLine("{0,-29} {1}", "OverwriteExistingResults:", OverwriteExistingResults);
+
             Console.WriteLine();
             Console.WriteLine("Modifications:");
 

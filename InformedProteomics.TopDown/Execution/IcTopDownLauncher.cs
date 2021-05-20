@@ -326,7 +326,7 @@ namespace InformedProteomics.TopDown.Execution
             List<DatabaseSearchResultData> targetSearchResults = null;
 
             var validTargetResults = ResultsFileHasData(targetOutputFilePath);
-            if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Target) && !validTargetResults)
+            if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Target) && !validTargetResults || Options.OverwriteExistingResults)
             {
                 targetSearchResults = RunDatabaseSearch(targetDb, targetOutputFilePath, ms1Filter, "target", prog);
             }
@@ -339,7 +339,7 @@ namespace InformedProteomics.TopDown.Execution
             List<DatabaseSearchResultData> decoySearchResults = null;
 
             var validDecoyResults = ResultsFileHasData(decoyOutputFilePath);
-            if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Decoy) && !validDecoyResults)
+            if (Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Decoy) && !validDecoyResults || Options.OverwriteExistingResults)
             {
                 var decoyDb = targetDb.Decoy(null, true);
                 decoySearchResults = RunDatabaseSearch(decoyDb, decoyOutputFilePath, ms1Filter, "decoy", prog);

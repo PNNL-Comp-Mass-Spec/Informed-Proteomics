@@ -71,6 +71,7 @@ namespace InformedProteomics.TopDown.Execution
             TagBasedSearch = true;
 
             ActivationMethod = ActivationMethod.Unknown;
+            OverwriteExistingResults = false;
         }
 
         /// <summary>
@@ -119,6 +120,12 @@ namespace InformedProteomics.TopDown.Execution
         /// Gets or sets the DB search mode.
         /// </summary>
         public virtual DatabaseSearchMode TargetDecoySearchMode { get; set; }
+
+        /// <summary>
+        /// If false, and existing results are found, the existing results will be used
+        /// Set to True to force the target and/or decoy search to be repeated even if _IcTarget.tsv or _IcDecoy.tsv exists
+        /// </summary>
+        public virtual bool OverwriteExistingResults { get; set; }
 
         /// <summary>
         /// Gets or sets the precursor ion tolerance.
@@ -272,7 +279,7 @@ namespace InformedProteomics.TopDown.Execution
         /// The matches in memory are used when computing spectral E-values
         /// </summary>
         /// <remarks>Defaults to 3</remarks>
-        public int MatchesPerSpectrumToKeepInMemory { get; set; }
+        public virtual int MatchesPerSpectrumToKeepInMemory { get; set; }
 
         /// <summary>
         /// Number of matches per spectrum to list in the results file
