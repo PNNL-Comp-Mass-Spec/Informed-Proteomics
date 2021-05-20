@@ -264,7 +264,7 @@ namespace InformedProteomics.TopDown.Execution
         /// The matches are used when computing confidence scores
         /// </summary>
         /// <remarks>Defaults to 3</remarks>
-        [Obsolete("Superseded by MatchesPerSpectrumToTrack")]
+        [Obsolete("Superseded by MatchesPerSpectrumToKeepInMemory")]
         public int NumMatchesPerSpectrum => MatchesPerSpectrumToKeepInMemory;
 
         /// <summary>
