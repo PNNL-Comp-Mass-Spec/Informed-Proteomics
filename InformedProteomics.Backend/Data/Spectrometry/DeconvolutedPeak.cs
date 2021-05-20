@@ -121,7 +121,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /*
     public class DeconvolutedPeak: IComparable<DeconvolutedPeak>
     {
-        public DeconvolutedPeak(double mass, int charge, Peak[] isotopePeaks = null, double[] envelop = null, double relativeThreshold = 0.3)
+        public DeconvolutedPeak(double mass, int charge, Peak[] isotopePeaks = null, double[] envelope = null, double relativeThreshold = 0.3)
         {
             Mass = mass;
             Charge = charge;
@@ -134,7 +134,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 {
                     if (isotopePeaks[i] == null) continue;
                     Intensity += isotopePeaks[i].Intensity;
-                    if (envelop[i] > relativeThreshold) IsotopePeaks.Add(isotopePeaks[i]);
+                    if (envelope[i] > relativeThreshold) IsotopePeaks.Add(isotopePeaks[i]);
                 }
             }
         }

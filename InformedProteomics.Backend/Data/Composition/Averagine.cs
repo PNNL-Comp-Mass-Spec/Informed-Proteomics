@@ -11,15 +11,19 @@ namespace InformedProteomics.Backend.Data.Composition
     /// </summary>
     public class Averagine
     {
-        // NominalMass -> Isotope Envelop (Changed to ConcurrentDictionary by Chris)
-        private readonly ConcurrentDictionary<int, IsotopomerEnvelope> IsotopeEnvelopMap;
+        // Ignore Spelling: Averagine, Isotopomer
+
+        /// <summary>
+        /// Map of NominalMass to Isotope Envelope
+        /// </summary>
+        private readonly ConcurrentDictionary<int, IsotopomerEnvelope> IsotopeEnvelopeMap;
 
         /// <summary>
         /// Constructor
         /// </summary>
         public Averagine()
         {
-            IsotopeEnvelopMap = new ConcurrentDictionary<int, IsotopomerEnvelope>();
+            IsotopeEnvelopeMap = new ConcurrentDictionary<int, IsotopomerEnvelope>();
         }
 
         /// <summary>
@@ -100,7 +104,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns></returns>
         public IsotopomerEnvelope GetIsotopomerEnvelopeFromNominalMassInst(int nominalMass, IsoProfilePredictor isoProfilePredictor = null)
         {
-            var nominalMassFound = IsotopeEnvelopMap.TryGetValue(nominalMass, out var envelope);
+            var nominalMassFound = IsotopeEnvelopeMap.TryGetValue(nominalMass, out var envelope);
             if (nominalMassFound)
             {
                 return envelope;
@@ -108,7 +112,7 @@ namespace InformedProteomics.Backend.Data.Composition
 
             var mass = nominalMass / Constants.RescalingConstant;
             envelope = ComputeIsotopomerEnvelope(mass, isoProfilePredictor);
-            IsotopeEnvelopMap.AddOrUpdate(nominalMass, envelope, (key, value) => value);
+            IsotopeEnvelopeMap.AddOrUpdate(nominalMass, envelope, (key, value) => value);
 
             return envelope;
         }

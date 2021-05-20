@@ -193,7 +193,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                             continue;
                         }
 
-                        var envelop = isotopomerEnvelope.Envelope;
+                        var envelope = isotopomerEnvelope.Envelope;
                         var observedIntensities = new double[observedPeaks.Length];
 
                         var observedPeakCount = 0;
@@ -210,10 +210,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                             observedIntensities[i] = observedPeak != null ? (float)observedPeak.Item1.Intensity : 0.0;
                         }
 
-                        var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelop, observedIntensities);
+                        var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelope, observedIntensities);
                         var bcDist = sim.Item1;
                         var corr = sim.Item2;
-                        var foundPeakRatio = observedPeakCount / ((double)envelop.Length);
+                        var foundPeakRatio = observedPeakCount / ((double)envelope.Length);
 
                         var interferenceScore = 10.0;
 
@@ -505,7 +505,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                     continue;
                                 }
 
-                                var envelop = isotopomerEnvelope.Envelope;
+                                var envelope = isotopomerEnvelope.Envelope;
                                 var observedIntensities = new double[observedPeaks.Length];
 
                                 for (var i = 0; i < observedPeaks.Length; i++)
@@ -514,10 +514,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                     observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
                                 }
 
-                                var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelop, observedIntensities);
+                                var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelope, observedIntensities);
                                 var bcDist = sim.Item1;
                                 var corr = sim.Item2;
-                                var score = corr / (bcDist * ((double)Math.Abs(isotopeIndex - mostAbundantIsotopeIndex) / envelop.Length));
+                                var score = corr / (bcDist * ((double)Math.Abs(isotopeIndex - mostAbundantIsotopeIndex) / envelope.Length));
 
                                 if (corr < corrScoreThreshold && bcDist > 0.03)
                                 {
@@ -555,7 +555,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                     continue;
                                 }
 
-                                var envelop = isotopomerEnvelope.Envelope;
+                                var envelope = isotopomerEnvelope.Envelope;
                                 var observedIntensities = new double[observedPeaks.Length];
 
                                 for (var i = 0; i < observedPeaks.Length; i++)
@@ -564,7 +564,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                     observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
                                 }
 
-                                var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelop, observedIntensities);
+                                var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelope, observedIntensities);
                                 var bcDist = sim.Item1;
                                 var corr = sim.Item2;
 
