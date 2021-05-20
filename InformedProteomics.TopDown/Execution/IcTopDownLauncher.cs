@@ -1079,8 +1079,40 @@ namespace InformedProteomics.TopDown.Execution
 
             foreach (var scanNum in scanNums)
             {
-                var matchesForScan = matches[scanNum].OrderBy(m => m.SpecEvalue).Take(Options.MatchesPerSpectrumToReport).ToList();
-                finalMatches.Add(scanNum, matchesForScan);
+                var matchesForScan = matches[scanNum].OrderBy(m => m.SpecEvalue).ToList();
+
+                var matchesToStore = new List<DatabaseSequenceSpectrumMatch>();
+                double comparisonSpecEValue = -1;
+
+                for (var i = 0; i < matchesForScan.Count; i++)
+                {
+                    matchesToStore.Add(matchesForScan[i]);
+
+                    if (matchesToStore.Count < Options.MatchesPerSpectrumToReport)
+                    {
+                        continue;
+                    }
+
+                    if (i == matchesForScan.Count - 1)
+                    {
+                        // No more matches
+                        break;
+                    }
+
+                    if (i == 0)
+                    {
+                        comparisonSpecEValue = matchesForScan[0].SpecEvalue;
+                    }
+
+                    // Compare the next lowest scoring match's score to the comparison Spec EValue
+                    if (Math.Abs(comparisonSpecEValue - matchesForScan[i + 1].SpecEvalue) > double.Epsilon)
+                    {
+                        // Scores are sufficiently different
+                        break;
+                    }
+                }
+
+                finalMatches.Add(scanNum, matchesToStore);
             }
 
             progData.StatusInternal = string.Empty;
