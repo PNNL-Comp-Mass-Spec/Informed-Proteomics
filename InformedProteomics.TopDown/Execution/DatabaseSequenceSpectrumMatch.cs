@@ -10,6 +10,23 @@ namespace InformedProteomics.TopDown.Execution
     /// </summary>
     public class DatabaseSequenceSpectrumMatch : IComparable<DatabaseSequenceSpectrumMatch>
     {
+        // Ignore spelling: proteoform
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="sequence"></param>
+        /// <param name="pre"></param>
+        /// <param name="post"></param>
+        /// <param name="scanNum"></param>
+        /// <param name="offset"></param>
+        /// <param name="numNTermCleavages"></param>
+        /// <param name="modifications"></param>
+        /// <param name="ion"></param>
+        /// <param name="score"></param>
+        /// <param name="isDecoy"></param>
+        /// <param name="specEvalue"></param>
+        /// <param name="featureId"></param>
         public DatabaseSequenceSpectrumMatch(string sequence, char pre, char post, int scanNum, long offset,
             int numNTermCleavages, ModificationCombination modifications, Ion ion, double score,
             bool isDecoy,
@@ -46,6 +63,9 @@ namespace InformedProteomics.TopDown.Execution
 
         public int NumMatchedFragments { get; internal set; }
 
+        /// <summary>
+        /// MS1 feature ID
+        /// </summary>
         public int FeatureId { get; private set; }
 
         public AminoAcid NTerm => Pre == '-' ? AminoAcid.ProteinNTerm : AminoAcid.PeptideNTerm;
