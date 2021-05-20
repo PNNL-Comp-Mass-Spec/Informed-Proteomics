@@ -23,7 +23,7 @@
     <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomics.Backend.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ProteinFileReader" Version="2.0.4" />
+    <PackageReference Include="ProteinFileReader" Version="2.0.5" />
     <PackageReference Include="SAIS-CSharp" Version="1.0.1" />
   </ItemGroup>
 </Project>
