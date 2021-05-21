@@ -214,7 +214,7 @@ namespace MSPathFinderT
             HelpText = "Activation Method")]
         public override ActivationMethod ActivationMethod { get; set; }
 
-        [Option("scansFile",
+        [Option("scansFile", "ScansFilePath",
             HelpText = "Optional text file with MS2 scans to process (tab, comma, or space separated); " +
                        "any integer in the file is assumed to be a scan number to process",
             HelpShowsDefault = false)]
