@@ -28,6 +28,9 @@ namespace InformedProteomics.TopDown.Execution
 
         private const bool USE_PARALLEL_FOREACH = true;
 
+        private const bool DEBUG_MODE = false;
+        private const int DEBUG_MODE_PROTEINS_TO_SEARCH = 275;
+
         public const string TargetFileNameEnding = "_IcTarget.tsv";
         public const string DecoyFileNameEnding = "_IcDecoy.tsv";
         public const string TdaFileNameEnding = "_IcTda.tsv";
@@ -620,17 +623,42 @@ namespace InformedProteomics.TopDown.Execution
 
             var maxNumNTermCleavages = Options.InternalCleavageMode == InternalCleavageType.NoInternalCleavage ? Options.MaxNumNTermCleavages : 0;
 
-            Parallel.ForEach(annotationsAndOffsets, pfeOptions, annotationAndOffset =>
+            if (USE_PARALLEL_FOREACH && !DEBUG_MODE)
             {
-                if (cancellationToken?.IsCancellationRequested == true)
+                Parallel.ForEach(annotationsAndOffsets, pfeOptions, annotationAndOffset =>
                 {
-                    //return matches;
-                    return;
-                }
+                    if (cancellationToken?.IsCancellationRequested == true)
+                    {
+                        //return matches;
+                        return;
+                    }
 
-                SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, matches);
-                SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages, db.IsDecoy, cancellationToken);
-            });
+                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, matches);
+                    SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages, db.IsDecoy, cancellationToken);
+                });
+            }
+            else
+            {
+                foreach(var annotationAndOffset in annotationsAndOffsets)
+                {
+                    if (cancellationToken?.IsCancellationRequested == true)
+                    {
+                        //return matches;
+                        return;
+                    }
+
+                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedProteins, sw, progData, matches);
+                    SearchForMatches(annotationAndOffset, sequenceFilter, matches, maxNumNTermCleavages, db.IsDecoy, cancellationToken);
+
+                    if (numProteins > DEBUG_MODE_PROTEINS_TO_SEARCH)
+                    {
+                        ConsoleMsgUtils.ShowWarning("Debug mode");
+                        ConsoleMsgUtils.ShowWarning(string.Format("Exiting ForEach since {0} proteins have been searched", DEBUG_MODE_PROTEINS_TO_SEARCH));
+                        Console.WriteLine();
+                        break;
+                    }
+                }
+            }
 
             OnStatusEvent(string.Format("Collected candidate matches: {0}", GetNumberOfMatches(matches)));
 
@@ -1066,6 +1094,15 @@ namespace InformedProteomics.TopDown.Execution
 
                         currentTask = "Reporting progress " + currentIteration;
                         SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData, null);
+
+                        if (DEBUG_MODE && numProteins > DEBUG_MODE_PROTEINS_TO_SEARCH)
+                        {
+                            ConsoleMsgUtils.ShowWarning("Debug mode");
+                            ConsoleMsgUtils.ShowWarning(string.Format(
+                                "Exiting Parallel.ForEach since {0} proteins have been searched", DEBUG_MODE_PROTEINS_TO_SEARCH));
+                            Console.WriteLine();
+                            break;
+                        }
                     }
                 }
                 catch (Exception ex)
