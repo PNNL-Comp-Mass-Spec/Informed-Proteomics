@@ -483,7 +483,7 @@ namespace InformedProteomics.TopDown.Execution
                 progData.Report(p.Percent);
             });
 
-            var bestMatchesByScan = RunGeneratingFunction(matches, null, progGen);
+            var bestMatchesByScan = RunGeneratingFunction(matches, searchDb, null, progGen);
 
             var results = WriteResultsToFile(bestMatchesByScan, outputFilePath, searchDb);
             sw.Stop();
@@ -930,6 +930,7 @@ namespace InformedProteomics.TopDown.Execution
 
         private Dictionary<int, List<DatabaseSequenceSpectrumMatch>> RunGeneratingFunction(
             IReadOnlyList<SortedSet<DatabaseSequenceSpectrumMatch>> sortedMatches,
+            FastaDatabase searchDb,
             CancellationToken? cancellationToken = null,
             IProgress<ProgressData> progress = null)
         {
@@ -1111,6 +1112,9 @@ namespace InformedProteomics.TopDown.Execution
                 }
             });
 
+            // Values in this SortedSet are Sequence_Modification_ProteinName
+            var storedSequences = new SortedSet<string>();
+
             // Keys in this dictionary are scan number
             // Values are the list of matches for each scan
             var finalMatches = new Dictionary<int, List<DatabaseSequenceSpectrumMatch>>();
@@ -1120,12 +1124,26 @@ namespace InformedProteomics.TopDown.Execution
                 var matchesForScan = matches[scanNum].OrderBy(m => m.SpecEvalue).ToList();
 
                 var matchesToStore = new List<DatabaseSequenceSpectrumMatch>();
+
+                storedSequences.Clear();
+
                 double comparisonSpecEValue = -1;
                 var ms1FeatureId = 0;
 
                 for (var i = 0; i < matchesForScan.Count; i++)
                 {
-                    matchesToStore.Add(matchesForScan[i]);
+                    // Multiple matches can have the same sequence, same protein, and same score
+                    // Typically they will have differing Offsets
+                    // Check for this and avoid duplicates
+
+                    var proteinName = searchDb.GetProteinName(matchesForScan[i].Offset);
+                    var sequenceKey = matchesForScan[i].Sequence + "_" + matchesForScan[i].ModificationText ?? string.Empty + "_" + proteinName;
+
+                    if (!storedSequences.Contains(sequenceKey))
+                    {
+                        matchesToStore.Add(matchesForScan[i]);
+                        storedSequences.Add(sequenceKey);
+                    }
 
                     if (matchesToStore.Count < Options.MatchesPerSpectrumToReport)
                     {
