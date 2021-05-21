@@ -498,7 +498,6 @@ namespace MSPathFinderT
             }
 
             return true;
-
         }
 
         /// <summary>
@@ -557,7 +556,6 @@ namespace MSPathFinderT
             ConsoleMsgUtils.ShowWarning("{0}\n{1}{2}\n{0}",
                 "----------------------------------------------------------",
                 messagePrefix, message);
-
 
             if (ex != null)
             {
@@ -688,7 +686,6 @@ namespace MSPathFinderT
                 ShowError(string.Format("Exception examining the file or directory path ({0}): {1}", fileOrDirectoryPath, ex.Message), ex);
                 return new List<FileInfo>();
             }
-
         }
 
         /// <summary>

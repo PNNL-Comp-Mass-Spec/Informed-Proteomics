@@ -68,7 +68,6 @@ namespace InformedProteomics.FeatureFinding
                 Console.WriteLine("{0,-14} {1}", "MaxThreads:", MaxThreads);
 
                 Console.WriteLine("{0,-14} {1}", "LikelihoodRatioThreshold:", LikelihoodScoreThreshold);
-
             }
             else
             {
