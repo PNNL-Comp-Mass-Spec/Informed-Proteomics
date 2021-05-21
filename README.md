@@ -18,7 +18,7 @@ The latest versions of the Informed Proteomics tools are available on the [AppVe
 
 ## MSPathFinderT
 
-MSPathFinder finds peptides in top-down LC-MS/MS datasets. Similar to database search engines for bottom-up, it takes a fasta file, a spectrum file, and a list of modifications as an input and reports proteoform spectrum matches (PsSMs) and their scores. These results are output in a tab-separated format and in a MzIdentML file.
+MSPathFinder finds peptides in top-down LC-MS/MS datasets. Similar to database search engines for bottom-up, it takes a FASTA file, a spectrum file, and a list of modifications as an input and reports proteoform spectrum matches (PsSMs) and their scores. These results are output in a tab-separated format and in a MzIdentML file.
 
 Processing steps:
 
@@ -33,7 +33,7 @@ Processing steps:
   * This file can be reused for multiple searches, as long as none of its parameters change
   * MSPathFinderT will perform this step automatically if not provided with a path to a feature file, using the respective parameters from the MSPathFinderT parameters.
 
-3. Run MSPathfinderT with the .Pbf (or .raw) file and a fasta file to search for proteins
+3. Run MSPathfinderT with the .Pbf (or .raw) file and a FASTA file to search for proteins
   * Creates \_IcTda.tsv files and .mzid
   * Can also be run with the spectrum source file directly, with PbfGen and ProMex run as part of the process.
 
@@ -104,7 +104,8 @@ MSPathFinderT version 1.0.7569 (September 21, 2020)
 
 Usage: MSPathFinderT.exe
 
-  -s, arg#1              Required. Spectrum File (*.raw)
+  -i, -s, -specFile,     Required. Spectrum File (.raw or .pbf)
+  arg#1
 
   -d, -database          Required. Database File (*.fasta or *.fa or *.faa)
 
@@ -114,18 +115,25 @@ Usage: MSPathFinderT.exe
                          Possible values are:
                            0 or 'NoInternalCleavage': No Internal Cleavage
                            1 or 'SingleInternalCleavage': Single Internal Cleavage
-                           2 or 'MultipleInternalCleavages': Multiple Internal Cleavages
+                           2 or 'MultipleInternalCleavages': Multiple Internal
+                           Cleavages
 
   -tagSearch             Include Tag-based Search (use true or false;
                          or use '0' for false or '1' for true) (Default: True)
 
-  -n                     Number of results to report for each mass spectrum (Default: 1)
+  -memMatches            Number of matches to keep in memory; these matches are
+                         used when computing spectral E-values (Default: 3)
 
-  -IncludeDecoys         Include decoy results in the _IcTda.tsv file (Default: False)
+  -n,                    Number of results to report for each mass spectrum
+  -NumMatchesPerSpec     (Default: 1)
+
+  -IncludeDecoy,         Include decoy results in the _IcTda.tsv file
+  -IncludeDecoys         (Default: False)
 
   -mod                   Path to modification file that defines static and dynamic
                          modifications. Modifications can alternatively be defined
-                         in a parameter file, as specified by /ParamFile or -ParamFile
+                         in a parameter file, as specified by /ParamFile or
+                         -ParamFile
                          Modifications defined using the -mod switch take
                          precedence over modifications defined in a parameter file
                          (Default: empty string, meaning no modifications)
@@ -135,9 +143,15 @@ Usage: MSPathFinderT.exe
                          1: search shuffled decoy database
                          (Default: 0, Min: -1, Max: 1)
 
-  -t, -precursorTol      Precursor Tolerance (in PPM) (Default: 10)
+  -overwrite             Overwrite existing results. If false (default), looks for
+                         files _IcTarget.tsv and _IcDecoy.tsv and uses the results
+                         in the files if found (Default: False)
 
-  -f, -fragmentTol       Fragment Ion Tolerance (in PPM) (Default: 10)
+  -t, -precursorTol,     Precursor Tolerance (in PPM) (Default: 10)
+  -PMTolerance
+
+  -f, -fragmentTol,      Fragment Ion Tolerance (in PPM) (Default: 10)
+  -FragTolerance
 
   -minLength             Minimum Sequence Length (Default: 21, Min: 0)
 
@@ -155,13 +169,15 @@ Usage: MSPathFinderT.exe
 
   -maxMass               Maximum sequence mass in Da (Default: 50000)
 
-  -feature               *.ms1ft, *_isos.csv, or *.msalign (Default: Run ProMex)
+  -feature               .ms1ft, _isos.csv, or .msalign feature file (typically
+                         the results from ProMex); leave blank/undefined if
+                         processing multiple input files
 
   -threads               Maximum number of threads, or 0 to set automatically
                          (Default: 0, Min: 0)
 
-  -act                   Activation Method (Default: Unknown (or 6))
-                         Possible values are:
+  -act,                  Activation Method (Default: Unknown (or 6))
+  -ActivationMethod      Possible values are:
                            0 or 'CID'
                            1 or 'ETD'
                            2 or 'HCD'
@@ -170,7 +186,9 @@ Usage: MSPathFinderT.exe
                            5 or 'UVPD'
                            6 or 'Unknown'
 
-  -scansFile             Text file with MS2 scans to process
+  -scansFile,            Optional text file with MS2 scans to process (tab, comma,
+  -ScansFilePath         or space separated); any integer in the file is assumed
+                         to be a scan number to process
 
   -flip                  If specified, FLIP scoring code will be used
                          (supports UVPD spectra) (Default: False)
@@ -188,7 +206,6 @@ Usage: MSPathFinderT.exe
 
   NOTE:                  arg#1, arg#2, etc. refer to positional arguments, used
                          like "AppName.exe [arg#1] [arg#2] [other args]".
-
 ```
 
 Enabling tag-based searching with `-tagSearch 1` can give 5% to 10% more matches, but can increase the runtime by 30% to 50%.
@@ -210,7 +227,7 @@ On Linux, supported input files are .raw, .mzML, and .mzML.gz
 See the [Example_Files](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/tree/master/Example_Files) folder for sample parameter files
 * Example command for invoking MSPathFinder with a parameter file:
 ```
-MSPathFinderT.exe -s C:\WorkDir\Dataset.pbf -feature C:\WorkDir\Dataset.ms1ft -d C:\WorkDir\Proteins.fasta -o C:\WorkDir  /ParamFile:C:\WorkDir\MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage_ReportTop2.txt
+MSPathFinderT.exe -s C:\WorkDir\Dataset.pbf -feature C:\WorkDir\Dataset.ms1ft -d C:\WorkDir\Proteins.fasta -o C:\WorkDir /ParamFile:C:\WorkDir\MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage_ReportTop2.txt
 ```
 
 ## MSPathFinder Mods File
@@ -242,14 +259,3 @@ in compliance with the License.  You may obtain a copy of the License at
 http://www.apache.org/licenses/LICENSE-2.0
 
 RawFileReader reading tool. Copyright © 2016 by Thermo Fisher Scientific, Inc. All rights reserved.
-
--------------------------------------------------------------------------------
-
-Notice: This computer software was prepared by Battelle Memorial Institute,
-hereinafter the Contractor, under Contract No. DE-AC05-76RL0 1830 with the
-Department of Energy (DOE).  All rights in the computer software are reserved
-by DOE on behalf of the United States Government and the Contractor as
-provided in the Contract.  NEITHER THE GOVERNMENT NOR THE CONTRACTOR MAKES ANY
-WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS
-SOFTWARE.  This notice including this sentence must appear on any copies of
-this computer software.
