@@ -54,6 +54,10 @@ minMass=3000
 # Maximum sequence mass, in Da
 maxMass=50000
 
+# Number of matches per spectrum to keep in memory
+# These matches are used when computing spectral E-values
+MatchesPerSpectrumToKeepInMemory=3
+
 # Number of matches per spectrum to be reported
 NumMatchesPerSpec=1
 
