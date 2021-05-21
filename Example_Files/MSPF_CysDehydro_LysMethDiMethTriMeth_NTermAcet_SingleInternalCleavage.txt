@@ -1,19 +1,19 @@
-#Parent mass tolerance (in ppm)
+# Parent mass tolerance (in ppm)
 PMTolerance=10
 
-#Fragmention ion  tolerance (in ppm)
+# Fragmention ion  tolerance (in ppm)
 FragTolerance=10
 
-#Search mode
-# 0: multiple internal cleavages
-# 1: single internal cleavage
-# 2: no internal cleavage
+# Search mode
+#  0: multiple internal cleavages
+#  1: single internal cleavage
+#  2: no internal cleavage
 SearchMode=1
 
-#Max Number of Modifications per peptide 
+# Max Number of Modifications per peptide 
 NumMods=4
 
-#Modifications (see below for examples)
+# Modifications (see below for examples)
 StaticMod=none
 
 DynamicMod=H-1,     C,   opt, any,         Dehydro                   # Dehydro C
@@ -24,65 +24,65 @@ DynamicMod=C1H2,    K,   opt, any,         Methyl                    # Methyl K;
 DynamicMod=C2H4,    K,   opt, any,         DiMethyl                  # Di-Methylation;       28.0314   Da  Dimethyl
 DynamicMod=C3H6,    K,   opt, any,         TriMethyl                 # Tri-Methylation;      42.0471   Da  TriMeth 
 
-#Target/Decoy search mode
-#  0 means don't search decoy database (default)
-#  1 means search decoy database to compute FDR (source FASTA file must be forward-only proteins)
+# Target/Decoy search mode
+#   0 means don't search decoy database (default)
+#   1 means search decoy database to compute FDR (source FASTA file must be forward-only proteins)
 TDA=1
 
-#Minimum sequence length to consider
+# Minimum sequence length to consider
 minLength=21
 
-#Maximum sequence length to consider
+# Maximum sequence length to consider
 maxLength=300
 
-#Minimum precursor charge to consider
+# Minimum precursor charge to consider
 minCharge=2
 
-#Maximum precursor charge to consider
+# Maximum precursor charge to consider
 maxCharge=30
 
-#Minimum fragmentation charge to consider
+# Minimum fragmentation charge to consider
 minFragCharge=1
 
-#Maximum fragmentation charge to consider
+# Maximum fragmentation charge to consider
 maxFragCharge=20
 
-#Minimum sequence mass, in Da
+# Minimum sequence mass, in Da
 minMass=3000
 
-#Maximum sequence mass, in Da
+# Maximum sequence mass, in Da
 maxMass=50000
 
-#Number of matches per spectrum to be reported
+# Number of matches per spectrum to be reported
 NumMatchesPerSpec=1
 
-#Include decoy results in the _IcTda.tsv file and the .mzid file
+# Include decoy results in the _IcTda.tsv file and the .mzid file
 IncludeDecoyResults=false
 
-#Tag-based search
-#  0 means no tag-based search 
-#  1 means tag-based search for covering multiple internal cleavages (default)
+# Tag-based search
+#   0 means no tag-based search 
+#   1 means tag-based search for covering multiple internal cleavages (default)
 # Enabling tag-based searching can give 5% to 10% more matches, but can increase the runtime by 30% to 50%
 tagSearch=1
 
-#Amino Acid Modification Examples
-# Specify static  modifications using one or more StaticMod=  entries
-# Specify dynamic modifications using one or more DynamicMod= entries
-# Modification format is:
-#   CompositionStr, Residues, ModType, Position, Name (all five fields are required)
-#   Note that entries cannot contain both * and any
-#
-# Examples:
-#   C2H2O,     *,   opt, Prot-N-term, Acetyl             # Acetylation Protein N-term (C2H2O can be replaced with "H(2) C(2) O")
-#   O1,        M,   opt, any,         Oxidation          # Oxidation M
-#   H-1,       C,   opt, any,         Dehydro            # Dehydro C
-#   HO3P,      STY, opt, any,         Phospho            # Phosphorylation STY
-#   C2H3NO,    C,   fix, any,         Carbamidomethyl    # Fixed Carbamidomethyl C
-#   H-1N-1O1,  NQ,  opt, any,         Deamidated         # Negative numbers are allowed.
-#   C2H3NO,    *,   opt, N-term,      Carbamidomethyl    # Variable Carbamidomethyl N-term
-#   H-2O-1,    E,   opt, N-term,      Glu->pyro-Glu      # Pyro-glu from E
-#   H-3N-1,    Q,   opt, N-term,      Gln->pyro-Glu      # Pyro-glu from Q
-#   C2H2O1,    K,   opt, any,         Acetyl             # Acetylation K
-#   CH2,       K,   opt, any,         Methyl             # Methylation K
-#   H(12) C(4) 13C(3) N 15N O,   K, any,    iTRAQ4plex   # iTRAQ K
-#   H(12) C(4) 13C(3) N 15N O,   *, N-term, iTRAQ4plex   # iTRAQ N-term
+# Amino Acid Modification Examples
+#  Specify static  modifications using one or more StaticMod=  entries
+#  Specify dynamic modifications using one or more DynamicMod= entries
+#  Modification format is:
+#    CompositionStr, Residues, ModType, Position, Name (all five fields are required)
+#    Note that entries cannot contain both * and any
+# 
+#  Examples:
+#    C2H2O,     *,   opt, Prot-N-term, Acetyl             # Acetylation Protein N-term (C2H2O can be replaced with "H(2) C(2) O")
+#    O1,        M,   opt, any,         Oxidation          # Oxidation M
+#    H-1,       C,   opt, any,         Dehydro            # Dehydro C
+#    HO3P,      STY, opt, any,         Phospho            # Phosphorylation STY
+#    C2H3NO,    C,   fix, any,         Carbamidomethyl    # Fixed Carbamidomethyl C
+#    H-1N-1O1,  NQ,  opt, any,         Deamidated         # Negative numbers are allowed.
+#    C2H3NO,    *,   opt, N-term,      Carbamidomethyl    # Variable Carbamidomethyl N-term
+#    H-2O-1,    E,   opt, N-term,      Glu->pyro-Glu      # Pyro-glu from E
+#    H-3N-1,    Q,   opt, N-term,      Gln->pyro-Glu      # Pyro-glu from Q
+#    C2H2O1,    K,   opt, any,         Acetyl             # Acetylation K
+#    CH2,       K,   opt, any,         Methyl             # Methylation K
+#    H(12) C(4) 13C(3) N 15N O,   K, any,    iTRAQ4plex   # iTRAQ K
+#    H(12) C(4) 13C(3) N 15N O,   *, N-term, iTRAQ4plex   # iTRAQ N-term
