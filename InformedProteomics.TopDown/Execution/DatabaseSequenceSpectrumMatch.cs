@@ -15,11 +15,11 @@ namespace InformedProteomics.TopDown.Execution
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="sequence"></param>
-        /// <param name="pre"></param>
-        /// <param name="post"></param>
-        /// <param name="scanNum"></param>
-        /// <param name="offset"></param>
+        /// <param name="sequence">Proteoform sequence</param>
+        /// <param name="pre">Residue in the protein before the sequence</param>
+        /// <param name="post">Residue in the protein after the sequence</param>
+        /// <param name="scanNum">Scan number</param>
+        /// <param name="offset">Offset in the concatenated protein sequence where the protein for this PSM starts</param>
         /// <param name="numNTermCleavages"></param>
         /// <param name="modifications"></param>
         /// <param name="ion"></param>
@@ -46,12 +46,31 @@ namespace InformedProteomics.TopDown.Execution
             FeatureId = featureId;
         }
 
-        public Sequence IpSequence { get; set; }
+        /// <summary>
+        /// Proteoform sequence
+        /// </summary>
         public string Sequence { get; }
+
+        /// <summary>
+        /// Residue in the protein before the sequence
+        /// </summary>
         public char Pre { get; }
+
+        /// <summary>
+        /// Residue in the protein after the sequence
+        /// </summary>
         public char Post { get; }
+
+        /// <summary>
+        /// Scan number
+        /// </summary>
         public int ScanNum { get; }
+
+        /// <summary>
+        /// Offset in the concatenated protein sequence where the protein for this PSM starts
+        /// </summary>
         public long Offset { get; }
+
         public int NumNTermCleavages { get; }
         public ModificationCombination Modifications { get; }
         public Ion Ion { get; }
