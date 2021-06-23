@@ -209,13 +209,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var minScore = Math.Min(f1.Score, f2.Score);
             if (minScore > 0 && maxScore > minScore*5) return false;*/
 
-            if (f1.Score >= _scorer.ScoreThreshold && f1.GoodEnough
-             && f2.Score >= _scorer.ScoreThreshold && f2.GoodEnough)
-            {
-                return true;
-            }
-
-            return false;
+            return f1.Score >= _scorer.ScoreThreshold && f1.GoodEnough &&
+                   f2.Score >= _scorer.ScoreThreshold && f2.GoodEnough;
         }
 
         private IEnumerable<LcMsPeakCluster> RemoveOverlappedFeatures(ISet<LcMsPeakCluster> featureSet)
