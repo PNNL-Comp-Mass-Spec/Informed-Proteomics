@@ -69,27 +69,27 @@ namespace InformedProteomics.FeatureFinding
 
         public void Display()
         {
-            Console.WriteLine("{0,-14} {1}", "InputPath:", InputPath);
-            Console.WriteLine("{0,-14} {1}", "OutputPath:", OutputPath);
+            Console.WriteLine("{0,-14} {1}", "Input Path:", InputPath);
+            Console.WriteLine("{0,-14} {1}", "Output Path:", OutputPath);
 
             if (string.IsNullOrEmpty(ExistingFeaturesFilePath))
             {
-                Console.WriteLine("{0,-14} {1:N0} Da", "MinMass:", MinSearchMass);
-                Console.WriteLine("{0,-14} {1:N0} Da", "MaxMass:", MaxSearchMass);
-                Console.WriteLine("{0,-14} {1}", "MinCharge:", MinSearchCharge);
-                Console.WriteLine("{0,-14} {1}", "MaxCharge:", MaxSearchCharge);
+                Console.WriteLine("{0,-14} {1:N0} Da", "Min Mass:", MinSearchMass);
+                Console.WriteLine("{0,-14} {1:N0} Da", "Max  Mass:", MaxSearchMass);
+                Console.WriteLine("{0,-14} {1}", "Min Charge:", MinSearchCharge);
+                Console.WriteLine("{0,-14} {1}", "Max Charge:", MaxSearchCharge);
 
-                Console.WriteLine("{0,-14} {1}", "FeatureMap:", FeatureMapImage);
+                Console.WriteLine("{0,-14} {1}", "Feature Map:", FeatureMapImage);
 
-                Console.WriteLine("{0,-14} {1}", "ScoreReport:", ScoreReport);
+                Console.WriteLine("{0,-14} {1}", "Score Report:", ScoreReport);
 
-                Console.WriteLine("{0,-14} {1}", "MaxThreads:", MaxThreads);
+                Console.WriteLine("{0,-14} {1}", "Max Threads:", MaxThreads);
 
-                Console.WriteLine("{0,-14} {1}", "LikelihoodRatioThreshold:", LikelihoodScoreThreshold);
                 Console.WriteLine("{0,-22} {1}", "Bit Count For Binning:", BitCountForBinning);
 
                 Console.WriteLine("{0,-22} {1} ppm", "Binning Resolution:", GetPPMResolutionForBitCount(BitCountForBinning));
 
+                Console.WriteLine("{0,-25} {1}", "Likelihood Ratio Threshold:", LikelihoodScoreThreshold);
             }
             else
             {

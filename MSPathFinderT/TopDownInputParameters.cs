@@ -569,38 +569,40 @@ namespace MSPathFinderT
         {
             foreach (var specFilePath in SpecFilePaths)
             {
-                Console.WriteLine("{0,-28} {1}", "SpectrumFilePath:", specFilePath);
+                Console.WriteLine("{0,-21} {1}", "Input File Path:", specFilePath);
             }
 
-            Console.WriteLine("{0,-28} {1}", "DatabaseFilePath:", DatabaseFilePath);
+            Console.WriteLine("{0,-21} {1}", "Database File Path:", DatabaseFilePath);
 
             var featureFilePathToShow = string.IsNullOrWhiteSpace(FeatureFilePath) ? "auto-find" : FeatureFilePath;
-            Console.WriteLine("{0,-28} {1}", "FeatureFilePath:", featureFilePathToShow);
+            Console.WriteLine("{0,-21} {1}", "Feature File Path:", featureFilePathToShow);
 
             var parameterFilePathToShow = string.IsNullOrWhiteSpace(parameterFilePath) ? "N/A" : parameterFilePath;
-            Console.WriteLine("{0,-28} {1}", "ParameterFilePath:", parameterFilePathToShow);
-            Console.WriteLine("{0,-28} {1}", "OutputDir:", OutputDir);
+            Console.WriteLine("{0,-21} {1}", "Parameter File Path:", parameterFilePathToShow);
+            Console.WriteLine("{0,-21} {1}", "Output Directory:", OutputDir);
             Console.WriteLine();
 
-            Console.WriteLine("{0,-29} {1}", "MaxThreads:", MaxNumThreads);
-            Console.WriteLine("{0,-29} {1}", "InternalCleavageMode:", InternalCleavageMode);
-            Console.WriteLine("{0,-29} {1}", "Tag-based search:", TagBasedSearch);
-            Console.WriteLine("{0,-29} {1}", "Tda:", TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString());
-            Console.WriteLine("{0,-29} {1}", "PrecursorIonTolerancePpm:", PrecursorIonTolerancePpm);
-            Console.WriteLine("{0,-29} {1}", "ProductIonTolerancePpm:", ProductIonTolerancePpm);
-            Console.WriteLine("{0,-29} {1}", "MinSequenceLength:", MinSequenceLength);
-            Console.WriteLine("{0,-29} {1}", "MaxSequenceLength:", MaxSequenceLength);
-            Console.WriteLine("{0,-29} {1}", "MinPrecursorIonCharge:", MinPrecursorIonCharge);
-            Console.WriteLine("{0,-29} {1}", "MaxPrecursorIonCharge:", MaxPrecursorIonCharge);
-            Console.WriteLine("{0,-29} {1}", "MinProductIonCharge:", MinProductIonCharge);
-            Console.WriteLine("{0,-29} {1}", "MaxProductIonCharge:", MaxProductIonCharge);
-            Console.WriteLine("{0,-29} {1}", "MinSequenceMass:", MinSequenceMass);
-            Console.WriteLine("{0,-29} {1}", "MaxSequenceMass:", MaxSequenceMass);
-            Console.WriteLine("{0,-29} {1}", "MatchesPerSpectrumToReport:", MatchesPerSpectrumToReport);
-            Console.WriteLine("{0,-29} {1}", "MatchesPerSpecToKeepInMemory:", MatchesPerSpectrumToKeepInMemory);
-            Console.WriteLine("{0,-29} {1}", "IncludeDecoyResults:", IncludeDecoyResults);
-            Console.WriteLine("{0,-29} {1}", "MaxDynamicModsPerSequence:", MaxDynamicModificationsPerSequence);
-            Console.WriteLine("{0,-29} {1}", "OverwriteExistingResults:", OverwriteExistingResults);
+            Console.WriteLine("{0,-26} {1}", "Maximum Threads:", MaxNumThreads);
+            Console.WriteLine("{0,-26} {1}", "Internal Cleavage Mode:", InternalCleavageMode);
+            Console.WriteLine("{0,-26} {1}", "Tag-based search:", TagBasedSearch);
+            Console.WriteLine("{0,-26} {1}", "TDA Mode:", TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString());
+            Console.WriteLine("{0,-26} {1} ppm", "Precursor Ion Tolerance:", PrecursorIonTolerancePpm);
+            Console.WriteLine("{0,-26} {1} ppm", "Product Ion Tolerance:", ProductIonTolerancePpm);
+            Console.WriteLine("{0,-26} {1}", "Min Sequence Length:", MinSequenceLength);
+            Console.WriteLine("{0,-26} {1}", "Max Sequence Length:", MaxSequenceLength);
+            Console.WriteLine("{0,-26} {1}", "Min Precursor Ion Charge:", MinPrecursorIonCharge);
+            Console.WriteLine("{0,-26} {1}", "Max Precursor Ion Charge:", MaxPrecursorIonCharge);
+            Console.WriteLine("{0,-26} {1}", "Min Product Ion Charge:", MinProductIonCharge);
+            Console.WriteLine("{0,-26} {1}", "Max Product Ion Charge:", MaxProductIonCharge);
+            Console.WriteLine("{0,-26} {1}", "Min Sequence Mass:", MinSequenceMass);
+            Console.WriteLine("{0,-26} {1}", "Max Sequence Mass:", MaxSequenceMass);
+            Console.WriteLine();
+
+            Console.WriteLine("{0,-35} {1}", "Matches PerSpectrum To Report:", MatchesPerSpectrumToReport);
+            Console.WriteLine("{0,-35} {1}", "Matches Per Spec To Keep In Memory:", MatchesPerSpectrumToKeepInMemory);
+            Console.WriteLine("{0,-35} {1}", "Include Decoy Results:", IncludeDecoyResults);
+            Console.WriteLine("{0,-35} {1}", "Max Dynamic Mods Per Sequence:", MaxDynamicModificationsPerSequence);
+            Console.WriteLine("{0,-35} {1}", "Overwrite Existing Results:", OverwriteExistingResults);
 
             Console.WriteLine();
             Console.WriteLine("Modifications:");
@@ -618,6 +620,7 @@ namespace MSPathFinderT
 
             if (ScanNumbers?.Any() == true)
             {
+                Console.WriteLine();
                 Console.WriteLine("Processing specific MS2 scans:");
                 Console.WriteLine(string.Join(", ", ScanNumbers));
             }
