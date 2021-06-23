@@ -172,8 +172,8 @@ namespace InformedProteomics.FeatureFinding
             Console.WriteLine("Start loading MS1 data from {0}", rawFile);
             var run = PbfLcMsRun.GetLcMsRun(rawFile);
 
-            var featureFinder = new LcMsPeakMatrix(run, _likelihoodScorer, 1, 60, Parameters.MaxThreads);
-            Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            var featureFinder = new LcMsPeakMatrix(run, _likelihoodScorer, 1, 60, Parameters.MaxThreads, numBits: Parameters.BitCountForBinning);
+            Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.0} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             if (run.GetMs1ScanVector().Length == 0)
             {
@@ -205,14 +205,14 @@ namespace InformedProteomics.FeatureFinding
                     var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
                     var processedBins = binNum - minSearchMassBin;
                     var processedPercentage = processedBins / totalMassBin * 100;
-                    Console.WriteLine("Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
+                    Console.WriteLine("Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.0} sec; # of features = {3}",
                         processedPercentage, featureFinder.Comparer.GetMzEnd(binNum), elapsed,
                         container.NumberOfFeatures);
                 }
             }
 
             Console.WriteLine("Complete MS1 feature extraction.");
-            Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(" - Elapsed time = {0:0.0} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             Console.WriteLine(" - Number of extracted features = {0}", container.NumberOfFeatures);
             Console.WriteLine("Start selecting mutually independent features from feature network graph");
             stopwatch.Restart();
@@ -220,7 +220,7 @@ namespace InformedProteomics.FeatureFinding
             var featureId = FilterAndOutputFeatures(container, featureFinder, outCsvFilePath, ms1FeaturesFilePath);
 
             Console.WriteLine("Complete feature filtration");
-            Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(" - Elapsed time = {0:0.0} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             Console.WriteLine(" - Number of filtered features = {0}", featureId);
             Console.WriteLine(" - ProMex output: {0}", ms1FeaturesFilePath);
 

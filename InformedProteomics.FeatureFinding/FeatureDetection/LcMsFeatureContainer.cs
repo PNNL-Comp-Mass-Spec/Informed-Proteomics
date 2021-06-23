@@ -134,7 +134,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             }
             //stopwatch.Stop(); stopwatch.Reset();
             //var elapsed = (stopwatch.ElapsedMilliseconds) / 1000.0d;
-            //Console.WriteLine("# of generated connected components = {0};  Elapsed Time = {1:0.000} sec", ret.Count, elapsed);
+            //Console.WriteLine("# of generated connected components = {0};  Elapsed Time = {1:0.0} sec", ret.Count, elapsed);
             return ret;
         }
 

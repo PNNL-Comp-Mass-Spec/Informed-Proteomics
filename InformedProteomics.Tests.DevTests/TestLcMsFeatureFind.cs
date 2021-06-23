@@ -144,7 +144,7 @@ namespace InformedProteomics.Tests.DevTests
 
             var run = PbfLcMsRun.GetLcMsRun(pbfFile.FullName);
             var featureFinder = new LcMsPeakMatrix(run, scorer);
-            Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.000} sec",
+            Console.WriteLine("Complete loading MS1 data. Elapsed Time = {0:0.0} sec",
                 (stopwatch.ElapsedMilliseconds) / 1000.0d);
 
             var container = new LcMsFeatureContainer(featureFinder.Ms1Spectra, scorer, new LcMsFeatureMergeComparer(new Tolerance(10)));
@@ -166,14 +166,14 @@ namespace InformedProteomics.Tests.DevTests
                     var processedBins = binNum - minSearchMassBin;
                     var processedPercentage = processedBins / totalMassBin * 100;
                     Console.WriteLine(
-                        "Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.000} sec; # of features = {3}",
+                        "Processing {0:0.0}% of mass bins ({1:0.0} Da); elapsed time = {2:0.0} sec; # of features = {3}",
                         processedPercentage, featureFinder.Comparer.GetMzEnd(binNum), elapsed,
                         container.NumberOfFeatures);
                 }
             }
 
             Console.WriteLine("Complete MS1 feature extraction.");
-            Console.WriteLine(" - Elapsed time = {0:0.000} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
+            Console.WriteLine(" - Elapsed time = {0:0.0} sec", (stopwatch.ElapsedMilliseconds) / 1000.0d);
             Console.WriteLine(" - Number of extracted features = {0}", container.NumberOfFeatures);
 
             // write result files
