@@ -11,42 +11,42 @@ namespace ProMex
     {
         // Ignore Spelling: pbf, Da, heatmap, csv
 
-        [Option("i", "s", ArgPosition = 1, Required = true,
+        [Option("InputFile", "i", "s", ArgPosition = 1, Required = true,
             HelpText = "Input file or input directory; supports .pbf, .mzML, and several vendor formats (see documentation)",
             HelpShowsDefault = false)]
         public override string InputPath { get; set; }
 
-        [Option("o",
+        [Option("OutputDirectory", "o",
             HelpText = "Output directory. (Default: directory containing input file)",
             HelpShowsDefault = false)]
         public override string OutputPath { get; set; }
 
-        [Option("minCharge",
+        [Option("MinCharge",
             HelpText = "Minimum charge state", Min = 1, Max = 60)]
         public override int MinSearchCharge { get; set; }
 
-        [Option("maxCharge",
+        [Option("MaxCharge",
             HelpText = "Maximum charge state", Min = 1, Max = 60)]
         public override int MaxSearchCharge { get; set; }
 
-        [Option("minMass",
+        [Option("MinMass",
             HelpText = "Minimum mass in Da", Min = 600, Max = 100000)]
         public override double MinSearchMass { get; set; }
 
-        [Option("maxMass",
+        [Option("MaxMass",
             HelpText = "Maximum mass in Da", Min = 600, Max = 100000)]
         public override double MaxSearchMass { get; set; }
 
-        [Option("featureMap",
-            HelpText = "Output the feature heatmap")]
+        [Option("FeatureMap",
+            HelpText = "Output the feature heatmap. To disable, use -FeatureMap:false or include 'FeatureMap=False' in a parameter file")]
         public override bool FeatureMapImage { get; set; }
 
-        [Option("score",
+        [Option("Score",
             HelpText = "Output extended scoring information")]
         public override bool ScoreReport { get; set; }
 
-        [Option("maxThreads", Min = 0,
-            HelpText = "Max number of threads to use (Default: 0 (automatically determine the number of threads to use))",
+        [Option("MaxThreads", Min = 0,
+            HelpText = "Max number of threads to use (Default: 0, meaning automatically determine the number of threads to use)",
             HelpShowsDefault = false)]
         public override int MaxThreads { get; set; }
 
@@ -54,7 +54,8 @@ namespace ProMex
             HelpText = "Also write feature data to a CSV file")]
         public override bool CsvOutput { get; set; }
 
-        [Option("scoreTh", "scoreThreshold",
+
+        [Option("ScoreThreshold", "ScoreTh",
             HelpText = "Likelihood score threshold")]
         public override double LikelihoodScoreThreshold { get; set; }
 

@@ -18,24 +18,24 @@ namespace MSPathFinderT
     {
         // Ignore Spelling: Da, frag, hyperthreaded, ic, tda, tol, wildcards
 
-        [Option("i", "s", "specFile", ArgPosition = 1, Required = true,
+        [Option("InputFile", "i", "s", "SpecFile", ArgPosition = 1, Required = true,
             HelpText = "Spectrum File (.raw or .pbf)",
             HelpShowsDefault = false)]
         public override string SpecFilePath { get; set; }
 
         public List<FileSystemInfo> SpecFilePaths { get; }
 
-        [Option("d", "database", Required = true,
+        [Option("Database", "d", Required = true,
             HelpText = "Database File (*.fasta or *.fa or *.faa)",
             HelpShowsDefault = false)]
         public override string DatabaseFilePath { get; set; }
 
-        [Option("o", "outputDir",
+        [Option("OutputDirectory", "OutputDir", "o",
             HelpText = "Output Directory",
             HelpShowsDefault = false)]
         public override string OutputDir { get; set; }
 
-        [Option("m", "searchMode", Min = 0, Max = 2,
+        [Option("SearchMode", "m", Min = 0, Max = 2,
             HelpText = "Search Mode (old format) (0: multiple internal cleavages, 1: single internal cleavage, 2: no internal cleavage)",
             Hidden = true)]
         [Obsolete("Use InternalCleavageMode")]
@@ -72,27 +72,27 @@ namespace MSPathFinderT
             }
         }
 
-        [Option("ic",
+        [Option("InternalCleavageMode", "ic",
             HelpText = "Search Mode")]
         public override InternalCleavageType InternalCleavageMode { get; set; }
 
-        [Option("tagSearch",
+        [Option("TagSearch",
             HelpText = "Include Tag-based Search (use true or false;\nor use '0' for false or '1' for true)")]
         public override bool TagBasedSearch { get; set; }
 
-        [Option("memMatches", "MatchesPerSpectrumToKeepInMemory",
-            HelpText = "Number of matches to keep in memory; these matches are used when computing spectral E-values")]
+        [Option("MatchesPerSpectrumToKeepInMemory", "MemMatches",
+            HelpText = "Number of matches to keep in memory; these matches are used when computing spectral E-values (Default: 3)")]
         public override int MatchesPerSpectrumToKeepInMemory { get; set; }
 
-        [Option("n", "NumMatchesPerSpec", "MatchesPerSpectrumToReport",
+        [Option("NumMatchesPerSpec", "MatchesPerSpectrumToReport", "n",
             HelpText = "Number of results to report for each mass spectrum")]
         public override int MatchesPerSpectrumToReport { get; set; }
 
-        [Option("IncludeDecoy", "IncludeDecoys", "IncludeDecoyResults",
+        [Option("IncludeDecoys", "IncludeDecoy", "IncludeDecoyResults",
             HelpText = "Include decoy results in the _IcTda.tsv file")]
         public override bool IncludeDecoyResults { get; set; }
 
-        [Option("mod",
+        [Option("ModificationFile", "mod",
             HelpText = "Path to modification file that defines static and dynamic modifications. " +
                        "Modifications can alternatively be defined in a parameter file, as specified by /ParamFile or -ParamFile\n" +
                        "Modifications defined using the -mod switch take precedence over modifications defined in a parameter file\n" +
@@ -148,11 +148,11 @@ namespace MSPathFinderT
         /// <remarks>This can alternatively be set using TdaInt</remarks>
         public override DatabaseSearchMode TargetDecoySearchMode { get; set; }
 
-        [Option("overwrite", "OverwriteExistingResults",
+        [Option("OverwriteExistingResults", "overwrite",
             HelpText = "Overwrite existing results. If false (default), looks for files _IcTarget.tsv and _IcDecoy.tsv and uses the results in the files if found")]
         public override bool OverwriteExistingResults { get; set; }
 
-        [Option("t", "precursorTol", "PMTolerance", /*Min = 1,*/
+        [Option("PMTolerance", "t", "precursorTol", /*Min = 1,*/
             HelpText = "Precursor Tolerance (in PPM)")]
         public override double PrecursorIonTolerancePpm
         {
@@ -160,7 +160,7 @@ namespace MSPathFinderT
             set => PrecursorIonTolerance = new Tolerance(value);
         }
 
-        [Option("f", "fragmentTol", "FragTolerance", /*Min = 1,*/
+        [Option("FragTolerance", "f", "fragmentTol", /*Min = 1,*/
             HelpText = "Fragment Ion Tolerance (in PPM)")]
         public override double ProductIonTolerancePpm
         {
@@ -168,59 +168,59 @@ namespace MSPathFinderT
             set => ProductIonTolerance = new Tolerance(value);
         }
 
-        [Option("minLength", Min = 0,
+        [Option("MinLength", Min = 0,
             HelpText = "Minimum Sequence Length")]
         public override int MinSequenceLength { get; set; }
 
-        [Option("maxLength", Min = 0,
+        [Option("MaxLength", Min = 0,
             HelpText = "Maximum Sequence Length")]
         public override int MaxSequenceLength { get; set; }
 
-        [Option("minCharge", Min = 1,
+        [Option("MinCharge", Min = 1,
             HelpText = "Minimum precursor ion charge")]
         public override int MinPrecursorIonCharge { get; set; }
 
-        [Option("maxCharge", Min = 1,
+        [Option("MaxCharge", Min = 1,
             HelpText = "Maximum precursor ion charge")]
         public override int MaxPrecursorIonCharge { get; set; }
 
-        [Option("minFragCharge", Min = 1,
+        [Option("MinFragCharge", Min = 1,
             HelpText = "Minimum fragment ion charge")]
         public override int MinProductIonCharge { get; set; }
 
-        [Option("maxFragCharge", Min = 1,
+        [Option("MaxFragCharge", Min = 1,
             HelpText = "Maximum fragment ion charge")]
         public override int MaxProductIonCharge { get; set; }
 
-        [Option("minMass", /*Min = 1,*/
+        [Option("MinMass", /*Min = 1,*/
             HelpText = "Minimum sequence mass in Da")]
         public override double MinSequenceMass { get; set; }
 
-        [Option("maxMass", /*Min = 1,*/
+        [Option("MaxMass", /*Min = 1,*/
             HelpText = "Maximum sequence mass in Da")]
         public override double MaxSequenceMass { get; set; }
 
-        [Option("feature",
+        [Option("FeatureFile", "feature",
             HelpText = ".ms1ft, _isos.csv, or .msalign feature file (typically the results from ProMex); " +
                        "leave blank/undefined if processing multiple input files",
             HelpShowsDefault = false)]
         public override string FeatureFilePath { get; set; }
 
-        [Option("threads", Min = 0,
+        [Option("ThreadCount", "threads", Min = 0,
             HelpText = "Maximum number of threads, or 0 to set automatically")]
         public override int MaxNumThreads { get; set; }
 
-        [Option("act", "ActivationMethod",
+        [Option("ActivationMethod", "act",
             HelpText = "Activation Method")]
         public override ActivationMethod ActivationMethod { get; set; }
 
-        [Option("scansFile", "ScansFilePath",
+        [Option("ScansFilePath", "scansFile",
             HelpText = "Optional text file with MS2 scans to process (tab, comma, or space separated); " +
                        "any integer in the file is assumed to be a scan number to process",
             HelpShowsDefault = false)]
         public string ScansFilePath { get; set; }
 
-        [Option("flip",
+        [Option("UseFlipScoring", "flip",
             HelpText = "If specified, FLIP scoring code will be used\n(supports UVPD spectra)")]
         public bool UseFLIP { get; set; }
 
