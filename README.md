@@ -1,6 +1,8 @@
 # Informed Proteomics
 
-The Informed Proteomics project includes algorithms for proteomic mass spectrometry data analysis. Although the back-end data access and some of the scoring routines are general purpose, this repository is currently maintained for top down MS/MS datasets.
+The Informed Proteomics project includes algorithms for proteomic mass spectrometry data analysis. 
+Although the back-end data access and some of the scoring routines are general purpose, 
+this repository is currently maintained for top down MS/MS datasets.
 
 [![DOI](https://zenodo.org/badge/21950650.svg)](https://zenodo.org/badge/latestdoi/21950650)
 
@@ -12,7 +14,7 @@ https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/releases
 
 ### Continuous Integration
 
-The latest versions of the Informed Proteomics tools are available on the [AppVeyor CI server](https://ci.appveyor.com/project/PNNLCompMassSpec/informed-proteomics/build/artifacts)
+The latest versions of the Informed Proteomics tools may be available on the [AppVeyor CI server](https://ci.appveyor.com/project/PNNLCompMassSpec/informed-proteomics/build/artifacts), though they get auto-deleted after 6 months.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/j52ywc5d204gaxtp?svg=true)](https://ci.appveyor.com/project/PNNLCompMassSpec/informed-proteomics)
 
@@ -41,9 +43,9 @@ Example command lines:
 
 `PbfGen.exe -s MyDataset.raw`
 
-`ProMex.exe -i MyDataset.pbf  -minCharge 2 -maxCharge 60 -minMass 3000 -maxMass 50000 -score n -csv n -maxThreads 0`
+`ProMex.exe -i MyDataset.pbf -minCharge 2 -maxCharge 60 -minMass 3000 -maxMass 50000 -score n -csv n -maxThreads 0`
 
-`MSPathFinderT.exe  -s MyDataset.pbf -feature MyDataset.ms1ft -d C:\FASTA\ProteinList.fasta -o C:\WorkFolder -t 10 -f 10 -m 1 -tda 1 -minLength 21 -maxLength 300 -minCharge 2 -maxCharge 30 -minFragCharge 1 -maxFragCharge 15 -minMass 3000 -maxMass 50000 -mod MSPathFinder_Mods.txt`
+`MSPathFinderT.exe -s MyDataset.pbf -feature MyDataset.ms1ft -d C:\FASTA\ProteinList.fasta -o C:\WorkDir -t 10 -f 10 -m 1 -tda 1 -minLength 21 -maxLength 300 -minCharge 2 -maxCharge 30 -minFragCharge 1 -maxFragCharge 15 -minMass 3000 -maxMass 50000 -mod MSPathFinder_Mods.txt`
 
 ### Results viewer / GUI
 For viewing search results, you might want to consider [LCMS-Spectator](https://github.com/PNNL-Comp-Mass-Spec/LCMS-Spectator). It can also function as a GUI for running ProMex and MSPathFinder.
@@ -66,147 +68,252 @@ mono MSPathFinder/MSPathFinderT.exe -s *.pbf -d ID_006407_8F27399B.fasta -o . -P
 ## ProMex Syntax
 
 ```
-ProMex version 1.0.6232 (January 23, 2017)
-Usage: ProMex.exe
-        [-i InputFolder or InputFile]
-        [-o OutFolder (default : InputFolder)]
-        [-minCharge MinCharge] (minimum charge state, default: 1)
-        [-maxCharge MaxCharge] (maximum charge state, default: 60)
-        [-minMass MinMassInDa] (minimum mass in Da, default: 2000.0)
-        [-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)
-        [-featureMap y or n (default: y)]
-        [-score y or n (default: n)]
-        [-maxThreads 0 (default: 0 (automatic set))]
-
-Syntax to create a PNG of the features in an existing ms1ft file
-(requires both a .pbf file and a .ms1ft file)
-ProMex.exe
-        [-i PbfFile]
-        [-o OutFolder (default : InputFolder)]
-        [-minMass MinMassInDa] (minimum mass in Da, default: 2000.0)
-        [-maxMass MaxMassInDa] (maximum mass in Da, default: 50000.0)
-        [-ms1ft FeaturesFilePath (use a period to infer the name from the pbf file)]
+ProMex.exe 
+  -i:InputFile [-o:OutputDirectory]
+  [-MinCharge:Value] [-MaxCharge:Value]
+  [-MinMass:Value]   [-MaxMass:Value]
+  [-FeatureMap:Flag] [-Score:Flag]
+  [MaxThreads:Value] [-csv:Flag]
+  [BinResPPM:Value]  [ScoreTh:Value]
 ```
+
+`-i` or `-s` or `-InputFile`
+* Input file or input directory; supports .pbf, .mzML, and several vendor formats (see documentation)
+
+`-o` or `-OutputDirectory`
+* Output directory. 
+* Default: directory containing input file
+
+`-MinCharge`
+* Minimum charge state. 
+* Default: 1, Min: 1, Max: 60
+
+`-MaxCharge`
+* Maximum charge state
+* Default: 60, Min: 1, Max: 60
+
+`-MinMass`
+* Minimum mass, in Daltons
+* Default: 2000, Min: 600, Max: 100000
+
+`-MaxMass`
+* Maximum mass, in Daltons
+* Default: 50000, Min: 600, Max: 100000
+
+`-FeatureMap`
+* Output the feature heatmap. Defaults to true.
+* To disable, use `-FeatureMap:false` or include 'FeatureMap=False' in a parameter file
+
+`-Score`
+* Output extended scoring information
+* Default: False
+
+`-MaxThreads`
+* Max number of threads to use
+* Default: 0, meaning automatically determine the number of threads to use
+
+`-csv`
+* Also write feature data to a CSV file
+* Default: False
+
+`-BinResPPM` or `-BinningResolutionPPM`
+* Binning resolution, in ppm.
+* Allowed values are 1, 2, 4, 8, 16, 32, 64, or 128
+* Default: 16, Min: 1, Max: 128
+
+`-ScoreTh` or `-ScoreThreshold`
+* Likelihood score threshold
+* Default: -10
+
+`-ms1ft`
+* Name of a ms1ft feature file to use to create a feature plot (the corresponding .pbf file must be included in the same directory)
+* Use `-ms1ft.` to infer the name from the pbf file
+
+`-ParamFile`
+* Path to a file containing program parameters. 
+* Additional arguments on the command line can supplement or override the arguments in the param file. 
+* Lines starting with '#' or ';' will be treated as comments; blank lines are ignored. 
+* Lines that start with text that does not match a parameter will also be ignored.
+
+`-CreateParamFile`
+* Create an example parameter file.
+* Can supply a path; if path is not supplied, the example parameter file content will output to the console.
+
+### Create PNG using existing ms1ft file
+
+Command to create a PNG of the features in an existing ms1ft file
+(requires both a .pbf file and a .ms1ft file):
+
+`ProMex.exe -i dataset.pbf -ms1ft dataset.ms1ft -featureMap`
 
 ## PbfGen Syntax
 
 ```
-PbfGen version 1.0.6232 (January 23, 2017)
-Usage: PbfGen.exe
-        -s RawFilePath (*.raw or directory)
-        [-o OutputDir]
+PbfGen.exe
+    -s RawFilePath (*.raw or directory)
+    [-o OutputDir]
 ```
 
 ## MSPathFinder Syntax
 
 ```
-MSPathFinderT version 1.0.7569 (September 21, 2020)
-
-Usage: MSPathFinderT.exe
-
-  -i, -s, -specFile,     Required. Spectrum File (.raw or .pbf)
-  arg#1
-
-  -d, -database          Required. Database File (*.fasta or *.fa or *.faa)
-
-  -o, -outputDir         Output Directory
-
-  -ic                    Search Mode (Default: SingleInternalCleavage (or 1))
-                         Possible values are:
-                           0 or 'NoInternalCleavage': No Internal Cleavage
-                           1 or 'SingleInternalCleavage': Single Internal Cleavage
-                           2 or 'MultipleInternalCleavages': Multiple Internal
-                           Cleavages
-
-  -tagSearch             Include Tag-based Search (use true or false;
-                         or use '0' for false or '1' for true) (Default: True)
-
-  -memMatches            Number of matches to keep in memory; these matches are
-                         used when computing spectral E-values (Default: 3)
-
-  -n,                    Number of results to report for each mass spectrum
-  -NumMatchesPerSpec     (Default: 1)
-
-  -IncludeDecoy,         Include decoy results in the _IcTda.tsv file
-  -IncludeDecoys         (Default: False)
-
-  -mod                   Path to modification file that defines static and dynamic
-                         modifications. Modifications can alternatively be defined
-                         in a parameter file, as specified by /ParamFile or
-                         -ParamFile
-                         Modifications defined using the -mod switch take
-                         precedence over modifications defined in a parameter file
-                         (Default: empty string, meaning no modifications)
-
-  -tda                   Database search mode:
-                         0: don't search decoy database,
-                         1: search shuffled decoy database
-                         (Default: 0, Min: -1, Max: 1)
-
-  -overwrite             Overwrite existing results. If false (default), looks for
-                         files _IcTarget.tsv and _IcDecoy.tsv and uses the results
-                         in the files if found (Default: False)
-
-  -t, -precursorTol,     Precursor Tolerance (in PPM) (Default: 10)
-  -PMTolerance
-
-  -f, -fragmentTol,      Fragment Ion Tolerance (in PPM) (Default: 10)
-  -FragTolerance
-
-  -minLength             Minimum Sequence Length (Default: 21, Min: 0)
-
-  -maxLength             Maximum Sequence Length (Default: 500, Min: 0)
-
-  -minCharge             Minimum precursor ion charge (Default: 2, Min: 1)
-
-  -maxCharge             Maximum precursor ion charge (Default: 50, Min: 1)
-
-  -minFragCharge         Minimum fragment ion charge (Default: 1, Min: 1)
-
-  -maxFragCharge         Maximum fragment ion charge (Default: 20, Min: 1)
-
-  -minMass               Minimum sequence mass in Da (Default: 3000)
-
-  -maxMass               Maximum sequence mass in Da (Default: 50000)
-
-  -feature               .ms1ft, _isos.csv, or .msalign feature file (typically
-                         the results from ProMex); leave blank/undefined if
-                         processing multiple input files
-
-  -threads               Maximum number of threads, or 0 to set automatically
-                         (Default: 0, Min: 0)
-
-  -act,                  Activation Method (Default: Unknown (or 6))
-  -ActivationMethod      Possible values are:
-                           0 or 'CID'
-                           1 or 'ETD'
-                           2 or 'HCD'
-                           3 or 'ECD'
-                           4 or 'PQD'
-                           5 or 'UVPD'
-                           6 or 'Unknown'
-
-  -scansFile,            Optional text file with MS2 scans to process (tab, comma,
-  -ScansFilePath         or space separated); any integer in the file is assumed
-                         to be a scan number to process
-
-  -flip                  If specified, FLIP scoring code will be used
-                         (supports UVPD spectra) (Default: False)
-
-  -ParamFile             Path to a file containing program parameters. Additional
-                         arguments on the command line can supplement or override
-                         the arguments in the param file. Lines starting with '#'
-                         or ';' will be treated as comments; blank lines are
-                         ignored. Lines that start with text that does not match a
-                         parameter will also be ignored.
-
-  -CreateParamFile       Create an example parameter file. Can supply a path; if
-                         path is not supplied, the example parameter file content
-                         will output to the console.
-
-  NOTE:                  arg#1, arg#2, etc. refer to positional arguments, used
-                         like "AppName.exe [arg#1] [arg#2] [other args]".
+MSPathFinderT.exe
+  -i:InputFile [-d:FastaFile] 
+  [-o:OutputDirectory] [-overwrite:Flag]
+  [-mod:ModificationFilePath]
+  [-ic:InternalCleavageMode]
+  [-tda:DatabaseSearchMode]
+  [-tagSearch:Flag]
+  [-t:PrecursorTolerance] 
+  [-f:FragmentIonTolerance]
+  [-MemMatches:Count] 
+  [-n:NumMatchesPerSpec]
+  [-IncludeDecoys:Flag] 
+  [-MinLength:Value] [-MaxLength:Value]
+  [-MinCharge:Value] [-MaxCharge:Value]
+  [-MinFragCharge:Value] [-MaxFragCharge:Value]
+  [-MinMass:Value] [-MaxMass:Value]
+  [-Feature:FeatureFile]
+  [-Threads:Value]
+  [-act:ActivationMethod]
+  [-ScansFile:MS2ScanFilterFile]
+  [-flip:Flag]
+  [-ParamFile]
+  [-CreateParamFile]
 ```
+
+`-i` or `-s` or `-specFile`
+* Spectrum File (.raw or .pbf)
+
+`-d` or `-database`
+* Database File (*.fasta or *.fa or *.faa)
+
+`-o` or `-outputDir`
+* Output Directory
+
+`-ic`
+* Internal Cleavage Search Mode
+* Default: SingleInternalCleavage (or 1)
+* Possible values:
+  * 0 or 'NoInternalCleavage': No Internal Cleavage
+  * 1 or 'SingleInternalCleavage': Single Internal Cleavage
+  * 2 or 'MultipleInternalCleavages': Multiple Internal Cleavages
+
+`-TagSearch`
+* Enable/disable Tag-based Search
+* Use true or false
+  * Or use '0' for false or '1' for true
+  * Or use 'n' for false or 'y' for true
+* Default: True
+
+`-MemMatches`
+* Number of matches to keep in memory
+  * These matches are used when computing spectral E-values
+* Default: 3
+
+`-n` or `-NumMatchesPerSpec`
+* Number of results to report for each mass spectrum
+* Default: 1
+
+`-IncludeDecoy` or `-IncludeDecoys`
+* Include decoy results in the _IcTda.tsv file
+* Default: False
+
+`-mod`
+* Path to modification file that defines static and dynamic modifications.
+* Modifications can alternatively be defined in a parameter file, as specified by `/ParamFile` or `-ParamFile`
+* Modifications defined using the `-mod` switch take precedence over modifications defined in a parameter file
+* Default: empty string, meaning no modifications
+
+`-tda`
+* Database search mode; can be 0, 1, or -1
+  * 0: target search only
+  * 1: target and shuffled decoy database
+  * -1: only search shuffled decoy database
+* Default: 0
+
+`-Overwrite`
+* Overwrite existing results
+* If false, looks for files _IcTarget.tsv and _IcDecoy.tsv and uses the results 
+* Default: False
+
+`-t` or `-PrecursorTol` or `-PMTolerance`
+* Precursor Tolerance (in PPM)
+* Default: 10
+
+`-f` or `-FragmentTol` or `-FragTolerance`
+* Fragment Ion Tolerance (in PPM)
+* Default: 10
+
+`-MinLength`
+* Minimum Sequence Length
+* Default: 21
+
+`-MaxLength`
+* Maximum Sequence Length
+* Default: 500
+
+`-MinCharge`
+* Minimum precursor ion charge
+* Default: 2
+
+`-MaxCharge`
+* Maximum precursor ion charge
+* Default: 50
+
+`-MinFragCharge`
+* Minimum fragment ion charge
+* Default: 1
+
+`-MaxFragCharge`
+* Maximum fragment ion charge
+* Default: 20
+
+`-MinMass`
+* Minimum sequence mass in Da
+* Default: 3000
+
+`-MaxMass`
+* Maximum sequence mass in Da
+* Default: 50000
+
+`-Feature`
+* Path to a .ms1ft, _isos.csv, or .msalign feature file (typically the results from ProMex)
+* Leave blank/undefined if processing multiple input files
+
+`-threads`
+* Maximum number of threads, or 0 to set automatically
+* Default: 0
+
+`-act` or `-ActivationMethod`
+* Activation Method; possible values:
+  * 0 or 'CID'
+  * 1 or 'ETD'
+  * 2 or 'HCD'
+  * 3 or 'ECD'
+  * 4 or 'PQD'
+  * 5 or 'UVPD'
+  * 6 or 'Unknown'
+* Default: Unknown (or 6)
+
+
+`-ScansFile` or `-ScansFilePath`
+* Optional text file with MS2 scans to process (tab, comma, or space separated)
+* Any integer in the file is assumed to be a scan number to process
+
+`-Flip`
+* If specified, FLIP scoring code will be used (experimental, supports UVPD spectra)
+* Default: False
+
+`-ParamFile`
+* Path to a file containing program parameters. 
+* Additional arguments on the command line can supplement or override the arguments in the param file. 
+* Lines starting with '#' or ';' will be treated as comments; blank lines are ignored. 
+* Lines that start with text that does not match a parameter will also be ignored.
+
+`-CreateParamFile`
+* Create an example parameter file.
+* Can supply a path; if path is not supplied, the example parameter file content will output to the console.
 
 Enabling tag-based searching with `-tagSearch 1` can give 5% to 10% more matches, but can increase the runtime by 30% to 50%.
 
@@ -214,9 +321,11 @@ Enabling tag-based searching with `-tagSearch 1` can give 5% to 10% more matches
 
 These programs, when used with no other software installed, only support the use of centroid mzML files as spectrum input.
 
-Versions prior to February 1, 2019: If Thermo Finnigan MSFileReader is installed, it also supports reading from Thermo Finnigan .raw files ([Download here](https://thermo.flexnetoperations.com/control/thmo/download?element=6306677), requires registration to download).
+Versions prior to February 1, 2019: 
+* If Thermo Finnigan MSFileReader is installed, they also support reading from Thermo .raw files ([Download here](https://thermo.flexnetoperations.com/control/thmo/download?element=6306677), requires registration to download).
 
-Versions after February 1, 2019: If running as a 64-bit program, reading from Thermo Finnigan .raw files is supported via the included RawFileReader dlls (no additional software install required).
+Versions after February 1, 2019
+* If running as a 64-bit program, reading from Thermo Finnigan .raw files is supported via the included RawFileReader DLLs (no additional software install required).
 
 On Windows, several other formats are supported if an appropriate version of ProteoWizard is installed ([Download here](http://proteowizard.sourceforge.net/downloads.shtml), make sure the version downloaded matches system architecture)
 
@@ -224,7 +333,7 @@ On Linux, supported input files are .raw, .mzML, and .mzML.gz
 
 ## MSPathFinder Parameter Files
 
-See the [Example_Files](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/tree/master/Example_Files) folder for sample parameter files
+See the [Example_Files](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/tree/master/Example_Files) directory on GitHub for sample parameter files
 * Example command for invoking MSPathFinder with a parameter file:
 ```
 MSPathFinderT.exe -s C:\WorkDir\Dataset.pbf -feature C:\WorkDir\Dataset.ms1ft -d C:\WorkDir\Proteins.fasta -o C:\WorkDir /ParamFile:C:\WorkDir\MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage_ReportTop2.txt
@@ -232,7 +341,7 @@ MSPathFinderT.exe -s C:\WorkDir\Dataset.pbf -feature C:\WorkDir\Dataset.ms1ft -d
 
 ## MSPathFinder Mods File
 
-See the [Example_Files](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/tree/master/Example_Files) folder for sample modification definition files.
+See the [Example_Files](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/tree/master/Example_Files) directory for sample modification definition files.
 
 ## System Requirements
 
@@ -245,16 +354,16 @@ Minimum recommended:
 * Windows 7 or newer
 * 250 GB hard drive
 
--------------------------------------------------------------------------------
-Written by Sangtae Kim, Junkap Park, and Chris Wilkins for the Department of Energy (PNNL, Richland, WA)
-Copyright 2015, Battelle Memorial Institute.  All Rights Reserved.
-
-E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
+-------------------------------------------------------------------------------\
+Written by Sangtae Kim, Junkap Park, and Chris Wilkins for the Department of Energy (PNNL, Richland, WA)\
+Copyright 2015, Battelle Memorial Institute.  All Rights Reserved.\
+\
+E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov\
 Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/\
 
 -------------------------------------------------------------------------------
 
-Licensed under the Apache License, Version 2.0; you may not use this file except
+Licensed under the Apache License, Version 2.0; you may not use this program except
 in compliance with the License.  You may obtain a copy of the License at
 http://www.apache.org/licenses/LICENSE-2.0
 
