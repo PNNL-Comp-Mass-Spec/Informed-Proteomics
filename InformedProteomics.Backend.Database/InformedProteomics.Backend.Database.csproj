@@ -4,7 +4,7 @@
     <TargetFrameworks>net462;net472;netstandard2.0</TargetFrameworks>
     <RootNamespace>InformedProteomics.Backend.Database</RootNamespace>
     <AssemblyName>InformedProteomics.Backend.Database</AssemblyName>
-    <Version>1.1.2</Version>
+    <Version>1.1.3</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <Description>Protein database parsing and preprocessing for performing database searches</Description>
