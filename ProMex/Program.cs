@@ -9,7 +9,10 @@ namespace ProMex
 {
     internal static class Program
     {
+        // Ignore Spelling: args
+
         public const string Name = "ProMex";
+
         public static string Version
         {
             get
@@ -44,8 +47,9 @@ namespace ProMex
                 // args = new string[] {"-i", @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf", "-minMass", "3000", "-maxMass", "30000"};
 
                 var parser = new CommandLineParser<ProMexInputParameters>(Name, Version);
+
                 parser.UsageExamples.Add("To create a PNG of the features in an existing ms1ft file " +
-                "(requires both a .pbf file and a .ms1ft file):\n\tProMex.exe -i dataset.pbf -ms1ft dataset.ms1ft -featureMap");
+                                         "(requires both a .pbf file and a .ms1ft file):\n\tProMex.exe -i dataset.pbf -ms1ft dataset.ms1ft -featureMap");
 
                 var results = parser.ParseArgs(args);
 

@@ -26,7 +26,11 @@ namespace InformedProteomics.Test
     [TestFixture]
     public class TestProMex
     {
-        // Ignore Spelling: msgfdb, prsm, Lewy, Jungkap, Samwise, Dey, peptidomics, IMERblast, peptidome, LongSep, yufeng
+        // ReSharper disable CommentTypo
+
+        // Ignore Spelling: Dey, IMERblast, Jungkap, Lewy, LongSep, msgfdb, peptidome, peptidomics, protoapps, prsm, Samwise, yufeng
+
+        // ReSharper restore CommentTypo
 
         private string mFeatureMapPbfFile;
         private string mFeatureMapResultsFile;
