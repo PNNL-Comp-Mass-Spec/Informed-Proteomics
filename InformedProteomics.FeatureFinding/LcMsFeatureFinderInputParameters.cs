@@ -7,6 +7,8 @@ namespace InformedProteomics.FeatureFinding
     {
         // Ignore Spelling: Da
 
+        public const int DEFAULT_BIT_COUNT_FOR_BINNING = 27;
+
         public virtual double MinSearchMass { get; set; }
 
         public virtual double MaxSearchMass { get; set; }
@@ -31,6 +33,21 @@ namespace InformedProteomics.FeatureFinding
 
         public virtual double LikelihoodScoreThreshold { get; set; }
 
+        /// <summary>
+        /// Bit count for binning (value between 24 and 31); defaults to 27
+        /// </summary>
+        /// <remarks>
+        /// 31: 1 ppm resolution
+        /// 30: 2 ppm
+        /// 29: 4 ppm
+        /// 28: 8 ppm
+        /// 27: 16 ppm
+        /// 26: 32 ppm
+        /// 25: 64 ppm
+        /// 24: 128 ppm
+        /// </remarks>
+        public int BitCountForBinning { get; set; }
+
         public LcMsFeatureFinderInputParameters()
         {
             SetDefaults();
@@ -47,6 +64,7 @@ namespace InformedProteomics.FeatureFinding
             LikelihoodScoreThreshold = -10;
             MaxThreads = 0;
             FeatureMapImage = true;
+            BitCountForBinning = DEFAULT_BIT_COUNT_FOR_BINNING;
         }
 
         public void Display()
@@ -68,6 +86,10 @@ namespace InformedProteomics.FeatureFinding
                 Console.WriteLine("{0,-14} {1}", "MaxThreads:", MaxThreads);
 
                 Console.WriteLine("{0,-14} {1}", "LikelihoodRatioThreshold:", LikelihoodScoreThreshold);
+                Console.WriteLine("{0,-22} {1}", "Bit Count For Binning:", BitCountForBinning);
+
+                Console.WriteLine("{0,-22} {1} ppm", "Binning Resolution:", GetPPMResolutionForBitCount(BitCountForBinning));
+
             }
             else
             {
@@ -75,6 +97,62 @@ namespace InformedProteomics.FeatureFinding
             }
 
             Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Get the approximate ppm resolution for the given binning bit count
+        /// </summary>
+        /// <param name="bitCount"></param>
+        /// <returns>ppm resolution</returns>
+        protected int GetPPMResolutionForBitCount(int bitCount)
+        {
+            if (bitCount < 24)
+                return 128;
+
+            if (bitCount > 31)
+                return 1;
+
+            return (int)Math.Pow(2, 31 - bitCount);
+        }
+
+        /// <summary>
+        /// Convert ppmResolution to nearest power of 2, then convert to the appropriate bit count
+        /// </summary>
+        /// <param name="ppmResolution"></param>
+        /// <returns>Bit count</returns>
+        /// <remarks>
+        /// 1 ppm converts to 31 bins
+        /// 2 ppm converts to 30 bins
+        /// 4 ppm converts to 29 bins
+        /// etc.
+        /// </remarks>
+        public static int GetBitCountForPPMResolution(int ppmResolution)
+        {
+            if (ppmResolution < 1)
+                return DEFAULT_BIT_COUNT_FOR_BINNING;
+
+            if (ppmResolution > 128)
+                ppmResolution = 128;
+
+            var closestPPM = 0;
+            var closestDelta = int.MaxValue;
+
+            for (var comparisonPPM = 1; comparisonPPM <= 128; comparisonPPM *= 2)
+            {
+                var delta = Math.Abs(ppmResolution - comparisonPPM);
+                if (delta >= closestDelta)
+                    continue;
+
+                closestDelta = delta;
+                closestPPM = comparisonPPM;
+            }
+
+            if (closestPPM == 0)
+            {
+                closestPPM = 16;
+            }
+
+            return 31 - (int)Math.Floor(Math.Log(closestPPM, 2));
         }
 
         protected int GetOptimalMaxThreads(int userMaxThreads)

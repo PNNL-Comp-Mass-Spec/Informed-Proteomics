@@ -39,7 +39,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             int maxScanCharge = 60,
             int maxThreadCount = 0,
             int minMs1Scan = int.MinValue,
-            int maxMs1Scan = int.MaxValue)
+            int maxMs1Scan = int.MaxValue,
+            int numBits = 27)
         {
             Run = run;
             _maxThreadCount = maxThreadCount;
@@ -93,8 +94,24 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             _summedEnvelopeColRange = new int[NRows, 2];
 
             _featureMatrix = null;
-            const int numBits = 27;
-            Comparer = new MzComparerWithBinning(numBits); // 16ppm
+
+            if (numBits == 0)
+            {
+                // 16 ppm
+                numBits = 27;
+            }
+            else if (numBits > 31)
+            {
+                // 1 ppm
+                numBits = 31;
+            }
+            else if (numBits < 24)
+            {
+                // 128 ppm
+                numBits = 24;
+            }
+
+            Comparer = new MzComparerWithBinning(numBits);
             _scorer = scorer;
             _seedEnvelopes = new List<KeyValuePair<double, ObservedIsotopeEnvelope>>();
             _ms1Filter = null;

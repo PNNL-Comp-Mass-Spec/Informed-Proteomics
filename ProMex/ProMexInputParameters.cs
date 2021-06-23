@@ -54,6 +54,9 @@ namespace ProMex
             HelpText = "Also write feature data to a CSV file")]
         public override bool CsvOutput { get; set; }
 
+        [Option("BinningResolutionPPM", "BinResPPM", Min = 1, Max= 128,
+            HelpText = "Binning resolution, in ppm. Valid values are 1, 2, 4, 8, 16, 32, 64, or 128")]
+        public int BinningResolutionPPM { get; set; } = 16;
 
         [Option("ScoreThreshold", "ScoreTh",
             HelpText = "Likelihood score threshold")]
@@ -98,6 +101,8 @@ namespace ProMex
         {
             var defaultOutputDirectoryPath = string.Empty;
             SourceDatasetPaths.Clear();
+
+            BitCountForBinning = GetBitCountForPPMResolution(BinningResolutionPPM);
 
             if (InputPath.Contains("*") || InputPath.Contains("?"))
             {
