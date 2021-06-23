@@ -379,6 +379,47 @@ namespace InformedProteomics.Test
         }
 
         [Test]
+        [TestCase(0, 27)]
+        [TestCase(1, 31)]
+        [TestCase(2, 30)]
+        [TestCase(3, 30)]
+        [TestCase(4, 29)]
+        [TestCase(5, 29)]
+        [TestCase(6, 29)]
+        [TestCase(7, 28)]
+        [TestCase(8, 28)]
+        [TestCase(9, 28)]
+        [TestCase(10, 28)]
+        [TestCase(11, 28)]
+        [TestCase(12, 28)]
+        [TestCase(13, 27)]
+        [TestCase(14, 27)]
+        [TestCase(15, 27)]
+        [TestCase(16, 27)]
+        [TestCase(17, 27)]
+        [TestCase(18, 27)]
+        [TestCase(19, 27)]
+        [TestCase(20, 27)]
+        [TestCase(22, 27)]
+        [TestCase(24, 27)]
+        [TestCase(25, 26)]
+        [TestCase(26, 26)]
+        [TestCase(28, 26)]
+        [TestCase(30, 26)]
+        [TestCase(32, 26)]
+        [TestCase(50, 25)]
+        [TestCase(75, 25)]
+        [TestCase(100, 24)]
+        [TestCase(200, 24)]
+        public void TestConvertPPMResolutionToBinCount(int ppmResolution, int expectedBinCount)
+        {
+            var binCount = LcMsFeatureFinderInputParameters.GetBitCountForPPMResolution(ppmResolution);
+
+            Console.WriteLine("Resolution of {0} ppm converts to {1} bins", ppmResolution, expectedBinCount);
+            Assert.AreEqual(expectedBinCount, binCount);
+        }
+
+        [Test]
         [TestCase(0.001, 70)]
         [TestCase(0.005, 74)]
         [TestCase(0.01, 80)]
