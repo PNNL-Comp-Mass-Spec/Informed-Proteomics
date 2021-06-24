@@ -319,17 +319,17 @@ Enabling tag-based searching with `-tagSearch 1` can give 5% to 10% more matches
 
 ### Supported file formats
 
-These programs, when used with no other software installed, only support the use of centroid mzML files as spectrum input.
+These suggested input file format is centroided .mzML files.
 
-Versions prior to February 1, 2019: 
-* If Thermo Finnigan MSFileReader is installed, they also support reading from Thermo .raw files ([Download here](https://thermo.flexnetoperations.com/control/thmo/download?element=6306677), requires registration to download).
+For versions released after February 1, 2019:
+* If running PbfGen and ProMex as 64-bit programs, reading from Thermo .raw files is supported via the included RawFileReader DLLs (no additional software is required).
 
-Versions after February 1, 2019
-* If running as a 64-bit program, reading from Thermo Finnigan .raw files is supported via the included RawFileReader DLLs (no additional software install required).
+For versions released prior to February 1, 2019: 
+* If Thermo's MSFileReader is installed, PbfGen and ProMex also support reading from Thermo .raw files ([Download here](https://thermo.flexnetoperations.com/control/thmo/download?element=6306677), requires registration to download).
 
 On Windows, several other formats are supported if an appropriate version of ProteoWizard is installed ([Download here](http://proteowizard.sourceforge.net/downloads.shtml), make sure the version downloaded matches system architecture)
 
-On Linux, supported input files are .raw, .mzML, and .mzML.gz
+On Linux, supported input file formats are .raw, .mzML, and .mzML.gz
 
 ## MSPathFinder Parameter Files
 
