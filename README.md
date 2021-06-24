@@ -86,19 +86,23 @@ ProMex.exe
 
 `-MinCharge`
 * Minimum charge state. 
-* Default: 1, Min: 1, Max: 60
+* Default: 1
+* Min: 1, Max: 60
 
 `-MaxCharge`
 * Maximum charge state
-* Default: 60, Min: 1, Max: 60
+* Default: 60
+* Min: 1, Max: 60
 
 `-MinMass`
 * Minimum mass, in Daltons
-* Default: 2000, Min: 600, Max: 100000
+* Default: 2000
+* Min: 600, Max: 100000
 
 `-MaxMass`
 * Maximum mass, in Daltons
-* Default: 50000, Min: 600, Max: 100000
+* Default: 50000
+* Min: 600, Max: 100000
 
 `-FeatureMap`
 * Output the feature heatmap. Defaults to true.
@@ -117,9 +121,11 @@ ProMex.exe
 * Default: False
 
 `-BinResPPM` or `-BinningResolutionPPM`
-* Binning resolution, in ppm.
+* Binning resolution, in ppm
+  * This is used when finding LC-MS features
+  * Data points whose mass difference is less than the resolution are grouped together
 * Allowed values are 1, 2, 4, 8, 16, 32, 64, or 128
-* Default: 16, Min: 1, Max: 128
+* Default: 16
 
 `-ScoreTh` or `-ScoreThreshold`
 * Likelihood score threshold
