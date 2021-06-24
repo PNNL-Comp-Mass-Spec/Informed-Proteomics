@@ -121,9 +121,9 @@ namespace InformedProteomics.FeatureFinding
         /// <param name="ppmResolution"></param>
         /// <returns>Bit count</returns>
         /// <remarks>
-        /// 1 ppm converts to 31 bins
-        /// 2 ppm converts to 30 bins
-        /// 4 ppm converts to 29 bins
+        /// 1 ppm converts to 31 bits
+        /// 2 ppm converts to 30 bits
+        /// 4 ppm converts to 29 bits
         /// etc.
         /// </remarks>
         public static int GetBitCountForPPMResolution(int ppmResolution)

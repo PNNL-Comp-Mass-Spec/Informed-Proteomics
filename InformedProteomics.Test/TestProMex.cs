@@ -415,12 +415,12 @@ namespace InformedProteomics.Test
         [TestCase(75, 25)]
         [TestCase(100, 24)]
         [TestCase(200, 24)]
-        public void TestConvertPPMResolutionToBinCount(int ppmResolution, int expectedBinCount)
+        public void TestConvertPPMResolutionToBitCount(int ppmResolution, int expectedBitCount)
         {
-            var binCount = LcMsFeatureFinderInputParameters.GetBitCountForPPMResolution(ppmResolution);
+            var bitCount = LcMsFeatureFinderInputParameters.GetBitCountForPPMResolution(ppmResolution);
 
-            Console.WriteLine("Resolution of {0} ppm converts to {1} bins", ppmResolution, expectedBinCount);
-            Assert.AreEqual(expectedBinCount, binCount);
+            Console.WriteLine("Resolution of {0} ppm converts to bit count = {1}", ppmResolution, expectedBitCount);
+            Assert.AreEqual(expectedBitCount, bitCount);
         }
 
         [Test]
