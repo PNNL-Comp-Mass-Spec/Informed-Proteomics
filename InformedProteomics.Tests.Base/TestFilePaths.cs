@@ -19,7 +19,7 @@ namespace InformedProteomics.Tests.Base
         [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_005133_8491EFA2.fasta", 3077075)]
         [TestCase(@"TEST_FOLDER\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML", 62492003)]
         [TestCase(@"TEST_FOLDER\PNNLOmicsElementData.xml", 63982)]
-        [TestCase(@"TEST_FOLDER\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv", 76189)]
+        [TestCase(@"TEST_FOLDER\SpecFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv", 75818)]
         [TestCase(@"TEST_FOLDER\TopDown\ProductionQCShew\Mods.txt", 1892)]
         [TestCase(@"TEST_FOLDER\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget.tsv", 684649)]
         [TestCase(@"TEST_FOLDER\IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcDecoy.tsv", 356790)]
