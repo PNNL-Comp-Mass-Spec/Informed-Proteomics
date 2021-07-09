@@ -38,7 +38,18 @@ namespace InformedProteomics.Tests.UnitTests
             const int numMutations = 3;
             var mutated = SimpleStringProcessing.Mutate(str, numMutations);
 
-            Console.WriteLine(mutated);
+            Console.WriteLine("Original: {0}", str);
+            Console.WriteLine("Mutated:  {0}", mutated);
+
+            Console.Write(new string(' ', "Original: ".Length));
+
+            for (var i = 0; i < str.Length; i++)
+            {
+                Console.Write(str[i] == mutated[i] ? " " : "^");
+            }
+
+            Console.WriteLine();
+
             Assert.IsTrue(str.Length == mutated.Length);
 
             var numDiff = str.Where((t, i) => t != mutated[i]).Count();
