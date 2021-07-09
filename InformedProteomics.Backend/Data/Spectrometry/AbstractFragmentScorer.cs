@@ -140,8 +140,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
             var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
             var fragmentIonMass = fragmentComposition.Mass;
 
-            //var matchedPeak = new MatchedFragmentPeak();
-            //var deconvPeak = new DeconvolutedPeak()
             if (fragmentIonMass < Ms2Spectrum.Peaks.First().Mz)
             {
                 yield break;

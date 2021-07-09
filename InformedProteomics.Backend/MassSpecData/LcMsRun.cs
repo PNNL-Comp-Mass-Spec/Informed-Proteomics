@@ -23,7 +23,6 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Factor used to bin isolation window data
         /// </summary>
         public const double IsolationWindowBinningFactor = 10;
-        //public const double DefaultSpectrumFilteringWindowSize = 100.0;
 
         /// <summary>
         /// Index of first LC scan in the dataset

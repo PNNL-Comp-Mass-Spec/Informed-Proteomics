@@ -194,14 +194,6 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns>List of prefix compositions</returns>
         public IEnumerable<Composition.Composition> GetPrefixCompositions()
         {
-            //var compositions = new Composition.Composition[Count];
-            //var prefixComposition = Data.Composition.Composition.Zero;
-            //var index = -1;
-            //foreach (var aa in this)
-            //{
-            //    compositions[++index] = (prefixComposition += aa.Composition);
-            //}
-            //return compositions;
             return PrefixComposition.Skip(1);
         }
 
