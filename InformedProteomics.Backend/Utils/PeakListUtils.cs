@@ -4,6 +4,8 @@ using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MathAndStats;
 using MathNet.Numerics.Statistics;
 
+// ReSharper disable UnusedMember.Global
+
 namespace InformedProteomics.Backend.Utils
 {
     /// <summary>

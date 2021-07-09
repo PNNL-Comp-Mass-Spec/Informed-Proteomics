@@ -7,6 +7,8 @@ using InformedProteomics.Backend.Utils;
 using ProteinFileReader;
 using PRISM;
 
+// ReSharper disable UnusedMember.Global
+
 namespace InformedProteomics.Backend.Database
 {
     /// <summary>

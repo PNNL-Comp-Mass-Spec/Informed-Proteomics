@@ -9,6 +9,8 @@ using InformedProteomics.Backend.Data.Sequence;
 using InformedProteomics.Backend.Utils;
 using SuffixArray;
 
+// ReSharper disable UnusedMember.Global
+
 namespace InformedProteomics.Backend.Database
 {
     /// <summary>

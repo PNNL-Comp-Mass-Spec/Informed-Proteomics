@@ -3293,6 +3293,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                 //bda.Data[i / dataSize] = BitConverter.ToSingle(oneNumber, 0);
                                 bda.Data[i / dataSize] = BitConverter.ToSingle(bytes, i);
                             }
+                            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                             else if (dataSize == 8)
                             {
                                 //bda.Data[i / dataSize] = BitConverter.ToDouble(oneNumber, 0);

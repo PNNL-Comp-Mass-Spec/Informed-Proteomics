@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using PRISM;
 
+// ReSharper disable UnusedMember.Global
+
 namespace InformedProteomics.Backend.Utils
 {
     /// <summary>
