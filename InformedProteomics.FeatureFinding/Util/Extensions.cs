@@ -31,7 +31,7 @@ namespace InformedProteomics.FeatureFinding.Util
                 sb.AppendFormat("{0},{1:0.000}", feature.TheoreticalEnvelope.Isotopes[i].Index, intensity[i] / maxIntensity);
             }
 
-            var ms1FtEntry = new Ms1FtEntry
+            return new Ms1FtEntry
             {
                 FeatureId = featureId,
                 MinScan = feature.MinScanNum,
@@ -52,8 +52,6 @@ namespace InformedProteomics.FeatureFinding.Util
                 LikelihoodRatio = feature.Score,
                 ExtendedData = feature.ToMs1FtEntryExtendedData()
             };
-
-            return ms1FtEntry;
         }
 
         /// <summary>
@@ -63,7 +61,7 @@ namespace InformedProteomics.FeatureFinding.Util
         /// <returns>New Ms1FtEntryExtendedData object</returns>
         private static Ms1FtEntryExtendedData ToMs1FtEntryExtendedData(this LcMsPeakCluster feature)
         {
-            var extended = new Ms1FtEntryExtendedData
+            return new Ms1FtEntryExtendedData
             {
                 BestEvenCharge = feature.BestCharge[LcMsPeakCluster.EvenCharge],
                 BestOddCharge = feature.BestCharge[LcMsPeakCluster.OddCharge],
@@ -80,8 +78,6 @@ namespace InformedProteomics.FeatureFinding.Util
                 AbundanceRatioEvenCharge = feature.AbundanceDistributionAcrossCharge[LcMsPeakCluster.EvenCharge],
                 AbundanceRatioOddCharge = feature.AbundanceDistributionAcrossCharge[LcMsPeakCluster.OddCharge]
             };
-
-            return extended;
         }
 
         /// <summary>
@@ -92,7 +88,7 @@ namespace InformedProteomics.FeatureFinding.Util
         /// <returns>New Ms1FtEntry object</returns>
         public static Ms1FtEntry ToMs1FtEntry(this LcMsFeature feature, int featureId = 0)
         {
-            var ms1FtEntry = new Ms1FtEntry
+            return new Ms1FtEntry
             {
                 FeatureId = featureId,
                 MinScan = feature.MinScanNum,
@@ -109,8 +105,6 @@ namespace InformedProteomics.FeatureFinding.Util
                 ElutionLength = feature.ElutionLength,
                 LikelihoodRatio = feature.Score
             };
-
-            return ms1FtEntry;
         }
 
         /// <summary>
@@ -133,13 +127,11 @@ namespace InformedProteomics.FeatureFinding.Util
                 maxNet = ms1FtEntry.MaxElutionTime / totalDatasetRunTime;
             }
 
-            var feature = new LcMsFeature(ms1FtEntry.MonoMass, repCharge, repMz, repScanNum, ms1FtEntry.Abundance, ms1FtEntry.MinCharge, ms1FtEntry.MaxCharge, ms1FtEntry.MinScan, ms1FtEntry.MaxScan, ms1FtEntry.MinElutionTime, ms1FtEntry.MaxElutionTime, minNet, maxNet)
+            return new LcMsFeature(ms1FtEntry.MonoMass, repCharge, repMz, repScanNum, ms1FtEntry.Abundance, ms1FtEntry.MinCharge, ms1FtEntry.MaxCharge, ms1FtEntry.MinScan, ms1FtEntry.MaxScan, ms1FtEntry.MinElutionTime, ms1FtEntry.MaxElutionTime, minNet, maxNet)
             {
                 FeatureId = ms1FtEntry.FeatureId,
                 Score = ms1FtEntry.LikelihoodRatio,
             };
-
-            return feature;
         }
     }
 }

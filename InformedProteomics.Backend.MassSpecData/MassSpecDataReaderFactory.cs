@@ -312,12 +312,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>True if we are running a 64-bit process</returns>
         public static bool IsThermoRawAvailable()
         {
-            if (Environment.Is64BitProcess)
-            {
-                return true;
-            }
-
-            return false;
+            return Environment.Is64BitProcess;
         }
 
         /// <summary>

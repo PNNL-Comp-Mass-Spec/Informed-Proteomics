@@ -264,8 +264,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         {
             var converted = BitConverter.DoubleToInt64Bits(mz);
             var rounded = (converted >> _numShifts) << _numShifts;
-            var roundedDouble = BitConverter.Int64BitsToDouble(rounded);
-            return roundedDouble;
+            return BitConverter.Int64BitsToDouble(rounded);
         }
 
         /// <summary>

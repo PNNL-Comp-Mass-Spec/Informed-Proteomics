@@ -94,8 +94,7 @@ namespace InformedProteomics.Backend.Utils
                 return null;
             }
 
-            var peptideSet = GetPeptidesAboveThreshold(peptideColumnIndex, proteinColumnIndex, pepQValueColumnIndex, pepQValueThreshold);
-            return peptideSet;
+            return GetPeptidesAboveThreshold(peptideColumnIndex, proteinColumnIndex, pepQValueColumnIndex, pepQValueThreshold);
         }
 
         /// <summary>
@@ -113,8 +112,7 @@ namespace InformedProteomics.Backend.Utils
                 return null;
             }
 
-            var peptideSet = GetPeptidesAboveThreshold(peptideColumnIndex, proteinColumnIndex, qValueColumnIndex, qValueThreshold);
-            return peptideSet;
+            return GetPeptidesAboveThreshold(peptideColumnIndex, proteinColumnIndex, qValueColumnIndex, qValueThreshold);
         }
 
         /// <summary>

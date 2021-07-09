@@ -66,8 +66,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>New ion type factory</returns>
         public static IonTypeFactory GetDeconvolutedIonTypeFactory(IEnumerable<BaseIonType> baseIons, IEnumerable<NeutralLoss> neutralLosses)
         {
-            var ionTypeFactory = new IonTypeFactory(baseIons.Select(ion => ion.GetDeconvolutedIon()), neutralLosses, 1);
-            return ionTypeFactory;
+            return new IonTypeFactory(baseIons.Select(ion => ion.GetDeconvolutedIon()), neutralLosses, 1);
         }
 
         /// <summary>
