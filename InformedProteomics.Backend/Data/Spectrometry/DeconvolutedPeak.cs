@@ -99,7 +99,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         //private readonly HashSet<Peak> _isotopePeaks;
 
         /// <summary>
-        /// Used for retrieving Observed peaks when reading from a .dpbf file, in conjunction with a .pbf file.
+        /// Used for retrieving Observed peaks when reading from a .dpbf file, in conjunction with a .pbf file
         /// </summary>
         public List<int> ObservedPeakIndices { get; }
 

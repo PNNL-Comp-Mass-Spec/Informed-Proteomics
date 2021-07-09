@@ -36,7 +36,7 @@
         /// Get a new <see cref="ModificationInstance"/> at offset <paramref name="offset"/> from this instance
         /// </summary>
         /// <param name="offset"></param>
-        /// <returns></returns>
+        /// <returns>Modification object</returns>
         public ModificationInstance GetModificationInstanceWithOffset(int offset)
         {
             return new ModificationInstance(Modification, Index + offset);

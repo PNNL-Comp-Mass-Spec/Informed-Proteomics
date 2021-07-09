@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Get the native ID of the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Native ID string</returns>
         string GetNativeId(int scanNum);
 
         /// <summary>
@@ -35,14 +35,14 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Get the elution time of the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Elution time</returns>
         double GetElutionTime(int scanNum);
 
         /// <summary>
         /// Get the ion mobility drift time of the specified scan number (if data is ion mobility)
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Drift time</returns>
         double GetDriftTime(int scanNum);
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum">scan number</param>
         /// <param name="msLevel">MS level</param>
-        /// <returns>previous scan number at the specified level</returns>
+        /// <returns>Previous scan number at the specified level</returns>
         int GetPrevScanNum(int scanNum, int msLevel);
 
         /// <summary>
@@ -65,21 +65,21 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum">scan number</param>
         /// <param name="msLevel">MS level</param>
-        /// <returns>next scan number at the specified level</returns>
+        /// <returns>Next scan number at the specified level</returns>
         int GetNextScanNum(int scanNum, int msLevel);
 
         /// <summary>
         /// Gets the scan numbers of the specified msLevel
         /// </summary>
         /// <param name="msLevel">MS level</param>
-        /// <returns>scan numbers of the specified msLevel</returns>
+        /// <returns>Scan numbers of the specified msLevel</returns>
         IList<int> GetScanNumbers(int msLevel);
 
         /// <summary>
         /// Read and return the isolation window for the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Isolation window</returns>
         IsolationWindow GetIsolationWindow(int scanNum);
     }
 }

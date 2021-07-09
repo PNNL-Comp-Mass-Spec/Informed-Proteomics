@@ -46,10 +46,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Get feature ids of features that match the sequence mass
+        /// Get feature IDs of features that match the sequence mass
         /// </summary>
         /// <param name="sequenceMass"></param>
-        /// <returns></returns>
+        /// <returns>List of Feature IDs</returns>
         public List<int> GetMatchingFeatureIds(double sequenceMass)
         {
             var massBinNum = GetBinNumber(sequenceMass);
@@ -65,7 +65,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get MS2 scan numbers that have precursors that match the sequence mass
         /// </summary>
         /// <param name="sequenceMass"></param>
-        /// <returns></returns>
+        /// <returns>List of scan numbers</returns>
         public IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass)
         {
             var massBinNum = GetBinNumber(sequenceMass);
@@ -81,7 +81,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the mass matching the scan number
         /// </summary>
         /// <param name="ms2ScanNum"></param>
-        /// <returns></returns>
+        /// <returns>List of matching m/z values</returns>
         public IEnumerable<double> GetMatchingMass(int ms2ScanNum)
         {
             if (_scanNumToMassBin.TryGetValue(ms2ScanNum, out var massBinNums))

@@ -139,7 +139,7 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         /// </summary>
         /// <param name="filePath">path to .ms1ft file</param>
         /// <param name="readExtendedData">if true, and file has extended data, <see cref="ExtendedData"/> will be populated from the file</param>
-        /// <returns></returns>
+        /// <returns>List of features</returns>
         public static IEnumerable<Ms1FtEntry> ReadFromFile(string filePath, bool readExtendedData = false)
         {
             using (var stream = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))

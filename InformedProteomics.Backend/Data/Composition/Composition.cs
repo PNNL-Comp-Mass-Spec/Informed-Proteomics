@@ -323,10 +323,10 @@ namespace InformedProteomics.Backend.Data.Composition
         #region Operators
 
         /// <summary>
-        /// Return a new composition that consists of this composition and <paramref name="c"/>
+        /// Return a new composition that consists of this composition plus <paramref name="c"/>
         /// </summary>
         /// <param name="c"></param>
-        /// <returns></returns>
+        /// <returns>New composition object</returns>
         protected Composition AddComposition(Composition c)
         {
             var numC = _c + c._c;
@@ -375,10 +375,10 @@ namespace InformedProteomics.Backend.Data.Composition
         }
 
         /// <summary>
-        /// Return a new composition that consists of this composition and <paramref name="c"/>
+        /// Return a new composition that consists of this composition plus <paramref name="c"/>
         /// </summary>
         /// <param name="c"></param>
-        /// <returns></returns>
+        /// <returns>New composition object</returns>
         public Composition Add(Composition c)
         {
             if (c is CompositionWithDeltaMass comWithDelta)
@@ -394,7 +394,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         /// <param name="c1"></param>
         /// <param name="c2"></param>
-        /// <returns></returns>
+        /// <returns>New composition object</returns>
         public static Composition operator +(Composition c1, Composition c2)
         {
             if (!(c1 is CompositionWithDeltaMass compWithDelta))
@@ -408,7 +408,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Return the inverse composition (all counts negative)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>New composition object</returns>
         public Composition Negate()
         {
             if (_additionalElements == null)
@@ -425,7 +425,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// Unary -
         /// </summary>
         /// <param name="c"></param>
-        /// <returns></returns>
+        /// <returns>New composition object</returns>
         public static Composition operator -(Composition c)
         {
             if (!(c is CompositionWithDeltaMass compWithDelta))
@@ -441,7 +441,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// </summary>
         /// <param name="c1"></param>
         /// <param name="c2"></param>
-        /// <returns></returns>
+        /// <returns>New composition object</returns>
         public static Composition operator -(Composition c1, Composition c2)
         {
             return c1 + (-c2);
@@ -472,7 +472,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// String representation of this composition
         /// </summary>
         /// <param name="spaceSeparated">When true, separate fields using spaces instead of commas</param>
-        /// <returns></returns>
+        /// <returns>Empirical formula</returns>
         public string ToString(bool spaceSeparated)
         {
             var formatString = spaceSeparated ?
@@ -576,7 +576,14 @@ namespace InformedProteomics.Backend.Data.Composition
         /// H(117) C(77) N(17) O(26) S(2)
         /// </summary>
         /// <param name="compositionStr"></param>
-        /// <remarks>Requires the use of parentheses for element counts.  Also requires whitespace (typically a space) between each element and count</remarks>
+        /// <remarks>
+        /// <para>
+        /// Requires the use of parentheses for element counts
+        /// </para>
+        /// <para>
+        /// Also requires whitespace (typically a space) between each element and count
+        /// </para>
+        /// </remarks>
         /// <returns>Composition object, or null if a parse error</returns>
         public static Composition Parse(string compositionStr)
         {

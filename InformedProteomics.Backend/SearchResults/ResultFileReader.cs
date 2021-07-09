@@ -14,10 +14,10 @@ namespace InformedProteomics.Backend.SearchResults
         public static readonly string[] SupportedResultsFiles = { ".mzid", ".mzid.gz", "_ictda.tsv" };
 
         /// <summary>
-        /// Read the file at path <paramref name="filePath"/>.
+        /// Read the file at path <paramref name="filePath"/>
         /// </summary>
         /// <param name="filePath"></param>
-        /// <returns></returns>
+        /// <returns>Container with database search results</returns>
         public static SimpleMZIdentMLReader.SimpleMZIdentMLData ReadResultFile(string filePath)
         {
             SimpleMZIdentMLReader.SimpleMZIdentMLData results = null;

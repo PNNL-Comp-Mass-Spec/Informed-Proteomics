@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.MathAndStats
     /// </summary>
     public static class ArrayUtil
     {
-        // Ignore Spelling: Kadane's
+        // Ignore Spelling: Kadane's, subarray
 
         /// <summary>
         /// Create a string to display the array values.
@@ -45,7 +45,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="array"></param>
         /// <param name="delimiter"></param>
         /// <param name="format"></param>
-        /// <returns></returns>
+        /// <returns>Human-readable list of values</returns>
         public static string ToString<T>(T[][] array, string delimiter = "\t", string format = "")
         {
             var s = new StringBuilder();
@@ -75,7 +75,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="values"></param>
         /// <param name="lowerBoundValue"></param>
-        /// <returns></returns>
+        /// <returns>Array of rankings</returns>
         public static int[] GetRankings(IEnumerable<double> values, double lowerBoundValue = 0.0d)
         {
             var temp = new List<KeyValuePair<double, int>>();
@@ -105,7 +105,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="values"></param>
         /// <param name="median"></param>
         /// <param name="lowerBoundValue"></param>
-        /// <returns></returns>
+        /// <returns>Array of rankings</returns>
         public static int[] GetRankings(IEnumerable<double> values, out double median, double lowerBoundValue = 0.0d)
         {
             var temp = new List<KeyValuePair<double, int>>();
@@ -138,11 +138,12 @@ namespace InformedProteomics.Backend.MathAndStats
 
         /// <summary>
         /// Kadane's algorithm
+        /// https://en.wikipedia.org/wiki/Maximum_subarray_problem
         /// </summary>
         /// <param name="a"></param>
         /// <param name="start"></param>
         /// <param name="len"></param>
-        /// <returns></returns>
+        /// <returns>Maximum sum of a contiguous subarray</returns>
         public static int MaxSumSubarray(IList<int> a, out int start, out int len)
         {
             start = 0;
@@ -183,12 +184,11 @@ namespace InformedProteomics.Backend.MathAndStats
 
         /// <summary>
         /// Kadane's algorithm
-        /// https://en.wikipedia.org/wiki/Maximum_subarray_problem
         /// </summary>
         /// <param name="a"></param>
         /// <param name="start"></param>
         /// <param name="len"></param>
-        /// <returns></returns>
+        /// <returns>Maximum sum of a contiguous subarray</returns>
         public static double MaxSumSubarray(IList<double> a, out int start, out int len)
         {
             start = 0;

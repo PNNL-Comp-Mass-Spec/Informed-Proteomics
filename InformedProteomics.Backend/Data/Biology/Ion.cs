@@ -35,17 +35,17 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// Get the monoisotopic m/z of the ion
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Monoisotopic m/z</returns>
         public double GetMonoIsotopicMz()
         {
             return (Composition.Mass + Charge * Constants.Proton) / Charge;
         }
 
         /// <summary>
-        /// Gets the m/z of ith isotope
+        /// Gets the m/z of nth isotope
         /// </summary>
         /// <param name="isotopeIndex">isotope index. 0 means mono-isotope, 1 means 2nd isotope, etc.</param>
-        /// <returns></returns>
+        /// <returns>Isotope m/z</returns>
         public double GetIsotopeMz(int isotopeIndex)
         {
             return (Composition.GetIsotopeMass(isotopeIndex) + Charge * Constants.Proton) / Charge;
@@ -61,10 +61,10 @@ namespace InformedProteomics.Backend.Data.Biology
         }
 
         /// <summary>
-        /// Gets the m/z of ith isotope
+        /// Gets the m/z of nth isotope
         /// </summary>
-        /// <param name="isotopeIndexInRealNumber">isotope index in real number. 0 means mono-isotope, 0.5 means the center of mono and 2nd isotopes.</param>
-        /// <returns></returns>
+        /// <param name="isotopeIndexInRealNumber">isotope index in real number. 0 means mono-isotope, 0.5 means the center of mono and 2nd isotopes</param>
+        /// <returns>m/z</returns>
         public double GetIsotopeMz(double isotopeIndexInRealNumber)
         {
             return (Composition.GetIsotopeMass(isotopeIndexInRealNumber) + Charge * Constants.Proton) / Charge;
@@ -109,7 +109,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// Get the top 3 isotopes for this ion
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of isotopes</returns>
         public IList<Isotope> GetTop3Isotopes()
         {
             var isotopes = Composition.GetIsotopomerEnvelopeRelativeIntensities();
@@ -140,7 +140,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <param name="monoIsotopicMass"></param>
         /// <param name="charge"></param>
         /// <param name="isotopeIndex"></param>
-        /// <returns></returns>
+        /// <returns>m/z</returns>
         public static double GetIsotopeMz(double monoIsotopicMass, int charge, int isotopeIndex)
         {
             var isotopeMass = monoIsotopicMass + isotopeIndex * Constants.C13MinusC12;
@@ -153,7 +153,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <param name="isotopeMz"></param>
         /// <param name="charge"></param>
         /// <param name="isotopeIndex"></param>
-        /// <returns></returns>
+        /// <returns>Monoisotopic mass</returns>
         public static double GetMonoIsotopicMass(double isotopeMz, int charge, int isotopeIndex)
         {
             var isotopeMass = (isotopeMz - Constants.Proton) * charge;

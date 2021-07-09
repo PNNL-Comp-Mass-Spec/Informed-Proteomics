@@ -20,20 +20,20 @@ namespace InformedProteomics.Backend.Data.Composition
         #region Methods to get masses
 
         /// <summary>
-        /// Gets the mass of ith isotope
+        /// Gets the mass of nth isotope
         /// </summary>
         /// <param name="isotopeIndex">isotope index. 0 means mono-isotope, 1 means 2nd isotope, etc.</param>
-        /// <returns></returns>
+        /// <returns>m/z</returns>
         public double GetIsotopeMass(int isotopeIndex)
         {
             return Mass + isotopeIndex * Constants.C13MinusC12;
         }
 
         /// <summary>
-        /// Gets the m/z of ith isotope
+        /// Gets the m/z of nth isotope
         /// </summary>
-        /// <param name="isotopeIndexInRealNumber">isotope index in real number. 0 means mono-isotope, 0.5 means the center of mono and 2nd isotopes.</param>
-        /// <returns></returns>
+        /// <param name="isotopeIndexInRealNumber">isotope index in real number. 0 means mono-isotope, 0.5 means the center of mono and 2nd isotopes</param>
+        /// <returns>m/z</returns>
         public double GetIsotopeMass(double isotopeIndexInRealNumber)
         {
             return Mass + isotopeIndexInRealNumber * Constants.C13MinusC12;
@@ -41,12 +41,12 @@ namespace InformedProteomics.Backend.Data.Composition
 
         #endregion
 
-        #region Methods to get Isotopomer Envelpops
+        #region Methods to get Isotopomer Envelopes
 
         /// <summary>
         /// Get the <see cref="IsotopomerEnvelope"/> for this composition
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Isotopomer envelope</returns>
         public IsotopomerEnvelope GetIsotopomerEnvelope()
         {
             return _isotopomerEnvelope ??
@@ -56,7 +56,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Get the relative intensities of the Isotopomer envelope for this composition
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Array of intensities</returns>
         public double[] GetIsotopomerEnvelopeRelativeIntensities()
         {
             if (_isotopomerEnvelope == null)
@@ -70,7 +70,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Get the zero-based index of the most abundant isotope, according to the isotopomer envelope
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Index of the most abundant isotope</returns>
         public int GetMostAbundantIsotopeZeroBasedIndex()
         {
             if (_isotopomerEnvelope == null)

@@ -160,7 +160,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="ion">ion</param>
         /// <param name="tolerance">tolerance</param>
         /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
-        /// <returns>true if spectrum contains all ions; false otherwise.</returns>
+        /// <returns>true if spectrum contains all ions; false otherwise</returns>
         public bool ContainsIon(Ion ion, Tolerance tolerance, double relativeIntensityThreshold = 0.1)
         {
             var baseIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -239,7 +239,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="ion">ion</param>
         /// <param name="tolerance">tolerance</param>
         /// <param name="relativeIntensityThreshold">relative intensity threshold of the theoretical isotope profile</param>
-        /// <returns>array of observed isotope peaks in the spectrum. null if no peak found.</returns>
+        /// <returns>Array of observed isotope peaks in the spectrum; null if no peak found</returns>
         public Peak[] GetAllIsotopePeaks(Ion ion, Tolerance tolerance, double relativeIntensityThreshold = 0.1)
         {
             var mostAbundantIsotopeIndex = ion.Composition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -331,7 +331,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="envelope"></param>
         /// <param name="tolerance"></param>
         /// <param name="relativeIntensityThreshold"></param>
-        /// <returns></returns>
+        /// <returns>Array of matching peaks</returns>
         public Peak[] GetAllIsotopePeaks(double monoIsotopeMass, int charge, IsotopomerEnvelope envelope, Tolerance tolerance, double relativeIntensityThreshold = 0.1)
         {
             var mostAbundantIsotopeIndex = envelope.MostAbundantIsotopeIndex;
@@ -698,7 +698,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="peakStartIndex"></param>
         /// <param name="peakEndIndex"></param>
-        /// <returns></returns>
+        /// <returns>Histogram bucket</returns>
         private Bucket GetMostAbundantIntensity(int peakStartIndex, int peakEndIndex)
         {
             const int numberOfBins = 10;
@@ -821,7 +821,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get a spectrum where the peaks have been filtered by the signal to noise ratio
         /// </summary>
         /// <param name="signalToNoiseRatio"></param>
-        /// <returns></returns>
+        /// <returns>Filtered spectrum</returns>
         public Spectrum GetFilteredSpectrumBySignalToNoiseRatio(double signalToNoiseRatio = 1.4826)
         {
             var filteredSpec = (Spectrum)MemberwiseClone();
@@ -833,7 +833,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get a spectrum where the peaks have been filtered by the slope
         /// </summary>
         /// <param name="slopeThreshold"></param>
-        /// <returns></returns>
+        /// <returns>Filtered spectrum</returns>
         public Spectrum GetFilteredSpectrumBySlope(double slopeThreshold = 0.33)
         {
             var filteredSpec = (Spectrum)MemberwiseClone();
@@ -846,7 +846,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="signalToNoiseRatio"></param>
         /// <param name="windowPpm"></param>
-        /// <returns></returns>
+        /// <returns>Filtered spectrum</returns>
         public Spectrum GetFilteredSpectrumByLocalWindow(double signalToNoiseRatio = 1.4826, int windowPpm = 10000)
         {
             var filteredSpec = (Spectrum)MemberwiseClone();
@@ -859,7 +859,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="mz"></param>
         /// <param name="tolerance"></param>
-        /// <returns></returns>
+        /// <returns>Peak index</returns>
         public int FindPeakIndex(double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsMz(mz);
@@ -873,7 +873,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
-        /// <returns></returns>
+        /// <returns>Peak index</returns>
         public int FindPeakIndex(double minMz, double maxMz)
         {
             int index;

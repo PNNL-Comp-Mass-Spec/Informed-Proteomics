@@ -12,7 +12,7 @@
         /// <param name="precursorMass"></param>
         /// <param name="precursorCharge"></param>
         /// <param name="activationMethod"></param>
-        /// <returns></returns>
+        /// <returns>Scorer object</returns>
         IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge, ActivationMethod activationMethod = ActivationMethod.Unknown);
 
         /// <summary>
@@ -22,7 +22,7 @@
         /// <param name="precursorMass"></param>
         /// <param name="precursorCharge"></param>
         /// <param name="activationMethod"></param>
-        /// <returns></returns>
+        /// <returns>Scorer object</returns>
         IScorer GetScorer(int scanNum, double precursorMass = 0.0, int precursorCharge = 0, ActivationMethod activationMethod = ActivationMethod.Unknown);
     }
 }

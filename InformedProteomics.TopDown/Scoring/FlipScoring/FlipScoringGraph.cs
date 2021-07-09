@@ -72,11 +72,11 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         }
 
         /// <summary>
-        ///Get edge score
+        /// Get edge score
         /// </summary>
         /// <param name="sourceMassBin"></param>
         /// <param name="sinkMassBin"></param>
-        /// <returns></returns>
+        /// <returns>Score for the edge between the two bins</returns>
         public double GetEdgeScore(int sourceMassBin, int sinkMassBin)
         {
             if (!(GetEdges(sinkMassBin).First(e => e.PrevNodeIndex == sourceMassBin) is FlipScoringGraphEdge edge))
@@ -88,10 +88,10 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         }
 
         /// <summary>
-        /// Gets the score for an entire sequence against the scoring graph.
+        /// Gets the score for an entire sequence against the scoring graph
         /// </summary>
         /// <param name="sequence">The sequence to score.</param>
-        /// <returns></returns>
+        /// <returns>Score</returns>
         public double ScoreSequence(Sequence sequence)
         {
             var cleavages = sequence.GetInternalCleavages();

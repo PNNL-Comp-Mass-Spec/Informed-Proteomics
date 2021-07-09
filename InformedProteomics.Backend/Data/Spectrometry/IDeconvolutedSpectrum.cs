@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="composition"></param>
         /// <param name="tolerance"></param>
-        /// <returns></returns>
+        /// <returns>Matching peak</returns>
         DeconvolutedPeak FindPeak(Composition.Composition composition, Tolerance tolerance);
     }
 }

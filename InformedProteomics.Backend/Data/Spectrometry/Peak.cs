@@ -29,10 +29,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double Intensity { get; }
 
         /// <summary>
-        /// Compare 2 peaks (for sorting by m/z)
+        /// Compare two peaks (for sorting by m/z)
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>0, 1, or -1</returns>
         public int CompareTo(Peak other)
         {
             var t = this as LcMsPeak;
@@ -52,10 +52,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Test 2 peaks for equality
+        /// Test two peaks for equality
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         public bool Equals(Peak other)
         {
             if (other == null)
@@ -103,7 +103,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-        /// <returns></returns>
         public static bool operator ==(Peak left, Peak right)
         {
             return Equals(left, right);
@@ -114,7 +113,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-        /// <returns></returns>
         public static bool operator !=(Peak left, Peak right)
         {
             return !Equals(left, right);

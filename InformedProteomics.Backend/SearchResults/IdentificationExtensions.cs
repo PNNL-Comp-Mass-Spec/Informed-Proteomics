@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// Convert the sequence information from the external types to the internal types
         /// </summary>
         /// <param name="peptide"></param>
-        /// <returns></returns>
+        /// <returns>Sequence object</returns>
         public static Sequence GetIpSequence(this SimpleMZIdentMLReader.PeptideRef peptide)
         {
             var aminoAcidSet = new AminoAcidSet();

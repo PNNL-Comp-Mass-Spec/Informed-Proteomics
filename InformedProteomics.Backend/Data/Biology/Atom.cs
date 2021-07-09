@@ -134,7 +134,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// Get the atom that corresponds to the provided atomic symbol
         /// </summary>
         /// <param name="code"></param>
-        /// <returns></returns>
+        /// <returns>Atom object</returns>
         public static Atom Get(string code)
         {
             return AtomMap[code];

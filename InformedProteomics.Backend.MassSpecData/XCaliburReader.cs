@@ -78,24 +78,28 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Always random-access capable.
+        /// Always returns true since this class is always random-access capable
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True</returns>
         public bool TryMakeRandomAccessCapable()
         {
             return true;
         }
 
         /// <summary>
-        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </remarks>
         public CV.CVID NativeIdFormat => CV.CVID.MS_Thermo_nativeID_format;
 
         /// <summary>
-        /// The Native Format of the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// The Native Format of the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </remarks>
         public CV.CVID NativeFormat => CV.CVID.MS_Thermo_RAW_format;
 
         /// <summary>
@@ -213,7 +217,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
             return ReadMassSpectrum(scanNum, includePeaks);
@@ -246,21 +250,22 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Get the maximum scan number in the file
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Last scan number</returns>
         public int GetMaxScanNum()
         {
             return _maxLcScan;
         }
 
         /// <summary>
-        /// The number of spectra in the file.
+        /// The number of spectra in the file
         /// </summary>
+        /// <returns>Number of spectra</returns>
         public int NumSpectra { get; }
 
         /// <summary>
         /// Get the minimum scan number in the file
         /// </summary>
-        /// <returns></returns>
+        /// <returns>First scan number</returns>
         public int GetMinScanNum()
         {
             return _minLcScan;
@@ -270,7 +275,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Read the MS Level of the specified scan number from the file
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>MS Level</returns>
         public int ReadMsLevel(int scanNum)
         {
             if (_msLevel.TryGetValue(scanNum, out var msLevel))
@@ -285,10 +290,10 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Get the retention time for the scan number
+        /// Get the retention time (elution time) for the scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Elution time</returns>
         public double RtFromScanNum(int scanNum)
         {
             return _rawFileReader.RetentionTimeFromScanNumber(scanNum);
@@ -296,7 +301,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         private readonly IRawDataPlus _rawFileReader;
 
-        private IScanFilter _cachedScanFilter = null;
+        private IScanFilter _cachedScanFilter;
 
         private int _cachedScanFilterScanNumber = -1;
 
@@ -322,7 +327,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Read the isolation window and precursor information
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Precursor info object</returns>
         private PrecursorInfo ReadPrecursorData(int scanNum)
         {
             if (ReadMsLevel(scanNum) == 1)

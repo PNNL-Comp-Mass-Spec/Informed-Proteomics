@@ -11,22 +11,22 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     public class LcmsRunDeconvoluter : IMassSpecDataReader
     {
         /// <summary>
-        /// MassSpec data reader to read raw spectra from.
+        /// MassSpec data reader to read raw spectra from
         /// </summary>
         private readonly IMassSpecDataReader dataReader;
 
         /// <summary>
-        /// Spectrum deconvoluter.
+        /// Spectrum deconvoluter
         /// </summary>
         private readonly Deconvoluter deconvoluter;
 
         /// <summary>
-        /// The MS levels (ex MS1, MS2, etc) to extract spectra for.
+        /// The MS levels (ex MS1, MS2, etc) to extract spectra for
         /// </summary>
         private readonly HashSet<int> msLevelSet;
 
         /// <summary>
-        /// The maximum number of threads the deconvoluter can use.
+        /// The maximum number of threads the deconvoluter can use
         /// </summary>
         /// <remarks>
         /// If -1, the system will decide the max thread count
@@ -35,13 +35,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly int maxDegreeOfParallelism;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LcmsRunDeconvoluter" /> class.
-        /// This constructor creates an instance with multiple MSLevels for default (MS1 and MS2).
+        /// Initializes a new instance of the <see cref="LcmsRunDeconvoluter" /> class
         /// </summary>
-        /// <param name="dataReader">MassSpec data reader to read raw spectra from.</param>
-        /// <param name="deconvoluter">Spectrum deconvoluter.</param>
-        /// <param name="msLevels">The MS levels (ex MS1, MS2, etc) to extract spectra for.</param>
-        /// <param name="maxDegreeOfParallelism">The maximum number of threads the deconvoluter can use.</param>
+        /// <param name="dataReader">MassSpec data reader to read raw spectra from</param>
+        /// <param name="deconvoluter">Spectrum deconvoluter</param>
+        /// <param name="msLevels">The MS levels (ex MS1, MS2, etc) to extract spectra for</param>
+        /// <param name="maxDegreeOfParallelism">The maximum number of threads the deconvoluter can use</param>
+        /// <remarks>
+        /// This constructor creates an instance with multiple MSLevels for default (MS1 and MS2)
+        /// </remarks>
         public LcmsRunDeconvoluter(
                     IMassSpecDataReader dataReader,
                     Deconvoluter deconvoluter,
@@ -55,13 +57,15 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LcmsRunDeconvoluter" /> class.
-        /// This constructor creates an instance with a single MSLevel
+        /// Initializes a new instance of the <see cref="LcmsRunDeconvoluter" /> class
         /// </summary>
-        /// <param name="dataReader">MassSpec data reader to read raw spectra from.</param>
-        /// <param name="deconvoluter">Spectrum deconvoluter.</param>
-        /// <param name="msLevel">The MS level (ex MS1, MS2, etc) to extract spectra for.</param>
-        /// <param name="maxDegreeOfParallelism">The maximum number of threads the deconvoluter can use.</param>
+        /// <param name="dataReader">MassSpec data reader to read raw spectra from</param>
+        /// <param name="deconvoluter">Spectrum deconvoluter</param>
+        /// <param name="msLevel">The MS level (ex MS1, MS2, etc) to extract spectra for</param>
+        /// <param name="maxDegreeOfParallelism">The maximum number of threads the deconvoluter can use</param>
+        /// <remarks>
+        /// This constructor creates an instance with a single MSLevel
+        /// </remarks>
         public LcmsRunDeconvoluter(
             IMassSpecDataReader dataReader,
             Deconvoluter deconvoluter,
@@ -72,11 +76,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Gets all spectra.
-        /// Deconvolutes spectra in parallel as it reads them.
+        /// Gets all spectra
         /// </summary>
         /// <param name="includePeaks">Ignored</param>
-        /// <returns>Deconvoluted spectra.</returns>
+        /// <returns>Deconvoluted spectra</returns>
+        /// <remarks>
+        /// Deconvolutes spectra in parallel as it reads them
+        /// </remarks>
         public IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true)
         {
             return dataReader.ReadAllSpectra()
@@ -88,11 +94,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Returns the spectrum specified by the scan number and deconvolutes it.
+        /// Returns the spectrum specified by the scan number and deconvolutes it
         /// </summary>
-        /// <param name="scanNum">The scan to deconvolute.</param>
+        /// <param name="scanNum">The scan to deconvolute</param>
         /// <param name="includePeaks">Should it be deconvoluted?</param>
-        /// <returns>Deconvoluted spectrum.</returns>
+        /// <returns>Deconvoluted spectrum</returns>
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
             var spectrum = dataReader.ReadMassSpectrum(scanNum, includePeaks);
@@ -109,19 +115,19 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
             return ReadMassSpectrum(scanNum, includePeaks);
         }
 
         /// <summary>
-        /// Gets the number of spectra in the file.
+        /// Gets the number of spectra in the file
         /// </summary>
         public int NumSpectra => dataReader.NumSpectra;
 
         /// <summary>
-        /// Close the reader.
+        /// Close the reader
         /// </summary>
         public void Close()
         {
@@ -146,15 +152,19 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </remarks>
         public CV.CVID NativeIdFormat => dataReader.NativeIdFormat;
 
         /// <summary>
-        /// The Native Format of the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// The Native Format of the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </remarks>
         public CV.CVID NativeFormat => dataReader.NativeFormat;
 
         /// <summary>

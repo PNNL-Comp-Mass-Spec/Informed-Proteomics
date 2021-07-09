@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="lcmsRun"></param>
         /// <param name="scanNums"></param>
         /// <param name="repScanNum">Representative scan number</param>
-        /// <returns></returns>
+        /// <returns>Summed spectrum</returns>
         public static SummedSpectrum GetSummedSpectrum(this ISpectrumAccessor lcmsRun, IList<int> scanNums, int repScanNum = 0)
         {
             var mzComparer = new MzComparerWithBinning();
@@ -71,7 +71,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="lcmsRun"></param>
         /// <param name="scanNum"></param>
         /// <param name="elutionTimeTolerance"></param>
-        /// <returns></returns>
+        /// <returns>Summed spectrum</returns>
         public static Spectrum GetSummedMs1Spectrum(this ISpectrumAccessor lcmsRun, int scanNum, double elutionTimeTolerance)
         {
             var elutionTime = lcmsRun.GetElutionTime(scanNum);
@@ -114,7 +114,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="lcmsRun"></param>
         /// <param name="minScanNum">min scan number, inclusive</param>
         /// <param name="maxScanNum">max scan number, inclusive</param>
-        /// <returns></returns>
+        /// <returns>Summed spectrum</returns>
         public static SummedSpectrum GetSummedMs1Spectrum(this ISpectrumAccessor lcmsRun, int minScanNum, int maxScanNum)
         {
             if (minScanNum < lcmsRun.MinLcScan)
@@ -151,7 +151,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="minCharge">min charge, inclusive</param>
         /// <param name="maxCharge">max charge, inclusive</param>
         /// <param name="activationMethod"></param>
-        /// <returns></returns>
+        /// <returns>Summed MS2 spectrum</returns>
         public static ProductSpectrum GetSummedMs2Spectrum(this ILcMsRun lcmsRun, double monoIsotopicMass,
             int minScanNum, int maxScanNum, int minCharge, int maxCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {

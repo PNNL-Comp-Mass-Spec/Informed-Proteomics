@@ -46,7 +46,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// Test if the enzyme will cleave at <paramref name="residue"/>
         /// </summary>
         /// <param name="residue"></param>
-        /// <returns></returns>
+        /// <returns>True if this residue is a cleavage point</returns>
         public bool IsCleavable(char residue)
         {
             if (Residues.Length == 0)

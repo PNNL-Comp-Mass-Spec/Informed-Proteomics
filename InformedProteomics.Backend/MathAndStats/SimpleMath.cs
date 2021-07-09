@@ -14,7 +14,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="n"></param>
         /// <param name="k"></param>
-        /// <returns></returns>
+        /// <returns>Calculated value</returns>
         public static int NChooseK(int n, int k)
         {
             var num = 1;
@@ -39,7 +39,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="n"></param>
         /// <param name="k"></param>
-        /// <returns></returns>
+        /// <returns>Calculated value</returns>
         public static double GetCombination(int n, int k)
         {
             var sum = GetLogCombination(n, k);
@@ -51,7 +51,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="n"></param>
         /// <param name="k"></param>
-        /// <returns></returns>
+        /// <returns>Calculated value</returns>
         public static double GetLogCombination(int n, int k)
         {
             if (LogCombinations.TryGetValue(new Tuple<int, int>(n, k), out var sum))
@@ -74,7 +74,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="n"></param>
         /// <param name="length"></param>
-        /// <returns></returns>
+        /// <returns>Calculated value</returns>
         public static int[][] GetCombinationsWithRepetition(int n, int length)
         {
             if (n <= 0)
@@ -119,7 +119,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="n"></param>
         /// <param name="length"></param>
-        /// <returns></returns>
+        /// <returns>Calculated value</returns>
         public static int[][] GetNtoTheKCombinations(int n, int length)
         {
             if (n <= 0)
@@ -163,7 +163,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="v1"></param>
         /// <param name="v2"></param>
-        /// <returns></returns>
+        /// <returns>Correlation score</returns>
         public static double GetCorrelation(double[] v1, double[] v2)
         {
             if (v1.Length <= 1)
@@ -189,7 +189,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// Get the mean of the values in <paramref name="x"/>
         /// </summary>
         /// <param name="x"></param>
-        /// <returns></returns>
+        /// <returns>Mean</returns>
         public static double GetSampleMean(double[] x)
         {
             var m = x.Sum();
@@ -201,7 +201,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="x"></param>
         /// <param name="m"></param>
-        /// <returns></returns>
+        /// <returns>Variance</returns>
         public static double GetSampleVariance(double[] x, double m)
         {
             var var = x.Sum(v => (v - m) * (v - m));
@@ -212,7 +212,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// Get the mean of the values in <paramref name="x"/>
         /// </summary>
         /// <param name="x"></param>
-        /// <returns></returns>
+        /// <returns>Mean</returns>
         public static float GetSampleMean(float[] x)
         {
             return x.Average();
@@ -223,7 +223,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="x"></param>
         /// <param name="m"></param>
-        /// <returns></returns>
+        /// <returns>Variance</returns>
         public static float GetSampleVariance(float[] x, float m)
         {
             var variance = 0f;
@@ -240,7 +240,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// Get the factors of x
         /// </summary>
         /// <param name="x"></param>
-        /// <returns></returns>
+        /// <returns>List of factors</returns>
         public static IEnumerable<int> GetFactors(int x)
         {
             for (var factor = 1; factor * factor <= x; factor++)
@@ -263,7 +263,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="P"></param>
         /// <param name="Q"></param>
-        /// <returns></returns>
+        /// <returns>Calculated value</returns>
         public static double GetKLDivergence(double[] P, double[] Q)
         {
             var ret = P.Select((t, i) => t * (Math.Log(t) - Math.Log(Q[i]))).Sum();

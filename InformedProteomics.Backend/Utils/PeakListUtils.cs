@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="peakList"></param>
         /// <param name="mz"></param>
         /// <param name="tolerance"></param>
-        /// <returns></returns>
+        /// <returns>Peak in the given m/z range with the highest intensity</returns>
         public static Peak FindPeak(List<Peak> peakList, double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsMz(mz);
@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="peakList"></param>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
-        /// <returns></returns>
+        /// <returns>Peak in the given m/z range with the highest intensity</returns>
         public static Peak FindPeak(List<Peak> peakList, double minMz, double maxMz)
         {
             //var index = peakList.BinarySearch(new Peak(mz, 0.0), comparer);
@@ -88,7 +88,7 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="peakList"></param>
         /// <param name="mz"></param>
         /// <param name="tolerance"></param>
-        /// <returns></returns>
+        /// <returns>List of matched peaks</returns>
         public static IList<Peak> FindAllPeaks(List<Peak> peakList, double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsMz(mz);
@@ -103,7 +103,7 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="peakList"></param>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
-        /// <returns></returns>
+        /// <returns>List of matched peaks</returns>
         public static IList<Peak> FindAllPeaks(List<Peak> peakList, double minMz, double maxMz)
         {
             //var index = peakList.BinarySearch(new Peak(mz, 0.0), comparer);
@@ -150,7 +150,7 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="spec"></param>
         /// <param name="isoProfile"></param>
         /// <param name="comparer"></param>
-        /// <returns></returns>
+        /// <returns>Pearson correlation</returns>
         public static double GetPearsonCorrelation(IList<Peak> spec, IList<Peak> isoProfile,
             IComparer<Peak> comparer)
         {
@@ -193,7 +193,7 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="spec"></param>
         /// <param name="isoProfile"></param>
         /// <param name="comparer"></param>
-        /// <returns></returns>
+        /// <returns>Cosine score</returns>
         public static double GetCosine(IList<Peak> spec, IList<Peak> isoProfile, IComparer<Peak> comparer)
         {
             var numPeaksSpec = spec.Count;
@@ -235,7 +235,7 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="peakList1"></param>
         /// <param name="peakList2"></param>
         /// <param name="comparer"></param>
-        /// <returns></returns>
+        /// <returns>List of matching peaks</returns>
         public static List<Peak> GetIntersection(List<Peak> peakList1, List<Peak> peakList2,
             IComparer<Peak> comparer)
         {
@@ -273,7 +273,7 @@ namespace InformedProteomics.Backend.Utils
         /// <param name="peakList1"></param>
         /// <param name="peakList2"></param>
         /// <param name="comparer"></param>
-        /// <returns></returns>
+        /// <returns>List of peaks only in peakList1</returns>
         public static List<Peak> GetExceptWith(List<Peak> peakList1, List<Peak> peakList2,
             IComparer<Peak> comparer)
         {
@@ -306,12 +306,12 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Get the sum of the 2 peak lists
+        /// Get the sum of the two peak lists
         /// </summary>
         /// <param name="peakList1"></param>
         /// <param name="peakList2"></param>
         /// <param name="comparer"></param>
-        /// <returns></returns>
+        /// <returns>Combined list of peaks (without any duplicates)</returns>
         public static List<Peak> Sum(IList<Peak> peakList1, IList<Peak> peakList2,
             IComparer<Peak> comparer)
         {

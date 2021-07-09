@@ -31,12 +31,14 @@ using PRISM;
 namespace InformedProteomics.Backend.MathAndStats
 {
     /// <summary>
-    /// Cubic spline interpolation.
-    /// Call Fit (or use the corrector constructor) to compute spline coefficients, then Eval to evaluate the spline at other X coordinates.
+    /// Cubic spline interpolation
+    /// <para>
+    /// Call Fit (or use the corrector constructor) to compute spline coefficients, then Eval to evaluate the spline at other X coordinates
+    /// </para>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This is implemented based on the wikipedia article:
+    /// This is implemented based on the Wikipedia article:
     /// http://en.wikipedia.org/wiki/Spline_interpolation
     /// I'm not sure I have the right to include a copy of the article so the equation numbers referenced in
     /// comments will end up being wrong at some point.
@@ -61,23 +63,23 @@ namespace InformedProteomics.Backend.MathAndStats
 
         #endregion
 
-        #region Ctor
+        #region Constructor
 
         /// <summary>
-        /// Default ctor.
+        /// Constructor
         /// </summary>
         public CubicSpline()
         {
         }
 
         /// <summary>
-        /// Construct and call Fit.
+        /// Construct and call Fit
         /// </summary>
-        /// <param name="x">Input. X coordinates to fit.</param>
-        /// <param name="y">Input. Y coordinates to fit.</param>
-        /// <param name="startSlope">Optional slope constraint for the first point. Single.NaN means no constraint.</param>
-        /// <param name="endSlope">Optional slope constraint for the final point. Single.NaN means no constraint.</param>
-        /// <param name="debug">Turn on console output. Default is false.</param>
+        /// <param name="x">Input: X coordinates to fit</param>
+        /// <param name="y">Input: Y coordinates to fit</param>
+        /// <param name="startSlope">Optional slope constraint for the first point. Single.NaN means no constraint</param>
+        /// <param name="endSlope">Optional slope constraint for the final point. Single.NaN means no constraint</param>
+        /// <param name="debug">True to write messages to the console</param>
         public CubicSpline(float[] x, float[] y, float startSlope = float.NaN, float endSlope = float.NaN, bool debug = false)
         {
             Fit(x, y, startSlope, endSlope, debug);
@@ -88,7 +90,7 @@ namespace InformedProteomics.Backend.MathAndStats
         #region Private Methods
 
         /// <summary>
-        /// Throws if Fit has not been called.
+        /// Throws an exception if Fit has not yet been called
         /// </summary>
         private void CheckAlreadyFitted()
         {
@@ -121,12 +123,12 @@ namespace InformedProteomics.Backend.MathAndStats
         }
 
         /// <summary>
-        /// Evaluate the specified x value using the specified spline.
+        /// Evaluate the specified x value using the specified spline
         /// </summary>
-        /// <param name="x">The x value.</param>
-        /// <param name="j">Which spline to use.</param>
-        /// <param name="debug">Turn on console output. Default is false.</param>
-        /// <returns>The y value.</returns>
+        /// <param name="x">The x value</param>
+        /// <param name="j">Which spline to use</param>
+        /// <param name="debug">True to enable writing messages to the console</param>
+        /// <returns>The y value</returns>
         private float EvalSpline(float x, int j, bool debug = false)
         {
             var dx = xOrig[j + 1] - xOrig[j];
@@ -145,18 +147,18 @@ namespace InformedProteomics.Backend.MathAndStats
         #region Fit*
 
         /// <summary>
-        /// Fit x,y and then eval at points xs and return the corresponding y's.
+        /// Fit x,y and then evaluate at points in xs and return the corresponding y's.
         /// This does the "natural spline" style for ends.
         /// This can extrapolate off the ends of the splines.
         /// You must provide points in X sort order.
         /// </summary>
-        /// <param name="x">Input. X coordinates to fit.</param>
-        /// <param name="y">Input. Y coordinates to fit.</param>
-        /// <param name="xs">Input. X coordinates to evaluate the fitted curve at.</param>
-        /// <param name="startSlope">Optional slope constraint for the first point. Single.NaN means no constraint.</param>
-        /// <param name="endSlope">Optional slope constraint for the final point. Single.NaN means no constraint.</param>
-        /// <param name="debug">Turn on console output. Default is false.</param>
-        /// <returns>The computed y values for each xs.</returns>
+        /// <param name="x">Input: X coordinates to fit</param>
+        /// <param name="y">Input: Y coordinates to fit</param>
+        /// <param name="xs">Input: X coordinates to evaluate the fitted curve at</param>
+        /// <param name="startSlope">Optional slope constraint for the first point. Single.NaN means no constraint</param>
+        /// <param name="endSlope">Optional slope constraint for the final point. Single.NaN means no constraint</param>
+        /// <param name="debug">Turn on console output. Default is false</param>
+        /// <returns>The computed y values for each xs</returns>
         public float[] FitAndEval(float[] x, float[] y, float[] xs, float startSlope = float.NaN, float endSlope = float.NaN, bool debug = false)
         {
             Fit(x, y, startSlope, endSlope, debug);
@@ -169,11 +171,11 @@ namespace InformedProteomics.Backend.MathAndStats
         /// This can extrapolate off the ends of the splines.
         /// You must provide points in X sort order.
         /// </summary>
-        /// <param name="x">Input. X coordinates to fit.</param>
-        /// <param name="y">Input. Y coordinates to fit.</param>
-        /// <param name="startSlope">Optional slope constraint for the first point. Single.NaN means no constraint.</param>
-        /// <param name="endSlope">Optional slope constraint for the final point. Single.NaN means no constraint.</param>
-        /// <param name="debug">Turn on console output. Default is false.</param>
+        /// <param name="x">Input: X coordinates to fit</param>
+        /// <param name="y">Input: Y coordinates to fit</param>
+        /// <param name="startSlope">Optional slope constraint for the first point. Single.NaN means no constraint</param>
+        /// <param name="endSlope">Optional slope constraint for the final point. Single.NaN means no constraint</param>
+        /// <param name="debug">Turn on console output. Default is false</param>
         public void Fit(float[] x, float[] y, float startSlope = float.NaN, float endSlope = float.NaN, bool debug = false)
         {
             if (float.IsInfinity(startSlope) || float.IsInfinity(endSlope))
@@ -186,7 +188,7 @@ namespace InformedProteomics.Backend.MathAndStats
             yOrig = y;
 
             var n = x.Length;
-            var r = new float[n]; // the right hand side numbers: wikipedia page overloads b
+            var r = new float[n]; // the right hand side numbers: Wikipedia page overloads b
 
             var m = new TriDiagonalMatrixF(n);
             float dx1;
@@ -286,9 +288,9 @@ namespace InformedProteomics.Backend.MathAndStats
         /// You must provide X's in ascending order.
         /// The spline must already be computed before calling this, meaning you must have already called Fit() or FitAndEval().
         /// </summary>
-        /// <param name="x">Input. X coordinates to evaluate the fitted curve at.</param>
-        /// <param name="debug">Turn on console output. Default is false.</param>
-        /// <returns>The computed y values for each x.</returns>
+        /// <param name="x">Input. X coordinates to evaluate the fitted curve at</param>
+        /// <param name="debug">Turn on console output. Default is false</param>
+        /// <returns>The computed y values for each x</returns>
         public float[] Eval(float[] x, bool debug = false)
         {
             CheckAlreadyFitted();
@@ -315,9 +317,9 @@ namespace InformedProteomics.Backend.MathAndStats
         /// You must provide X's in ascending order.
         /// The spline must already be computed before calling this, meaning you must have already called Fit() or FitAndEval().
         /// </summary>
-        /// <param name="x">Input. X coordinates to evaluate the fitted curve at.</param>
-        /// <param name="debug">Turn on console output. Default is false.</param>
-        /// <returns>The computed y values for each x.</returns>
+        /// <param name="x">Input. X coordinates to evaluate the fitted curve at</param>
+        /// <param name="debug">Turn on console output. Default is false</param>
+        /// <returns>The computed y values for each x</returns>
         public float[] EvalSlope(float[] x, bool debug = false)
         {
             CheckAlreadyFitted();
@@ -360,15 +362,15 @@ namespace InformedProteomics.Backend.MathAndStats
         #region Static Methods
 
         /// <summary>
-        /// Static all-in-one method to fit the splines and evaluate at X coordinates.
+        /// Static all-in-one method to fit the splines and evaluate at X coordinates
         /// </summary>
-        /// <param name="x">Input. X coordinates to fit.</param>
-        /// <param name="y">Input. Y coordinates to fit.</param>
-        /// <param name="xs">Input. X coordinates to evaluate the fitted curve at.</param>
-        /// <param name="startSlope">Optional slope constraint for the first point. Single.NaN means no constraint.</param>
-        /// <param name="endSlope">Optional slope constraint for the final point. Single.NaN means no constraint.</param>
-        /// <param name="debug">Turn on console output. Default is false.</param>
-        /// <returns>The computed y values for each xs.</returns>
+        /// <param name="x">Input: X coordinates to fit</param>
+        /// <param name="y">Input: Y coordinates to fit</param>
+        /// <param name="xs">Input: X coordinates to evaluate the fitted curve at</param>
+        /// <param name="startSlope">Optional slope constraint for the first point. Single.NaN means no constraint</param>
+        /// <param name="endSlope">Optional slope constraint for the final point. Single.NaN means no constraint</param>
+        /// <param name="debug">Turn on console output. Default is false</param>
+        /// <returns>The computed y values for each xs</returns>
         public static float[] Compute(float[] x, float[] y, float[] xs, float startSlope = float.NaN, float endSlope = float.NaN, bool debug = false)
         {
             var spline = new CubicSpline();
@@ -377,13 +379,13 @@ namespace InformedProteomics.Backend.MathAndStats
 
         /// <summary>
         /// Fit the input x,y points using a 'geometric' strategy so that y does not have to be a single-valued
-        /// function of x.
+        /// function of x
         /// </summary>
-        /// <param name="x">Input x coordinates.</param>
-        /// <param name="y">Input y coordinates, do not need to be a single-valued function of x.</param>
-        /// <param name="nOutputPoints">How many output points to create.</param>
-        /// <param name="xs">Output (interpolated) x values.</param>
-        /// <param name="ys">Output (interpolated) y values.</param>
+        /// <param name="x">Input: x coordinates</param>
+        /// <param name="y">Input: y coordinates, do not need to be a single-valued function of x</param>
+        /// <param name="nOutputPoints">How many output points to create</param>
+        /// <param name="xs">Output (interpolated) x values</param>
+        /// <param name="ys">Output (interpolated) y values</param>
         public static void FitGeometric(float[] x, float[] y, int nOutputPoints, out float[] xs, out float[] ys)
         {
             // Compute distances

@@ -81,7 +81,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Calculates the composition of the ion, with option amino acid
         /// </summary>
         /// <param name="aminoAcid"></param>
-        /// <returns></returns>
+        /// <returns>List of composition objects</returns>
         public delegate IEnumerable<Composition> CompositionCalculator(AminoAcid aminoAcid = null);
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Gets the deconvoluted version of this ion
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Deconvoluted ion</returns>
         public BaseIonType GetDeconvolutedIon()
         {
             return new BaseIonType(Symbol + "'", IsPrefix,
@@ -113,7 +113,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get possible compositions of this ion
         /// </summary>
         /// <param name="residue"></param>
-        /// <returns></returns>
+        /// <returns>List of compositions</returns>
         public IEnumerable<Composition> GetPossibleCompositions(AminoAcid residue = null)
         {
             return _compositionCalculator(residue);

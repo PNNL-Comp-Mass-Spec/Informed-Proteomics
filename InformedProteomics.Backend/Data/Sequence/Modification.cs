@@ -88,10 +88,10 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Returns a string that represents this modification object.
+        /// Returns a string that represents this modification object
         /// </summary>
         /// <returns>
-        /// A string that represents the modification.
+        /// A string that represents the modification
         /// </returns>
         public override string ToString()
         {
@@ -137,7 +137,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the modification that matches the given mass
         /// </summary>
         /// <param name="mass"></param>
-        /// <returns></returns>
+        /// <returns>List of modification objects</returns>
         public static IList<Modification> GetFromMass(double mass)
         {
             var massStr = string.Format(MOD_MASS_FORMAT_STRING, mass);
@@ -148,7 +148,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the modification that matches the given mass
         /// </summary>
         /// <param name="massStr"></param>
-        /// <returns></returns>
+        /// <returns>List of modification definitions</returns>
         public static IList<Modification> GetFromMass(string massStr)
         {
             if (massStr.StartsWith("+"))
@@ -400,7 +400,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="name"></param>
         /// <param name="composition"></param>
-        /// <returns></returns>
+        /// <returns>Modification definition</returns>
         public static Modification RegisterAndGetModification(string name, Composition.Composition composition)
         {
             var lowerName = name.ToLower();
@@ -420,7 +420,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="name"></param>
         /// <param name="mass"></param>
-        /// <returns></returns>
+        /// <returns>Modification object</returns>
         public static Modification RegisterAndGetModification(string name, double mass)
         {
             var lowerName = name.ToLower();
@@ -441,13 +441,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return mod;
         }
 
-        // Added by Chris
         /// <summary>
-        /// Register a new modification or update existing modification.
+        /// Register a new modification or update existing modification
         /// </summary>
-        /// <param name="name">The name of the modification.</param>
-        /// <param name="composition">The composition of the modification.</param>
-        /// <returns>Registered modification.</returns>
+        /// <param name="name">The name of the modification</param>
+        /// <param name="composition">The composition of the modification</param>
+        /// <returns>Registered modification</returns>
         public static Modification UpdateAndGetModification(string name, Composition.Composition composition)
         {
             // Names should be case-insensitive.
@@ -470,13 +469,12 @@ namespace InformedProteomics.Backend.Data.Sequence
             return modification;
         }
 
-        // Added by Chris
         /// <summary>
-        /// Register a new modification or update an existing modification.
+        /// Register a new modification or update an existing modification
         /// </summary>
-        /// <param name="name">The name of the modification.</param>
-        /// <param name="mass">The mass of the modification.</param>
-        /// <returns>Registered modification.</returns>
+        /// <param name="name">The name of the modification</param>
+        /// <param name="mass">The mass of the modification</param>
+        /// <returns>Registered modification</returns>
         public static Modification UpdateAndGetModification(string name, double mass)
         {
             // Names should be case-insensitive.
@@ -499,10 +497,9 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Unregister a modification by name.
-        /// Added by Chris.
+        /// Unregister a modification by name
         /// </summary>
-        /// <param name="modification">The modification to remove.</param>
+        /// <param name="modification">The modification to remove</param>
         public static void UnregisterModification(Modification modification)
         {
             var lowerName = modification.Name.ToLower();

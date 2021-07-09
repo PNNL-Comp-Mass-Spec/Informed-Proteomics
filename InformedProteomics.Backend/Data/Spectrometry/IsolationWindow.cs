@@ -88,10 +88,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// True of the mz is within the isolation window
+        /// True if the m/z is within the isolation window
         /// </summary>
         /// <param name="mz"></param>
-        /// <returns></returns>
+        /// <returns>True if in the window</returns>
         public bool Contains(double mz)
         {
             return mz >= MinMz && mz < MaxMz;
@@ -101,7 +101,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Object equality
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         protected bool Equals(IsolationWindow other)
         {
             if (Math.Abs(MinMz - other.MinMz) < 0.01 && Math.Abs(MaxMz - other.MaxMz) < 0.01)
@@ -116,7 +116,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Comparer for sorting, orders by Target m/z
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>0, 1, or -1</returns>
         public int CompareTo(IsolationWindow other)
         {
             return IsolationWindowTargetMz.CompareTo(other.IsolationWindowTargetMz);

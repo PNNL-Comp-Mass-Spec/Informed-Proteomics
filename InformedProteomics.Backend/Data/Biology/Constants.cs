@@ -16,7 +16,8 @@ namespace InformedProteomics.Backend.Data.Biology
         /// Used to convert between bin number and mass
         /// </summary>
         public const double RescalingConstantHighPrecision = 274.335215;
-        //public static readonly double H2O = Annotation.Composition.H2O.GetMass();
+
+        //public static double H2O = Annotation.Composition.H2O.GetMass();
 
         /// <summary>
         /// Carbon-13 isotopic mass

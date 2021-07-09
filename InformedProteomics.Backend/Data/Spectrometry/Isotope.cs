@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Compare two isotopes by Index
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>0, -1, or 1</returns>
         public int CompareTo(Isotope other)
         {
             return Index.CompareTo(other.Index);

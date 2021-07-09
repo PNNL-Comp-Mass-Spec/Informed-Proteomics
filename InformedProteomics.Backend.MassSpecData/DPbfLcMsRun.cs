@@ -23,16 +23,22 @@ namespace InformedProteomics.Backend.MassSpecData
         protected override string FileExtensionVirtual => FileExtensionConst;
 
         /// <summary>
-        /// File extension - overridden. See <see cref="FileExtensionConst"/> for static access.
+        /// File extension - overridden
         /// </summary>
+        /// <remarks>
+        /// See <see cref="FileExtensionConst"/> for static access
+        /// </remarks>
         public override bool ContainsChromatograms => false;
 
         /// <summary>
         /// Function to convert a spectra file name/path to a *.pbf name, even when it has multiple extensions (i.e., .mzML.gz)
         /// </summary>
         /// <param name="specFileName"></param>
-        /// <returns></returns>
-        /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
+        /// <returns>pbf file path</returns>
+        /// <remarks>
+        /// It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function,
+        /// and that the returned string be used instead of the original path
+        /// </remarks>
         public new static string GetPbfFileName(string specFileName)
         {
             return MassSpecDataReaderFactory.ChangeExtension(specFileName, FileExtensionConst);
@@ -85,9 +91,9 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Reads a Spectrum from the DPbf file with isotope peaks populated
         /// </summary>
-        /// <param name="fullData">The file used to create the DPbf file (throws <see cref="System.ArgumentException"/> if it is not) - PBF file preferred.</param>
+        /// <param name="fullData">The file used to create the DPbf file (throws <see cref="System.ArgumentException"/> if it is not) - PBF file preferred</param>
         /// <param name="scanNum">The scan to read</param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         /// <exception cref="System.ArgumentException">If the checksum of the source file does not match the checksum stored in the DPbf file</exception>
         public DeconvolutedSpectrum GetSpectrumWithIsotopePeaks(IMassSpecDataReader fullData, int scanNum)
         {
@@ -117,18 +123,20 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Read a spectrum from the current position in <paramref name="reader"/>, with the option to only read the metadata.
+        /// Read a spectrum from the current position in <paramref name="reader"/>, with the option to only read the metadata
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         protected internal override Spectrum ReadSpectrum(BinaryReader reader, bool includePeaks = true)
         {
             // Must reflect all changes to WriteSpectrum
 
             var scanNum = reader.ReadInt32();
             var c = new char[NativeIdLength];
+
             reader.Read(c, 0, NativeIdLength);
+
             var nativeId = (new string(c)).Trim();
             var msLevel = reader.ReadByte();
             var elutionTime = reader.ReadDouble();

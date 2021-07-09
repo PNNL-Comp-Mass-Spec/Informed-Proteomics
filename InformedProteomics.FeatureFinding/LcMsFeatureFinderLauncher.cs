@@ -246,13 +246,13 @@ namespace InformedProteomics.FeatureFinding
         }
 
         /// <summary>
-        /// Create <see cref="Ms1FtEntry"/> objects for the features, and output to csv (if desired).
+        /// Create <see cref="Ms1FtEntry"/> objects for the features, and output to csv (if desired)
         /// </summary>
         /// <param name="container"></param>
         /// <param name="featureFinder"></param>
         /// <param name="outCsvFilePath"></param>
         /// <param name="featureCounter"></param>
-        /// <returns></returns>
+        /// <returns>List of filtered features</returns>
         private IEnumerable<Ms1FtEntry> FilterFeaturesWithOutput(
             LcMsFeatureContainer container,
             LcMsPeakMatrix featureFinder,

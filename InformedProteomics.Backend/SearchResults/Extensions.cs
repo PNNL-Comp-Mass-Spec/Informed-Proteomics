@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// </summary>
         /// <param name="results"></param>
         /// <param name="pepQValueThreshold"></param>
-        /// <returns></returns>
+        /// <returns>List of peptides</returns>
         public static ISet<string> GetPeptides(this IEnumerable<DatabaseSearchResultData> results, double pepQValueThreshold)
         {
             return results.GetPeptidesAboveThreshold(x => x.PepQValue, pepQValueThreshold);
@@ -24,7 +24,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// </summary>
         /// <param name="results"></param>
         /// <param name="qValueThreshold"></param>
-        /// <returns></returns>
+        /// <returns>List of filter-passing peptides</returns>
         public static ISet<string> GetPeptidesAboveQValueThreshold(this IEnumerable<DatabaseSearchResultData> results, double qValueThreshold)
         {
             return results.GetPeptidesAboveThreshold(x => x.QValue, qValueThreshold);
@@ -36,7 +36,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// <param name="results"></param>
         /// <param name="fieldSelector">A function, e.g. x => x.QValue</param>
         /// <param name="threshold"></param>
-        /// <returns></returns>
+        /// <returns>List of filter-passing peptides</returns>
         private static ISet<string> GetPeptidesAboveThreshold(this IEnumerable<DatabaseSearchResultData> results, Func<DatabaseSearchResultData, double> fieldSelector, double threshold)
         {
             var peptideSet = new HashSet<string>();

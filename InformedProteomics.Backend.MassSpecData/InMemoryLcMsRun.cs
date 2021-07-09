@@ -30,7 +30,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="singleScanNum"></param>
-        /// <returns></returns>
+        /// <returns>LcMsRun object</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRunScanRange(string specFilePath, int singleScanNum)
         {
@@ -45,7 +45,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="scanStart"></param>
         /// <param name="scanEnd"></param>
         /// <param name="progress"></param>
-        /// <returns></returns>
+        /// <returns>LcMsRun object</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRunScanRange(string specFilePath, int scanStart, int scanEnd, IProgress<ProgressData> progress = null)
         {
@@ -58,7 +58,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="progress"></param>
-        /// <returns></returns>
+        /// <returns>LcMsRun object</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(string specFilePath, IProgress<ProgressData> progress = null)
         {
@@ -73,7 +73,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
         /// <param name="productSignalToNoiseRatioThreshold"></param>
         /// <param name="progress"></param>
-        /// <returns></returns>
+        /// <returns>LcMsRun object</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(
             string specFilePath,
@@ -95,7 +95,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="progress"></param>
         /// <param name="scanStart"></param>
         /// <param name="scanEnd"></param>
-        /// <returns></returns>
+        /// <returns>LcMsRun object</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(
             string specFilePath,
@@ -258,7 +258,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     spec.FilterNoise(trackingInfo.PrecursorSignalToNoiseRatioThreshold);
                 }
 
-                //foreach (var peak in spec.Peaks)
+                //for each (var peak in spec.Peaks)
                 //{
                 //    _ms1PeakList.Add(new LcMsPeak(peak.Mz, peak.Intensity, spec.ScanNum));
                 //}
@@ -409,7 +409,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="ms1ScanIndex"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public override Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex)
         {
             //throw new NotImplementedException();
@@ -428,7 +428,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Return the isolation window for the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Isolation window object</returns>
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
             var spec = GetSpectrum(scanNum);
@@ -450,7 +450,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>Xic object</returns>
         public override Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz)
         {
             return GetExtractedIonChromatogram(minMz, maxMz, Ms1PeakList);
@@ -461,7 +461,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
-        /// <returns></returns>
+        /// <returns>Xic object</returns>
         public override Xic GetPrecursorChromatogramRange(double minMz, double maxMz)
         {
             return GetChromatogramRange(minMz, maxMz, Ms1PeakList);
@@ -473,7 +473,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>
         /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>Xic object</returns>
         public override Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorIonMz)
         {
             return GetProductExtractedIonChromatogram(minMz, maxMz, precursorIonMz, MinLcScan, MaxLcScan);
@@ -487,7 +487,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
         /// <param name="minScanNum">minimum scan number (inclusive)</param>
         /// <param name="maxScanNum">maximum scan number (inclusive)</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns> Xic object</returns>
         public Xic GetProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz, int minScanNum, int maxScanNum)
         {
             var tolTh = tolerance.GetToleranceAsMz(mz);
@@ -504,7 +504,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
         /// <param name="minScanNum">minimum scan number (inclusive)</param>
         /// <param name="maxScanNum">maximum scan number (inclusive)</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>Xic object</returns>
         public Xic GetProductExtractedIonChromatogram(double minMz, double maxMz, double precursorIonMz, int minScanNum, int maxScanNum)
         {
             var xic = new Xic();
@@ -535,7 +535,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="tolerance"></param>
         /// <param name="minScanNum"></param>
         /// <param name="maxScanNum"></param>
-        /// <returns></returns>
+        /// <returns>Xic object</returns>
         public Xic GetProductExtractedIonChromatogram(double productIonMz, double precursorIonMz, Tolerance tolerance, int minScanNum, int maxScanNum)
         {
             var productXic = new Xic();

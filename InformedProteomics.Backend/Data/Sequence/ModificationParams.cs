@@ -60,7 +60,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the modification at index <paramref name="modIndex"/>
         /// </summary>
         /// <param name="modIndex"></param>
-        /// <returns></returns>
+        /// <returns>Modification object</returns>
         public Modification GetModification(int modIndex)
         {
             return _modifications[modIndex];
@@ -71,7 +71,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="prevModCombIndex"></param>
         /// <param name="modIndex"></param>
-        /// <returns></returns>
+        /// <returns>Index of the modification, or -1 if not found</returns>
         public int GetModificationCombinationIndex(int prevModCombIndex, int modIndex)
         {
             if (_modCombMap.TryGetValue(prevModCombIndex * _modifications.Length + modIndex, out var newModCombIndex))
@@ -86,7 +86,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="prevModCombIndex"></param>
         /// <param name="curModCombIndex"></param>
-        /// <returns></returns>
+        /// <returns>Modification object, or null if not found</returns>
         public Modification GetModificationIndexBetween(int prevModCombIndex, int curModCombIndex)
         {
             if (_modCombsToModMap.TryGetValue(prevModCombIndex * _modificationCombinations.Length + curModCombIndex, out var modIndex))
@@ -99,7 +99,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get all <see cref="ModificationCombination"/>s in this instance
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of Modification Combination objects</returns>
         public IEnumerable<ModificationCombination> GetModificationCombinations()
         {
             return _modificationCombinations;

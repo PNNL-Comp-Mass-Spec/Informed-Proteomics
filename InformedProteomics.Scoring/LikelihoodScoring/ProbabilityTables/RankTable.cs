@@ -160,7 +160,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
         /// </summary>
         /// <param name="rankNum"></param>
         /// <param name="ionType"></param>
-        /// <returns></returns>
+        /// <returns>Number of matching peaks</returns>
         public Probability<IonType> GetRankProbability(int rankNum, IonType ionType)
         {
             var rankIndex = GetRankIndex(rankNum);

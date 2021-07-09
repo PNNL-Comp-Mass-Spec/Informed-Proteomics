@@ -14,12 +14,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         private readonly ToleranceUnit _unit;
 
         /// <summary>
-        /// Constant tolerance object for 1 PPM
+        /// Constant tolerance object for 1 ppm
         /// </summary>
         public static readonly Tolerance OnePpm = new Tolerance(1);
 
         /// <summary>
-        /// Instantiate a tolerance with the supplied value and PPM units
+        /// Instantiate a tolerance with the supplied value and ppm units
         /// </summary>
         /// <param name="value"></param>
         public Tolerance(double value)
@@ -41,7 +41,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Get the tolerance value for this instance
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Tolerance value</returns>
         public double GetValue()
         {
             return _value;
@@ -50,7 +50,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Get the tolerance unit set for this instance
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Tolerance unit</returns>
         public ToleranceUnit GetUnit()
         {
             return _unit;
@@ -60,7 +60,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the tolerance limit in terms of m/z for the supplied mass
         /// </summary>
         /// <param name="mz"></param>
-        /// <returns></returns>
+        /// <returns>Tolerance, as m/z</returns>
         public double GetToleranceAsMz(double mz)
         {
             if (_unit == ToleranceUnit.Mz)
@@ -80,7 +80,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the tolerance limit in terms of Thomsons (m/z) for the supplied mass
         /// </summary>
         /// <param name="mz"></param>
-        /// <returns></returns>
+        /// <returns>Tolerance, as m/z</returns>
         [Obsolete("Use GetToleranceAsMz")]
         public double GetToleranceAsTh(double mz)
         {
@@ -92,7 +92,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="mz"></param>
         /// <param name="charge"></param>
-        /// <returns></returns>
+        /// <returns>Tolerance, as uncharged mass in Daltons</returns>
         public double GetToleranceAsDa(double mz, int charge)
         {
             if (_unit == ToleranceUnit.Da)
@@ -108,7 +108,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="mz1"></param>
         /// <param name="mz2"></param>
-        /// <returns></returns>
+        /// <returns>True if the m/z values are within tolerance</returns>
         public bool IsWithin(double mz1, double mz2)
         {
             var tolTh = GetToleranceAsMz(mz1);
@@ -123,7 +123,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Return the string representation of this tolerance
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Human-readable tolerance, including units</returns>
         public override string ToString()
         {
             return string.Format("{0}{1}", _value, _unit);
@@ -133,7 +133,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Return a tolerance object that was created using the data from the supplied string
         /// </summary>
         /// <param name="tolStr"></param>
-        /// <returns></returns>
+        /// <returns>Tolerance object</returns>
         public static Tolerance Parse(string tolStr)
         {
             tolStr = tolStr.ToLower();

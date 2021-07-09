@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="removeRedundantIonTypes"></param>
         public IonTypeFactory(bool removeRedundantIonTypes = true)
             : this(
-                BaseIonType.AllBaseIonTypes,    // a, b, c, x, y, z
+                BaseIonType.AllBaseIonTypes,     // a, b, c, x, y, z
                 NeutralLoss.CommonNeutralLosses, // H2O and NH3 loss
                 3   // up to charge 3
             )
@@ -31,7 +31,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="maxCharge"></param>
         public IonTypeFactory(int maxCharge)
             : this(
-                BaseIonType.AllBaseIonTypes,    // a, b, c, x, y, z
+                BaseIonType.AllBaseIonTypes,     // a, b, c, x, y, z
                 NeutralLoss.CommonNeutralLosses, // H2O and NH3 loss
                 maxCharge   // up to charge 3
             )
@@ -63,7 +63,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="baseIons"></param>
         /// <param name="neutralLosses"></param>
-        /// <returns></returns>
+        /// <returns>New ion type factory</returns>
         public static IonTypeFactory GetDeconvolutedIonTypeFactory(IEnumerable<BaseIonType> baseIons, IEnumerable<NeutralLoss> neutralLosses)
         {
             var ionTypeFactory = new IonTypeFactory(baseIons.Select(ion => ion.GetDeconvolutedIon()), neutralLosses, 1);
@@ -74,7 +74,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get an ion type by name, e.g. y2-NH3
         /// </summary>
         /// <param name="name"></param>
-        /// <returns></returns>
+        /// <returns>Ion type object</returns>
         public IonType GetIonType(string name)
         {
             return _ionTypeMap[name];
@@ -86,7 +86,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="baseIonType"></param>
         /// <param name="charge"></param>
         /// <param name="neutralLoss"></param>
-        /// <returns></returns>
+        /// <returns>Ion type object</returns>
         public IonType GetIonType(BaseIonType baseIonType, int charge, NeutralLoss neutralLoss)
         {
             var ionTypeName = string.Format("{0}{1}{2}", baseIonType.Symbol, charge, neutralLoss.Name);
@@ -95,11 +95,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
         /// <summary>
         /// Given a list of IonTypes of charge 1 and a charge value, a list of the same IonTypes of charge up to and
-        /// including charge are outputted.
+        /// including charge are outputted
         /// </summary>
         /// <param name="ionTypes">List of IonTypes of charge 1</param>
         /// <param name="charge">IonTypes of charge up to and including charge will be outputted</param>
         /// <returns>List of charged IonTypes</returns>
+        // ReSharper disable once IdentifierTypo
         public static List<IonType> GetIonTypesFromDecharged(IEnumerable<IonType> ionTypes, int charge)
         {
             var chargedIonTypes = new List<IonType>();
@@ -118,7 +119,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Get all known ion types
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of ion types</returns>
         public IEnumerable<IonType> GetAllKnownIonTypes()
         {
             return _ionTypeMap.Values.ToArray();

@@ -45,7 +45,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Get the TSV file headers
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of headers</returns>
         public IList<string> GetHeaders()
         {
             return (from item in _header orderby item.Key select item.Value).ToList();
@@ -54,7 +54,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Get all data in the TSV
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Dictionary where keys are column names and values are the list of data read from the input file for the given column</returns>
         public Dictionary<string, List<string>> GetAllData()
         {
             return _data;
@@ -64,7 +64,7 @@ namespace InformedProteomics.Backend.Utils
         /// Get the data in the specified column
         /// </summary>
         /// <param name="columnName"></param>
-        /// <returns></returns>
+        /// <returns>List of data read from the input file for the given column, or null if the column name is invalid</returns>
         public IList<string> GetData(string columnName)
         {
             return _data.TryGetValue(columnName, out var columnData) ? columnData : null;
@@ -73,17 +73,18 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Get all rows of data
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of the data rows</returns>
         public IList<string> GetRows()
         {
             return _rows;
         }
 
         /// <summary>
-        /// Get peptides that pass the specified threshold
+        /// Get peptides that pass the specified PepQValue threshold
         /// </summary>
         /// <param name="pepQValueThreshold"></param>
-        /// <returns></returns>
+        /// <remarks>Filters on Q-values in column PepQValue</remarks>
+        /// <returns>List of filter passing peptides</returns>
         public ISet<string> GetPeptides(double pepQValueThreshold)
         {
             FindPeptideHeaders(out var peptideColumnIndex, out var proteinColumnIndex, out var pepQValueColumnIndex, "PepQValue");
@@ -98,10 +99,11 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Get peptides that pass the specified threshold
+        /// Get peptides that pass the specified Q-value threshold
         /// </summary>
         /// <param name="qValueThreshold"></param>
-        /// <returns></returns>
+        /// <remarks>Filters on Q-values in column QValue</remarks>
+        /// <returns>List of filter passing peptides</returns>
         public ISet<string> GetPeptidesAboveQValueThreshold(double qValueThreshold)
         {
             FindPeptideHeaders(out var peptideColumnIndex, out var proteinColumnIndex, out var qValueColumnIndex, "QValue");
@@ -120,8 +122,14 @@ namespace InformedProteomics.Backend.Utils
         /// </summary>
         private readonly Dictionary<int, string> _header;
 
+        /// <summary>
+        /// List of each row of data read from the input file
+        /// </summary>
         private readonly List<string> _rows;
 
+        /// <summary>
+        /// Keys in this dictionary are column names, values are the list of data read from the input file for the given column
+        /// </summary>
         private readonly Dictionary<string, List<string>> _data;
 
         private readonly char _delimiter;

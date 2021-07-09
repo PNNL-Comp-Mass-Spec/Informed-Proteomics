@@ -12,7 +12,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         Spectrum GetSpectrum(int scanNum, bool includePeaks = true);
     }
 }

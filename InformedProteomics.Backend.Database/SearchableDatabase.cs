@@ -207,8 +207,8 @@ namespace InformedProteomics.Backend.Database
         private readonly byte[] _sequence;
         private readonly int[] _suffixArray;
         //private readonly byte[] _neighboringLcps;   // neighboring Lcps
-        private readonly byte[] _leftLcps;   // left Lcps
-        private readonly byte[] _rightLcps;   // right Lcps
+        private readonly byte[] _leftLcps;            // left Lcps
+        private readonly byte[] _rightLcps;           // right Lcps
 
         private static byte InitializeLcps(IList<byte> nLcps, IList<byte> lLcps, IList<byte> rLcps, int start, int end)
         {
@@ -278,7 +278,7 @@ namespace InformedProteomics.Backend.Database
         /// <param name="pattern"></param>
         /// <param name="index"></param>
         /// <param name="startIndex"></param>
-        /// <returns></returns>
+        /// <returns>Length of the longest common prefix</returns>
         public byte GetLcp(IList<byte> pattern, int index, byte startIndex)
         {
             for (var offset = startIndex; offset < pattern.Count; offset++)

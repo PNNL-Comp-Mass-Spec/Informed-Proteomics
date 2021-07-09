@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="intervalX"></param>
         /// <param name="xLb"></param>
         /// <param name="xUb"></param>
-        /// <returns></returns>
+        /// <returns>Threshold</returns>
         public static double GetThreshold(double[] data, double minX, double maxX, double intervalX, double xLb, double xUb)
         {
             var nBins = (int)Math.Ceiling((maxX - minX) / intervalX);
@@ -59,7 +59,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="maxCol"></param>
         /// <param name="xLb"></param>
         /// <param name="xUb"></param>
-        /// <returns></returns>
+        /// <returns>Threshold</returns>
         public static double GetThreshold(double[][] data, double minX, double maxX, double intervalX,
             int minRow, int maxRow, int minCol, int maxCol, double xLb, double xUb)
         {

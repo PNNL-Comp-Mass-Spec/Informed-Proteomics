@@ -42,7 +42,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// Return a new composition that consists of this composition added to <paramref name="c"/>
         /// </summary>
         /// <param name="c"></param>
-        /// <returns></returns>
+        /// <returns>New composition object</returns>
         public new Composition Add(Composition c)
         {
             if (!(c is CompositionWithDeltaMass comWithDelta))
@@ -56,7 +56,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Return the negation of this composition
         /// </summary>
-        /// <returns></returns>
+        /// <returns>New composition object</returns>
         public new Composition Negate()
         {
             return new CompositionWithDeltaMass(base.Negate(), -_deltaMass, -_deltaNominalMass);
@@ -69,10 +69,10 @@ namespace InformedProteomics.Backend.Data.Composition
         }
 
         /// <summary>
-        /// Check 2 CompositionWithDeltaMasses for equality
+        /// Check two CompositionWithDeltaMasses for equality
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         protected bool Equals(CompositionWithDeltaMass other)
         {
             return base.Equals(other) && _deltaMass.Equals(other._deltaMass);

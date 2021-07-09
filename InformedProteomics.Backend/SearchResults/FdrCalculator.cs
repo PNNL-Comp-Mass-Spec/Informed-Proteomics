@@ -134,7 +134,6 @@ namespace InformedProteomics.Backend.SearchResults
         /// <summary>
         /// True if there was an error calculating the FDR scores
         /// </summary>
-        /// <returns></returns>
         public bool HasError()
         {
             return !string.IsNullOrWhiteSpace(ErrorMessage);

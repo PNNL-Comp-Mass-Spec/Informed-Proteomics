@@ -131,7 +131,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
             return GetSpectrum(scanNum, includePeaks);
@@ -152,7 +152,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public abstract Spectrum GetSpectrum(int scanNum, bool includePeaks = true);
 
         /// <summary>
@@ -160,14 +160,14 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="ms1ScanIndex"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public abstract Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex);
 
         /// <summary>
         /// Return the isolation window for the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Isolation window object</returns>
         public abstract IsolationWindow GetIsolationWindow(int scanNum);
 
         /*
@@ -183,10 +183,10 @@ namespace InformedProteomics.Backend.MassSpecData
         #region Detail data by scan number
 
         /// <summary>
-        /// Gets the MS level of the specified scan
+        /// Gets the MS Level of the specified scan
         /// </summary>
         /// <param name="scanNum">scan number</param>
-        /// <returns>MS level</returns>
+        /// <returns>MS Level</returns>
         public int GetMsLevel(int scanNum)
         {
             return ScanNumToMsLevel.TryGetValue(scanNum, out var msLevel) ? msLevel : 0;
@@ -196,7 +196,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Get the elution time of the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Elution time</returns>
         public double GetElutionTime(int scanNum)
         {
             return ScanNumElutionTimeMap.TryGetValue(scanNum, out var elutionTime) ? elutionTime : 0.0;
@@ -206,7 +206,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Get the native ID of the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Native ID string</returns>
         public virtual string GetNativeId(int scanNum)
         {
             return ScanNumNativeIdMap.TryGetValue(scanNum, out var nativeId) ? nativeId : string.Empty;
@@ -216,7 +216,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Get the ion mobility drift time of the specified scan number (if data is ion mobility)
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Drift time</returns>
         public double GetDriftTime(int scanNum)
         {
             // TODO: Not implemented for LcMsRun, not stored in PbfLcMsRun, so return 0.
@@ -242,7 +242,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Gets the next scan number whose ms level is smaller by 1
+        /// Gets the next scan number whose MS Level is smaller by 1
         /// </summary>
         /// <param name="scanNum">scan number</param>
         /// <returns>next scan number or MaxLc for MS1</returns>
@@ -259,7 +259,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Gets the greatest scan number smaller than ms2ScanNum
         /// </summary>
         /// <param name="scanNum">scan number</param>
-        /// <param name="msLevel">MS level</param>
+        /// <param name="msLevel">MS Level</param>
         /// <returns>previous scan number at the specified level</returns>
         public int GetPrevScanNum(int scanNum, int msLevel)
         {
@@ -267,10 +267,10 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Gets the smallest scan number larger than ms2ScanNum
+        /// Gets the smallest scan number larger than ms2ScanNum, for the given MS Level
         /// </summary>
         /// <param name="scanNum">scan number</param>
-        /// <param name="msLevel">MS level</param>
+        /// <param name="msLevel">MS Level</param>
         /// <returns>next scan number at the specified level</returns>
         public int GetNextScanNum(int scanNum, int msLevel)
         {
@@ -280,7 +280,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Gets the scan numbers of the specified msLevel
         /// </summary>
-        /// <param name="msLevel">MS level</param>
+        /// <param name="msLevel">MS Level</param>
         /// <returns>scan numbers of the specified msLevel</returns>
         public IList<int> GetScanNumbers(int msLevel)
         {
@@ -292,7 +292,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// An array of all of the MS1 scan numbers
         /// </summary>
-        /// <returns></returns>
+        /// <returns>MS1 scan numbers</returns>
         public int[] GetMs1ScanVector()
         {
             return _ms1ScanVector ?? (_ms1ScanVector = GetScanNumbers(1).ToArray());
@@ -303,7 +303,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Array of length MaxLcScan where entries that are non-zero are the scan index of the given scan number
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Scan number</returns>
         /// <remarks>
         /// For example, if scan 7 is the 5th MS1 scan in the dataset, then _ms1ScanNumToIndex[7] is 4
         /// Entries in the array that are 0 mean that MS1 scan does not map to an index
@@ -350,7 +350,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>XIC object</returns>
         public Xic GetFullPrecursorIonExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsMz(mz);
@@ -365,7 +365,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>XIC object</returns>
         public Xic GetFullPrecursorIonExtractedIonChromatogram(double minMz, double maxMz)
         {
             var xic = GetPrecursorExtractedIonChromatogram(minMz, maxMz);
@@ -412,7 +412,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>XIC object</returns>
         public Xic GetPrecursorExtractedIonChromatogram(double mz, Tolerance tolerance)
         {
             var tolTh = tolerance.GetToleranceAsMz(mz);
@@ -426,7 +426,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
-        /// <returns></returns>
+        /// <returns>Extracted ion chromatogram data</returns>
         public abstract Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz);
 
         /// <summary>
@@ -476,7 +476,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
-        /// <returns></returns>
+        /// <returns>Extracted ion chromatogram data</returns>
         public abstract Xic GetPrecursorChromatogramRange(double minMz, double maxMz);
 
         #endregion
@@ -489,7 +489,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
         /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>XIC object</returns>
         public Xic GetFullProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz)
         {
             var tolTh = tolerance.GetToleranceAsMz(mz);
@@ -504,7 +504,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
         /// <param name="precursorMz"></param>
-        /// <returns></returns>
+        /// <returns>Extracted ion chromatogram data</returns>
         public abstract Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz);
 
         #endregion
@@ -610,7 +610,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Return the number of unique isolation windows in the dataset
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Isolation window count</returns>
         public int GetNumUniqueIsoWindows()
         {
             var isoWindowSet = new HashSet<IsolationWindow>();
@@ -629,7 +629,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Get the narrowest isolation window width
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Narrowest window width</returns>
         public double GetMinIsolationWindowWidth()
         {
             var minWidth = double.MaxValue;
@@ -714,7 +714,17 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         protected bool? IsDiaOrNull;
 
+        /// <summary>
+        /// This dictionary tracks, for each scan, its corresponding precursor scan number (if an MS2 scan); for MS1 scans, it stores 0
+        /// </summary>
         private Dictionary<int, int> _precursorScan;
+
+        /// <summary>
+        /// This dictionary tracks, for each scan, the next scan number whose MS Level is smaller by 1
+        /// </summary>
+        /// <remarks>
+        /// For all MS1 scans, it stores one more than the final scan number in the file
+        /// </remarks>
         private Dictionary<int, int> _nextScan;
 
         /// <summary>
@@ -725,8 +735,13 @@ namespace InformedProteomics.Backend.MassSpecData
             _precursorScan = new Dictionary<int, int>(NumSpectra + 1);
             _nextScan = new Dictionary<int, int>(NumSpectra + 1);
 
+            // This dictionary tracks the most recent precursor scan number for the given MS Level
             var precursorMap = new Dictionary<int, int>();
+
+            // This dictionary tracks the next scan number for the given MS Level
             var nextScanMap = new Dictionary<int, int>();
+
+            // Initialize the dictionaries to defaults
             for (var msLevel = MinMsLevel; msLevel <= MaxMsLevel; msLevel++)
             {
                 precursorMap[msLevel] = 0;

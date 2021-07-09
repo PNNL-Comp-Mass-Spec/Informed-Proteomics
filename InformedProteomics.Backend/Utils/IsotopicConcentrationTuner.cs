@@ -10,12 +10,12 @@ namespace InformedProteomics.Backend.Utils
 {
     /// <summary>
     /// Class attempts to find ideal concentration of particular isotope by comparing it to an
-    /// observed isotopic profile.
+    /// observed isotopic profile
     /// </summary>
     public class IsotopicConcentrationTuner
     {
         /// <summary>
-        /// Initializes new instance of the <see cref="IsotopicConcentrationTuner" /> class.
+        /// Initializes new instance of the <see cref="IsotopicConcentrationTuner" /> class
         /// </summary>
         public IsotopicConcentrationTuner()
         {
@@ -32,57 +32,57 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Gets or sets the element to manipulate isotope proportions for.
+        /// Gets or sets the element for which isotope proportions will be manipulated
         /// </summary>
         public Atom Element { get; set; }
 
         /// <summary>
-        /// Gets or sets the index of the isotope to manipulate, relative to the monoisotope.
+        /// Gets or sets the index of the isotope to manipulate, relative to the monoisotope
         /// </summary>
-        /// <remarks>Monoisotope is index 0.</remarks>
+        /// <remarks>Monoisotope is index 0</remarks>
         public int IsotopeIndex { get; set; }
 
         /// <summary>
-        /// Gets the peak tolerance for matching observed peaks to theoretical peaks.
+        /// Gets the peak tolerance for matching observed peaks to theoretical peaks
         /// </summary>
         public Tolerance Tolerance { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of observed peaks to compare to the theoretical isotope profile.
+        /// Gets or sets the list of observed peaks to compare to the theoretical isotope profile
         /// </summary>
         public List<Peak> ObservedPeaks { get; set; }
 
         /// <summary>
-        /// Gets or sets the monoisotopic mass of the ion to calculate isotope peaks for.
+        /// Gets or sets the monoisotopic mass of the ion for which isotope peaks will be calculated
         /// </summary>
         public double Mass { get; set; }
 
         /// <summary>
-        /// Gets or sets the charge of the ion to calculate isotope peaks for.
+        /// Gets or sets the charge of the ion for which isotope peaks will be calculated
         /// </summary>
         public int Charge { get; set; }
 
         /// <summary>
-        /// Gets or sets the amount to increase the concentration of the selected isotope index for each iteration.
+        /// Gets or sets the amount to increase the concentration of the selected isotope index for each iteration
         /// </summary>
         public double StepSize { get; set; }
 
         /// <summary>
-        /// Gets or sets the maximum concentration of the selected isotope to consider.
+        /// Gets or sets the maximum concentration of the selected isotope to consider
         /// </summary>
         public double MaxConcentration { get; set; }
 
         /// <summary>
-        /// Gets or sets the least abundant theoretical isotope peak to consider, relative to the highest theoretical isotope peak.
+        /// Gets or sets the least abundant theoretical isotope peak to consider, relative to the highest theoretical isotope peak
         /// </summary>
         public double RelativeIntensityThreshold { get; set; }
 
         /// <summary>
         /// Try to find the best concentration of the selected isotope
         /// by stepping through the concentrations and fitting a theoretical
-        /// isotopic profile to the provided observed peaks.
+        /// isotopic profile to the provided observed peaks
         /// </summary>
-        /// <param name="progress">The progress reporter.</param>
+        /// <param name="progress">The progress reporter</param>
         public IsotopeConcentrationCorrelationCurve Tune(IProgress<PRISM.ProgressData> progress = null)
         {
             // Set up progress reporter
@@ -158,10 +158,10 @@ namespace InformedProteomics.Backend.Utils
 
         /// <summary>
         /// Gets the theoretical isotope profile calculated using Averagine with the provided
-        /// isotope proportions.
+        /// isotope proportions
         /// </summary>
-        /// <param name="proportions">The proportions of each isotope.</param>
-        /// <returns>The theoretical isotope profile peaks.</returns>
+        /// <param name="proportions">The proportions of each isotope</param>
+        /// <returns>The theoretical isotope profile peaks</returns>
         public List<Peak> GetTheoreticalIsotopeProfile(double[] proportions)
         {
             // Get IsoProfilePredictor with updated proportions
@@ -183,12 +183,12 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Aligns observed peak list to theoretical peak list.
+        /// Aligns observed peak list to theoretical peak list
         /// </summary>
         /// <param name="observedPeaks"></param>
         /// <param name="theoreticalPeaks"></param>
         /// <param name="tolerance"></param>
-        /// <returns></returns>
+        /// <returns>List of peaks</returns>
         public List<Peak> AlignObservedPeaks(IList<Peak> observedPeaks, IList<Peak> theoreticalPeaks, Tolerance tolerance = null)
         {
             tolerance = tolerance ?? new Tolerance(10, ToleranceUnit.Ppm);
@@ -225,9 +225,9 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Get the default isotope proportions for the given element.
+        /// Get the default isotope proportions for the given element
         /// </summary>
-        /// <param name="element">The element to get the default proportions for.</param>
+        /// <param name="element">The element to get the default proportions for</param>
         /// <returns>An array where each index is the </returns>
         private double[] GetDefaultProportions(Atom element)
         {
@@ -258,7 +258,7 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Checks to make sure that the selected element is one that is possible to manipulate.
+        /// Checks to make sure that the selected element is one that is possible to manipulate
         /// </summary>
         private void ValidateParameters()
         {
@@ -270,12 +270,12 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Class representing a the results of the isotope concentration tuning.
+        /// Class representing a the results of the isotope concentration tuning
         /// </summary>
         public class IsotopeConcentrationCorrelationCurve
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="IsotopeConcentrationCorrelationCurve" />.
+            /// Initializes a new instance of the <see cref="IsotopeConcentrationCorrelationCurve" />
             /// </summary>
             public IsotopeConcentrationCorrelationCurve()
             {
@@ -284,32 +284,32 @@ namespace InformedProteomics.Backend.Utils
             }
 
             /// <summary>
-            /// Gets or sets the curve showing isotope concentration vs pearson correlation with fit to observed peaks.
+            /// Gets or sets the curve showing isotope concentration vs Pearson correlation with fit to observed peaks
             /// </summary>
             public List<ConcentrationCorrelationPoint> DataPoints { get; set; }
 
             /// <summary>
-            /// The concentration with the best fit with observed peaks.
+            /// The concentration with the best fit with observed peaks
             /// </summary>
             public ConcentrationCorrelationPoint BestConcentration { get; set; }
 
             /// <summary>
-            /// Class representing a single point in the curve showing concentration vs correlation.
+            /// Class representing a single point in the curve showing concentration vs correlation
             /// </summary>
             public class ConcentrationCorrelationPoint
             {
                 /// <summary>
-                /// Gets the concentration of selected isotope.
+                /// Gets the concentration of selected isotope
                 /// </summary>
                 public double IsotopeConcentration { get; set; }
 
                 /// <summary>
-                /// Gets the concentration of monoisotope..
+                /// Gets the concentration of the monoisotope
                 /// </summary>
                 public double MonoisotopeConcentration { get; set; }
 
                 /// <summary>
-                /// Gets pearson correlation of the isotope concentration fit to the observed peaks.
+                /// Gets Pearson correlation of the isotope concentration fit to the observed peaks
                 /// </summary>
                 public double PearsonCorrelation { get; set; }
             }

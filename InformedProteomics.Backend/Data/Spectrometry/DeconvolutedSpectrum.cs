@@ -52,7 +52,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="composition"></param>
         /// <param name="tolerance"></param>
-        /// <returns></returns>
+        /// <returns>Deconvoluted peak</returns>
         public DeconvolutedPeak FindPeak(Composition.Composition composition, Tolerance tolerance)
         {
             return base.FindPeak(composition.Mass, tolerance) as DeconvolutedPeak;

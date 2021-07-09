@@ -18,17 +18,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// The charge state of the fragment.
+        /// The charge state of the fragment
         /// </summary>
         public int ChargeState { get; set; }
 
         /// <summary>
-        /// The m/z of the fragment.
+        /// The m/z of the fragment
         /// </summary>
         public double Mz { get; set; }
 
         /// <summary>
-        /// The mass of the fragment.
+        /// The mass of the fragment
         /// </summary>
         public double Mass { get; set; }
 
@@ -38,20 +38,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public string IonType { get; set; }
 
         /// <summary>
-        /// The index of the residue this fragment breaks the peptide at.
+        /// The index of the residue this fragment breaks the peptide at
         /// </summary>
         public int ResidueNumber { get; set; }
 
         /// <summary>
-        /// The full ion symbol of the fragment. e.g. y6 or y6++ or y6-H2O++
+        /// The full ion symbol of the fragment; e.g. y6 or y6++ or y6-H2O++
         /// </summary>
         public string IonSymbol { get; }
 
         /// <summary>
-        /// Check if 2 fragments are equal
+        /// Check if two fragments are equal
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         public bool Equals(Fragment other)
         {
             if (other == null)
@@ -99,7 +99,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-        /// <returns></returns>
         public static bool operator ==(Fragment left, Fragment right)
         {
             return Equals(left, right);
@@ -110,7 +109,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-        /// <returns></returns>
         public static bool operator !=(Fragment left, Fragment right)
         {
             return !Equals(left, right);

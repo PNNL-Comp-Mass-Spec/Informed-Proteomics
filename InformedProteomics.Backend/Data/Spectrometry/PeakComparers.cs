@@ -9,11 +9,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     public class IntensityComparer : IComparer<Peak>
     {
         /// <summary>
-        /// Compare 2 peaks by intensity
+        /// Compare two peaks by intensity
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
+        /// <returns>0, 1, or -1</returns>
         public int Compare(Peak x, Peak y)
         {
             if (x == null)
@@ -31,7 +31,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     }
 
     /// <summary>
-    /// Compare by m/z. Two peaks within ppmTolerance are considered to be equal.
+    /// Compare by m/z; two peaks within ppmTolerance are considered to be equal
     /// </summary>
     public class MzComparerWithTolerance : IComparer<Peak>, IEqualityComparer<Peak>
     {
@@ -64,11 +64,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Compare 2 peaks by m/z with a tolerance
+        /// Compare two peaks by m/z with a tolerance
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
+        /// <returns>0, 1, or-1</returns>
         public int Compare(Peak x, Peak y)
         {
             if (x == null)
@@ -90,11 +90,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Test 2 peaks for m/z equality, within a tolerance
+        /// Test two peaks for m/z equality, within a tolerance
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         public bool Equals(Peak x, Peak y)
         {
             return _equalityComparer.Equals(x, y);
@@ -110,7 +110,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     }
 
     /// <summary>
-    /// Compare by m/z. Two peaks within ppmTolerance are considered to be equal.
+    /// Compare by m/z; two peaks within ppmTolerance are considered to be equal
     /// </summary>
     public class MzComparerWithPpmTolerance : IEqualityComparer<Peak>
     {
@@ -124,11 +124,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Test 2 peaks for m/z equality, within a tolerance
+        /// Test two peaks for m/z equality, within a tolerance
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         public bool Equals(Peak x, Peak y)
         {
             if (x == null || y == null)
@@ -148,7 +148,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     }
 
     /// <summary>
-    /// Compare by m/z. Two peaks within toleranceTh Th are considered to be equal.
+    /// Compare by m/z; two peaks within toleranceTh Th are considered to be equal
     /// </summary>
     public class MzComparerWithToleranceMz : IEqualityComparer<Peak>
     {
@@ -162,11 +162,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Test 2 peaks for m/z equality, within a tolerance
+        /// Test two peaks for m/z equality, within a tolerance
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         public bool Equals(Peak x, Peak y)
         {
             if (x == null || y == null)
@@ -187,7 +187,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     }
 
     /// <summary>
-    /// Compare by m/z. Two peaks within ppmTolerance are considered to be equal.
+    /// Compare by m/z; two peaks within ppmTolerance are considered to be equal
     /// </summary>
     public class MzComparerWithBinning : IComparer<Peak>, IEqualityComparer<Peak>
     {
@@ -202,11 +202,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Check if 2 peaks are in the same m/z bin
+        /// Check if two peaks are in the same m/z bin
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         public bool Equals(Peak x, Peak y)
         {
             if (x == null || y == null)
@@ -218,11 +218,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Check if 2 masses are in the same m/z bin
+        /// Check if two masses are in the same m/z bin
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         public bool Equals(double x, double y)
         {
             return GetBinNumber(x) == GetBinNumber(y);
@@ -235,11 +235,11 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         }
 
         /// <summary>
-        /// Compare 2 peaks by m/z bin
+        /// Compare two peaks by m/z bin
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
+        /// <returns>0, 1, or -1</returns>
         public int Compare(Peak x, Peak y)
         {
             if (x == null)
@@ -259,7 +259,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the m/z rounded by <see cref="NumBits"/> using bit shifting magic
         /// </summary>
         /// <param name="mz"></param>
-        /// <returns></returns>
+        /// <returns>Rounded m/z</returns>
         public double GetRoundedValue(double mz)
         {
             var converted = BitConverter.DoubleToInt64Bits(mz);
@@ -272,7 +272,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the bin number for the m/z
         /// </summary>
         /// <param name="mz"></param>
-        /// <returns></returns>
+        /// <returns>Bin number</returns>
         public int GetBinNumber(double mz)
         {
             var converted = BitConverter.DoubleToInt64Bits(mz);
@@ -285,7 +285,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the lowest m/z value in bin <paramref name="binNum"/>, inclusive
         /// </summary>
         /// <param name="binNum"></param>
-        /// <returns></returns>
+        /// <returns>Lowest m/z in the bin</returns>
         public double GetMzStart(int binNum)
         {
             var rounded = (long)binNum << _numShifts;
@@ -296,7 +296,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the highest m/z value in bin <paramref name="binNum"/>, exclusive
         /// </summary>
         /// <param name="binNum"></param>
-        /// <returns></returns>
+        /// <returns>Highest m/z in the bin</returns>
         public double GetMzEnd(int binNum)
         {
             var rounded = (long)(binNum + 1) << _numShifts;
@@ -307,7 +307,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get average m/z for bin <paramref name="binNum"/>
         /// </summary>
         /// <param name="binNum"></param>
-        /// <returns></returns>
+        /// <returns>Average m/z value (halfway between the lowest and highest values)</returns>
         public double GetMzAverage(int binNum)
         {
             return (GetMzStart(binNum) + GetMzEnd(binNum)) * 0.5;
@@ -316,10 +316,13 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Get the ppm tolerance that corresponds to <see cref="NumBits"/>
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Tolerance object</returns>
         public Tolerance GetTolerance()
         {
-            // 27 bits: max error = 16 ppm, 28 bits (8 ppm), 26 bits (32 ppm)
+            // 28 bits: max error =  8 ppm
+            // 27 bits: max error = 16 ppm
+            // 26 bits: max error = 32 ppm
+
             var numBits = sizeof(double) * 8 - _numShifts;
             var ppm = 16 * Math.Pow(2, 27 - numBits);
 

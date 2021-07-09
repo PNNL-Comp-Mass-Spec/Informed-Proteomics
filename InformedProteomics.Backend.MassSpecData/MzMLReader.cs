@@ -13,8 +13,11 @@ using PSI_Interface.CV;
 namespace InformedProteomics.Backend.MassSpecData
 {
     /// <summary>
-    /// Reader for mzML files. Can handle gzipped mzML files, and read in a forward-only fashion or in a random-access fashion.
+    /// Reader for mzML files
     /// </summary>
+    /// <remarks>
+    /// Can handle gzipped mzML files, and read in a forward-only fashion or in a random-access fashion
+    /// </remarks>
     public sealed class MzMLReader : IMassSpecDataReader
     {
         // Ignore Spelling: foreach
@@ -45,9 +48,11 @@ namespace InformedProteomics.Backend.MassSpecData
         private readonly XmlReaderSettings _xSettings = new XmlReaderSettings { IgnoreWhitespace = true };
         private Encoding _encoding;
         private readonly List<Spectrum> _spectra = new List<Spectrum>();
+
         #endregion
 
         #region Internal Objects
+
         /// <summary>
         /// Enumeration of common mzML versions
         /// </summary>
@@ -58,7 +63,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Store the mzML version, so that we can use it to adjust how some things are processed.
+        /// Store the mzML version, so that we can use it to adjust how some things are processed
         /// </summary>
         private MzML_Version _version;
 
@@ -80,15 +85,42 @@ namespace InformedProteomics.Backend.MassSpecData
             userParam
         }
 
+        /// <summary>
+        /// Parameter base class
+        /// </summary>
         private abstract class Param
         {
             protected ParamType ParamType { get; set; }
 
-            public string Name;          // Required
-            public string Value;         // Optional
-            public string UnitCVRef;     // Optional
-            public string UnitAccession; // Optional
-            public string UnitName;      // Optional
+            /// <summary>
+            /// Parameter name
+            /// </summary>
+            /// <remarks>Required</remarks>
+            public string Name;
+
+            /// <summary>
+            /// Parameter value
+            /// </summary>
+            /// <remarks>Optional</remarks>
+            public string Value;
+
+            /// <summary>
+            /// Parameter unit name
+            /// </summary>
+            /// <remarks>Optional</remarks>
+            public string UnitName;
+
+            /// <summary>
+            /// Parameter unit CVRef
+            /// </summary>
+            /// <remarks>Optional</remarks>
+            public string UnitCVRef;
+
+            /// <summary>
+            /// Parameter accession
+            /// </summary>
+            /// <remarks>Optional</remarks>
+            public string UnitAccession;
 
             protected string _cvRef;
             protected string _accession;
@@ -125,34 +157,58 @@ namespace InformedProteomics.Backend.MassSpecData
             }
         }
 
+        /// <summary>
+        /// Controlled vocabulary parameter
+        /// </summary>
         private class CVParam : Param
         {
-            public override string CVRef      // Required
+            /// <summary>
+            /// Controlled vocabulary reference
+            /// </summary>
+            /// <remarks>Required</remarks>
+            public override string CVRef
             {
                 get => _cvRef;
                 set => _cvRef = value;
             }
 
-            public override string Accession  // Required
+            /// <summary>
+            /// Accession
+            /// </summary>
+            /// <remarks>Required</remarks>
+            public override string Accession
             {
                 get => _accession;
                 set => _accession = value;
             }
 
+            /// <summary>
+            /// Constructor
+            /// </summary>
             public CVParam()
             {
                 ParamType = ParamType.cvParam;
             }
         }
 
+        /// <summary>
+        /// User parameter
+        /// </summary>
         private class UserParam : Param
         {
-            public override string Type       // Optional
+            /// <summary>
+            /// Parameter type
+            /// </summary>
+            /// <remarks>Optional</remarks>
+            public override string Type
             {
                 get => _type;
                 set => _type = value;
             }
 
+            /// <summary>
+            /// Constructor
+            /// </summary>
             public UserParam()
             {
                 ParamType = ParamType.userParam;
@@ -234,12 +290,11 @@ namespace InformedProteomics.Backend.MassSpecData
             // Unused
             // private readonly Dictionary<long, string> IdToNativeMap = new Dictionary<long, string>();
 
-
             /// <summary>
             /// Keys are NativeID
             /// Values are artificial scan number
             /// </summary>
-            public readonly Dictionary<string, long> NativeToIdMap = new Dictionary<string, long>();
+            private readonly Dictionary<string, long> NativeToIdMap = new Dictionary<string, long>();
 
             // Unused
             // private readonly Dictionary<long, long> ActualScanToIdMap = new Dictionary<long, long>();
@@ -361,7 +416,7 @@ namespace InformedProteomics.Backend.MassSpecData
             /// </summary>
             /// <param name="nativeId"></param>
             /// <param name="num"></param>
-            /// <returns></returns>
+            /// <returns>True if a numeric scan number was found, otherwise false</returns>
             public static bool TryGetScanNumberLong(string nativeId, out long num)
             {
                 return long.TryParse(GetScanNumber(nativeId), out num);
@@ -372,7 +427,7 @@ namespace InformedProteomics.Backend.MassSpecData
             /// </summary>
             /// <param name="nativeId"></param>
             /// <param name="num"></param>
-            /// <returns></returns>
+            /// <returns>True if a numeric scan number was found, otherwise false</returns>
             public static bool TryGetScanNumberInt(string nativeId, out int num)
             {
                 return int.TryParse(GetScanNumber(nativeId), out num);
@@ -382,8 +437,15 @@ namespace InformedProteomics.Backend.MassSpecData
             /// For the supplied <paramref name="nativeId"/>, get the corresponding scan number
             /// </summary>
             /// <param name="nativeId"></param>
-            /// <returns></returns>
-            /// <remarks>Code is ported from MSData.cpp in ProteoWizard</remarks>
+            /// <returns>Scan number (as a string)</returns>
+            /// <remarks>
+            /// <para>
+            /// If the scan number cannot be extracted, returns the original nativeId
+            /// </para>
+            /// <para>
+            /// Code is ported from MSData.cpp in ProteoWizard
+            /// </para>
+            /// </remarks>
             public static string GetScanNumber(string nativeId)
             {
                 // TODO: Add interpreter for Waters' S0F1, S1F1, S0F2,... format
@@ -562,16 +624,18 @@ namespace InformedProteomics.Backend.MassSpecData
                 ArrayLength = 0;
             }
         }
+
         #endregion
 
         #region Constructor
+
         /// <summary>
         /// Initialize a MzMLReader object
         /// </summary>
         /// <param name="filePath">Path to mzML file</param>
         /// <param name="randomAccess">If mzML reader should be configured for random access</param>
         /// <param name="tryReducingMemoryUsage">
-        /// If mzML reader should try to avoid reading all spectra into memory.
+        /// Set to true if the mzML reader should try to avoid reading all spectra into memory.
         /// This will reduce memory usage for a non-random access MzMLReader, as long as ReadMassSpectrum(int) isn't used.
         /// </param>
         public MzMLReader(string filePath, bool randomAccess = false, bool tryReducingMemoryUsage = true)
@@ -636,12 +700,13 @@ namespace InformedProteomics.Backend.MassSpecData
                 _fileReader.BaseStream.Position = 0;
             }
         }
+
         #endregion
 
         #region Public interface functions
 
         /// <summary>
-        /// The number of spectra in the file.
+        /// The number of spectra in the file
         /// </summary>
         public int NumSpectra
         {
@@ -653,9 +718,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </remarks>
         public CV.CVID NativeIdFormat
         {
             get
@@ -666,9 +733,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// The Native Format of the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// The Native Format of the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </remarks>
         public CV.CVID NativeFormat
         {
             get
@@ -735,10 +804,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Returns all mass spectra.
-        /// ReadAllSpectraNonRandom and ReadAllSpectraRandom use "yield return" to allow processing one spectra at a time if called from a foreach loop statement.
+        /// ReadAllSpectraNonRandom and ReadAllSpectraRandom use "yield return" to allow processing one spectra at a time if called from a for each loop statement.
         /// </summary>
         /// <param name="includePeaks">true to include peak data; only used for random-access capable reading</param>
-        /// <returns>all spectra</returns>
+        /// <returns>Enumerable list of spectrum objects</returns>
         public IEnumerable<Spectrum> ReadAllSpectra(bool includePeaks = true)
         {
             if (!_randomAccess)
@@ -790,7 +859,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Using index = 1 will return the first spectrum in the file, regardless of its actual scan number
         /// </param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
             return ReadMassSpectrum(scanNum, includePeaks);
@@ -799,11 +868,12 @@ namespace InformedProteomics.Backend.MassSpecData
         #endregion
 
         #region Interface Helper Functions: Non-Random Access
+
         /// <summary>
         /// Read all mass spectra in the file, not using random access
         /// Uses "yield return" to use less memory when called from a "foreach" statement
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Enumerable list of spectrum objects</returns>
         private IEnumerable<Spectrum> ReadAllSpectraNonRandom()
         {
             if (_reduceMemoryUsage)
@@ -851,13 +921,14 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Read a single mass spectrum and return it.
-        /// Causes all spectra in the file to be loaded into memory
+        /// Read a single mass spectrum and return it
         /// </summary>
         /// <param name="index">
         /// 1-based index of the spectrum in the file
         /// Using index = 1 will return the first spectrum in the file, regardless of its actual scan number
         /// </param>
+        /// <remarks>Causes all spectra in the file to be loaded into memory</remarks>
+        /// <returns>Spectrum object</returns>
         private Spectrum ReadMassSpectrumNonRandom(int index)
         {
             if (!_allRead)
@@ -879,12 +950,13 @@ namespace InformedProteomics.Backend.MassSpecData
         #endregion
 
         #region Interface Helper Functions: Random Access
+
         /// <summary>
         /// Read all mass spectra in the file, using random access
         /// Uses "yield return" to use less memory when called from a "foreach" statement
         /// </summary>
         /// <param name="includePeaks">true to include peak data</param>
-        /// <returns></returns>
+        /// <returns>Enumerable list of spectrum objects</returns>
         private IEnumerable<Spectrum> ReadAllSpectraRandom(bool includePeaks = true)
         {
             if (!_haveIndex || !_haveMetaData)
@@ -898,7 +970,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Read a single mass spectrum and return it.
+        /// Read a single mass spectrum and return it
         /// </summary>
         /// <param name="index">
         /// 1-based index of the spectrum in the file
@@ -926,9 +998,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 return ReadSpectrum(reader.ReadSubtree(), includePeaks);
             }
         }
+
         #endregion
 
         #region Cleanup functions
+
         /// <summary>
         /// Close out the file handle and delete any temp files
         /// </summary>
@@ -940,7 +1014,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Delete unzipped file, if we had to unzip the file to read it.
+        /// Delete unzipped file, if we had to unzip the file to read it
         /// </summary>
         public void Cleanup()
         {
@@ -994,11 +1068,13 @@ namespace InformedProteomics.Backend.MassSpecData
             _spectra.Clear();
             _allRead = false;
         }
+
         #endregion
 
         #region Index reading functions
+
         /// <summary>
-        /// Find and read the index information, starting at the end of the file...
+        /// Find and read the index information, starting at the end of the file
         /// </summary>
         private void ReadIndexFromEnd()
         {
@@ -1152,7 +1228,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle the child nodes of the run element
-        /// Called by IndexMzMl (xml hierarchy)
+        /// Called by IndexMzMl (XML hierarchy)
         /// </summary>
         private void ReadRunForOffsets()
         {
@@ -1189,6 +1265,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         var foundSpec = stringBuffer.IndexOf("<" + specTag + " ", searchPoint, StringComparison.Ordinal);
                         var foundChrom = stringBuffer.IndexOf("<" + chromTag + " ", searchPoint, StringComparison.Ordinal);
+
                         if (foundSpec >= 0)
                         {
                             searchPoint = foundSpec;
@@ -1201,6 +1278,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         {
                             break;
                         }
+
                         var pos = bufStart + _encoding.GetByteCount(stringBuffer.Substring(0, searchPoint));
                         var end = stringBuffer.IndexOf('>', searchPoint + 1);
                         // Grab everything between '<' and the next '>'
@@ -1300,7 +1378,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle the child nodes of the indexed mzML element
-        /// Called by IndexMzMl (xml hierarchy)
+        /// Called by IndexMzMl (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single "indexList" element</param>
         private void ReadIndexList(XmlReader reader)
@@ -1336,7 +1414,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle the child nodes of the indexList element
-        /// Called by ReadIndexList (xml hierarchy)
+        /// Called by ReadIndexList (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single "index" element</param>
         private void ReadIndex(XmlReader reader)
@@ -1385,9 +1463,11 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             reader.Dispose();
         }
+
         #endregion
 
         #region Root tag reader
+
         /// <summary>
         /// Read and parse a .mzML file
         /// Files are commonly larger than 100 MB, so use a streaming reader instead of a DOM reader
@@ -1601,12 +1681,14 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
             }
         }
+
         #endregion
 
         #region Metadata tag readers
+
         /// <summary>
         /// Handle the child nodes of the fileDescription element
-        /// Called by ReadMzML (xml hierarchy)
+        /// Called by ReadMzML (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single "fileDescription" element</param>
         private void ReadFileDescription(XmlReader reader)
@@ -1646,7 +1728,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle a single sourceFileList element and child nodes
-        /// Called by ReadMzML (xml hierarchy)
+        /// Called by ReadMzML (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single sourceFileList element</param>
         private void ReadSourceFileList(XmlReader reader)
@@ -1709,7 +1791,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                  *   e.g.: MS:1001559 "AB SCIEX TOF/TOF T2D nativeID format"
                                  *   e.g.: MS:1001562 "Scaffold nativeID format"
                                  *   e.g.: MS:1002303 "Bruker Container nativeID format"
-                                 *   et al.
+                                 *   etc.
                                  * MUST supply a *child* term of MS:1000561 (data file checksum type) one or more times
                                  *   e.g.: MS:1000568 (MD5)
                                  *   e.g.: MS:1000569 (SHA-1)
@@ -1744,7 +1826,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                  *   e.g.: MS:1002302 "Bruker Container format"
                                  *   e.g.: MS:1002385 "SCiLS Lab format"
                                  *   e.g.: MS:1002441 "Andi-MS format"
-                                 *   et al.
+                                 *   etc.
                                  */
                                 // ReSharper restore CommentTypo
                                 var cv = innerReader.GetAttribute("cvRef");
@@ -1865,7 +1947,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle the child nodes of the referenceableParamGroupList element
-        /// Called by ReadMzML (xml hierarchy)
+        /// Called by ReadMzML (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single "referenceableParamGroupList" element</param>
         private void ReadReferenceableParamGroupList(XmlReader reader)
@@ -1977,12 +2059,14 @@ namespace InformedProteomics.Backend.MassSpecData
             reader.Dispose();
             return userParam;
         }
+
         #endregion
 
         #region Run and SpectrumList Tags
+
         /// <summary>
         /// Handle the child nodes of the run element
-        /// Called by ReadMzML (xml hierarchy)
+        /// Called by ReadMzML (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single "run" element</param>
         private void ReadRunData(XmlReader reader)
@@ -2042,7 +2126,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle the child nodes of a spectrumList element
-        /// Called by ReadRunData (xml hierarchy)
+        /// Called by ReadRunData (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single spectrumList element</param>
         private void ReadSpectrumList(XmlReader reader)
@@ -2092,12 +2176,14 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             reader.Dispose();
         }
+
         #endregion
 
         #region Spectrum Tag
+
         /// <summary>
         /// Handle a single spectrum element and child nodes
-        /// Called by ReadSpectrumList (xml hierarchy)
+        /// Called by ReadSpectrumList (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single spectrum element</param>
         /// <param name="includePeaks">Whether to read binary data arrays</param>
@@ -2141,9 +2227,9 @@ namespace InformedProteomics.Backend.MassSpecData
             //    scanNum = Convert.ToInt32(index) + 1;
             //    // Interpret the NativeID (if the format has an interpreter) and use it instead of the artificial number.
             //    // TODO: Better handling than the artificial ID for other nativeIDs (ones currently not supported)
-            //    if (NativeIdConversion.TryGetScanNumberInt(nativeId, out var num))
+            //    if (NativeIdConversion.TryGetScanNumberInt(nativeId, out var value))
             //    {
-            //        scanNum = num;
+            //        scanNum = value;
             //    }
             //}
 
@@ -2197,7 +2283,7 @@ namespace InformedProteomics.Backend.MassSpecData
                          *   e.g.: MS:1000627 (selected ion current chromatogram)
                          *   e.g.: MS:1000789 (enhanced multiply charged spectrum)
                          *   e.g.: MS:1000790 (time-delayed fragmentation spectrum)
-                         *   et al.
+                         *   etc.
                          * MUST supply term MS:1000525 (spectrum representation) or any of its children only once
                          *   e.g.: MS:1000127 (centroid spectrum)
                          *   e.g.: MS:1000128 (profile spectrum)
@@ -2212,7 +2298,7 @@ namespace InformedProteomics.Backend.MassSpecData
                          *   e.g.: MS:1000618 (highest observed wavelength)
                          *   e.g.: MS:1000619 (lowest observed wavelength)
                          *   e.g.: MS:1000796 (spectrum title)
-                         *   et al.
+                         *   etc.
                          */
                         switch (reader.GetAttribute("accession"))
                         {
@@ -2375,13 +2461,15 @@ namespace InformedProteomics.Backend.MassSpecData
 
             return spectrum;
         }
+
         #endregion
 
         #region Spectrum internal Tags
+
         /// <summary>
         /// mzML_1.0.0 compatibility
         /// Handle a single spectrumDescription element and child nodes
-        /// Called by ReadSpectrumList (xml hierarchy)
+        /// Called by ReadSpectrumList (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single spectrum element</param>
         /// <param name="scans"></param>
@@ -2460,10 +2548,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle a single scanList element and child nodes
-        /// Called by ReadSpectrum (xml hierarchy)
+        /// Called by ReadSpectrum (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single scanList element</param>
-        /// <returns></returns>
+        /// <returns>Enumerable list of scan data objects</returns>
         private IEnumerable<ScanData> ReadScanList(XmlReader reader)
         {
             reader.MoveToContent();
@@ -2538,10 +2626,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle a single scan element and child nodes
-        /// Called by ReadSpectrum (xml hierarchy)
+        /// Called by ReadSpectrum (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single scan element</param>
-        /// <returns></returns>
+        /// <returns>Scan data object</returns>
         private ScanData ReadScan(XmlReader reader)
         {
             reader.MoveToContent();
@@ -2646,10 +2734,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle a single precursorList element and child nodes
-        /// Called by ReadSpectrum (xml hierarchy)
+        /// Called by ReadSpectrum (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single precursorList element</param>
-        /// <returns></returns>
+        /// <returns>Enumerable list of precursor objects</returns>
         private IEnumerable<Precursor> ReadPrecursorList(XmlReader reader)
         {
             reader.MoveToContent();
@@ -2683,10 +2771,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle a single precursor element and child nodes
-        /// Called by ReadPrecursorList (xml hierarchy)
+        /// Called by ReadPrecursorList (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single precursor element</param>
-        /// <returns></returns>
+        /// <returns>Precursor object</returns>
         private Precursor ReadPrecursor(XmlReader reader)
         {
             reader.MoveToContent();
@@ -2807,7 +2895,7 @@ namespace InformedProteomics.Backend.MassSpecData
                                      *   e.g.: MS:1000282 (sustained off-resonance irradiation)
                                      *   e.g.: MS:1000422 (high-energy collision-induced dissociation)
                                      *   e.g.: MS:1000433 (low-energy collision-induced dissociation)
-                                     *   et al.
+                                     *   etc.
                                      *
                                      *   e.g.: MS:1000133 "collision-induced dissociation"
                                      *   e.g.: MS:1000134 "plasma desorption"
@@ -2888,10 +2976,10 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle a single selectedIonList element and child nodes
-        /// Called by ReadPrecursor (xml hierarchy)
+        /// Called by ReadPrecursor (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single selectedIonList element</param>
-        /// <returns></returns>
+        /// <returns>List of selected ions</returns>
         private List<SelectedIon> ReadSelectedIonList(XmlReader reader)
         {
             reader.MoveToContent();
@@ -2979,11 +3067,11 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle a single binaryDataArrayList element and child nodes
-        /// Called by ReadSpectrum (xml hierarchy)
+        /// Called by ReadSpectrum (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single binaryDataArrayList element</param>
         /// <param name="defaultArrayLength">Default array length, coming from spectrum attribute</param>
-        /// <returns></returns>
+        /// <returns>Enumerable list of binary data arrays</returns>
         private IEnumerable<BinaryDataArray> ReadBinaryDataArrayList(XmlReader reader, int defaultArrayLength)
         {
             reader.MoveToContent();
@@ -3017,11 +3105,11 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// Handle a single binaryDataArray element and child nodes
-        /// Called by ReadBinaryDataArrayList (xml hierarchy)
+        /// Called by ReadBinaryDataArrayList (XML hierarchy)
         /// </summary>
         /// <param name="reader">XmlReader that is only valid for the scope of the single binaryDataArray element</param>
         /// <param name="defaultLength">Default array length, coming from spectrum attribute</param>
-        /// <returns></returns>
+        /// <returns>Binary data array</returns>
         private BinaryDataArray ReadBinaryDataArray(XmlReader reader, int defaultLength)
         {
             reader.MoveToContent();
@@ -3064,16 +3152,19 @@ namespace InformedProteomics.Backend.MassSpecData
 
                         reader.Read();
                         break;
+
                     case "cvParam":
                         // Schema requirements: zero to many instances of this element
                         paramList.Add(ReadCvParam(reader.ReadSubtree()));
                         reader.Read(); // Consume the cvParam element (no child nodes)
                         break;
+
                     case "userParam":
                         // Schema requirements: zero to many instances of this element
                         paramList.Add(ReadUserParam(reader.ReadSubtree()));
                         reader.Read();
                         break;
+
                     case "binary":
                         // Schema requirements: zero to many instances of this element
                         // Process the ParamList first.
@@ -3161,11 +3252,13 @@ namespace InformedProteomics.Backend.MassSpecData
                                     break;
                             }
                         }
+
                         var dataSize = 8;
                         if (bda.Precision == Precision.Precision32)
                         {
                             dataSize = 4;
                         }
+
                         var bytes = Convert.FromBase64String(reader.ReadElementContentAsString()); // Consumes the start and end elements.
                         //var bytesRead = reader.ReadContentAsBase64(bytes, 0, dataSize);
                         if (compressed)
@@ -3182,11 +3275,13 @@ namespace InformedProteomics.Backend.MassSpecData
                         for (var i = 0; i < bytes.Length; i += dataSize)
                         {
                             // mzML binary data should always be Little Endian. Some other data formats may use Big Endian, which would require a byte swap
+
                             //Array.Copy(bytes, i, oneNumber, 0, dataSize);
                             //if (swapBytes)
                             //{
                             //  Array.Reverse(oneNumber);
                             //}
+
                             if (dataSize == 4)
                             {
                                 //bda.Data[i / dataSize] = BitConverter.ToSingle(oneNumber, 0);
@@ -3247,6 +3342,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //msInflated.Read(newBytes, 0, (int)msInflated.Length);
             return newBytes;
         }
+
         #endregion
     }
 }

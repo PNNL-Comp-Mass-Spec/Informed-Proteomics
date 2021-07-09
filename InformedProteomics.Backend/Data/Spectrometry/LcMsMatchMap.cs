@@ -169,7 +169,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the bin number for the provided mass
         /// </summary>
         /// <param name="mass"></param>
-        /// <returns></returns>
+        /// <returns>Bin number</returns>
         public static int GetBinNumber(double mass)
         {
             return (int)Math.Round(mass * Constants.RescalingConstantHighPrecision);
@@ -179,7 +179,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the mass for the provided bin number
         /// </summary>
         /// <param name="binNum"></param>
-        /// <returns></returns>
+        /// <returns>m/z</returns>
         public static double GetMass(int binNum)
         {
             return binNum / Constants.RescalingConstantHighPrecision;

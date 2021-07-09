@@ -15,16 +15,18 @@ namespace InformedProteomics.Backend.MassSpecData
         // Ignore Spelling: cli, lcd, pwiz, Shimadzu
 
         /// <summary>
-        /// Gets the appropriate IMassSpecDataReader for the supplied path.
-        /// It is recommended that "NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path
+        /// Gets the appropriate IMassSpecDataReader for the supplied path
         /// </summary>
         /// <param name="filePath"></param>
-        /// <returns></returns>
-        /// <remarks>It is recommended that "NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
+        /// <returns>Data reader object</returns>
+        /// <remarks>
+        /// It is recommended that "NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path
+        /// </remarks>
         public static IMassSpecDataReader GetMassSpecDataReader(string filePath)
         {
             filePath = NormalizeDatasetPath(filePath);
             var type = GetMassSpecDataType(filePath);
+
             IMassSpecDataReader reader = null;
             switch (type)
             {
@@ -60,6 +62,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public static ISpectrumAccessor GetMassSpecDataAccessor(string filePath, IProgress<ProgressData> progress = null)
         {
             var reader = GetMassSpecDataReader(filePath);
+
             if (reader == null)
             {
                 return null;
@@ -83,7 +86,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Gets the appropriate classifying MassSpecDataType for the supplied path
         /// </summary>
         /// <param name="filePath">Path to spec file/folder</param>
-        /// <returns></returns>
+        /// <returns>Mass spec data type object</returns>
         public static MassSpecDataType GetMassSpecDataType(string filePath)
         {
             // Calls "NormalizeDatasetPath" to make sure we save the file to the containing directory
@@ -98,6 +101,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 return MassSpecDataType.XCaliburRun;
             }
+
             // If it is an mzML file that is gzipped, use the ProteoWizardReader, since it does random access without extracting.
             if (pathLower.EndsWith(".mzml") || (pathLower.EndsWith(".mzml.gz") && !_pwizAvailable))
             {
@@ -116,9 +120,9 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// The list of all formats supported by built-in type and ProteoWizard (not all-inclusive), as an OpenFileDialog filter string.
+        /// The list of all formats supported by built-in type and ProteoWizard (not all-inclusive), as an OpenFileDialog filter string
         /// </summary>
-        /// <remarks>Included are some filenames, which are inner contents for folder-type datasets.</remarks>
+        /// <remarks>Included are some filenames, which are inner contents for folder-type datasets</remarks>
         public static string MassSpecDataTypeFilterString
         {
             get
@@ -136,9 +140,9 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// The list of all formats supported by built-in type and ProteoWizard (not all-inclusive).
+        /// The list of all formats supported by built-in type and ProteoWizard (not all-inclusive)
         /// </summary>
-        /// <remarks>Included are some filenames, which are inner contents for folder-type datasets.</remarks>
+        /// <remarks>Included are some filenames, which are inner contents for folder-type datasets</remarks>
         public static List<Tuple<string, string[]>> MassSpecDataTypes
         {
             get
@@ -158,7 +162,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// The list of extensions (some file names) of all formats supported by built-in types and by ProteoWizard (not all-inclusive)
         /// </summary>
-        /// <remarks>Included are some filenames, which are inner contents for folder-type datasets.</remarks>
+        /// <remarks>Included are some filenames, which are inner contents for folder-type datasets</remarks>
         public static List<string> MassSpecDataTypeFilterList
         {
             get
@@ -190,7 +194,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Test the supplied path to see if we can read it using available readers
         /// </summary>
         /// <param name="path"></param>
-        /// <returns></returns>
+        /// <returns>True if the directory path ends with a supported extension</returns>
         public static bool IsADirectoryDataset(string path)
         {
             path = NormalizeDatasetPath(path);
@@ -201,14 +205,14 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Gets the directory that contains the dataset; it will back out of subdirectories of folder-type datasets
         /// </summary>
         /// <param name="path"></param>
-        /// <returns></returns>
+        /// <returns>Directory path</returns>
         public static string GetDirectoryContainingDataset(string path)
         {
             return Path.GetDirectoryName(GetDatasetName(path));
         }
 
         /// <summary>
-        /// Utility function: Gets the actual dataset name, needed in cases when a file in a folder-type dataset is given.
+        /// Utility function: Gets the actual dataset name, needed in cases when a file in a folder-type dataset is given
         /// </summary>
         /// <param name="path"></param>
         /// <returns>The path to the dataset, or the path to the dataset directory</returns>
@@ -228,11 +232,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Modification of Path.ChangeExtension: properly removes multiple extensions.
+        /// Modification of Path.ChangeExtension: properly removes multiple extensions
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="newExt"></param>
-        /// <returns></returns>
+        /// <returns>Updated file path</returns>
         public static string ChangeExtension(string filePath, string newExt)
         {
             var path = filePath;
@@ -254,10 +258,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Modification of Path.ChangeExtension(path, null), which removes the extension. This will remove multiple extensions.
+        /// Modification of Path.ChangeExtension(path, null), which removes the extension.
+        /// This method will remove multiple extensions.
         /// </summary>
         /// <param name="filePath"></param>
-        /// <returns></returns>
+        /// <returns>File path without the extension</returns>
         public static string RemoveExtension(string filePath)
         {
             return ChangeExtension(filePath, null);
@@ -304,7 +309,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Tests to see if we can use RawFileReader (i.e. are we running as 64-bit process)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if we are running a 64-bit process</returns>
         public static bool IsThermoRawAvailable()
         {
             if (Environment.Is64BitProcess)
@@ -316,9 +321,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Gets the list of all file types supported as a pair of description and file extensions.
-        /// Contains all files supported when ProteoWizard is available.
+        /// Gets the list of supported file types as a pair of description and file extensions, assuming ProteoWizard is available
         /// </summary>
+        /// <remarks>
+        /// Returns all supported file types when ProteoWizard is available
+        /// </remarks>
         private static List<Tuple<string, string[]>> SupportedTypesAll => new List<Tuple<string, string[]>>
         {
             new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
@@ -334,9 +341,11 @@ namespace InformedProteomics.Backend.MassSpecData
         };
 
         /// <summary>
-        /// Gets the list of all file types supported as a pair of description and file extensions.
-        /// Contains all file types supported if only ThermoRawFileReaderDLL is available.
+        /// Gets the list of supported file types as a pair of description and file extensions, assuming  only ThermoRawFileReaderDLL is available
         /// </summary>
+        /// <remarks>
+        /// Returns the limited list of supported file types if only ThermoRawFileReaderDLL is available
+        /// </remarks>
         private static List<Tuple<string, string[]>> SupportedTypesBuiltIn => new List<Tuple<string, string[]>>
         {
             new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
@@ -345,10 +354,11 @@ namespace InformedProteomics.Backend.MassSpecData
         };
 
         /// <summary>
-        /// Gets the list of all file types supported as a pair of description and file extensions.
-        /// Contains only file types that are natively supported by InformedProteomics without
-        /// any external DLLs available.
+        /// Gets the list of supported file types as a pair of description and file extension when no external DLLs are available
         /// </summary>
+        /// <remarks>
+        /// Returns the limited list of supported file types natively supported by InformedProteomics without any external DLLs available
+        /// </remarks>
         private static List<Tuple<string, string[]>> SupportedTypesNoExternalDll => new List<Tuple<string, string[]>>
         {
             new Tuple<string, string[]>("mzMl", new[] { ".mzml", ".mzml.gz" }),

@@ -22,28 +22,28 @@ namespace InformedProteomics.Backend.Utils
         /// Check if <paramref name="value"/> is within this range
         /// </summary>
         /// <param name="value"></param>
-        /// <returns></returns>
+        /// <returns>True if within range</returns>
         public bool Contains(int value)
         {
             return value >= Min && value <= Max;
         }
 
         /// <summary>
-        /// Check if 2 IntRanges overlap
+        /// Check if two IntRanges overlap
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>True if the ranges overlap</returns>
         public bool Overlaps(IntRange other)
         {
             return Contains(other.Min) || Contains(other.Max);
         }
 
         /// <summary>
-        /// Create a new IntRange that is the union of 2 other ranges
+        /// Create a new IntRange that is the union of two other ranges
         /// </summary>
         /// <param name="range1"></param>
         /// <param name="range2"></param>
-        /// <returns></returns>
+        /// <returns>New IntRange</returns>
         public static IntRange Union(IntRange range1, IntRange range2)
         {
             return new IntRange(Math.Min(range1.Min, range2.Min), Math.Max(range1.Max, range2.Max));
@@ -82,10 +82,10 @@ namespace InformedProteomics.Backend.Utils
         public int Length => Max - Min + 1;
 
         /// <summary>
-        /// Compare 2 IntRanges
+        /// Compare two IntRanges
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>0, 1, or -1</returns>
         public int CompareTo(IntRange other)
         {
             return Min.CompareTo(other.Min);

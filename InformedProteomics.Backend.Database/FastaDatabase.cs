@@ -104,7 +104,7 @@ namespace InformedProteomics.Backend.Database
         /// </summary>
         /// <param name="enzyme"></param>
         /// <param name="shuffle"></param>
-        /// <returns></returns>
+        /// <returns>Decoy-based database</returns>
         public FastaDatabase Decoy(Enzyme enzyme, bool shuffle = false)
         {
             if (IsDecoy)
@@ -201,7 +201,7 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Returns the characters in the sequence file
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Enumerable list of amino acids in the FASTA file</returns>
         public IEnumerable<byte> Characters()
         {
             if (_sequence != null)
@@ -261,7 +261,7 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Path to the Fasta file
         /// </summary>
-        /// <returns></returns>
+        /// <returns>File path</returns>
         public string GetFastaFilePath()
         {
             return _databaseFilePath;
@@ -270,7 +270,7 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Number of proteins in the database
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Protein count</returns>
         public int GetNumEntries()
         {
             Read();
@@ -280,7 +280,7 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Get the names of all proteins in the database
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of protein names</returns>
         public IEnumerable<string> GetProteinNames()
         {
             Read();
@@ -290,7 +290,7 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Get the entire concatenated sequence
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Concatenated sequence, as an array of bytes</returns>
         public byte[] GetSequence()
         {
             if (_sequence == null)
@@ -314,7 +314,7 @@ namespace InformedProteomics.Backend.Database
         /// </summary>
         /// <param name="enzyme"></param>
         /// <param name="shuffle"></param>
-        /// <returns></returns>
+        /// <returns>File path</returns>
         public string GetDecoyDatabasePath(Enzyme enzyme, bool shuffle = false)
         {
             string newExtension;
@@ -344,7 +344,7 @@ namespace InformedProteomics.Backend.Database
         /// Get the name of the protein that starts at <paramref name="offset"/> in the concatenated sequence
         /// </summary>
         /// <param name="offset"></param>
-        /// <returns></returns>
+        /// <returns>Protein name</returns>
         public string GetProteinName(long offset)
         {
             var offsetKey = GetOffsetKey(offset);
@@ -360,7 +360,7 @@ namespace InformedProteomics.Backend.Database
         /// Get the description of the protein that starts at <paramref name="offset"/> in the concatenated sequence
         /// </summary>
         /// <param name="offset"></param>
-        /// <returns></returns>
+        /// <returns>Protein description</returns>
         public string GetProteinDescription(long offset)
         {
             var offsetKey = GetOffsetKey(offset);
@@ -377,7 +377,7 @@ namespace InformedProteomics.Backend.Database
         /// Get the offset in the concatenated sequence of the protein with name <paramref name="name"/>
         /// </summary>
         /// <param name="name"></param>
-        /// <returns></returns>
+        /// <returns>Byte offset in the file, or null if an unrecognized protein name</returns>
         public long? GetOffset(string name)
         {
             if (!_nameToOffset.TryGetValue(name, out var offset))
@@ -392,7 +392,7 @@ namespace InformedProteomics.Backend.Database
         /// Get the description of the protein with name <paramref name="name"/>
         /// </summary>
         /// <param name="name"></param>
-        /// <returns></returns>
+        /// <returns>Protein description, or null if an unrecognized protein name</returns>
         public string GetProteinDescription(string name)
         {
             if (!_nameToOffset.TryGetValue(name, out var offset))
@@ -408,7 +408,7 @@ namespace InformedProteomics.Backend.Database
         /// Get the length of the protein with name <paramref name="name"/>
         /// </summary>
         /// <param name="name"></param>
-        /// <returns></returns>
+        /// <returns>Number of residues in the given protein, or -1 if an unrecognized protein name</returns>
         public int GetProteinLength(string name)
         {
             if (_nameToLength.TryGetValue(name, out var length))
@@ -423,7 +423,7 @@ namespace InformedProteomics.Backend.Database
         /// Get the sequence of the protein with name <paramref name="name"/>
         /// </summary>
         /// <param name="name"></param>
-        /// <returns></returns>
+        /// <returns>Protein residues of the given protein, or null if an unrecognized protein name</returns>
         public string GetProteinSequence(string name)
         {
             if (!_nameToOffset.TryGetValue(name, out var offset))
@@ -440,7 +440,7 @@ namespace InformedProteomics.Backend.Database
         /// </summary>
         /// <param name="offset"></param>
         /// <param name="length"></param>
-        /// <returns></returns>
+        /// <returns>Protein sequence</returns>
         private string GetProteinSequence(long offset, int length)
         {
             return Encoding.GetString(_sequence, (int)(offset + 1), length);
@@ -450,7 +450,7 @@ namespace InformedProteomics.Backend.Database
         /// Get the position in the protein sequence of the offset in the concatenated sequence (one-based index)
         /// </summary>
         /// <param name="offset"></param>
-        /// <returns></returns>
+        /// <returns>One-based position</returns>
         public int GetOneBasedPositionInProtein(long offset)
         {
             return (int)(offset - GetOffsetKey(offset));
@@ -460,7 +460,7 @@ namespace InformedProteomics.Backend.Database
         /// Get the position in the protein sequence of the offset in the concatenated sequence (zero-based index)
         /// </summary>
         /// <param name="offset"></param>
-        /// <returns></returns>
+        /// <returns>Zero-based position</returns>
         public int GetZeroBasedPositionInProtein(long offset)
         {
             return GetOneBasedPositionInProtein(offset) - 1;
@@ -469,7 +469,7 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Returns the hash based on last write time, used for consistency verification
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Hash of the last write time</returns>
         internal int GetLastWriteTimeHash()
         {
             return _lastWriteTimeHash;
@@ -480,7 +480,7 @@ namespace InformedProteomics.Backend.Database
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="code"></param>
-        /// <returns></returns>
+        /// <returns>True if the file matches the current filter format and the hash matches the given code, otherwise false</returns>
         internal static bool CheckHashCodeBinaryFile(string filePath, int code)
         {
             var dataFile = new FileInfo(filePath);

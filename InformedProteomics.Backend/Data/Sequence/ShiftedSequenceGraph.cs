@@ -60,7 +60,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="residue"></param>
         /// <param name="location"></param>
-        /// <returns></returns>
+        /// <returns>True if residue is a valid amino acid, otherwise false</returns>
         public bool AddAminoAcid(char residue, SequenceLocation location = SequenceLocation.Everywhere)
         {
             return PutAminoAcid(_index, residue, location);
@@ -129,7 +129,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get the sink sequence composition with H2O added
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Composition object</returns>
         public Composition.Composition GetSinkSequenceCompositionWithH2O()
         {
             return _sinkSequenceCompositionWithH2O;
@@ -139,7 +139,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the fragment score using the provided scorer
         /// </summary>
         /// <param name="scorer"></param>
-        /// <returns></returns>
+        /// <returns>Fragment score</returns>
         public double GetFragmentScore(IScorer scorer)
         {
             var nodeScore = new double?[_maxSeqIndex][];
@@ -160,7 +160,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the score and modifications
         /// </summary>
         /// <param name="scorer"></param>
-        /// <returns></returns>
+        /// <returns>Tuple of fragment score and list of modifications</returns>
         public Tuple<double, LinkedList<ModificationInstance>> GetScoreAndModifications(IScorer scorer)
         {
             var nodeScore = new double?[_maxSeqIndex][];
@@ -187,7 +187,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="scorer"></param>
         /// <param name="nodeScore"></param>
         /// <param name="maxScoreAndMods"></param>
-        /// <returns></returns>
+        /// <returns>Tuple of fragment score and list of modifications</returns>
         private Tuple<double, LinkedList<ModificationInstance>> GetFragmentScoreAndModifications(
             int seqIndex,
             int modIndex,
@@ -283,7 +283,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="seqIndex"></param>
         /// <param name="modIndex"></param>
-        /// <returns></returns>
+        /// <returns>Composition object</returns>
         protected Composition.Composition GetComposition(int seqIndex, int modIndex)
         {
             if (_nodeComposition[seqIndex][modIndex] == null)
@@ -301,7 +301,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="seqIndex"></param>
         /// <param name="modIndex"></param>
-        /// <returns></returns>
+        /// <returns>Composition object</returns>
         protected Composition.Composition GetComplementaryComposition(int seqIndex, int modIndex)
         {
             if (_compNodeComposition[seqIndex][modIndex] == null)
@@ -327,7 +327,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="scorer"></param>
         /// <param name="nodeScore"></param>
         /// <param name="maxScore"></param>
-        /// <returns></returns>
+        /// <returns>Fragment score</returns>
         protected double GetFragmentScore(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
         {
             var score = maxScore[seqIndex][modIndex];
@@ -375,12 +375,12 @@ namespace InformedProteomics.Backend.Data.Sequence
         private readonly Composition.Composition[] _fragmentComposition;
 
         /// <summary>
-        /// Add an amino acid residue to this generator.
+        /// Add an amino acid residue to this generator
         /// </summary>
-        /// <param name="index">index to add the amino acid. 0 is C-term. 1 is the C-term amino acid.</param>
-        /// <param name="residue">amino acid residue to add.</param>
-        /// <param name="loc">location of the residue</param>
-        /// <returns>true if residue is a valid amino acid; false otherwise.</returns>
+        /// <param name="index">Index to add the amino acid; 0 is C-terminus; 1 is the C-terminal amino acid</param>
+        /// <param name="residue">Amino acid residue to add</param>
+        /// <param name="loc">Location of the residue</param>
+        /// <returns>True if residue is a valid amino acid, otherwise false</returns>
         private bool PutAminoAcid(int index, char residue, SequenceLocation loc)
         {
             _index = index + 1;

@@ -14,12 +14,13 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class SequenceGraph
     {
+
         /// <summary>
-        /// Create a graph representing the annotation. Annotation is reversed.
+        /// Create a graph representing the annotation; annotation is reversed
         /// </summary>
         /// <param name="aaSet">amino acid set</param>
         /// <param name="annotation">annotation (e.g. G.PEPTIDER.K or _.PEPTIDER._)</param>
-        /// <returns></returns>
+        /// <returns>Sequence graph object</returns>
         public static SequenceGraph CreateGraph(AminoAcidSet aaSet, string annotation)
         {
             const char delimiter = (char)FastaDatabaseConstants.Delimiter;
@@ -40,7 +41,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Create a graph representing the sequence. Sequence is reversed.
+        /// Create a graph representing the sequence; sequence is reversed
         /// </summary>
         /// <param name="aaSet">amino acid set</param>
         /// <param name="nTerm">N-term amino acid</param>
@@ -125,7 +126,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the number of proteoform sequences possible with the provided number of dynamic modifications
         /// </summary>
         /// <param name="nDynMods"></param>
-        /// <returns></returns>
+        /// <returns>Number of possible proteoform sequences</returns>
         public double GetNumProteoformSequencesByNumMods(int nDynMods)
         {
             if (nDynMods < 1 || nDynMods > ModificationParams.MaxNumDynModsPerSequence)
@@ -158,7 +159,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get number of possible proteoform sequences for the specified modification combination
         /// </summary>
         /// <param name="modIndex">index of modification combination</param>
-        /// <returns>number of sequences</returns>
+        /// <returns>Number of sequences</returns>
         public double GetNumProteoformSequences(int modIndex)
         {
             var numModCombs = _graph[_index].Length;
@@ -194,7 +195,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         private double[][] _countTable;
 
         /// <summary>
-        /// Perform  N-Terminus cleavage on the sequence graph
+        /// Perform N-Terminus cleavage on the sequence graph
         /// </summary>
         public void CleaveNTerm()
         {
@@ -216,7 +217,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get the modification combinations in the current sequence graph
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Array of modification combinations</returns>
         public ModificationCombination[] GetModificationCombinations()
         {
             var numModCombs = _graph[_index].Length;
@@ -229,9 +230,9 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Gets the composition of the sequence without variable modification.
+        /// Gets the composition of the sequence without variable modification
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Composition object</returns>
         public Composition.Composition GetUnmodifiedSequenceComposition()
         {
             return _suffixComposition[_index];
@@ -254,7 +255,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get the compositions of all fragment nodes
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of compositions</returns>
         public IEnumerable<Composition.Composition> GetAllFragmentNodeCompositions()
         {
             for (var seqIndex = 2; seqIndex < _maxSeqIndex - 2; seqIndex++)
@@ -271,7 +272,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="modIndex"></param>
         /// <param name="numNTermCleavages"></param>
-        /// <returns></returns>
+        /// <returns>List of compositions</returns>
         public IEnumerable<Composition.Composition> GetFragmentCompositions(int modIndex, int numNTermCleavages)
         {
             var seqIndex = _index - 1 - numNTermCleavages;
@@ -319,7 +320,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get the Sink sequence composition with H2O added
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Composition object</returns>
         public Composition.Composition GetSinkSequenceCompositionWithH2O()
         {
             return _sinkSequenceCompositionWithH2O;
@@ -334,7 +335,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the fragment score using the provided scorer
         /// </summary>
         /// <param name="scorer"></param>
-        /// <returns></returns>
+        /// <returns>Fragment score</returns>
         public double GetFragmentScore(IScorer scorer)
         {
             var nodeScore = new double?[_maxSeqIndex][];
@@ -355,7 +356,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the fragment score and string-format modifications of this sequence graph
         /// </summary>
         /// <param name="scorer"></param>
-        /// <returns></returns>
+        /// <returns>Fragment score</returns>
         public Tuple<double, string> GetFragmentScoreAndModifications(IScorer scorer)
         {
             var nodeScore = new double?[_maxSeqIndex][];
@@ -508,7 +509,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="seqIndex"></param>
         /// <param name="modIndex"></param>
-        /// <returns></returns>
+        /// <returns>Composition object</returns>
         protected Composition.Composition GetComposition(int seqIndex, int modIndex)
         {
             if (_nodeComposition[seqIndex][modIndex] == null)
@@ -525,7 +526,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="seqIndex"></param>
         /// <param name="modIndex"></param>
-        /// <returns></returns>
+        /// <returns>Composition object</returns>
         protected Composition.Composition GetComplementaryComposition(int seqIndex, int modIndex)
         {
             if (_compNodeComposition[seqIndex][modIndex] == null)
@@ -544,7 +545,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="scorer"></param>
         /// <param name="nodeScore"></param>
         /// <param name="maxScore"></param>
-        /// <returns></returns>
+        /// <returns>Fragment score</returns>
         protected double GetFragmentScore(int seqIndex, int modIndex, IScorer scorer, double?[][] nodeScore, double?[][] maxScore)
         {
             var score = maxScore[seqIndex][modIndex];
@@ -647,11 +648,11 @@ namespace InformedProteomics.Backend.Data.Sequence
         }
 
         /// <summary>
-        /// Add an amino acid residue to this generator.
+        /// Add an amino acid residue to this generator
         /// </summary>
-        /// <param name="index">index to add the amino acid. 0 is C-term. 1 is the C-term amino acid.</param>
-        /// <param name="residue">amino acid residue to add.</param>
-        /// <returns>true if residue is a valid amino acid; false otherwise.</returns>
+        /// <param name="index">index to add the amino acid: 0 is C-term, 1 is the C-term amino acid</param>
+        /// <param name="residue">amino acid residue to add</param>
+        /// <returns>true if residue is a valid amino acid; false otherwise</returns>
         private bool PutAminoAcid(int index, char residue)
         {
             _index = index + 1;
@@ -824,7 +825,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get the indices of the previous nodes
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of indices</returns>
         public IEnumerable<int> GetPrevNodeIndices()
         {
             for (var i = 0; i < _count; i++)

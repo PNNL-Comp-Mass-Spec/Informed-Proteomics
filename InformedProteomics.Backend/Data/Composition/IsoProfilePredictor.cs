@@ -28,7 +28,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <param name="n"></param>
         /// <param name="o"></param>
         /// <param name="s"></param>
-        /// <returns></returns>
+        /// <returns>Isotopomer envelope</returns>
         public static IsotopomerEnvelope GetIsotopomerEnvelop(int c, int h, int n, int o, int s)
         {
             return Predictor.GetIsotopomerEnvelope(c, h, n, o, s);
@@ -42,7 +42,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <param name="n"></param>
         /// <param name="o"></param>
         /// <param name="s"></param>
-        /// <returns></returns>
+        /// <returns>Isotopomer envelope</returns>
         public IsotopomerEnvelope GetIsotopomerEnvelope(int c, int h, int n, int o, int s)
         {
             var dist = new double[MaxNumIsotopes];

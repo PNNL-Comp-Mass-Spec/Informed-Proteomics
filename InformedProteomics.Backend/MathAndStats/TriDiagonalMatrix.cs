@@ -32,11 +32,11 @@ namespace InformedProteomics.Backend.MathAndStats
 {
     /// <summary>
     /// A tri-diagonal matrix has non-zero entries only on the main diagonal, the diagonal above the main (super), and the
-    /// diagonal below the main (sub).
+    /// diagonal below the main (sub)
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This is based on the wikipedia article: http://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
+    /// This is based on the Wikipedia article: http://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
     /// </para>
     /// <para>
     /// The entries in the matrix on a particular row are A[i], B[i], and C[i] where i is the row index.
@@ -48,31 +48,40 @@ namespace InformedProteomics.Backend.MathAndStats
     /// </remarks>
     public class TriDiagonalMatrixF
     {
-        // Ignore Spelling: Seghers, NxN, tri, sublicense
+        // Ignore Spelling: Seghers, NxN, tri, sublicense, Wikipedia
 
         /// <summary>
-        /// The values for the sub-diagonal. A[0] is never used.
+        /// The values for the sub-diagonal
         /// </summary>
+        /// <remarks>
+        /// A[0] is never used
+        /// </remarks>
         public float[] A;
 
         /// <summary>
-        /// The values for the main diagonal.
+        /// The values for the main diagonal
         /// </summary>
         public float[] B;
 
         /// <summary>
-        /// The values for the super-diagonal. C[C.Length-1] is never used.
+        /// The values for the super-diagonal
         /// </summary>
+        /// <remarks>
+        /// C[C.Length-1] is never used
+        /// </remarks>
         public float[] C;
 
         /// <summary>
-        /// The width and height of this matrix.
+        /// The width and height of this matrix
         /// </summary>
         public int N => A?.Length ?? 0;
 
         /// <summary>
-        /// Indexer. Setter throws an exception if you try to set any not on the super, main, or sub diagonals.
+        /// Indexer
         /// </summary>
+        /// <remarks>
+        /// Setter throws an exception if you try to set any not on the super, main, or sub diagonals
+        /// </remarks>
         public float this[int row, int col]
         {
             get
@@ -120,7 +129,7 @@ namespace InformedProteomics.Backend.MathAndStats
         }
 
         /// <summary>
-        /// Construct an NxN matrix.
+        /// Construct an NxN matrix
         /// </summary>
         public TriDiagonalMatrixF(int n)
         {
@@ -130,10 +139,10 @@ namespace InformedProteomics.Backend.MathAndStats
         }
 
         /// <summary>
-        /// Produce a string representation of the contents of this matrix.
+        /// Produce a string representation of the contents of this matrix
         /// </summary>
-        /// <param name="fmt">Optional. For String.Format. Must include the colon. Examples are ':0.000' and ',5:0.00' </param>
-        /// <param name="prefix">Optional. Per-line indentation prefix.</param>
+        /// <param name="fmt">Optional: For string.Format. Must include the colon. Examples are ':0.000' and ',5:0.00'</param>
+        /// <param name="prefix">Optional: Per-line indentation prefix</param>
         public string ToDisplayString(string fmt = "", string prefix = "")
         {
             if (N > 0)
@@ -164,13 +173,13 @@ namespace InformedProteomics.Backend.MathAndStats
         }
 
         /// <summary>
-        /// Solve the system of equations this*x=d given the specified d.
+        /// Solve the system of equations this*x=d given the specified d
         /// </summary>
         /// <remarks>
-        /// Uses the Thomas algorithm described in the wikipedia article: http://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
+        /// Uses the Thomas algorithm described in the Wikipedia article: http://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
         /// Not optimized. Not destructive.
         /// </remarks>
-        /// <param name="d">Right side of the equation.</param>
+        /// <param name="d">Right side of the equation</param>
         public float[] Solve(float[] d)
         {
             var n = N;

@@ -29,11 +29,9 @@ namespace InformedProteomics.Backend.Database
 
         /// <summary>
         /// Examine the extension on the database file
-        /// Return true if .fasta or .fa or .faa
-        /// Otherwise, return false
         /// </summary>
         /// <param name="databaseFilePath"></param>
-        /// <returns></returns>
+        /// <returns>True if .fasta or .fa or .faa, otherwise false</returns>
         public static bool ValidFASTAExtension(string databaseFilePath)
         {
             if (string.IsNullOrWhiteSpace(databaseFilePath))

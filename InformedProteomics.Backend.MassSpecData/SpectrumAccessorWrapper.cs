@@ -48,7 +48,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Get the native ID of the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Native ID string</returns>
         public string GetNativeId(int scanNum)
         {
             return scanMetadata.TryGetValue(scanNum, out var metadata) ? metadata.NativeId : "";
@@ -63,7 +63,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Get the ion mobility drift time of the specified scan number (if data is ion mobility)
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Drift time</returns>
         public double GetDriftTime(int scanNum)
         {
             return scanMetadata.TryGetValue(scanNum, out var metadata) ? metadata.DriftTime : 0.0;

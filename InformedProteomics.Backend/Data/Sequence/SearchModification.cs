@@ -69,7 +69,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// String representation of this search mod
         /// </summary>
         /// <param name="spaceSeparated">When true, separate fields using spaces instead of commas</param>
-        /// <returns></returns>
+        /// <returns>Description of the modification</returns>
         public string ToString(bool spaceSeparated)
         {
             var formatString = spaceSeparated ?

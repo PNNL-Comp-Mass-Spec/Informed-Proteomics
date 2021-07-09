@@ -13,31 +13,38 @@ using Spectrum = InformedProteomics.Backend.Data.Spectrometry.Spectrum;
 namespace InformedProteomics.Backend.MassSpecData
 {
     /// <summary>
-    /// ProteoWizard Reader, using the ProteoWizard pwiz_bindings_cli to utilize the ProteoWizard suite of vendor readers.
+    /// ProteoWizard Reader, using the ProteoWizard pwiz_bindings_cli to utilize the ProteoWizard suite of vendor readers
     /// </summary>
     /// <remarks>
-    /// This class uses a custom AssemblyResolver to find an installation of ProteoWizard, specified in ProteoWizardReaderImplementation.
+    /// <para>
+    /// This class uses a custom AssemblyResolver to find an installation of ProteoWizard, specified in ProteoWizardReaderImplementation
+    /// </para>
+    /// <para>
     /// This class is a wrapper around ProteoWizardReaderImplementation to encapsulate the usage of the custom AssemblyResolver, which must be
-    /// added to the AppDomain.CurrentDomain.AssemblyResolve event before the class is instantiated.
+    /// added to the AppDomain.CurrentDomain.AssemblyResolve event before the class is instantiated
+    /// </para>
     /// </remarks>
     public sealed class ProteoWizardReader : IMassSpecDataReader
     {
-        // Ignore Spelling: Apps, centroiding, cli, fid, lcd, Pwiz, Shimadzu, snr, stateful, uimf
+        // Ignore Spelling: accessor, Apps, centroiding, cli, fid, lcd, pre, Pwiz, snr, stateful, uimf
+        // Ignore Spelling: Bruker, SciEx, Shimadzu
 
         #region Static stateful data
 
         /// <summary>
         /// The path to the most recent 64-bit ProteoWizard install
-        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard DLLs are available.
         /// </summary>
+        /// <remarks>
+        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard DLLs are available
+        /// </remarks>
         public static string PwizPath => ProteoWizardLoader.PwizPath;
 
         /// <summary>
-        /// Finds the path to the most recent 64-bit ProteoWizard install
+        /// Finds the path to the most recent 64-bit ProteoWizard install.
         /// PwizPath is populated from this, but only causes a single search.
         /// Paths searched, in order: "%ProteoWizard%" environment variable data, "C:\DMS_Programs\ProteoWizard", "%ProgramFiles%\ProteoWizard\(highest sorted)"
         /// </summary>
-        /// <returns></returns>
+        /// <returns>ProteoWizard directory path, or null if not found</returns>
         public static string FindPwizPath()
         {
             return ProteoWizardLoader.FindPwizPath();
@@ -76,15 +83,19 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </remarks>
         public PSI_Interface.CV.CV.CVID NativeIdFormat => _pwizReader.NativeIdFormat;
 
         /// <summary>
-        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </remarks>
         public PSI_Interface.CV.CV.CVID NativeFormat => _pwizReader.NativeFormat;
 
         /// <summary>
@@ -97,11 +108,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Returns the spectrum specified by the scan number.
+        /// Returns the spectrum specified by the scan number
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
             return _pwizReader.ReadMassSpectrum(scanNum, includePeaks);
@@ -112,7 +123,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
             return ReadMassSpectrum(scanNum, includePeaks);
@@ -127,7 +138,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// The number of spectra in the file.
+        /// The number of spectra in the file
         /// </summary>
         public int NumSpectra => _pwizReader.NumSpectra;
 
@@ -205,12 +216,15 @@ namespace InformedProteomics.Backend.MassSpecData
         };
 
         /// <summary>
-        /// List of "folder extensions" that ProteoWizard can read. This does not include all folder type datasets - some require directory listings.
+        /// List of "folder extensions" that ProteoWizard can read
         /// </summary>
-        public static List<string> SupportedDirectoryTypes => new List<string>() { ".d", ".raw" };
+        /// <remarks>
+        /// This does not include all folder type datasets - some require directory listings
+        /// </remarks>
+        public static List<string> SupportedDirectoryTypes => new List<string> { ".d", ".raw" };
 
         /// <summary>
-        /// List of files that are produced by Bruker instruments that ProteoWizard can read.
+        /// List of files that are produced by Bruker instruments that ProteoWizard can read
         /// </summary>
         public static List<string> BrukerFiles => new List<string>()
         {
@@ -293,12 +307,16 @@ namespace InformedProteomics.Backend.MassSpecData
     }
 
     /// <summary>
-    /// ProteoWizardReaderImplementation, using the ProteoWizard pwiz_bindings_cli to utilize the ProteoWizard suite of vendor readers.
+    /// ProteoWizardReaderImplementation, using the ProteoWizard pwiz_bindings_cli to utilize the ProteoWizard suite of vendor readers
     /// </summary>
     /// <remarks>
-    /// This class uses a custom AssemblyResolver in class ProteoWizardLoader to find an installation of ProteoWizard.
+    /// <para>
+    /// This class uses a custom AssemblyResolver in class ProteoWizardLoader to find an installation of ProteoWizard
+    /// </para>
+    /// <para>
     /// If there are DLL resolving problems when trying to use it, add the ProteoWizardAssemblyResolver to the
-    /// AppDomain.CurrentDomain.AssemblyResolve event before first instantiating the class.
+    /// AppDomain.CurrentDomain.AssemblyResolve event before first instantiating the class
+    /// </para>
     /// </remarks>
     internal sealed class ProteoWizardReaderImplementation : IMassSpecDataReader
     {
@@ -435,7 +453,7 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// The number of spectra in the file.
+        /// The number of spectra in the file
         /// </summary>
         public int NumSpectra
         {
@@ -447,9 +465,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// The NativeIdFormat stored/used by the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000767, native spectrum identifier format
+        /// </remarks>
         public PSI_Interface.CV.CV.CVID NativeIdFormat
         {
             get
@@ -472,9 +492,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// The Native Format of the source file - needed for tracking purposes.
-        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// The Native Format of the source file - needed for tracking purposes
         /// </summary>
+        /// <remarks>
+        /// Child term of PSI-MS term MS:1000560, mass spectrometer file format
+        /// </remarks>
         public PSI_Interface.CV.CV.CVID NativeFormat
         {
             get
@@ -506,11 +528,11 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Returns the spectrum specified by the scan number.
+        /// Returns the spectrum specified by the scan number
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public Spectrum ReadMassSpectrum(int scanNum, bool includePeaks = true)
         {
             LoadPwizReader();
@@ -522,7 +544,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
             return ReadMassSpectrum(scanNum, includePeaks);
@@ -533,7 +555,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// This abstraction may be removed at a point in the future when versions of ProteoWizard older than that date are less likely to be in use.
         /// </summary>
         /// <param name="bda"></param>
-        /// <returns></returns>
+        /// <returns>Array of binary data</returns>
         private double[] GetBinaryDataAsArray(BinaryDataArray bda)
         {
             // BinaryDataArray.get_data() problem fix
@@ -558,7 +580,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanIndex"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         private Spectrum ReadSpectrum(int scanIndex, bool includePeaks = true)
         {
             var pwizSpec = _dataFile.run.spectrumList.spectrum(scanIndex - 1, includePeaks);

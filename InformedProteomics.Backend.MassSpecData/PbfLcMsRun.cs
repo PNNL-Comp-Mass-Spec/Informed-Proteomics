@@ -58,7 +58,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Function to convert a spectra file name/path to a *.pbf name, even when it has multiple extensions (i.e., .mzML.gz)
         /// </summary>
         /// <param name="specFileName"></param>
-        /// <returns></returns>
+        /// <returns>Pbf filename</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static string GetPbfFileName(string specFileName)
         {
@@ -70,7 +70,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="specFilePath"></param>
         /// <param name="progress"></param>
-        /// <returns></returns>
+        /// <returns>LcMsRun object</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(string specFilePath, IProgress<ProgressData> progress = null)
         {
@@ -84,7 +84,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
         /// <param name="productSignalToNoiseRatioThreshold"></param>
         /// <param name="progress"></param>
-        /// <returns></returns>
+        /// <returns>LcMsRun object</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(
             string specFilePath,
@@ -104,7 +104,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="precursorSignalToNoiseRatioThreshold"></param>
         /// <param name="productSignalToNoiseRatioThreshold"></param>
         /// <param name="progress"></param>
-        /// <returns></returns>
+        /// <returns>LcMsRun object</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         public static LcMsRun GetLcMsRun(string specFilePath, IMassSpecDataReader specReader, double precursorSignalToNoiseRatioThreshold, double productSignalToNoiseRatioThreshold,
             IProgress<ProgressData> progress = null)
@@ -126,7 +126,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="productSignalToNoiseRatioThreshold"></param>
         /// <param name="pbfFilePath">If supplied, file will be written to this path; otherwise the file will be written to the same directory as specFilePath, or to the temp directory if the user does not have write permissions</param>
         /// <param name="progress">Progress data, as a percentage</param>
-        /// <returns></returns>
+        /// <returns>Path to the actual pbf file opened</returns>
         /// <remarks>It is recommended that "MassSpecDataReaderFactory.NormalizeDatasetPath" be called prior to calling this function, and that the returned string be used instead of the original path</remarks>
         [Obsolete("Use GetLcMsRun() for an optimized pbf creation process", false)]
         public static string ConvertToPbf(string specFilePath, IMassSpecDataReader specReader, string pbfFilePath = null,
@@ -159,7 +159,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 // Calls "NormalizeDatasetPath" to make sure we save the file to the containing directory
                 pbfPath = GetPbfFileName(MassSpecDataReaderFactory.NormalizeDatasetPath(specFilePath));
                 fileName = Path.GetFileName(pbfPath);
-                if (String.IsNullOrEmpty(fileName))
+                if (string.IsNullOrEmpty(fileName))
                 {
                     throw new ArgumentException("Cannot create .pbf cache file", nameof(specFilePath));
                 }
@@ -235,7 +235,7 @@ namespace InformedProteomics.Backend.MassSpecData
             // Calls "NormalizeDatasetPath" to make sure we save the file to the containing directory
             pbfPath = MassSpecDataReaderFactory.ChangeExtension(MassSpecDataReaderFactory.NormalizeDatasetPath(specFilePath), extension);
             fileName = Path.GetFileName(pbfPath);
-            if (String.IsNullOrEmpty(fileName))
+            if (string.IsNullOrEmpty(fileName))
             {
                 throw new ArgumentException("Cannot create .pbf cache file", nameof(specFilePath));
             }
@@ -676,7 +676,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Get the native ID of the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Native ID string</returns>
         public override string GetNativeId(int scanNum)
         {
             if (!ScanNumNativeIdMap.TryGetValue(scanNum, out var nativeId))
@@ -698,7 +698,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public override Spectrum GetSpectrum(int scanNum, bool includePeaks = true)
         {
             if (!_scanNumToSpecOffset.TryGetValue(scanNum, out var offset))
@@ -723,7 +723,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Read and return the isolation window for the specified scan number
         /// </summary>
         /// <param name="scanNum"></param>
-        /// <returns></returns>
+        /// <returns>Isolation window object</returns>
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
             if (_scanNumToSpecOffset.TryGetValue(scanNum, out var offset))
@@ -742,7 +742,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
         /// <param name="precursorMz"></param>
-        /// <returns></returns>
+        /// <returns>Xic object</returns>
         public override Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorMz)
         {
             var targetOffset = GetOffset(minMz, maxMz, _offsetProductChromatogramBegin, _offsetProductChromatogramEnd);
@@ -777,7 +777,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
-        /// <returns></returns>
+        /// <returns>Xic object</returns>
         public override Xic GetPrecursorExtractedIonChromatogram(double minMz, double maxMz)
         {
             if (_precursorChromatogramCache.Count > 0 && _precursorChromatogramCache.First().Mz < minMz && _precursorChromatogramCache.Last().Mz > maxMz)
@@ -833,7 +833,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
-        /// <returns></returns>
+        /// <returns>Xic object</returns>
         public override Xic GetPrecursorChromatogramRange(double minMz, double maxMz)
         {
             if (_precursorChromatogramCache.Count > 0 && _precursorChromatogramCache.First().Mz < minMz && _precursorChromatogramCache.Last().Mz > maxMz)
@@ -895,7 +895,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="scanNum"></param>
         /// <param name="ms1ScanIndex"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         public override Spectrum GetMs1Spectrum(int scanNum, out int ms1ScanIndex)
         {
             ms1ScanIndex = -1;
@@ -1145,7 +1145,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="includePeaks"></param>
-        /// <returns></returns>
+        /// <returns>Spectrum object</returns>
         protected internal virtual Spectrum ReadSpectrum(BinaryReader reader, bool includePeaks = true)
         {
             // Must reflect all changes to WriteSpectrum
@@ -2356,7 +2356,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Get the MzBin index for the supplied m/z
         /// </summary>
         /// <param name="mz"></param>
-        /// <returns></returns>
+        /// <returns>Bin index</returns>
         public static int GetMzBinIndex(double mz)
         {
             return (int)(mz / MzBinSize);

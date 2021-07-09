@@ -12,7 +12,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the sequence tags for ProductSpectrum <paramref name="spec"/>
         /// </summary>
         /// <param name="spec"></param>
-        /// <returns></returns>
+        /// <returns>List of sequence tags</returns>
         IEnumerable<string> GetSequenceTags(ProductSpectrum spec);
     }
 }

@@ -15,7 +15,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>XIC object</returns>
         Xic GetFullPrecursorIonExtractedIonChromatogram(double mz, Tolerance tolerance);
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="minMz">min m/z</param>
         /// <param name="maxMz">max m/z</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>XIC object</returns>
         Xic GetFullPrecursorIonExtractedIonChromatogram(double minMz, double maxMz);
 
         // MS/MS
@@ -35,16 +35,16 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <param name="mz">target m/z</param>
         /// <param name="tolerance">tolerance</param>
         /// <param name="precursorIonMz">precursor m/z of the precursor ion</param>
-        /// <returns>XIC as an Xic object</returns>
+        /// <returns>XIC object</returns>
         Xic GetFullProductExtractedIonChromatogram(double mz, Tolerance tolerance, double precursorIonMz);
 
         /// <summary>
-        /// Returns a xic for the chosen range that covers the entire run.
+        /// Returns a XIC for the chosen range that covers the entire run.
         /// </summary>
         /// <param name="minMz"></param>
         /// <param name="maxMz"></param>
         /// <param name="precursorIonMz"></param>
-        /// <returns></returns>
+        /// <returns>XIC object</returns>
         Xic GetFullProductExtractedIonChromatogram(double minMz, double maxMz, double precursorIonMz);
     }
 }

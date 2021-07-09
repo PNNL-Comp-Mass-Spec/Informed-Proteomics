@@ -83,7 +83,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="suffixFragmentComposition"></param>
         /// <param name="nTerminalResidue"></param>
         /// <param name="cTerminalResidue"></param>
-        /// <returns></returns>
+        /// <returns>Fragment score</returns>
         public abstract double GetFragmentScore(Composition prefixFragmentComposition, Composition suffixFragmentComposition,
             AminoAcid nTerminalResidue = null,
             AminoAcid cTerminalResidue = null);
@@ -92,7 +92,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the range of min and max charges for the fragment composition
         /// </summary>
         /// <param name="fragmentComposition"></param>
-        /// <returns></returns>
+        /// <returns>Charge range object</returns>
         protected IntRange GetMinMaxChargeRange(Composition fragmentComposition)
         {
             var mostAbundantIsotopeIndex = fragmentComposition.GetMostAbundantIsotopeZeroBasedIndex();
@@ -104,7 +104,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the range of min and max charges for the provided fragment mass
         /// </summary>
         /// <param name="fragmentIonMostAbuMass"></param>
-        /// <returns></returns>
+        /// <returns>Charge range object</returns>
         protected IntRange GetMinMaxChargeRange(double fragmentIonMostAbuMass)
         {
             var minMz = Ms2Spectrum.Peaks.First().Mz;
@@ -131,7 +131,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="fragmentComposition"></param>
         /// <param name="corrThreshold"></param>
         /// <param name="distThreshold"></param>
-        /// <returns></returns>
+        /// <returns>List of deconvoluted peaks</returns>
         protected IEnumerable<DeconvolutedPeak> FindMatchedPeaks(Composition fragmentComposition,
                    double corrThreshold, double distThreshold)
         {
@@ -229,7 +229,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <param name="observedCharge"></param>
         /// <param name="envelopeCorr"></param>
         /// <param name="envelopeDist"></param>
-        /// <returns></returns>
+        /// <returns>List of peaks</returns>
         protected Peak[] FindMostIntensePeak(Composition fragmentComposition, double corrThreshold, double distThreshold, out int observedCharge, out double envelopeCorr, out double envelopeDist)
         {
             Peak[] intenseObservedPeaks = null;
@@ -281,7 +281,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="ion"></param>
         /// <param name="observedPeaks"></param>
-        /// <returns></returns>
+        /// <returns>Tuple of Bhattacharyya distance and Pearson correlation</returns>
         public static Tuple<double, double> GetDistCorr(Ion ion, Peak[] observedPeaks)
         {
             var isotopomerEnvelope = ion.Composition.GetIsotopomerEnvelopeRelativeIntensities();

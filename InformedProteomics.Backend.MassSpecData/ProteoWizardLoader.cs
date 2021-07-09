@@ -23,9 +23,15 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Add the Assembly Resolver to the system assembly resolver chain
         /// </summary>
-        /// <remarks>This should be called early in the program, so that the ProteoWizard Assembly Resolver will
-        /// already be in the resolver chain before any other use of ProteoWizardWrapper.
-        /// Also, DependencyLoader.ValidateLoader() should be used to make sure a meaningful error message is thrown if ProteoWizard is not available.</remarks>
+        /// <remarks>
+        /// <para>
+        /// This should be called early in the program, so that the ProteoWizard Assembly Resolver will
+        /// already be in the resolver chain before any other use of ProteoWizardWrapper
+        /// </para>
+        /// <para>
+        /// Also, DependencyLoader.ValidateLoader() should be used to make sure a meaningful error message is thrown if ProteoWizard is not available
+        /// </para>
+        /// </remarks>
         public static void AddAssemblyResolver()
         {
             if (!_resolverAdded)
@@ -45,7 +51,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        /// <returns></returns>
+        /// <returns>The loaded assembly</returns>
         public static Assembly ProteoWizardAssemblyResolver(object sender, ResolveEventArgs args)
         {
 #if DEBUG
@@ -55,7 +61,7 @@ namespace InformedProteomics.Backend.MassSpecData
             if (!args.Name.StartsWith("pwiz_bindings_cli", StringComparison.OrdinalIgnoreCase))
             {
                 return Assembly.LoadFrom(""); // We are not interested in searching for anything else - resolving pwiz_bindings_cli provides the hint for all of its dependencies.
-                // This will actually trigger an exception, which is handled in the system code, and the dll search goes on down the chain.
+                // This will actually trigger an exception, which is handled in the system code, and the DLL search goes on down the chain.
                 // returning null results in this code being called multiple times, for the same dependency.
             }
             Console.WriteLine("Searching for ProteoWizard files...");
@@ -144,19 +150,23 @@ namespace InformedProteomics.Backend.MassSpecData
 
         /// <summary>
         /// The path to the most recent 64-bit ProteoWizard install
-        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard DLLs are available.
         /// </summary>
+        /// <remarks>
+        /// If this is not null/empty, we can usually make a safe assumption that the ProteoWizard DLLs are available
+        /// </remarks>
         public static readonly string PwizPath;
 
         /// <summary>
-        /// Finds the path to the most recent 64-bit ProteoWizard install
+        /// Finds the path to the most recent 64-bit ProteoWizard install.
         /// PwizPath is populated from this, but only causes a single search.
         /// </summary>
-        /// <returns></returns>
-        /// <remarks>Paths searched, in order:
+        /// <returns>Path of the directory with ProteoWizard, or null if not found</returns>
+        /// <remarks>
+        /// Paths searched, in order:
         /// "%ProteoWizard%" or "%ProteoWizard%_x86" environment variable data,
         /// "C:\DMS_Programs\ProteoWizard" or "C:\DMS_Programs\ProteoWizard_x86",
-        /// "%ProgramFiles%\ProteoWizard\(highest sorted)"</remarks>
+        /// "%ProgramFiles%\ProteoWizard\(highest sorted)"
+        /// </remarks>
         public static string FindPwizPath()
         {
             string pwizPath;
@@ -194,7 +204,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 return pwizPath;
             }
 
-            // Look for Per-user and per-machine ProteoWizard installs; use whichever install is newer.
+            // Look for per-user and per-machine ProteoWizard installs; use whichever install is newer.
 
             var possibleInstallDirs = new List<DirectoryInfo>();
             // Per-User ProteoWizard install detection
@@ -319,10 +329,12 @@ namespace InformedProteomics.Backend.MassSpecData
         }
 
         /// <summary>
-        /// Checks to make sure the path to ProteoWizard files is set. If not, throws an exception.
+        /// Checks to make sure the path to ProteoWizard files is set; if not, throws an exception
         /// </summary>
-        /// <remarks>This function should generally only be called inside of a conditional statement to prevent the
-        /// exception from being thrown when the ProteoWizard DLLs will not be needed.</remarks>
+        /// <remarks>
+        /// This function should generally only be called inside of a conditional statement to prevent the
+        /// exception from being thrown when the ProteoWizard DLLs will not be needed
+        /// </remarks>
         public static void ValidateLoader()
         {
             try

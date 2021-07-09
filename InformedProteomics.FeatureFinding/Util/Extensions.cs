@@ -15,7 +15,7 @@ namespace InformedProteomics.FeatureFinding.Util
         /// </summary>
         /// <param name="feature"></param>
         /// <param name="featureId"></param>
-        /// <returns></returns>
+        /// <returns>New Ms1FtEntry object</returns>
         public static Ms1FtEntry ToMs1FtEntry(this LcMsPeakCluster feature, int featureId = 0)
         {
             var intensity = feature.RepresentativeSummedEnvelop;
@@ -60,7 +60,7 @@ namespace InformedProteomics.FeatureFinding.Util
         /// Converts a <see cref="LcMsPeakCluster"/> to a <see cref="Ms1FtEntryExtendedData"/>
         /// </summary>
         /// <param name="feature"></param>
-        /// <returns></returns>
+        /// <returns>New Ms1FtEntryExtendedData object</returns>
         private static Ms1FtEntryExtendedData ToMs1FtEntryExtendedData(this LcMsPeakCluster feature)
         {
             var extended = new Ms1FtEntryExtendedData
@@ -89,7 +89,7 @@ namespace InformedProteomics.FeatureFinding.Util
         /// </summary>
         /// <param name="feature"></param>
         /// <param name="featureId"></param>
-        /// <returns></returns>
+        /// <returns>New Ms1FtEntry object</returns>
         public static Ms1FtEntry ToMs1FtEntry(this LcMsFeature feature, int featureId = 0)
         {
             var ms1FtEntry = new Ms1FtEntry
@@ -118,7 +118,7 @@ namespace InformedProteomics.FeatureFinding.Util
         /// </summary>
         /// <param name="ms1FtEntry"></param>
         /// <param name="totalDatasetRunTime">The total runtime of the dataset; generally the elution time of the last scan. Used to compute NET</param>
-        /// <returns></returns>
+        /// <returns>New LcMsFeature object</returns>
         public static LcMsFeature ToLcMsFeature(this Ms1FtEntry ms1FtEntry, double totalDatasetRunTime = 0)
         {
             var repCharge = ms1FtEntry.RepresentativeCharge != 0 ? ms1FtEntry.RepresentativeCharge : (int)Math.Round(0.5 * (ms1FtEntry.MinCharge + ms1FtEntry.MaxCharge));

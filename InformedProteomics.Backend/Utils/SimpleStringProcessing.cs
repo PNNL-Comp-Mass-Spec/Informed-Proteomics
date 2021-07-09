@@ -15,7 +15,7 @@ namespace InformedProteomics.Backend.Utils
         /// Random shuffle a string
         /// </summary>
         /// <param name="str"></param>
-        /// <returns></returns>
+        /// <returns>Shuffled string</returns>
         public static string Shuffle(string str)
         {
             var indices = Enumerable.Range(0, str.Length).OrderBy(_ => _random.Next()).ToArray();
@@ -33,11 +33,13 @@ namespace InformedProteomics.Backend.Utils
         /// </summary>
         /// <param name="textToMutate"></param>
         /// <param name="numMutations"></param>
-        /// <returns></returns>
+        /// <remarks>The given number of residues will be changed to a different residue</remarks>
+        /// <returns>String with randomly changed amino acids</returns>
         public static string Mutate(string textToMutate, int numMutations)
         {
             var textLength = textToMutate.Length;
 
+            // Populate a HashSet with list of indices of the residues that we will mutate
             // Use a HashSet to assure that there are no duplicates
             var selectedIndexSet = new HashSet<int>();
             var maxValues = Math.Min(numMutations, textLength);
@@ -69,10 +71,10 @@ namespace InformedProteomics.Backend.Utils
         }
 
         /// <summary>
-        /// Get the string between 2 periods, so A.PEPTIDE.J returns PEPTIDE
+        /// Get the string between two periods, so A.PEPTIDE.J returns PEPTIDE
         /// </summary>
         /// <param name="str"></param>
-        /// <returns></returns>
+        /// <returns>Sequence without the prefix or suffix residue</returns>
         public static string GetStringBetweenDots(string str)
         {
             //if (!Regex.IsMatch(str, @"^[A-Z" + FastaDatabase.Delimiter + @"]\.[A-Z]+\.[A-Z" + FastaDatabase.Delimiter + @"]$")) return null;

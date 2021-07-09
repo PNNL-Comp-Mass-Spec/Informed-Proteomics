@@ -17,7 +17,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="count"></param>
         /// <param name="v1Index"></param>
         /// <param name="v2Index"></param>
-        /// <returns></returns>
+        /// <returns>Distance</returns>
         public static double GetBhattacharyyaDistance(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
             if (count == -1)
@@ -63,7 +63,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="n1"></param>
         /// <param name="k1"></param>
         /// <param name="upperTailProb"></param>
-        /// <returns></returns>
+        /// <returns>P value</returns>
         public static double GetHyperGeometricPValue(int n, int k, int n1, int k1, bool upperTailProb = true)
         {
             if (k >= n)
@@ -91,7 +91,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="n1"></param>
         /// <param name="r1"></param>
         /// <param name="upperTailProb"></param>
-        /// <returns></returns>
+        /// <returns>P value</returns>
         public static double GetRankSumPValue(double n, double n1, double r1, bool upperTailProb = true)
         {
             var n2 = n - n1;
@@ -163,7 +163,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="count"></param>
         /// <param name="v1Index"></param>
         /// <param name="v2Index"></param>
-        /// <returns></returns>
+        /// <returns>Distance and correlation</returns>
         public static Tuple<double, double> GetDistanceAndCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
             if (count == -1)
@@ -233,7 +233,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="count"></param>
         /// <param name="v1Index"></param>
         /// <param name="v2Index"></param>
-        /// <returns></returns>
+        /// <returns>Correlation</returns>
         public static double GetPearsonCorrelation(double[] v1, double[] v2, int count = -1, int v1Index = 0, int v2Index = 0)
         {
             if (count == -1)
@@ -291,7 +291,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="theoreticalPeakList"></param>
         /// <param name="observedPeakList"></param>
-        /// <returns></returns>
+        /// <returns>Cosine score</returns>
         public static double GetCosine(double[] theoreticalPeakList, double[] observedPeakList)
         {
             if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0)
@@ -319,7 +319,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="theoreticalPeakList"></param>
         /// <param name="observedPeakList"></param>
-        /// <returns></returns>
+        /// <returns>Dot product</returns>
         public static double GetDotProduct(double[] theoreticalPeakList, double[] observedPeakList)
         {
             if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0)
@@ -339,11 +339,11 @@ namespace InformedProteomics.Backend.MathAndStats
         }
 
         /// <summary>
-        /// Calculate the Decon Tools fit score for the provided data. Smaller scores are better.
+        /// Calculate the DeconTools fit score for the provided data. Smaller scores are better.
         /// </summary>
         /// <param name="theoreticalPeakList"></param>
         /// <param name="observedPeakList"></param>
-        /// <returns></returns>
+        /// <returns>Fit score</returns>
         public static double GetDeconToolsFit(double[] theoreticalPeakList, double[] observedPeakList)
         {
             if (theoreticalPeakList.Length != observedPeakList.Length || theoreticalPeakList.Length == 0)
@@ -383,7 +383,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// </summary>
         /// <param name="normTheoreticalPeakList"></param>
         /// <param name="normObservedPeakList"></param>
-        /// <returns></returns>
+        /// <returns>Fit score</returns>
         public static double GetFitOfNormalizedVectors(double[] normTheoreticalPeakList, double[] normObservedPeakList)
         {
             if (normTheoreticalPeakList.Length != normObservedPeakList.Length || normTheoreticalPeakList.Length == 0)

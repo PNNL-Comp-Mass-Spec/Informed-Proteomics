@@ -49,20 +49,20 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public double Intensity { get; }
 
         /// <summary>
-        /// Compare 2 XicPoints
+        /// Compare two XicPoints
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>0, 1, or -1</returns>
         public int CompareTo(XicPoint other)
         {
             return ScanNum - other.ScanNum;
         }
 
         /// <summary>
-        /// Check 2 XicPoints for equality
+        /// Check two XicPoints for equality
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         public bool Equals(XicPoint other)
         {
             if (other == null)
@@ -116,7 +116,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-        /// <returns></returns>
         public static bool operator ==(XicPoint left, XicPoint right)
         {
             return Equals(left, right);
@@ -127,7 +126,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
-        /// <returns></returns>
         public static bool operator !=(XicPoint left, XicPoint right)
         {
             return !Equals(left, right);

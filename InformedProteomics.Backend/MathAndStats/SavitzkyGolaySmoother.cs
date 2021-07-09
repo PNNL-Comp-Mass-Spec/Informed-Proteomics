@@ -60,7 +60,7 @@ namespace InformedProteomics.Backend.MathAndStats
         /// Smooth the provided array
         /// </summary>
         /// <param name="inputValues"></param>
-        /// <returns></returns>
+        /// <returns>Array of smoothed values</returns>
         public double[] Smooth(double[] inputValues)
         {
             // No need to smooth if all values are 0

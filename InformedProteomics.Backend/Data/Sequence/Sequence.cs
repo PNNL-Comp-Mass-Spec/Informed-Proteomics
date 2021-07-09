@@ -46,7 +46,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get the list (as a string) of the modifications and their locations in this sequence
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Human readable list of modifications</returns>
         public string GetModificationString()
         {
             var sb = new StringBuilder();
@@ -73,7 +73,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <param name="sequence"></param>
         /// <param name="modStr">E.g. Acetyl 0,Oxidation 1,Oxidation 20,Oxidation 27</param>
         /// <param name="aminoAcidSet"></param>
-        /// <returns></returns>
+        /// <returns>Sequence object</returns>
         public static Sequence CreateSequence(string sequence, string modStr, AminoAcidSet aminoAcidSet)
         {
             if (string.IsNullOrEmpty(modStr))
@@ -148,7 +148,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="from">inclusive</param>
         /// <param name="to">exclusive</param>
-        /// <returns></returns>
+        /// <returns>Summed mass of the matching residues</returns>
         public double GetMass(int from, int to)
         {
             return _prefixMass[to] - _prefixMass[from];
@@ -159,7 +159,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// </summary>
         /// <param name="from">inclusive</param>
         /// <param name="to">exclusive</param>
-        /// <returns></returns>
+        /// <returns>Composition of the matching residues</returns>
         public Composition.Composition GetComposition(int from, int to)
         {
             return PrefixComposition[to] - PrefixComposition[from];
@@ -168,7 +168,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get the internal cleavages
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of internal cleavage points</returns>
         public IEnumerable<Cleavage> GetInternalCleavages()
         {
             var cleavages = new Cleavage[Count - 1];
@@ -189,7 +189,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get the prefix compositions
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of prefix compositions</returns>
         public IEnumerable<Composition.Composition> GetPrefixCompositions()
         {
             //var compositions = new Composition.Composition[Count];
@@ -206,7 +206,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Get the suffix compositions
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of suffix compositions</returns>
         public IEnumerable<Composition.Composition> GetSuffixCompositions()
         {
             //var compositions = new Composition.Composition[Count];
@@ -223,7 +223,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the precursor ion
         /// </summary>
         /// <param name="charge"></param>
-        /// <returns></returns>
+        /// <returns>Precursor ion for the given charge state</returns>
         public Ion GetPrecursorIon(int charge)
         {
             return new Ion(Composition + Data.Composition.Composition.H2O, charge);
@@ -233,7 +233,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the product ions of the specified types
         /// </summary>
         /// <param name="ionTypes"></param>
-        /// <returns></returns>
+        /// <returns>Dictionary of product ions, where keys are Tuples of IonType and int, while are Ion objects</returns>
         public Dictionary<Tuple<IonType, int>, Ion> GetProductIons(IEnumerable<IonType> ionTypes)
         {
             var ionTypeArr = ionTypes as IonType[] ?? ionTypes.ToArray();
@@ -269,7 +269,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Parse peptide string from MS-GF+ results
         /// </summary>
         /// <param name="msgfPlusPeptideStr">string of format "+229.163C+57.021GLGGSGTPVDELDK+229.163C+57.021C+57.021QTHDNC+57.021YDQAK+229.163"</param>
-        /// <returns></returns>
+        /// <returns>Sequence object</returns>
         public static Sequence GetSequenceFromMsGfPlusPeptideStr(string msgfPlusPeptideStr)
         {
             const string aminoAcidRegex = "[" + AminoAcid.StandardAminoAcidCharacters + "]";

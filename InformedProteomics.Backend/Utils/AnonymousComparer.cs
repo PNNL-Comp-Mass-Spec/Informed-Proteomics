@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace InformedProteomics.Backend.Utils
 {
     /// <summary>
-    /// Class used for helping create an IComparer class for binary search.
+    /// Class used for helping create an IComparer class for binary search
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class AnonymousComparer<T> : IComparer<T>
@@ -12,19 +12,19 @@ namespace InformedProteomics.Backend.Utils
         private readonly Comparison<T> _mComparison;
 
         /// <summary>
-        /// Constructor that requires the Comparison be passed in.
+        /// Constructor that requires the Comparison be passed in
         /// </summary>
-        /// <param name="comparison">The Comparison to be used for the binary search.</param>
+        /// <param name="comparison">The Comparison to be used for the binary search</param>
         public AnonymousComparer(Comparison<T> comparison)
         {
             _mComparison = comparison ?? throw new ArgumentNullException(nameof(comparison));
         }
 
         /// <summary>
-        /// Compares 2 objects using the Comparison passed in when creating the AnonymousComparer class.
+        /// Compares 2 objects using the Comparison passed in when creating the AnonymousComparer class
         /// </summary>
-        /// <param name="x">The first object.</param>
-        /// <param name="y">The second object.</param>
+        /// <param name="x">The first object</param>
+        /// <param name="y">The second object</param>
         /// <returns>
         /// Less than zero if the first object precedes the second.
         /// Zero if the objects occur in the same position.

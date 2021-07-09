@@ -62,7 +62,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Nominal mass of the amino acid
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Nominal mass</returns>
         public int GetNominalMass()
         {
             return _nominalMass;
@@ -144,7 +144,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Checks if <paramref name="residue"/> is a standard amino acid character
         /// </summary>
         /// <param name="residue"></param>
-        /// <returns></returns>
+        /// <returns>True if a standard amino acid symbol</returns>
         public static bool IsStandardAminoAcidResidue(char residue)
         {
             return StandardAminoAcidCharacters.IndexOf(residue) >= 0;
@@ -169,7 +169,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// Get the UniProt statistical frequency of <paramref name="residue"/>
         /// </summary>
         /// <param name="residue"></param>
-        /// <returns></returns>
+        /// <returns>Frequency at which this residue is seen (number between 0 and 1)</returns>
         public static double GetUniProtFrequency(char residue)
         {
             var index = StandardAminoAcidCharacters.IndexOf(residue);

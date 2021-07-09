@@ -37,7 +37,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Number of modifications applied to the sequence
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Modification count</returns>
         public int GetNumModifications()
         {
             return Modifications.Count;

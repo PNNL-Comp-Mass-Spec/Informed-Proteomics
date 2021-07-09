@@ -218,7 +218,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// Read in result data from the specified TSV format file.
         /// </summary>
         /// <param name="filePath"></param>
-        /// <returns></returns>
+        /// <returns>List of database search results</returns>
         public static List<DatabaseSearchResultData> ReadResultsFromFile(string filePath)
         {
             List<DatabaseSearchResultData> results;
@@ -322,7 +322,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// Read results from TSV file into group of objects from PSI_Interface
         /// </summary>
         /// <param name="idFilePath"></param>
-        /// <returns></returns>
+        /// <returns>Container with database search results</returns>
         public static SimpleMZIdentMLReader.SimpleMZIdentMLData ReadResultsFromFileToMzIdData(string idFilePath)
         {
             var databaseSearchResultData = ReadResultsFromFile(idFilePath);
@@ -401,9 +401,9 @@ namespace InformedProteomics.Backend.SearchResults
         }
 
         /// <summary>
-        /// Show the scan number and the sequence
+        /// Show the scan number, scores, and sequence
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Human-readable description of this database search result</returns>
         public override string ToString()
         {
             return string.Format("Scan {0,4}, EValue {1:0.00000}, Probability {2:0.00000}: {3}", ScanNum, EValue, Probability, SequenceWithEnds);

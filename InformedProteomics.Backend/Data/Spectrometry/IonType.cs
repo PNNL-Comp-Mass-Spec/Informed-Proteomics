@@ -91,7 +91,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the m/z of <paramref name="cutMass"/> + (the offset mass)
         /// </summary>
         /// <param name="cutMass"></param>
-        /// <returns></returns>
+        /// <returns>m/z</returns>
         public double GetMz(double cutMass)
         {
             return (cutMass + _offsetMass) / Charge + Constants.Proton;
@@ -101,7 +101,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the m/z of <paramref name="prefixComposition"/> + (the offset composition)
         /// </summary>
         /// <param name="prefixComposition"></param>
-        /// <returns></returns>
+        /// <returns>m/z</returns>
         public double GetMz(Composition.Composition prefixComposition)
         {
             Debug.Assert(prefixComposition != null, "prefixComposition must not be null");
@@ -112,7 +112,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get the Ion with the cutComposition added
         /// </summary>
         /// <param name="cutComposition"></param>
-        /// <returns></returns>
+        /// <returns>Ion object</returns>
         public Ion GetIon(Composition.Composition cutComposition)
         {
             return new Ion(cutComposition + OffsetComposition, Charge);
@@ -123,7 +123,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// </summary>
         /// <param name="cutComposition"></param>
         /// <param name="terminalResidue"></param>
-        /// <returns></returns>
+        /// <returns>List of ions</returns>
         public IEnumerable<Ion> GetPossibleIons(Composition.Composition cutComposition, AminoAcid terminalResidue)
         {
             return BaseIonType.GetPossibleCompositions(terminalResidue)
@@ -135,7 +135,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get possible ions for <paramref name="sequence"/>
         /// </summary>
         /// <param name="sequence"></param>
-        /// <returns></returns>
+        /// <returns>List of ions</returns>
         public IEnumerable<Ion> GetPossibleIons(Sequence sequence)
         {
             var cutComposition = sequence.Composition;
@@ -156,7 +156,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Returns ion name with ion index (e.g. y++4-H2O => charge 2 y4 - H2O)
         /// </summary>
         /// <param name="index"></param>
-        /// <returns></returns>
+        /// <returns>Ion name</returns>
         public string GetName(int index)
         {
             string chargeStr;
@@ -181,7 +181,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Parse an ion from string <paramref name="s"/>
         /// </summary>
         /// <param name="s"></param>
-        /// <returns></returns>
+        /// <returns>Ion type object</returns>
         [Obsolete("IonType object should be generated through IonTypeFactory")]
         public static IonType Parse(string s)
         {
@@ -218,7 +218,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Check for equality
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>True if the items match</returns>
         protected bool Equals(IonType other)
         {
             return Charge == other.Charge && Equals(OffsetComposition, other.OffsetComposition) && IsPrefixIon == other.IsPrefixIon;

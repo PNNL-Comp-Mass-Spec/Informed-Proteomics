@@ -27,10 +27,10 @@ namespace PromexAlign
         public string MsPfIdFilePath { get; set; }
 
         /// <summary>
-        /// Parse a dataset info file to get the datasets to run on.
+        /// Parse a dataset info file to get the datasets to run on
         /// </summary>
         /// <param name="filePath"></param>
-        /// <returns></returns>
+        /// <returns>List of dataset info objects</returns>
         public static List<DatasetInfo> ParseDatasetInfoFile(string filePath)
         {
             var datasets = new List<DatasetInfo>();

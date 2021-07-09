@@ -637,7 +637,7 @@ namespace MSPathFinderT
         /// Prevent the user from specifying too many threads
         /// </summary>
         /// <param name="userMaxThreads"></param>
-        /// <returns></returns>
+        /// <returns>Actual thread count to use</returns>
         private int GetOptimalMaxThreads(int userMaxThreads)
         {
             var threads = userMaxThreads;

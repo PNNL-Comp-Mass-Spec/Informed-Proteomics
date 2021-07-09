@@ -11,7 +11,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// Get MS2 scans that have a precursor mass that matches <paramref name="sequenceMass"/>
         /// </summary>
         /// <param name="sequenceMass"></param>
-        /// <returns></returns>
+        /// <returns>List of scan numbers</returns>
         IEnumerable<int> GetMatchingMs2ScanNums(double sequenceMass);
     }
 }

@@ -82,9 +82,9 @@ namespace InformedProteomics.Backend.Database
         /// <param name="numTolerableTermini"></param>
         /// <param name="numMissedCleavages"></param>
         /// <param name="enzyme"></param>
-        /// <returns></returns>
-        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(int minLength, int maxLength, int numTolerableTermini,
-                                                      int numMissedCleavages, Enzyme enzyme)
+        /// <returns>List of annotation and offset data</returns>
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsets(
+            int minLength, int maxLength, int numTolerableTermini, int numMissedCleavages, Enzyme enzyme)
         {
             return AnnotationsAndOffsets(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues,
                                enzyme.IsNTerm);
@@ -100,12 +100,11 @@ namespace InformedProteomics.Backend.Database
         /// <param name="enzyme"></param>
         /// <param name="threads"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(int minLength, int maxLength, int numTolerableTermini,
-                                                      int numMissedCleavages, Enzyme enzyme, int threads, CancellationToken? cancellationToken = null)
+        /// <returns>List of annotation and offset data</returns>
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsParallel(
+            int minLength, int maxLength, int numTolerableTermini, int numMissedCleavages, Enzyme enzyme, int threads, CancellationToken? cancellationToken = null)
         {
-            return AnnotationsAndOffsetsParallel(
-                minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues, enzyme.IsNTerm, threads, cancellationToken);
+            return AnnotationsAndOffsetsParallel(minLength, maxLength, numTolerableTermini, numMissedCleavages, enzyme.Residues, enzyme.IsNTerm, threads, cancellationToken);
         }
 
         /// <summary>
@@ -113,7 +112,7 @@ namespace InformedProteomics.Backend.Database
         /// </summary>
         /// <param name="minLength"></param>
         /// <param name="maxLength"></param>
-        /// <returns></returns>
+        /// <returns>List of annotation and offset data</returns>
         public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzyme(int minLength, int maxLength)
         {
             return AnnotationsAndOffsets(minLength, maxLength, 0, 0, null, false);
@@ -126,8 +125,9 @@ namespace InformedProteomics.Backend.Database
         /// <param name="maxLength"></param>
         /// <param name="threads"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzymeParallel(int minLength, int maxLength, int threads = 0, CancellationToken? cancellationToken = null)
+        /// <returns>List of annotation and offset data</returns>
+        public IEnumerable<AnnotationAndOffset> AnnotationsAndOffsetsNoEnzymeParallel(
+            int minLength, int maxLength, int threads = 0, CancellationToken? cancellationToken = null)
         {
             return AnnotationsAndOffsetsParallel(minLength, maxLength, 0, 0, null, false, threads, cancellationToken);
         }
@@ -137,7 +137,7 @@ namespace InformedProteomics.Backend.Database
         /// </summary>
         /// <param name="minLength"></param>
         /// <param name="maxLength"></param>
-        /// <returns></returns>
+        /// <returns>List of annotation and offset data</returns>
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength)
         {
             return IntactSequenceAnnotationsAndOffsets(minLength, maxLength, 0);
@@ -149,7 +149,7 @@ namespace InformedProteomics.Backend.Database
         /// <param name="minLength"></param>
         /// <param name="maxLength"></param>
         /// <param name="numCTermCleavages"></param>
-        /// <returns></returns>
+        /// <returns>List of annotation and offset data</returns>
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsets(int minLength, int maxLength, int numCTermCleavages)
         {
             foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
@@ -178,7 +178,7 @@ namespace InformedProteomics.Backend.Database
         /// <param name="minLength"></param>
         /// <param name="maxLength"></param>
         /// <param name="numCTermCleavages"></param>
-        /// <returns></returns>
+        /// <returns>List of annotation and offset data</returns>
         public IEnumerable<AnnotationAndOffset> IntactSequenceAnnotationsAndOffsetsWithCTermCleavagesLargerThan(int minLength, int maxLength, int numCTermCleavages)
         {
             foreach (var seqWithOffset in SequencesWithOffsetNoCleavage())
@@ -208,7 +208,7 @@ namespace InformedProteomics.Backend.Database
         /// <param name="maxSequenceLength"></param>
         /// <param name="maxNumNTermCleavages"></param>
         /// <param name="maxNumCTermCleavages"></param>
-        /// <returns></returns>
+        /// <returns>List of annotation and offset data</returns>
         public IEnumerable<AnnotationAndOffset> SequenceAnnotationsAndOffsetsWithNTermOrCTermCleavageNoLargerThan(
             int minSequenceLength, int maxSequenceLength, int maxNumNTermCleavages, int maxNumCTermCleavages)
         {
@@ -263,7 +263,6 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Length of the longest sequence
         /// </summary>
-        /// <returns></returns>
         public int GetLongestSequenceLength()
         {
             return SequencesWithOffsetNoCleavage().Max(seqWithOffset => seqWithOffset.Sequence.Length);
@@ -334,7 +333,7 @@ namespace InformedProteomics.Backend.Database
         /// <param name="maxLength"></param>
         /// <param name="numNTermCleavages"></param>
         /// <param name="numCTermCleavages"></param>
-        /// <returns></returns>
+        /// <returns>Estimated number of peptides</returns>
         public long EstimateTotalPeptides(int mode, int minLength = 21, int maxLength = 300, int numNTermCleavages = 1,
             int numCTermCleavages = 0)
         {
@@ -363,7 +362,7 @@ namespace InformedProteomics.Backend.Database
         /// <param name="maxLength"></param>
         /// <param name="numNTermCleavages"></param>
         /// <param name="numCTermCleavages"></param>
-        /// <returns></returns>
+        /// <returns>Estimated number of peptides</returns>
         public long EstimateTotalPeptides(InternalCleavageType mode, int minLength = 21, int maxLength = 300, int numNTermCleavages = 1, int numCTermCleavages = 0)
         {
             long count = 0;
@@ -901,7 +900,7 @@ namespace InformedProteomics.Backend.Database
         /// <param name="sequence"></param>
         /// <param name="index1"></param>
         /// <param name="index2"></param>
-        /// <returns></returns>
+        /// <returns>Length of the longest common prefix</returns>
         public static byte GetLcp(IList<byte> sequence, int index1, int index2)
         {
             var lcp = (byte)0;

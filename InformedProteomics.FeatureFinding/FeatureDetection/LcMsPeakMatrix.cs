@@ -138,14 +138,14 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         public int Ms1PeakCount => _ms1PeakList.Count;
 
         /// <summary>
-        /// find Lc-Ms feature for a specified mass, charge state, and range of scan
+        /// Find LC/MS feature for a specified mass, charge state, and range of scan
         /// </summary>
         /// <param name="targetMass"></param>
         /// <param name="targetCharge"></param>
         /// <param name="targetMinScanNum"></param>
         /// <param name="targetMaxScanNum"></param>
         /// <param name="featureMatrixCreated"></param>
-        /// <returns></returns>
+        /// <returns>Matched feature, or null if no match</returns>
         public LcMsPeakCluster GetLcMsPeakCluster(double targetMass, int targetCharge, int targetMinScanNum, int targetMaxScanNum, bool featureMatrixCreated = false)
         {
             if (!featureMatrixCreated)
@@ -219,14 +219,14 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         }
 
         /// <summary>
-        /// find Lc-Ms feature for a specified mass, given charge states and a range of scan
+        /// Find LC/MS feature for a specified mass, given charge states and a range of scan
         /// </summary>
         /// <param name="targetMass"></param>
         /// <param name="minCharge"></param>
         /// <param name="maxCharge"></param>
         /// <param name="minScanNum"></param>
         /// <param name="maxScanNum"></param>
-        /// <returns></returns>
+        /// <returns>Matched feature, or null if no match</returns>
         public LcMsPeakCluster GetLcMsPeakCluster(double targetMass, int minCharge, int maxCharge, int minScanNum, int maxScanNum)
         {
             InitFeatureMatrix();
@@ -788,7 +788,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 
             var clusters = new List<LcMsPeakCluster>();
 
-            // todo : bottom up dataset??
+            // ToDo: bottom up dataset??
             if (_rows.Length < 2 || _cols.Length < 1)
             {
                 return clusters;
@@ -1214,7 +1214,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 options.MaxDegreeOfParallelism = _maxThreadCount;
             }
 
-            //foreach (var i in _rows)
+            // foreach (var i in _rows)
             Parallel.ForEach(_rows, options, i =>
             {
                 var summedEnvelope = GetSummedEnvelopeAtCharge(targetMass, i, seedMinCol, seedMaxCol);

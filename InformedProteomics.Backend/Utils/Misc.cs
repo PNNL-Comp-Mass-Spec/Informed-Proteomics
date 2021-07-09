@@ -13,7 +13,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Parse the assembly's version to try to get a build date
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Build date</returns>
         public static DateTime GetBuildDateFromVersion()
         {
             try
@@ -33,7 +33,7 @@ namespace InformedProteomics.Backend.Utils
         /// Parse the supplied version to try to get a build date
         /// </summary>
         /// <param name="version"></param>
-        /// <returns></returns>
+        /// <returns>Build date as a DateTime object</returns>
         public static DateTime GetBuildDateFromVersion(Version version)
         {
             var buildDateTime = new DateTime(2000, 1, 1).Add(
@@ -46,7 +46,7 @@ namespace InformedProteomics.Backend.Utils
         /// <summary>
         /// Parse the assembly's version to try to get a build date
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Build date</returns>
         public static string GetBuildDateTextFromVersion()
         {
             try
@@ -66,7 +66,7 @@ namespace InformedProteomics.Backend.Utils
         /// Parse the supplied version to try to get a build date
         /// </summary>
         /// <param name="version"></param>
-        /// <returns></returns>
+        /// <returns>Build date</returns>
         public static string GetBuildDateTextFromVersion(Version version)
         {
             var buildDateTime = GetBuildDateFromVersion(version);

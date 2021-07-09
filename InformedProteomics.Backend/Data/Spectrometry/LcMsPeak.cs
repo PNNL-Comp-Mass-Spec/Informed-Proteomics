@@ -25,10 +25,10 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         public int ScanNum { get; }
 
         /// <summary>
-        /// Compare 2 LcMsPeaks (for sorting)
+        /// Compare two LcMsPeaks (for sorting)
         /// </summary>
         /// <param name="other"></param>
-        /// <returns></returns>
+        /// <returns>0, -1 or 1</returns>
         public int CompareTo(LcMsPeak other)
         {
             var mzCompare = Mz.CompareTo(other.Mz);
