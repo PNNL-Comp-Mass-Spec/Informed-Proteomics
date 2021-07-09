@@ -172,7 +172,7 @@ namespace InformedProteomics.Backend.MassSpecData
             string pwizPath;
 
             // Set the DMS_Programs ProteoWizard path based on if the process is 32- or 64-bit.
-            string dmsProgPwiz;
+            string dmsProgramsPwiz;
 
             if (!Environment.Is64BitProcess)
             {
@@ -184,19 +184,19 @@ namespace InformedProteomics.Backend.MassSpecData
                     pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
                 }
 
-                dmsProgPwiz = @"C:\DMS_Programs\ProteoWizard_x86";
+                dmsProgramsPwiz = @"C:\DMS_Programs\ProteoWizard_x86";
             }
             else
             {
                 // Check for a x64 ProteoWizard environment variable
                 pwizPath = Environment.GetEnvironmentVariable("ProteoWizard");
-                dmsProgPwiz = @"C:\DMS_Programs\ProteoWizard";
+                dmsProgramsPwiz = @"C:\DMS_Programs\ProteoWizard";
             }
 
-            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(dmsProgPwiz) &&
-                new DirectoryInfo(dmsProgPwiz).GetFiles(TargetDllName).Length > 0)
+            if (string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(dmsProgramsPwiz) &&
+                new DirectoryInfo(dmsProgramsPwiz).GetFiles(TargetDllName).Length > 0)
             {
-                return dmsProgPwiz;
+                return dmsProgramsPwiz;
             }
 
             if (!string.IsNullOrWhiteSpace(pwizPath) && Directory.Exists(pwizPath) && new DirectoryInfo(pwizPath).GetFiles(TargetDllName).Length > 0)
@@ -211,32 +211,32 @@ namespace InformedProteomics.Backend.MassSpecData
             var localAppDataDir = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Apps"));
             if (localAppDataDir.Exists)
             {
-                var bitness = Environment.Is64BitProcess ? 64 : 32;
-                possibleInstallDirs.AddRange(localAppDataDir.EnumerateDirectories($"ProteoWizard*{bitness}-bit"));
+                var bitType = Environment.Is64BitProcess ? 64 : 32;
+                possibleInstallDirs.AddRange(localAppDataDir.EnumerateDirectories($"ProteoWizard*{bitType}-bit"));
             }
 
             // NOTE: This call returns the 32-bit Program Files folder if the running process is 32-bit
             // or the 64-bit Program Files folder if the running process is 64-bit
-            var progFiles = Environment.GetEnvironmentVariable("ProgramFiles");
-            if (string.IsNullOrWhiteSpace(progFiles))
+            var programFiles = Environment.GetEnvironmentVariable("ProgramFiles");
+            if (string.IsNullOrWhiteSpace(programFiles))
             {
                 return null;
             }
 
             // Construct a path of the form "C:\Program Files\ProteoWizard" or "C:\Program Files (x86)\ProteoWizard"
-            var progPwiz = Path.Combine(progFiles, "ProteoWizard");
-            var pwizFolder = new DirectoryInfo(progPwiz);
+            var programFilesPwiz = Path.Combine(programFiles, "ProteoWizard");
+            var pwizFolder = new DirectoryInfo(programFilesPwiz);
             if (pwizFolder.Exists)
             {
                 if (pwizFolder.GetFiles(TargetDllName).Length > 0)
                 {
-                    return progPwiz;
+                    return programFilesPwiz;
                 }
             }
             else
             {
                 // Update pwizFolder to be "C:\Program Files" or "C:\Program Files (x86)"
-                pwizFolder = new DirectoryInfo(progFiles);
+                pwizFolder = new DirectoryInfo(programFiles);
                 if (!pwizFolder.Exists)
                 {
                     return null;

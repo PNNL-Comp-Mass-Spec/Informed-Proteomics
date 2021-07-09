@@ -1315,7 +1315,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     {
                         if (file.ReadByte() == '<')
                         {
-                            pos = file.Position - 1; // position of caret
+                            position = file.Position - 1; // position of caret
                             int spaceCaretSlash = 0;
                             for (int i = 0; i < 13; i++) // 13: "chromatogram "
                             {
@@ -1365,11 +1365,11 @@ namespace InformedProteomics.Backend.MassSpecData
                     // Add offset to the correct list
                     if (builder.StartsWith(specTag))
                     {
-                        _spectrumOffsets.AddOffset(id, pos);
+                        _spectrumOffsets.AddOffset(id, position);
                     }
                     else if (builder.StartsWith(chromTag))
                     {
-                        _chromatogramOffsets.AddOffset(id, pos);
+                        _chromatogramOffsets.AddOffset(id, position);
                     }
                 }*/
                 _haveIndex = true;

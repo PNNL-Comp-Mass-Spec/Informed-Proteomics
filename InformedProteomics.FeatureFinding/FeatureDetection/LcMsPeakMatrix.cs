@@ -352,16 +352,18 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 }
 
                 var timeInterval = Run.GetElutionTime(ms1ScanNums[col + 1]) - Run.GetElutionTime(ms1ScanNums[col]);
-                var abu = centerIntensity * timeInterval;
-                //abuList.Add(abu);
-                abundance += abu;
-                if (col >= minCol && col <= maxCol && apexIntensity < abu)
+                var currentAbundance = centerIntensity * timeInterval;
+                //abuList.Add(currentAbundance);
+
+                abundance += currentAbundance;
+
+                if (col >= minCol && col <= maxCol && apexIntensity < currentAbundance)
                 {
-                    apexIntensity = abu;
+                    apexIntensity = currentAbundance;
                     apexScanNum = ms1ScanNums[col];
                     if (col == minCol || col == maxCol)
                     {
-                        boundaryIntensity += abu;
+                        boundaryIntensity += currentAbundance;
                     }
                 }
             }

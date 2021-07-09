@@ -35,23 +35,23 @@ namespace InformedProteomics.Backend.Data.Biology
         public const double Proton = 1.00727649;
 
         /// <summary>
-        /// Get the bin number of the supplied mass <paramref name="m"/>
+        /// Get the bin number of the supplied mass <paramref name="mass"/>
         /// </summary>
-        /// <param name="m"></param>
-        /// <returns></returns>
-        public static int GetBinNum(double m)
+        /// <param name="mass"></param>
+        /// <returns>Bin number</returns>
+        public static int GetBinNum(double mass)
         {
-            return (int)Math.Round(m * RescalingConstant);
+            return (int)Math.Round(mass * RescalingConstant);
         }
 
         /// <summary>
-        /// Get the high-precision bin number of the supplied mass <paramref name="m"/>
+        /// Get the high-precision bin number of the supplied mass <paramref name="mass"/>
         /// </summary>
-        /// <param name="m"></param>
-        /// <returns></returns>
-        public static int GetBinNumHighPrecision(double m)
+        /// <param name="mass"></param>
+        /// <returns>Bin number</returns>
+        public static int GetBinNumHighPrecision(double mass)
         {
-            return (int)Math.Round(m * RescalingConstantHighPrecision);
+            return (int)Math.Round(mass * RescalingConstantHighPrecision);
         }
     }
 }

@@ -23,16 +23,16 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             _locationSpecificResidueMap = new Dictionary<SequenceLocation, Dictionary<char, AminoAcid>>();
             _locationSpecificResidueModMap = new Dictionary<SequenceLocation, Dictionary<char, int[]>>();
-            foreach (var loc in AllSequenceLocations)
+            foreach (var location in AllSequenceLocations)
             {
-                _locationSpecificResidueModMap[loc] = new Dictionary<char, int[]>();
+                _locationSpecificResidueModMap[location] = new Dictionary<char, int[]>();
             }
 
             // Initialize standard amino acid set
-            foreach (var loc in AllSequenceLocations)
+            foreach (var location in AllSequenceLocations)
             {
                 var residueMap = new Dictionary<char, AminoAcid>();
-                switch (loc)
+                switch (location)
                 {
                     case SequenceLocation.PeptideNTerm:
                         residueMap.Add(AminoAcid.PeptideNTerm.Residue, AminoAcid.PeptideNTerm);
@@ -48,12 +48,13 @@ namespace InformedProteomics.Backend.Data.Sequence
                         break;
                 }
 
-                // loc is SequenceLocation.Everywhere
+                // location is SequenceLocation.Everywhere
                 foreach (var aa in AminoAcid.StandardAminoAcidArr)
                 {
                     residueMap.Add(aa.Residue, aa);
                 }
-                _locationSpecificResidueMap[loc] = residueMap;
+
+                _locationSpecificResidueMap[location] = residueMap;
             }
         }
 

@@ -1423,7 +1423,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var minMzIndex = lcmsRun.Ms1PeakList.Count > 0 ? GetMzBinIndex(lcmsRun.Ms1PeakList[0].Mz) : 0;
             var maxMzIndex = lcmsRun.Ms1PeakList.Count > 0 ? GetMzBinIndex(lcmsRun.Ms1PeakList[lcmsRun.Ms1PeakList.Count - 1].Mz) : -1;
 
-            var chromMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
+            var chromatogramMzIndexToOffset = new long[maxMzIndex - minMzIndex + 1];
             var prevMzIndex = -1;
             counter = 0;
             countTotal = lcmsRun.Ms1PeakList.Count;
@@ -1439,7 +1439,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 var mzIndex = GetMzBinIndex(mz);
                 if (mzIndex > prevMzIndex)
                 {
-                    chromMzIndexToOffset[mzIndex - minMzIndex] = writer.BaseStream.Position;
+                    chromatogramMzIndexToOffset[mzIndex - minMzIndex] = writer.BaseStream.Position;
                     prevMzIndex = mzIndex;
                 }
                 writer.Write(peak.Mz);
@@ -1545,19 +1545,19 @@ namespace InformedProteomics.Backend.MassSpecData
             progressData.Report(99.9); // Metadata: Approximately 0.2% of total file size
 
             var prevOffset = offsetBeginMetaInformation;
-            for (var i = chromMzIndexToOffset.Length - 1; i >= 0; i--)
+            for (var i = chromatogramMzIndexToOffset.Length - 1; i >= 0; i--)
             {
-                if (chromMzIndexToOffset[i] < offsetBeginPrecursorChromatogram)
+                if (chromatogramMzIndexToOffset[i] < offsetBeginPrecursorChromatogram)
                 {
-                    chromMzIndexToOffset[i] = prevOffset;
+                    chromatogramMzIndexToOffset[i] = prevOffset;
                 }
                 else
                 {
-                    prevOffset = chromMzIndexToOffset[i];
+                    prevOffset = chromatogramMzIndexToOffset[i];
                 }
             }
 
-            foreach (var offset in chromMzIndexToOffset)
+            foreach (var offset in chromatogramMzIndexToOffset)
             {
                 writer.Write(offset);
             }

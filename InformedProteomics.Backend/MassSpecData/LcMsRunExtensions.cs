@@ -156,17 +156,17 @@ namespace InformedProteomics.Backend.MassSpecData
             int minScanNum, int maxScanNum, int minCharge, int maxCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
             var isoEnv = Averagine.GetIsotopomerEnvelope(monoIsotopicMass);
-            var ms2ScanNums = new List<int>();
+            var ms2ScanNumbers = new List<int>();
             for (var charge = minCharge; charge <= maxCharge; charge++)
             {
                 var mostAbundantIsotopeMz = Ion.GetIsotopeMz(monoIsotopicMass, charge, isoEnv.MostAbundantIsotopeIndex);
-                ms2ScanNums.AddRange(lcmsRun.GetFragmentationSpectraScanNums(mostAbundantIsotopeMz)
+                ms2ScanNumbers.AddRange(lcmsRun.GetFragmentationSpectraScanNums(mostAbundantIsotopeMz)
                     .Where(ms2ScanNum => ms2ScanNum >= minScanNum && ms2ScanNum <= maxScanNum &&
                         (activationMethod == ActivationMethod.Unknown ||
                         ((ProductSpectrum)lcmsRun.GetSpectrum(ms2ScanNum)).ActivationMethod == activationMethod)))
                         ;
             }
-            var summedSpec = lcmsRun.GetSummedSpectrum(ms2ScanNums);
+            var summedSpec = lcmsRun.GetSummedSpectrum(ms2ScanNumbers);
             return new ProductSpectrum(summedSpec.Peaks, 0) { ActivationMethod = activationMethod };
         }
     }

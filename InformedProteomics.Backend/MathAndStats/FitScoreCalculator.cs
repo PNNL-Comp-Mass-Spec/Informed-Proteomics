@@ -300,18 +300,18 @@ namespace InformedProteomics.Backend.MathAndStats
             }
 
             var innerProduct = 0.0;
-            var magnitudeTheo = 0.0;
-            var magnitudeObs = 0.0;
+            var magnitudeTheoretical = 0.0;
+            var magnitudeObserved = 0.0;
             for (var i = 0; i < theoreticalPeakList.Length; i++)
             {
-                var theo = theoreticalPeakList[i];
-                var obs = observedPeakList[i];
-                innerProduct += theo * obs;
-                magnitudeTheo += theo * theo;
-                magnitudeObs += obs * obs;
+                var theoretical = theoreticalPeakList[i];
+                var observed = observedPeakList[i];
+                innerProduct += theoretical * observed;
+                magnitudeTheoretical += theoretical * theoretical;
+                magnitudeObserved += observed * observed;
             }
 
-            return innerProduct / Math.Sqrt(magnitudeTheo * magnitudeObs);
+            return innerProduct / Math.Sqrt(magnitudeTheoretical * magnitudeObserved);
         }
 
         /// <summary>
@@ -330,9 +330,9 @@ namespace InformedProteomics.Backend.MathAndStats
             var innerProduct = 0.0;
             for (var i = 0; i < theoreticalPeakList.Length; i++)
             {
-                var theo = theoreticalPeakList[i];
-                var obs = observedPeakList[i];
-                innerProduct += theo * obs;
+                var theoretical = theoreticalPeakList[i];
+                var observed = observedPeakList[i];
+                innerProduct += theoretical * observed;
             }
 
             return innerProduct;

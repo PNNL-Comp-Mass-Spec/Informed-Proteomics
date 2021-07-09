@@ -316,11 +316,11 @@ namespace InformedProteomics.Backend.MassSpecData
                 return _ms1ScanNumToIndex;
             }
 
-            var ms1ScanNums = GetMs1ScanVector();
+            var ms1ScanNumbers = GetMs1ScanVector();
             _ms1ScanNumToIndex = new int[MaxLcScan + 1];
-            for (var i = 0; i < ms1ScanNums.Length; i++)
+            for (var i = 0; i < ms1ScanNumbers.Length; i++)
             {
-                _ms1ScanNumToIndex[ms1ScanNums[i]] = i;
+                _ms1ScanNumToIndex[ms1ScanNumbers[i]] = i;
             }
 
             return _ms1ScanNumToIndex;

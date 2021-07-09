@@ -130,11 +130,11 @@ namespace InformedProteomics.Backend.Utils
                 var alignedObservedPeaks = AlignObservedPeaks(ObservedPeaks, theoreticalIsotopeProfile, Tolerance);
 
                 // Break out the intensities of the isotope profiles
-                var theoIntensities = theoreticalIsotopeProfile.Select(peak => peak.Intensity).ToArray();
+                var theoreticalIntensities = theoreticalIsotopeProfile.Select(peak => peak.Intensity).ToArray();
                 var obsIntensities = alignedObservedPeaks.Select(peak => peak.Intensity).ToArray();
 
-                // Compute pearson correlation
-                var pearsonCorrelation = FitScoreCalculator.GetPearsonCorrelation(obsIntensities, theoIntensities);
+                // Compute Pearson correlation
+                var pearsonCorrelation = FitScoreCalculator.GetPearsonCorrelation(obsIntensities, theoreticalIntensities);
 
                 // Add data point for this concentration to result curve
                 var dataPoint = new IsotopeConcentrationCorrelationCurve.ConcentrationCorrelationPoint
@@ -199,16 +199,16 @@ namespace InformedProteomics.Backend.Utils
             var alignedPeaks = new List<Peak> { Capacity = theoreticalPeaks.Count };
 
             var j = 0;
-            foreach (var theoPeak in theoreticalPeaks)
+            foreach (var theoreticalPeak in theoreticalPeaks)
             {
-                var tolDa = tolerance.GetToleranceAsMz(theoPeak.Mz);
-                var maxMz = theoPeak.Mz + tolDa;
+                var tolDa = tolerance.GetToleranceAsMz(theoreticalPeak.Mz);
+                var maxMz = theoreticalPeak.Mz + tolDa;
                 var obsPeak = observedPeaks[j];
 
-                var selectedPeak = new Peak(theoPeak.Mz, 0);
+                var selectedPeak = new Peak(theoreticalPeak.Mz, 0);
                 while (obsPeak.Mz <= maxMz)
                 {
-                    var diff = Math.Abs(obsPeak.Mz - theoPeak.Mz);
+                    var diff = Math.Abs(obsPeak.Mz - theoreticalPeak.Mz);
                     if (diff < tolDa && obsPeak.Intensity > selectedPeak.Intensity)
                     {
                         selectedPeak = obsPeak;
