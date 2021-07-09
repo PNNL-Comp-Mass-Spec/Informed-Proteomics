@@ -10,6 +10,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class LcmsRunDeconvoluter : IMassSpecDataReader
     {
+        // Ignore Spelling: deconvolute, deconvoluted, deconvoluter, deconvolutes
+
         /// <summary>
         /// MassSpec data reader to read raw spectra from
         /// </summary>

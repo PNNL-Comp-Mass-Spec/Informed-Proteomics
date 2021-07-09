@@ -9,6 +9,8 @@ namespace InformedProteomics.Backend.MathAndStats
     /// </summary>
     public static class FitScoreCalculator
     {
+        // Ignore Spelling: Bhattacharyya, cov
+
         /// <summary>
         /// Calculate the Bhattacharyya distance for the provided data
         /// </summary>

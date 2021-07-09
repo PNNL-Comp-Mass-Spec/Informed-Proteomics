@@ -12,6 +12,9 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class Deconvoluter
     {
+        // Ignore Spelling: deconvoluted, deconvoluter
+
+
         /// <summary>
         /// Largest mass that will be deconvoluted
         /// </summary>

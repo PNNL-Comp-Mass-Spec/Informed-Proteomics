@@ -20,8 +20,14 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </remarks>
     public sealed class MzMLReader : IMassSpecDataReader
     {
-        // Ignore Spelling: foreach
-        // Ignore Spelling: readonly
+        // ReSharper disable CommentTypo
+
+        // Ignore Spelling: bal, bool, centroided, dta, endian, foreach, gzipped, interchannel, multiphoton
+        // Ignore Spelling: photodissociation, pkl, readonly, referenceable, struct, wiff, xcalibur, xsi, zlib
+
+        // Ignore Spelling: Biosystems, Biotech, Bioworks, Bruker, Micromass, Phenyx, Proteinscape, Sciex, Shimadzu
+
+        // ReSharper restore CommentTypo
 
         #region Private Members
 

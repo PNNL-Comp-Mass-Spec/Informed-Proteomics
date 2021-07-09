@@ -14,6 +14,8 @@ namespace InformedProteomics.Backend.Utils
     /// </summary>
     public class IsotopicConcentrationTuner
     {
+        // Ignore Spelling: averagine, monoisotope
+
         /// <summary>
         /// Initializes new instance of the <see cref="IsotopicConcentrationTuner" /> class
         /// </summary>

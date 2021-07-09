@@ -12,6 +12,8 @@ namespace InformedProteomics.Tests.UnitTests
     [TestFixture]
     public class TestSimpleUtils
     {
+        // Ignore Spelling: Histone
+
         [Test]
         public void TestStringShuffling()
         {

@@ -15,6 +15,8 @@ namespace InformedProteomics.Backend.Utils
     /// </remarks>
     public class TsvFileParser
     {
+        // Ignore Spelling: qvalue
+
         /// <summary>
         /// Constructor
         /// </summary>

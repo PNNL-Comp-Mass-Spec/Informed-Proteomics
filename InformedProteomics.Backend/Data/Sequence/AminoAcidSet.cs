@@ -10,6 +10,8 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class AminoAcidSet
     {
+        // Ignore Spelling: alkylated, alkylation, carboamidomethyl, cysteine, cysteines
+
         #region Constructors
 
         /// <summary>

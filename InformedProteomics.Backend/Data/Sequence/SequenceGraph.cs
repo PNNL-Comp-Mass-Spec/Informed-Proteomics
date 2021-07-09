@@ -14,6 +14,7 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class SequenceGraph
     {
+        // Ignore Spelling: proteoform, proteoforms
 
         /// <summary>
         /// Create a graph representing the annotation; annotation is reversed

@@ -9,6 +9,8 @@ namespace InformedProteomics.Backend.MathAndStats
     /// </summary>
     public class SavitzkyGolaySmoother
     {
+        // Ignore Spelling: Savitzky, Golay
+
         private readonly int _mNumPointsForSmoothing;
         private readonly Matrix<double> _mSmoothingFiltersConjugateTranspose;
 

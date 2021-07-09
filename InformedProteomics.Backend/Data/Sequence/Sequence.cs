@@ -13,6 +13,8 @@ namespace InformedProteomics.Backend.Data.Sequence
     /// </summary>
     public class Sequence : List<AminoAcid>, IMolecule
     {
+        // Ignore Spelling: acetyl
+
         /// <summary>
         /// Build a sequence from the supplied list of amino acids
         /// </summary>

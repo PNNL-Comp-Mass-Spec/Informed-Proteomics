@@ -5,6 +5,8 @@
     /// </summary>
     public interface IDeconvolutedSpectrum
     {
+        // Ignore Spelling: deconvoluted
+
         /// <summary>
         /// Get the peak that matches <paramref name="composition"/> and <paramref name="tolerance"/>
         /// </summary>

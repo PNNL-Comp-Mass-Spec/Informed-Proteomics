@@ -8,7 +8,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class Tolerance
     {
-        // Ignore Spelling: Da
+        // Ignore Spelling: Da, Daltons, Thomsons
 
         private readonly double _value;
         private readonly ToleranceUnit _unit;

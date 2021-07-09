@@ -7,6 +7,8 @@ namespace InformedProteomics.Backend.Data.Composition
     /// </summary>
     public abstract class AbstractComposition
     {
+        // Ignore Spelling: isotopomer
+
         /// <summary>
         /// Composition mass
         /// </summary>

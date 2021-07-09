@@ -11,6 +11,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class TargetedDeconvolutedSpectrum : IDeconvolutedSpectrum
     {
+        // Ignore Spelling: deconvoluted
+
         /// <summary>
         /// Non-deconvoluted spectrum
         /// </summary>

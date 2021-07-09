@@ -18,6 +18,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
 {
     public class LcMsPeakMatrix
     {
+        // Ignore Spelling: foreach, Xic
+
         public LcMsPeakMatrix(
             LcMsRun run,
             ISequenceFilter ms1Filter,

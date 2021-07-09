@@ -9,6 +9,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class IonTypeFactory
     {
+        // Ignore Spelling: deconvoluted
+
         private readonly bool _removeRedundantIonTypes;
 
         /// <summary>

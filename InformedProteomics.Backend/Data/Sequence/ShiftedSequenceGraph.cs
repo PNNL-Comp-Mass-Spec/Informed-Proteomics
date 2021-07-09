@@ -13,6 +13,8 @@ namespace InformedProteomics.Backend.Data.Sequence
     // ReSharper disable once UnusedMember.Global
     public class ShiftedSequenceGraph
     {
+        // Ignore Spelling: proteoforms
+
         /// <summary>
         /// Constructor
         /// </summary>

@@ -17,6 +17,8 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </summary>
     public class XcaliburReader : IMassSpecDataReader
     {
+        // Ignore Spelling: centroided, centroiding
+
         /// <summary>
         /// Parameters for centroiding spectra
         /// </summary>

@@ -51,6 +51,8 @@ namespace InformedProteomics.Backend.MathAndStats
     /// </remarks>
     public class CubicSpline
     {
+        // Ignore Spelling: eval, tri, Wikipedia, xs
+
         #region Fields
 
         // N-1 spline coefficients for N points

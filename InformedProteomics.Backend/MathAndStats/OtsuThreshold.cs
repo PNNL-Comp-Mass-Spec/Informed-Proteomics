@@ -8,6 +8,8 @@ namespace InformedProteomics.Backend.MathAndStats
     /// </summary>
     public static class OtsuThreshold
     {
+        // Ignore Spelling: Otsu
+
         /// <summary>
         /// Calculate the Otsu threshold for the provided data
         /// </summary>

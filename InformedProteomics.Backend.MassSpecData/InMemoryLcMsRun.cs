@@ -10,8 +10,10 @@ namespace InformedProteomics.Backend.MassSpecData
     /// <summary>
     /// LcMsRun implementation where all information is held in the system's memory. Due to the amount of memory this can consume, use of <see cref="PbfLcMsRun"/> is generally preferred.
     /// </summary>
-    public class InMemoryLcMsRun : LcMsRun //LcMsRun
+    public class InMemoryLcMsRun : LcMsRun
     {
+        // Ignore Spelling: pbf, workflow, Xic
+
         private struct SpectrumTrackingInfo
         {
             public int NumSpectra;

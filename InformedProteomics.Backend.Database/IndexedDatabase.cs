@@ -16,7 +16,8 @@ namespace InformedProteomics.Backend.Database
     /// </summary>
     public class IndexedDatabase
     {
-        // Ignore Spelling: Lcp, cterm, foreach, const, ntt, sep, nmc
+        // ReSharper disable once CommentTypo
+        // Ignore Spelling: bool, const, cterm, foreach, hyperthreaded, Lcp, pre, ntt, sep, nmc
 
         /// <summary>
         /// File extension to use for Permuted Longest Common Prefix file

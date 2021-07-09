@@ -12,6 +12,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public sealed class BaseIonType
     {
+        // Ignore Spelling: deconvoluted, isoleucine, threonine
+
         /// <summary>
         /// Default base ion types
         /// </summary>

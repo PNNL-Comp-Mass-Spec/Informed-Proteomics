@@ -16,6 +16,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     // ReSharper disable once UnusedMember.Global
     public abstract class AbstractFragmentScorer : IScorer
     {
+        // Ignore Spelling: Bhattacharyya, deconvoluted
+
         /// <summary>
         /// Constructor
         /// </summary>

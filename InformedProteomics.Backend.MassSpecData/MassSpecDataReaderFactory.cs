@@ -12,7 +12,8 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </summary>
     public static class MassSpecDataReaderFactory
     {
-        // Ignore Spelling: cli, lcd, pwiz, Shimadzu
+        // ReSharper disable once CommentTypo
+        // Ignore Spelling: Bruker, cli, gzipped, lcd, pwiz, Sciex, Shimadzu
 
         /// <summary>
         /// Gets the appropriate IMassSpecDataReader for the supplied path

@@ -8,6 +8,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class DeconvolutedSpectrum : ProductSpectrum, IDeconvolutedSpectrum
     {
+        // Ignore Spelling: deconvoluted
+
         /// <summary>
         /// Constructor
         /// </summary>

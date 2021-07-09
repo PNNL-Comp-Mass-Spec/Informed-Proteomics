@@ -15,7 +15,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </summary>
     public class PbfLcMsRun : LcMsRun, IPbfLcMsRun
     {
-        // Ignore Spelling: Baf, LcMs, Nums, overridable, Pbf, struct, structs
+        // Ignore Spelling: Baf, LcMs, Nums, overridable, Pbf, struct, structs, workflow, Xic
 
         /// <summary>
         /// File extension

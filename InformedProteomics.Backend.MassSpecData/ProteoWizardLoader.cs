@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </remarks>
     internal static class ProteoWizardLoader
     {
-        // Ignore Spelling: pwiz_bindings_cli, Apps
+        // Ignore Spelling: Apps, pre, pwiz_bindings_cli
 
         /// <summary>
         /// Add the Assembly Resolver to the system assembly resolver chain

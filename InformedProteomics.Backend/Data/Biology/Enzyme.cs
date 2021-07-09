@@ -8,6 +8,8 @@ namespace InformedProteomics.Backend.Data.Biology
     /// </summary>
     public sealed class Enzyme
     {
+        // Ignore Spelling: Arg, Chymotrypsin, Glu, Lys
+
         private Enzyme(string name, string residues, bool isNTerm, string description, string psiCvAccession)
         {
             Name = name;

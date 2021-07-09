@@ -10,6 +10,8 @@ namespace InformedProteomics.Backend.Data.Composition
     /// </summary>
     public class IsoProfilePredictor
     {
+        // Ignore Spelling: Isotopomer, pre, uni
+
         /// <summary>
         /// Max number of isotopes to predict
         /// </summary>

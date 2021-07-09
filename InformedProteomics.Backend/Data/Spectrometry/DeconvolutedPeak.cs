@@ -9,6 +9,8 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     /// </summary>
     public class DeconvolutedPeak : Peak
     {
+        // Ignore Spelling: Bhattacharyya, deconvoluted
+
         /// <summary>
         /// Constructor
         /// </summary>

@@ -12,6 +12,8 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </summary>
     public class DPbfLcMsRun : PbfLcMsRun
     {
+        // Ignore Spelling: deconvoluted, pbf
+
         /// <summary>
         /// File extension for a deconvoluted pbf file
         /// </summary>

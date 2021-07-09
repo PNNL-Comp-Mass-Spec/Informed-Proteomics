@@ -8,6 +8,8 @@ namespace InformedProteomics.Backend.SearchResults
     /// </summary>
     public static class Extensions
     {
+        // Ignore Spelling: namespace
+
         /// <summary>
         /// Get peptides that pass the specified threshold
         /// </summary>

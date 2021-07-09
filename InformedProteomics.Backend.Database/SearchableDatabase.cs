@@ -9,6 +9,8 @@ namespace InformedProteomics.Backend.Database
     /// </summary>
     public class SearchableDatabase
     {
+        // Ignore Spelling: lcps, readonly
+
         /// <summary>
         /// Constructor
         /// </summary>

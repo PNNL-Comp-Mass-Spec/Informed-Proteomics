@@ -12,6 +12,8 @@ namespace InformedProteomics.Backend.MassSpecData
     /// </summary>
     public abstract class LcMsRun : ILcMsRun, IMassSpecDataReader
     {
+        // Ignore Spelling: xic
+
         /// <summary>
         /// Number of unique isolation windows kept for DIA data
         /// </summary>
