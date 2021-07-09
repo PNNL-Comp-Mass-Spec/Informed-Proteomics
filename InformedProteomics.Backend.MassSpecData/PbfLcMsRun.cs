@@ -726,13 +726,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>Isolation window object</returns>
         public override IsolationWindow GetIsolationWindow(int scanNum)
         {
-            if (_scanNumToSpecOffset.TryGetValue(scanNum, out var offset))
+            if (_scanNumToSpecOffset.TryGetValue(scanNum, out var offset) &&
+                ReadSpectrum(offset, false) is ProductSpectrum spec)
             {
-                if (ReadSpectrum(offset, false) is ProductSpectrum spec)
-                {
-                    return spec.IsolationWindow;
-                }
+                return spec.IsolationWindow;
             }
+
             return null;
         }
 
