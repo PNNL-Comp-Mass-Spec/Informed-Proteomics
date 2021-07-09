@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 
@@ -138,7 +139,7 @@ namespace InformedProteomics.Backend.MathAndStats
             return smoothingFilters;
         }
 
-        private bool IsEmpty(double[] inputValues)
+        private bool IsEmpty(IEnumerable<double> inputValues)
         {
             foreach (var inputValue in inputValues)
             {
