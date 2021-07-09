@@ -69,7 +69,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 }
                 catch (System.Runtime.InteropServices.COMException/* ex*/)
                 {
-                    ConsoleMsgUtils.ShowWarning(string.Format("[Warning] Ignore corrupted spectrum Scan={0}", scanNum));
+                    ConsoleMsgUtils.ShowWarning("[Warning] Ignore corrupted spectrum Scan={0}", scanNum);
                 }
 
                 if (spec != null)
@@ -157,7 +157,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     peaks.Capacity = data.Masses.Length + 2;
                     for (var i = 0; i < data.Masses.Length; i++)
                     {
-                        peaks.Add(new Data.Spectrometry.PeakDetailed(data.Masses[i], data.Intensities[i], data.Noises[i]));
+                        peaks.Add(new PeakDetailed(data.Masses[i], data.Intensities[i], data.Noises[i]));
                     }
                 }
                 else if (scanStats.IsCentroidScan)
