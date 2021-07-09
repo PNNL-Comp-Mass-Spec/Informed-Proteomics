@@ -18,7 +18,7 @@ namespace InformedProteomics.Backend.Utils
         {
             try
             {
-                var version = Assembly.GetEntryAssembly().GetName().Version;
+                var version = Assembly.GetEntryAssembly()?.GetName().Version;
                 return GetBuildDateFromVersion(version);
             }
             catch
@@ -49,7 +49,7 @@ namespace InformedProteomics.Backend.Utils
         {
             try
             {
-                var version = Assembly.GetEntryAssembly().GetName().Version;
+                var version = Assembly.GetEntryAssembly()?.GetName().Version;
                 return GetBuildDateTextFromVersion(version);
             }
             catch
