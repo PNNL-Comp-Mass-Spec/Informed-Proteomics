@@ -321,7 +321,7 @@ namespace InformedProteomics.TopDown.SequenceTag
 
                     if (matchedPeaks)
                     {
-                        //string annotation = String.Format("{0}{1}{2}({3}+)", ionType.BaseIonType.Symbol, index, ionType.NeutralLoss.Name, ionType.Charge);
+                        //string annotation = string.Format("{0}{1}{2}({3}+)", ionType.BaseIonType.Symbol, index, ionType.NeutralLoss.Name, ionType.Charge);
                         //Console.WriteLine(annotation);
                         if (ionType.IsPrefixIon)
                         {

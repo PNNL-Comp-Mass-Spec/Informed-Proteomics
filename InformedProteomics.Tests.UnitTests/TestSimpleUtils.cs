@@ -21,8 +21,8 @@ namespace InformedProteomics.Tests.UnitTests
             const string str = "MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG";  // Histone H4
             var shuffled = SimpleStringProcessing.Shuffle(str);
 
-            var strSorted = String.Concat(str.OrderBy(c => c));
-            var shuffledSorted = String.Concat(shuffled.OrderBy(c => c));
+            var strSorted = string.Concat(str.OrderBy(c => c));
+            var shuffledSorted = string.Concat(shuffled.OrderBy(c => c));
             Assert.IsTrue(strSorted.Equals(shuffledSorted));
         }
 
@@ -42,8 +42,8 @@ namespace InformedProteomics.Tests.UnitTests
             var numDiff = str.Where((t, i) => t != mutated[i]).Count();
             Console.WriteLine("Mutations: {0}", numDiff);
 
-            //var strSorted = String.Concat(str.OrderBy(c => c));
-            //var shuffledSorted = String.Concat(mutated.OrderBy(c => c));
+            //var strSorted = string.Concat(str.OrderBy(c => c));
+            //var shuffledSorted = string.Concat(mutated.OrderBy(c => c));
             //Assert.IsTrue(strSorted.Equals(shuffledSorted));
         }
 
