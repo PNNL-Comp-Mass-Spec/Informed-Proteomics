@@ -145,31 +145,31 @@ namespace InformedProteomics.Backend.MathAndStats
         /// <param name="prefix">Optional: Per-line indentation prefix</param>
         public string ToDisplayString(string fmt = "", string prefix = "")
         {
-            if (N > 0)
+            if (N <= 0)
             {
-                var s = new StringBuilder();
-                var formatString = "{0" + fmt + "}";
-
-                for (var r = 0; r < N; r++)
-                {
-                    s.Append(prefix);
-
-                    for (var c = 0; c < N; c++)
-                    {
-                        s.AppendFormat(formatString, this[r, c]);
-                        if (c < N - 1)
-                        {
-                            s.Append(", ");
-                        }
-                    }
-
-                    s.AppendLine();
-                }
-
-                return s.ToString();
+                return prefix + "0x0 Matrix";
             }
 
-            return prefix + "0x0 Matrix";
+            var s = new StringBuilder();
+            var formatString = "{0" + fmt + "}";
+
+            for (var r = 0; r < N; r++)
+            {
+                s.Append(prefix);
+
+                for (var c = 0; c < N; c++)
+                {
+                    s.AppendFormat(formatString, this[r, c]);
+                    if (c < N - 1)
+                    {
+                        s.Append(", ");
+                    }
+                }
+
+                s.AppendLine();
+            }
+
+            return s.ToString();
         }
 
         /// <summary>
