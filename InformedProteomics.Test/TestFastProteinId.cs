@@ -52,7 +52,7 @@ namespace InformedProteomics.Test
 
             foreach (var ms2ScanNum in ms2ScanNumArr)
             {
-                if (!(run.GetSpectrum(ms2ScanNum) is ProductSpectrum productSpec))
+                if (run.GetSpectrum(ms2ScanNum) is not ProductSpectrum productSpec)
                 {
                     continue;
                 }

@@ -54,7 +54,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             var sb = new StringBuilder();
             for (var i = 0; i < Count; i++)
             {
-                if (!(this[i] is ModifiedAminoAcid modAa))
+                if (this[i] is not ModifiedAminoAcid modAa)
                 {
                     continue;
                 }

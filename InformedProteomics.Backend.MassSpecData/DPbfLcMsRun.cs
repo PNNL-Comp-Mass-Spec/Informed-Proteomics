@@ -104,7 +104,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 throw new ArgumentException("Supplied file was not used to create this DPbf file!", nameof(fullData));
             }
 
-            if (!(GetSpectrum(scanNum, true) is DeconvolutedSpectrum spec))
+            if (GetSpectrum(scanNum, true) is not DeconvolutedSpectrum spec)
             {
                 return null;
             }
@@ -113,7 +113,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             foreach (var peakBase in spec.Peaks)
             {
-                if (!(peakBase is DeconvolutedPeak peak))
+                if (peakBase is not DeconvolutedPeak peak)
                 {
                     continue;
                 }
@@ -207,7 +207,7 @@ namespace InformedProteomics.Backend.MassSpecData
         protected internal override void WriteSpectrum(Spectrum specIn, BinaryWriter writer)
         {
             // All changes made here must be duplicated to ReadSpectrum() and GetPeakMetadataForSpectrum()
-            if (!(specIn is DeconvolutedSpectrum spec))
+            if (specIn is not DeconvolutedSpectrum spec)
             {
                 throw new ArgumentException("Input spectrum must be DeconvolutedSpectrum!", nameof(specIn));
             }
@@ -252,7 +252,7 @@ namespace InformedProteomics.Backend.MassSpecData
 
             foreach (var peakIn in spec.Peaks)
             {
-                if (!(peakIn is DeconvolutedPeak peak))
+                if (peakIn is not DeconvolutedPeak peak)
                 {
                     throw new ArgumentException("Input spectrum peaks array must contain only DeconvolutedPeaks!");
                 }

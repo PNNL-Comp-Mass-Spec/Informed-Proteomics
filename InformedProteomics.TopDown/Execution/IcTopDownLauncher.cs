@@ -73,7 +73,7 @@ namespace InformedProteomics.TopDown.Execution
 
         private void ReportOverallProgress(object searchObj)
         {
-            if (!(searchObj is IcTopDownLauncher searchClass))
+            if (searchObj is not IcTopDownLauncher searchClass)
             {
                 return;
             }
@@ -156,7 +156,7 @@ namespace InformedProteomics.TopDown.Execution
             _isolationWindowTargetMz = new double[_run.MaxLcScan + 1];
             foreach (var ms2Scan in _ms2ScanNums)
             {
-                if (!(_run.GetSpectrum(ms2Scan) is ProductSpectrum ms2Spec))
+                if (_run.GetSpectrum(ms2Scan) is not ProductSpectrum ms2Spec)
                 {
                     continue;
                 }
@@ -983,7 +983,7 @@ namespace InformedProteomics.TopDown.Execution
                         continue;
                     }
 
-                    if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec))
+                    if (_run.GetSpectrum(scanNum) is not ProductSpectrum spec)
                     {
                         continue;
                     }

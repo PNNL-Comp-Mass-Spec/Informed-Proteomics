@@ -79,7 +79,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>Score for the edge between the two bins</returns>
         public double GetEdgeScore(int sourceMassBin, int sinkMassBin)
         {
-            if (!(GetEdges(sinkMassBin).First(e => e.PrevNodeIndex == sourceMassBin) is FlipScoringGraphEdge edge))
+            if (GetEdges(sinkMassBin).First(e => e.PrevNodeIndex == sourceMassBin) is not FlipScoringGraphEdge edge)
             {
                 return 0.0;
             }

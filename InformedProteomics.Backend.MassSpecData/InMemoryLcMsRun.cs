@@ -439,7 +439,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 return null;
             }
 
-            if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec))
+            if (GetSpectrum(scanNum) is not ProductSpectrum productSpec)
             {
                 return null;
             }
@@ -518,7 +518,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     continue;
                 }
 
-                if (!(GetSpectrum(scanNum) is ProductSpectrum spec))
+                if (GetSpectrum(scanNum) is not ProductSpectrum spec)
                 {
                     continue;
                 }
@@ -549,7 +549,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     continue;
                 }
 
-                if (!(_scanNumSpecMap[scanNum] is ProductSpectrum productSpec))
+                if (_scanNumSpecMap[scanNum] is not ProductSpectrum productSpec)
                 {
                     continue;
                 }

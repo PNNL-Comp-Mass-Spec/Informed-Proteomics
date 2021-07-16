@@ -67,7 +67,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IScorer GetScorer(int scanNum)
         {
-            if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec))
+            if (_run.GetSpectrum(scanNum) is not ProductSpectrum spec)
             {
                 return null;
             }

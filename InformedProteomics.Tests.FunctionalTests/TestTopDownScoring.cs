@@ -315,7 +315,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                     var sequence = Sequence.CreateSequence(protSequence, modStr, aminoAcidSet);
                     // Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
 
-                    if (!(run.GetSpectrum(scan) is ProductSpectrum ms2Spec))
+                    if (run.GetSpectrum(scan) is not ProductSpectrum ms2Spec)
                     {
                         Console.WriteLine("Could not get the spectrum datafor scan {0}", scan);
                     }

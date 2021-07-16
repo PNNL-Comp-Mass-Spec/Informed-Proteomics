@@ -617,7 +617,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var isoWindowSet = new HashSet<IsolationWindow>();
             foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
-                if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec))
+                if (GetSpectrum(scanNum) is not ProductSpectrum productSpec)
                 {
                     continue;
                 }
@@ -636,7 +636,7 @@ namespace InformedProteomics.Backend.MassSpecData
             var minWidth = double.MaxValue;
             foreach (var scanNum in ScanNumToMsLevel.Where(x => x.Value > 1).Select(x => x.Key))
             {
-                if (!(GetSpectrum(scanNum) is ProductSpectrum productSpec))
+                if (GetSpectrum(scanNum) is not ProductSpectrum productSpec)
                 {
                     continue;
                 }

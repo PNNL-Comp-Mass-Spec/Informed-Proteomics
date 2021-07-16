@@ -328,7 +328,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (!(obj is Xic itemToCompare))
+            if (obj is not Xic itemToCompare)
             {
                 return false;
             }

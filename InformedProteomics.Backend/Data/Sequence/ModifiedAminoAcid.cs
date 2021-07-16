@@ -13,7 +13,7 @@
         public ModifiedAminoAcid(AminoAcid aa, Modification modification)
             : base(aa.Residue, aa.Name + "+" + modification.Name, aa.Composition + modification.Composition)
         {
-            if (!(aa is ModifiedAminoAcid modAa))
+            if (aa is not ModifiedAminoAcid modAa)
             {
                 // aa is not modified
                 Modification = modification;

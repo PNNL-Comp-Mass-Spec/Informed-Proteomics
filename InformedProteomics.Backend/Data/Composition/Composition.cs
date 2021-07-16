@@ -284,7 +284,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (!(obj is Composition other))
+            if (obj is not Composition other)
             {
                 return false;
             }
@@ -397,7 +397,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns>New composition object</returns>
         public static Composition operator +(Composition c1, Composition c2)
         {
-            if (!(c1 is CompositionWithDeltaMass compWithDelta))
+            if (c1 is not CompositionWithDeltaMass compWithDelta)
             {
                 return c1.Add(c2);
             }
@@ -428,7 +428,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns>New composition object</returns>
         public static Composition operator -(Composition c)
         {
-            if (!(c is CompositionWithDeltaMass compWithDelta))
+            if (c is not CompositionWithDeltaMass compWithDelta)
             {
                 return c.Negate();
             }

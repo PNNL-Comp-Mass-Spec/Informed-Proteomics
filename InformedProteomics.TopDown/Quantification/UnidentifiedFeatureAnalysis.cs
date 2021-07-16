@@ -151,7 +151,7 @@ namespace InformedProteomics.TopDown.Quantification
                     continue;
                 }
 
-                if (!(run.GetSpectrum(scanNum) is ProductSpectrum spectrum))
+                if (run.GetSpectrum(scanNum) is not ProductSpectrum spectrum)
                 {
                     Console.WriteLine("Unable to retrieve the spectrum for scan " + scanNum);
                     continue;

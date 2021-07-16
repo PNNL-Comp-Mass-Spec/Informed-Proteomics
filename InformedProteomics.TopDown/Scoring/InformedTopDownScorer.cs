@@ -37,7 +37,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IcScores GetScores(AminoAcid nTerm, string seqStr, AminoAcid cTerm, Composition composition, int charge, int ms2ScanNum)
         {
-            if (!(Run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+            if (Run.GetSpectrum(ms2ScanNum) is not ProductSpectrum spec)
             {
                 return null;
             }
@@ -149,7 +149,7 @@ namespace InformedProteomics.TopDown.Scoring
             score = 0d;
             nMatchedFragments = 0;
 
-            if (!(Run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+            if (Run.GetSpectrum(ms2ScanNum) is not ProductSpectrum spec)
             {
                 return;
             }

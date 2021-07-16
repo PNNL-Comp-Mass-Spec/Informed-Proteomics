@@ -65,7 +65,7 @@ namespace InformedProteomics.TopDown.Scoring
 
         private void SetLcMsMatches(int ms2ScanNumber)
         {
-            if (!(_run.GetSpectrum(ms2ScanNumber) is ProductSpectrum productSpec))
+            if (_run.GetSpectrum(ms2ScanNumber) is not ProductSpectrum productSpec)
             {
                 return;
             }

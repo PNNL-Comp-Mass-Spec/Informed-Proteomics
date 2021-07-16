@@ -186,7 +186,7 @@ namespace InformedProteomics.Tests.DevTests
 
                     foreach (var ms2ScanNum in ms1Filter.GetMatchingMs2ScanNums(sequenceMass))
                     {
-                        if (!(run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+                        if (run.GetSpectrum(ms2ScanNum) is not ProductSpectrum spec)
                         {
                             continue;
                         }
@@ -241,7 +241,7 @@ namespace InformedProteomics.Tests.DevTests
             const int maxScanNum = 46661;   // 638.90
             const int MAX_POINTS = 50;
 
-            if (!(PbfLcMsRun.GetLcMsRun(TestRawFilePath) is PbfLcMsRun run))
+            if (PbfLcMsRun.GetLcMsRun(TestRawFilePath) is not PbfLcMsRun run)
             {
                 return;
             }
@@ -270,7 +270,7 @@ namespace InformedProteomics.Tests.DevTests
             const int maxScanNum = 6661;
             const int MAX_POINTS = 50;
 
-            if (!(PbfLcMsRun.GetLcMsRun(TestRawFilePath2) is PbfLcMsRun run))
+            if (PbfLcMsRun.GetLcMsRun(TestRawFilePath2) is not PbfLcMsRun run)
             {
                 return;
             }

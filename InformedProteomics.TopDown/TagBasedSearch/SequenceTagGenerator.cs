@@ -31,7 +31,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
 
         public void Generate(int ms2ScanNum)
         {
-            if (!(_run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+            if (_run.GetSpectrum(ms2ScanNum) is not ProductSpectrum spec)
             {
                 return;
             }
@@ -58,7 +58,7 @@ namespace InformedProteomics.TopDown.TagBasedSearch
                 }
             }
 
-            if (!(_run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+            if (_run.GetSpectrum(ms2ScanNum) is not ProductSpectrum spec)
             {
                 return new List<SequenceTag.SequenceTag>();
             }

@@ -181,7 +181,7 @@ namespace InformedProteomics.TopDown.Scoring
 
             try
             {
-                if (!(_run.GetSpectrum(scanNum) is ProductSpectrum spec))
+                if (_run.GetSpectrum(scanNum) is not ProductSpectrum spec)
                 {
                     return null;
                 }
@@ -197,22 +197,17 @@ namespace InformedProteomics.TopDown.Scoring
 
         public IScorer GetScorer(ProductSpectrum spectrum, double precursorMass, int precursorCharge, ActivationMethod activationMethod = ActivationMethod.Unknown)
         {
-            IScorer scorer = null;
-            if (spectrum is DeconvolutedSpectrum)
+            if (spectrum is DeconvolutedSpectrum deconSpec)
             {
-                var deconSpec = spectrum as DeconvolutedSpectrum;
-                scorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconSpec, spectrum, _productTolerance, _comparer, spectrum.ActivationMethod);
+                return new CompositeScorerBasedOnDeconvolutedSpectrum(deconSpec, deconSpec, _productTolerance, _comparer, deconSpec.ActivationMethod);
             }
-            else
-            {
-                scorer = new CompositeScorer(
-                                spectrum,
-                                this._productTolerance,
-                                activationMethod: activationMethod,
-                                minCharge: _minProductCharge,
-                                maxCharge: _maxProductCharge);
-            }
-            return scorer;
+
+            return new CompositeScorer(
+                spectrum,
+                this._productTolerance,
+                activationMethod: activationMethod,
+                minCharge: _minProductCharge,
+                maxCharge: _maxProductCharge);
         }
 
         public void WriteToFile(string outputFilePath)

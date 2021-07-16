@@ -55,7 +55,7 @@ namespace InformedProteomics.BottomUp.Scoring
             var index = GetChargeScanNumPairIndex(charge, ms2ScanNum);
             if (!_scoredSpectra.TryGetValue(index, out var scoredSpectrum))
             {
-                if (!(Run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+                if (Run.GetSpectrum(ms2ScanNum) is not ProductSpectrum spec)
                 {
                     return null;
                 }

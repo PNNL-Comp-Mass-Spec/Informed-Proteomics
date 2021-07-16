@@ -72,7 +72,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
 
                         if (run.GetMsLevel(scanNum) == 2)
                         {
-                            if (!(run.GetSpectrum(scanNum) is ProductSpectrum productSpec))
+                            if (run.GetSpectrum(scanNum) is not ProductSpectrum productSpec)
                             {
                                 continue;
                             }

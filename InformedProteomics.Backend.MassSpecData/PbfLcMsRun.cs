@@ -1449,7 +1449,7 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 progressData.Report(counter, countTotal);
                 counter++;
-                if (!(lcmsRun.GetSpectrum(ms2ScanNum) is ProductSpectrum productSpec))
+                if (lcmsRun.GetSpectrum(ms2ScanNum) is not ProductSpectrum productSpec)
                 {
                     continue;
                 }

@@ -45,7 +45,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns>New composition object</returns>
         public new Composition Add(Composition c)
         {
-            if (!(c is CompositionWithDeltaMass comWithDelta))
+            if (c is not CompositionWithDeltaMass comWithDelta)
             {
                 return new CompositionWithDeltaMass(AddComposition(c), _deltaMass, _deltaNominalMass);
             }

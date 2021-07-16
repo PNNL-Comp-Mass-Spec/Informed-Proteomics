@@ -83,7 +83,7 @@ namespace InformedProteomics.FeatureFinding.Training
 
                 foreach (var scan in prsmSet.Select(prsm => prsm.ScanNum))
                 {
-                    if (!(run.GetSpectrum(scan) is ProductSpectrum spectrum))
+                    if (run.GetSpectrum(scan) is not ProductSpectrum spectrum)
                     {
                         continue;
                     }

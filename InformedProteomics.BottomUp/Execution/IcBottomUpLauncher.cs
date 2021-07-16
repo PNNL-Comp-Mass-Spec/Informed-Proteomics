@@ -393,7 +393,7 @@ namespace InformedProteomics.BottomUp.Execution
 
                     foreach (var ms2ScanNum in ms1Filter.GetMatchingMs2ScanNums(sequenceMass))
                     {
-                        if (!(_run.GetSpectrum(ms2ScanNum) is ProductSpectrum spec))
+                        if (_run.GetSpectrum(ms2ScanNum) is not ProductSpectrum spec)
                         {
                             continue;
                         }
