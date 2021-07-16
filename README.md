@@ -6,6 +6,13 @@ this repository is currently maintained for top down MS/MS datasets.
 
 [![DOI](https://zenodo.org/badge/21950650.svg)](https://zenodo.org/badge/latestdoi/21950650)
 
+## Manuscript 
+
+Implementation details are described in the manuscript "Informed-Proteomics: open-source software package for top-down proteomics", published in Nature Methods
+* [PMID 28783154](https://pubmed.ncbi.nlm.nih.gov/28783154/)
+* [Manuscript text](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5578875/) in PMC
+* [DOI 10.1038/nmeth.4388](https://doi.org/10.1038/nmeth.4388)
+
 ## Install/Tutorials
 #### [See the Informed Proteomics GitHub wiki for usage, tutorials, and more!](https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics/wiki)
 
@@ -39,6 +46,10 @@ Processing steps:
   * Creates \_IcTda.tsv files and .mzid
   * Can also be run with the spectrum source file directly, with PbfGen and ProMex run as part of the process.
 
+4. Optionally use ProMexAlign to align MS1 features between datasets
+  * Creates a .tsv file listing a consolidated list of MS1 features, plus the corresponding Feature IDs from the input files
+  * A FeatureID of 0 means the feature was not present
+
 Example command lines:
 
 `PbfGen.exe -s MyDataset.raw`
@@ -65,6 +76,31 @@ mono ProMex.exe -i *.pbf -minCharge 2 -maxCharge 60 -minMass 2000 -maxMass 50000
 mono MSPathFinder/MSPathFinderT.exe -s *.pbf -d ID_006407_8F27399B.fasta -o . -ParamFile MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage.txt
 ```
 
+## PbfGen Syntax
+
+```
+PbfGen.exe
+    -s:RawFilePath (*.raw or directory)
+    [-o:OutputDir]
+    [-start:StartScan] [-end:EndScan]
+```
+
+`-i` or `-s` or `-InputFile`
+* Input file or input directory
+* Supports .pbf, .mzML, and several vendor formats (see documentation)
+
+`-o` or `-OutputDirectory`
+* Output directory.
+* Default: directory containing input file
+
+`-start`
+* Start scan number
+* Optionally use to limit scan range included in .pbf file
+
+`-end`
+* End scan number
+* Optionally use to limit scan range included in .pbf file
+
 ## ProMex Syntax
 
 ```
@@ -78,7 +114,8 @@ ProMex.exe
 ```
 
 `-i` or `-s` or `-InputFile`
-* Input file or input directory; supports .pbf, .mzML, and several vendor formats (see documentation)
+* Input file or input directory
+  * Supports .pbf, .mzML, and several vendor formats (see documentation)
 
 `-o` or `-OutputDirectory`
 * Output directory. 
@@ -152,13 +189,27 @@ Command to create a PNG of the features in an existing ms1ft file
 
 `ProMex.exe -i dataset.pbf -ms1ft dataset.ms1ft -featureMap`
 
-## PbfGen Syntax
+## ProMexAlign syntax
 
 ```
-PbfGen.exe
-    -s RawFilePath (*.raw or directory)
-    [-o OutputDir]
+ProMexAlign.exe DatasetInfoFile
 ```
+
+* The dataset info file is a tab-delimited text file with either 3 or 4 columns of information
+  * Expected columns: 
+  * `Label`  `RawFilePath`  `Ms1FtFilePath`  `MsPathfinderIdFilePath`
+* If data in the Label column is an empty string, dataset labels will be auto-assigned as `Dataset_1`, `Dataset_2`, etc.
+* The raw files are either Thermo .raw files or .pbf files created by PbfGen
+* The MsPathfinderIdFilePath column is optional
+  * If \_IcTda.tsv files are listed in this column, additional columns will appear in the output file created by ProMexAlign
+
+Example input file:
+
+| Label | RawFilePath | Ms1FtFilePath | MsPathfinderIdFilePath |
+|-------|-------------|---------------|------------------------|
+| Intact\_Run8  | Intact\_100ng\_Run8.pbf  | Intact\_100ng\_Run8.ms1ft |
+| Intact\_Run9  | Intact\_100ng\_Run9.pbf  | Intact\_100ng\_Run9.ms1ft |
+| Intact\_Run10 | Intact\_100ng\_Run10.pbf | Intact\_100ng\_Run10.ms1ft |
 
 ## MSPathFinder Syntax
 
@@ -222,7 +273,7 @@ MSPathFinderT.exe
 * Default: 1
 
 `-IncludeDecoy` or `-IncludeDecoys`
-* Include decoy results in the _IcTda.tsv file
+* Include decoy results in the \_IcTda.tsv file
 * Default: False
 
 `-mod`
@@ -240,7 +291,7 @@ MSPathFinderT.exe
 
 `-Overwrite`
 * Overwrite existing results
-* If false, looks for files _IcTarget.tsv and _IcDecoy.tsv and uses the results 
+* If false, looks for files \_IcTarget.tsv and \_IcDecoy.tsv and uses the results 
 * Default: False
 
 `-t` or `-PrecursorTol` or `-PMTolerance`
@@ -284,7 +335,7 @@ MSPathFinderT.exe
 * Default: 50000
 
 `-Feature`
-* Path to a .ms1ft, _isos.csv, or .msalign feature file (typically the results from ProMex)
+* Path to a .ms1ft, \_isos.csv, or .msalign feature file (typically the results from ProMex)
 * Leave blank/undefined if processing multiple input files
 
 `-threads`
