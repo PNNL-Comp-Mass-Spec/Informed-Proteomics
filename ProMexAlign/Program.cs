@@ -1,9 +1,11 @@
 ﻿using System.IO;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using InformedProteomics.Backend.Data.Spectrometry;
 using InformedProteomics.Backend.MassSpecData;
 using InformedProteomics.FeatureFinding.Alignment;
+using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.SpectrumMatching;
 using MathNet.Numerics.Statistics;
 using PRISM;
@@ -16,147 +18,230 @@ namespace PromexAlign
 
         public static void Main(string[] args)
         {
-            if (args.Length == 0)
+            try
             {
-                ShowSyntax();
-                return;
-            }
-
-            // Parse file
-            var inputFilePath = args[0];
-
-            if (!File.Exists(inputFilePath))
-            {
-                ConsoleMsgUtils.ShowError("File not found: " + inputFilePath);
-                return;
-            }
-
-            var datasets = DatasetInfo.ParseDatasetInfoFile(inputFilePath);
-
-            if (datasets.Count == 0)
-            {
-                ConsoleMsgUtils.ShowError("No valid data found in the dataset info file");
-                ShowSyntax();
-                return;
-            }
-
-            var fileName = Path.GetFileNameWithoutExtension(inputFilePath);
-            var directory = Path.GetDirectoryName(inputFilePath);
-
-            var crosstabFilename = string.Format("{0}_crosstab.tsv", fileName);
-
-            string outputFilePath;
-            if (string.IsNullOrWhiteSpace(directory))
-            {
-                outputFilePath = crosstabFilename;
-            }
-            else
-            {
-                outputFilePath = Path.Combine(directory, crosstabFilename);
-            }
-
-            var nDataset = datasets.Count;
-            var prsmReader = new ProteinSpectrumMatchReader();
-            var tolerance = new Tolerance(100);
-            var alignment = new LcMsFeatureAlignment(new CompRefFeatureComparer(tolerance));
-
-            var dataId = 0;
-            foreach (var dataset in datasets)
-            {
-                if (!File.Exists(dataset.RawFilePath))
+                if (args.Length == 0)
                 {
-                    ConsoleMsgUtils.ShowError("Instrument file not found: " + dataset.RawFilePath);
-                    continue;
+                    ShowSyntax();
+                    ConsoleMsgUtils.SleepSeconds(0.5);
+                    return;
                 }
 
-                if (!File.Exists(dataset.Ms1FtFilePath))
+                // Parse file
+                var inputFilePath = args[0];
+
+                var datasetInfoFile = new FileInfo(inputFilePath);
+                if (!datasetInfoFile.Exists)
                 {
-                    ConsoleMsgUtils.ShowError("ProMex results file not found: " + dataset.Ms1FtFilePath);
-                    continue;
-                }
-
-                Console.WriteLine("Opening " + dataset.RawFilePath);
-                var run = PbfLcMsRun.GetLcMsRun(dataset.RawFilePath, 0, 0);
-
-                Console.WriteLine("Opening " + dataset.Ms1FtFilePath);
-                var features = LcMsFeatureAlignment.LoadProMexResult(dataId++, dataset.Ms1FtFilePath, run);
-
-                if (!string.IsNullOrWhiteSpace(dataset.MsPfIdFilePath) && File.Exists(dataset.MsPfIdFilePath))
-                {
-                    Console.WriteLine("Opening " + dataset.MsPfIdFilePath);
-                    var prsmList = prsmReader.LoadIdentificationResult(dataset.MsPfIdFilePath, ProteinSpectrumMatch.SearchTool.MsPathFinder);
-
-                    foreach (var match in prsmList)
+                    ConsoleMsgUtils.ShowError("Dataset info file not found: " + inputFilePath);
+                    if (!datasetInfoFile.FullName.Equals(inputFilePath, StringComparison.OrdinalIgnoreCase))
                     {
-                        match.ProteinId = match.ProteinName;
+                        ConsoleMsgUtils.ShowWarning("Full path to the file: " + datasetInfoFile.FullName);
                     }
 
-                    // tag features by PrSMs
-                    foreach (var feature in features)
+                    ConsoleMsgUtils.SleepSeconds(1.5);
+                    return;
+                }
+
+                var datasets = DatasetInfo.ParseDatasetInfoFile(inputFilePath);
+
+                if (datasets.Count == 0)
+                {
+                    ConsoleMsgUtils.ShowError("No valid data found in the dataset info file");
+                    ConsoleMsgUtils.ShowWarning("See " + inputFilePath);
+                    ShowSyntax();
+
+                    ConsoleMsgUtils.SleepSeconds(1.5);
+                    return;
+                }
+
+                AlignDatasets(datasetInfoFile, datasets);
+
+                Console.WriteLine();
+                Console.WriteLine("Processing Complete");
+            }
+            catch (Exception ex)
+            {
+                ConsoleMsgUtils.ShowError("Error in entry method", ex);
+            }
+        }
+
+        private static bool AddPrsms(ProteinSpectrumMatchReader prsmReader, FileSystemInfo prsmFile, IEnumerable<LcMsFeature> features, Tolerance tolerance)
+        {
+            try
+            {
+                Console.WriteLine("Opening {0}", PathUtils.CompactPathString(prsmFile.FullName, 80));
+                var prsmList = prsmReader.LoadIdentificationResult(prsmFile.FullName, ProteinSpectrumMatch.SearchTool.MsPathFinder);
+
+                if (prsmList.Count == 0)
+                    return false;
+
+                foreach (var match in prsmList)
+                {
+                    match.ProteinId = match.ProteinName;
+                }
+
+                // Tag features by PrSMs
+                foreach (var feature in features)
+                {
+                    var massTol = tolerance.GetToleranceAsMz(feature.Mass);
+                    foreach (var match in prsmList)
                     {
-                        //features[j].ProteinSpectrumMatches = new ProteinSpectrumMatchSet(i);
-                        var massTol = tolerance.GetToleranceAsMz(feature.Mass);
-                        foreach (var match in prsmList)
+                        if (feature.MinScanNum < match.ScanNum && match.ScanNum < feature.MaxScanNum && Math.Abs(feature.Mass - match.Mass) < massTol)
                         {
-                            if (feature.MinScanNum < match.ScanNum && match.ScanNum < feature.MaxScanNum && Math.Abs(feature.Mass - match.Mass) < massTol)
-                            {
-                                feature.ProteinSpectrumMatches.Add(match);
-                            }
+                            feature.ProteinSpectrumMatches.Add(match);
                         }
                     }
                 }
 
-                alignment.AddDataSet(dataId, features, run);
+                return true;
             }
-
-            alignment.AlignFeatures();
-
-            Console.WriteLine("{0} alignments ", alignment.CountAlignedFeatures);
-
-            var validResults = 0;
-            for (var datasetIndex = 0; datasetIndex < nDataset; datasetIndex++)
+            catch (Exception ex)
             {
-                if (datasetIndex >= alignment.CountDatasets)
+                if (ex.Message.StartsWith("You can ignore bad data", StringComparison.OrdinalIgnoreCase))
                 {
-                    ConsoleMsgUtils.ShowWarning(string.Format("Could not align {0}; features not found", datasets[datasetIndex].Label));
-                    continue;
+                    // The error message comes from CsvHelper; it won't be helpful to the end user so don't show it
+                    ConsoleMsgUtils.ShowError("Error loading MSPathFinderResults file {0}; data format error", prsmFile.Name);
+                    ConsoleMsgUtils.ShowWarning(StackTraceFormatter.GetExceptionStackTraceMultiLine(ex));
+                }
+                else
+                {
+                    ConsoleMsgUtils.ShowError(string.Format("Error loading MSPathFinderResults file {0}", prsmFile.Name), ex);
                 }
 
-                alignment.FillMissingFeatures(datasetIndex);
-                Console.WriteLine("{0} has been processed", datasets[datasetIndex].Label);
-                validResults++;
-            }
-
-            if (validResults > 0)
-            {
-                OutputCrossTabWithId(outputFilePath, alignment, datasets.Select(ds => ds.Label).ToArray());
+                return false;
             }
         }
 
-        public static void OutputCrossTabWithId(string outputFilePath, LcMsFeatureAlignment alignment, string[] runLabels)
+        private static void AlignDatasets(FileInfo datasetInfoFile, IReadOnlyList<DatasetInfo> datasets)
         {
-            var nDataset = runLabels.Length;
-            var writer = new StreamWriter(outputFilePath);
-
-            writer.Write("MonoMass");
-            writer.Write("\t");
-            writer.Write("MinElutionTime");
-            writer.Write("\t");
-            writer.Write("MaxElutionTime");
-
-            foreach (var dataName in runLabels)
+            try
             {
-                writer.Write("\t");
-                writer.Write(dataName + "_Abundance");
+                var baseName = Path.GetFileNameWithoutExtension(datasetInfoFile.Name);
+
+                var workingDirectoryPath = datasetInfoFile.Directory == null ? "." : datasetInfoFile.Directory.FullName;
+
+                var outputFilePath = Path.Combine(workingDirectoryPath, string.Format("{0}_crosstab.tsv", baseName));
+
+                var nDataset = datasets.Count;
+                var prsmReader = new ProteinSpectrumMatchReader();
+                var tolerance = new Tolerance(100);
+                var alignment = new LcMsFeatureAlignment(new CompRefFeatureComparer(tolerance));
+
+                var dataId = 0;
+                var prsmsDefined = false;
+
+                foreach (var dataset in datasets)
+                {
+                    Console.WriteLine();
+
+                    var datasetFile = FindInputFile(workingDirectoryPath, dataset.RawFilePath, "Instrument file");
+                    if (datasetFile == null)
+                        continue;
+
+                    var featuresFile = FindInputFile(workingDirectoryPath, dataset.Ms1FtFilePath, "ProMex results file");
+                    if (featuresFile == null)
+                        continue;
+
+                    var prsmFile = FindInputFile(workingDirectoryPath, dataset.MsPfIdFilePath, "MSPathFinder results file", true);
+
+                    Console.WriteLine("Opening {0}", PathUtils.CompactPathString(datasetFile.FullName, 80));
+                    var run = PbfLcMsRun.GetLcMsRun(datasetFile.FullName, 0, 0);
+
+                    Console.WriteLine("Opening {0}", PathUtils.CompactPathString(featuresFile.FullName, 80));
+                    var features = LcMsFeatureAlignment.LoadProMexResult(dataId++, featuresFile.FullName, run);
+
+                    if (prsmFile != null)
+                    {
+                        if (prsmFile.Extension.Equals(".mzid", StringComparison.OrdinalIgnoreCase))
+                        {
+                            ConsoleMsgUtils.ShowWarning(
+                                "The MSPathFinder results file should be a .tsv file with columns Scan, Pre, Sequence, etc. (typically the _IcTda.tsv file);\n" +
+                                "{0} files are not supported:\nignoring {1}", prsmFile.Extension, prsmFile.Name);
+                        }
+                        else
+                        {
+                            if (!prsmFile.Extension.Equals(".tsv", StringComparison.OrdinalIgnoreCase))
+                            {
+                                ConsoleMsgUtils.ShowWarning(string.Format(
+                                    "The MSPathFinder results file should be a .tsv file with columns Scan, Pre, Sequence, etc. (typically the _IcTda.tsv file);\n" +
+                                    "suffix {0} indicates this may not be a compatible file:\n{1}", prsmFile.Extension, prsmFile.Name));
+                            }
+
+                            var prsmsFound = AddPrsms(prsmReader, prsmFile, features, tolerance);
+                            if (prsmsFound)
+                            {
+                                prsmsDefined = true;
+                            }
+                        }
+                    }
+
+                    alignment.AddDataSet(dataId, features, run);
+                }
+
+                alignment.AlignFeatures();
+
+                Console.WriteLine();
+                Console.WriteLine("{0} alignments ", alignment.CountAlignedFeatures);
+
+                var validResults = 0;
+                for (var datasetIndex = 0; datasetIndex < nDataset; datasetIndex++)
+                {
+                    if (datasetIndex >= alignment.CountDatasets)
+                    {
+                        ConsoleMsgUtils.ShowWarning("Could not align {0}; features not found", datasets[datasetIndex].Label);
+                        continue;
+                    }
+
+                    Console.WriteLine();
+                    Console.WriteLine("Processing {0}", datasets[datasetIndex].Label);
+
+                    alignment.FillMissingFeatures(datasetIndex);
+                    validResults++;
+                }
+
+                if (validResults == 0)
+                {
+                    Console.WriteLine("None of the datasets had valid results; aborting");
+                    return;
+                }
+
+                OutputCrossTabWithId(outputFilePath, alignment, datasets.Select(dataset => dataset.Label).ToList(), prsmsDefined);
+            }
+            catch (Exception ex)
+            {
+                ConsoleMsgUtils.ShowError("Error in AlignDatasets", ex);
+            }
+        }
+
+        private static FileInfo FindInputFile(string workingDirectoryPath, string inputFilePath, string inputFileDescription, bool optionalFile = false)
+        {
+            if (string.IsNullOrWhiteSpace(inputFilePath))
+            {
+                if (!optionalFile)
+                    ConsoleMsgUtils.ShowError("{0} not defined", inputFileDescription);
+
+                return null;
             }
 
-            foreach (var dataName in runLabels)
+            if (File.Exists(inputFilePath))
             {
-                writer.Write("\t");
-                writer.Write(dataName + "_Ms1Score");
+                return new FileInfo(inputFilePath);
             }
 
-            foreach (var dataName in runLabels)
+            // File not found in the executable's working directory; examine workingDirectoryPath
+            var alternatePath = Path.Combine(workingDirectoryPath, Path.GetFileName(inputFilePath));
+            if (File.Exists(alternatePath))
+            {
+                return new FileInfo(alternatePath);
+            }
+
+            if (!optionalFile)
+                ConsoleMsgUtils.ShowError("{0} not found: {1}", inputFileDescription, inputFilePath);
+
+            return null;
+        }
+
             {
                 writer.Write("\t");
                 writer.Write(dataName + "_FeatureId");
