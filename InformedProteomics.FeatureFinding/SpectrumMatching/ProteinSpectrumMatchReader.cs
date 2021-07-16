@@ -161,6 +161,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             return prsmList;
         }
 
+        [Obsolete("Unused method")]
         public List<ProteinSpectrumMatch> ReadMsPathFinderResultOld(string msPathFinderResultPath, int maxPrsm, double minScore = 3, double maxScore = int.MaxValue)
         {
             var parser = new TsvFileParser(msPathFinderResultPath);
