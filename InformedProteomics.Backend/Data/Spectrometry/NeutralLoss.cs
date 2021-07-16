@@ -38,17 +38,17 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// No neutral loss
         /// </summary>
-        public static readonly NeutralLoss NoLoss = new NeutralLoss(string.Empty, "NoLoss", Data.Composition.Composition.Zero);
+        public static readonly NeutralLoss NoLoss = new(string.Empty, "NoLoss", Data.Composition.Composition.Zero);
 
         /// <summary>
         /// Neutral water loss
         /// </summary>
-        public static readonly NeutralLoss H2O = new NeutralLoss("-H2O", "H2O", Data.Composition.Composition.H2O);
+        public static readonly NeutralLoss H2O = new("-H2O", "H2O", Data.Composition.Composition.H2O);
 
         /// <summary>
         /// Neutral ammonia loss
         /// </summary>
-        public static readonly NeutralLoss NH3 = new NeutralLoss("-NH3", "NH3", Data.Composition.Composition.NH3);
+        public static readonly NeutralLoss NH3 = new("-NH3", "NH3", Data.Composition.Composition.NH3);
 
         //public static readonly NeutralLoss DeconvolutedIon = new NeutralLoss("'", new CompositionWithDeltaMass(Biology.Constants.Proton));
 

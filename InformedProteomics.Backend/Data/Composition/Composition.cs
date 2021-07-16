@@ -17,37 +17,37 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Empty composition
         /// </summary>
-        public static readonly Composition Zero = new Composition(0, 0, 0, 0, 0);
+        public static readonly Composition Zero = new(0, 0, 0, 0, 0);
 
         /// <summary>
         /// Water
         /// </summary>
-        public static readonly Composition H2O = new Composition(0, 2, 0, 1, 0);
+        public static readonly Composition H2O = new(0, 2, 0, 1, 0);
 
         /// <summary>
         /// Ammonia
         /// </summary>
-        public static readonly Composition NH3 = new Composition(0, 3, 1, 0, 0);
+        public static readonly Composition NH3 = new(0, 3, 1, 0, 0);
 
         /// <summary>
         /// Amide
         /// </summary>
-        public static readonly Composition NH2 = new Composition(0, 2, 1, 0, 0);
+        public static readonly Composition NH2 = new(0, 2, 1, 0, 0);
 
         /// <summary>
         /// Hydroxide
         /// </summary>
-        public static readonly Composition OH = new Composition(0, 1, 0, 1, 0);
+        public static readonly Composition OH = new(0, 1, 0, 1, 0);
 
         /// <summary>
         /// Carbon Monoxide
         /// </summary>
-        public static readonly Composition CO = new Composition(1, 0, 0, 1, 0);
+        public static readonly Composition CO = new(1, 0, 0, 1, 0);
 
         /// <summary>
         /// Hydrogen
         /// </summary>
-        public static readonly Composition Hydrogen = new Composition(0, 1, 0, 0, 0);
+        public static readonly Composition Hydrogen = new(0, 1, 0, 0, 0);
 
         #region Constructors
 

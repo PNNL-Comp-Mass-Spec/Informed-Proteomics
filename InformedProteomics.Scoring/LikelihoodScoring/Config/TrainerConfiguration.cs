@@ -216,8 +216,8 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
 
         }
 
-        private readonly Tolerance _defaultTolerancePpm = new Tolerance(10, ToleranceUnit.Ppm);
-        private readonly Tolerance _defaultToleranceMz = new Tolerance(0.5, ToleranceUnit.Mz);
+        private readonly Tolerance _defaultTolerancePpm = new(10, ToleranceUnit.Ppm);
+        private readonly Tolerance _defaultToleranceMz = new(0.5, ToleranceUnit.Mz);
         private IonTypeFactory _ionTypeFactory;
     }
 }

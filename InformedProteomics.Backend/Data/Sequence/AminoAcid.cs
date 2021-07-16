@@ -86,27 +86,27 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Protein N-Terminus marker
         /// </summary>
-        public static readonly AminoAcid ProteinNTerm = new AminoAcid('[', "Protein-N-terminus", Data.Composition.Composition.Zero);
+        public static readonly AminoAcid ProteinNTerm = new('[', "Protein-N-terminus", Data.Composition.Composition.Zero);
 
         /// <summary>
         /// Protein C-Terminus marker
         /// </summary>
-        public static readonly AminoAcid ProteinCTerm = new AminoAcid(']', "Protein-C-terminus", Data.Composition.Composition.Zero);
+        public static readonly AminoAcid ProteinCTerm = new(']', "Protein-C-terminus", Data.Composition.Composition.Zero);
 
         /// <summary>
         /// Peptide N-Terminus marker
         /// </summary>
-        public static readonly AminoAcid PeptideNTerm = new AminoAcid('(', "Peptide-N-terminus", Data.Composition.Composition.Zero);
+        public static readonly AminoAcid PeptideNTerm = new('(', "Peptide-N-terminus", Data.Composition.Composition.Zero);
 
         /// <summary>
         /// Peptide C-Terminus marker
         /// </summary>
-        public static readonly AminoAcid PeptideCTerm = new AminoAcid(')', "Peptide-C-terminus", Data.Composition.Composition.Zero);
+        public static readonly AminoAcid PeptideCTerm = new(')', "Peptide-C-terminus", Data.Composition.Composition.Zero);
 
         /// <summary>
         /// Empty amino acid
         /// </summary>
-        public static readonly AminoAcid Empty = new AminoAcid('\0', "Empty", Data.Composition.Composition.Zero);
+        public static readonly AminoAcid Empty = new('\0', "Empty", Data.Composition.Composition.Zero);
 
         /// <summary>
         /// Standard amino acids

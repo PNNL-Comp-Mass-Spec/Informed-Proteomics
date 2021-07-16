@@ -572,7 +572,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         protected internal const int NativeIdLength = 50;
 
-        private readonly object _fileLock = new object();
+        private readonly object _fileLock = new();
         private BinaryReader _reader;
 
         private readonly double _precursorSignalToNoiseRatioThreshold;
@@ -601,7 +601,7 @@ namespace InformedProteomics.Backend.MassSpecData
         // Each peak is a double, a float, and an int, representing mass, intensity, and scan number
         private const int NumBytePeak = 16;
 
-        private readonly List<XicPoint> _precursorChromatogramCache = new List<XicPoint>();
+        private readonly List<XicPoint> _precursorChromatogramCache = new();
 
         #endregion
 

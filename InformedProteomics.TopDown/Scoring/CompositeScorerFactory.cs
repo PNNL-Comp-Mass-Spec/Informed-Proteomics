@@ -230,7 +230,7 @@ namespace InformedProteomics.TopDown.Scoring
         private readonly int _minProductCharge;
         private readonly int _maxProductCharge;
         private readonly Tolerance _productTolerance;
-        private readonly Dictionary<int, double> _referencePeakIntensities = new Dictionary<int, double>();
+        private readonly Dictionary<int, double> _referencePeakIntensities = new();
 
         /*
               * Scoring based on deconvoluted spectrum

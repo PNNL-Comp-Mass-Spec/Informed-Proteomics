@@ -12,7 +12,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// No modification
         /// </summary>
-        public static readonly ModificationCombination NoModification = new ModificationCombination(new List<Modification>());
+        public static readonly ModificationCombination NoModification = new(new List<Modification>());
 
         /// <summary>
         /// Constructor

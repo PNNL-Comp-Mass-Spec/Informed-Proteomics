@@ -322,7 +322,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <remarks>
         /// Returns all supported file types when ProteoWizard is available
         /// </remarks>
-        private static List<Tuple<string, string[]>> SupportedTypesAll => new List<Tuple<string, string[]>>
+        private static List<Tuple<string, string[]>> SupportedTypesAll => new()
         {
             new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
             new Tuple<string, string[]>("mzML", new[] { ".mzml", ".mzml.gz" }),
@@ -342,7 +342,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <remarks>
         /// Returns the limited list of supported file types if only ThermoRawFileReaderDLL is available
         /// </remarks>
-        private static List<Tuple<string, string[]>> SupportedTypesBuiltIn => new List<Tuple<string, string[]>>
+        private static List<Tuple<string, string[]>> SupportedTypesBuiltIn => new()
         {
             new Tuple<string, string[]>("Thermo .RAW", new[] { ".raw" }),
             new Tuple<string, string[]>("mzMl", new[] { ".mzml", ".mzml.gz" }),
@@ -355,7 +355,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <remarks>
         /// Returns the limited list of supported file types natively supported by InformedProteomics without any external DLLs available
         /// </remarks>
-        private static List<Tuple<string, string[]>> SupportedTypesNoExternalDll => new List<Tuple<string, string[]>>
+        private static List<Tuple<string, string[]>> SupportedTypesNoExternalDll => new()
         {
             new Tuple<string, string[]>("mzMl", new[] { ".mzml", ".mzml.gz" }),
             new Tuple<string, string[]>("PNNL Binary Format", new[] { ".pbf" }),

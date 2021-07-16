@@ -708,7 +708,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// Dictionary to map scan numbers to native IDs
         /// </summary>
-        protected Dictionary<int, string> ScanNumNativeIdMap = new Dictionary<int, string>();
+        protected Dictionary<int, string> ScanNumNativeIdMap = new();
 
         /// <summary>
         /// True if DIA data, false if not, null if unknown

@@ -72,7 +72,7 @@ namespace InformedProteomics.TopDown.SequenceTag
             return true;
         }
 
-        private static readonly MzComparerWithBinning _mzComparer = new MzComparerWithBinning(28);
+        private static readonly MzComparerWithBinning _mzComparer = new(28);
 
         public int ScanNum { get; }
         public string Sequence { get; }

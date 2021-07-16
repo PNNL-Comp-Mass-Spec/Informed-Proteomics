@@ -97,6 +97,6 @@ namespace InformedProteomics.Backend.Utils
             _random = new Random(seed);
         }
 
-        private static Random _random = new Random();
+        private static Random _random = new();
     }
 }

@@ -7,7 +7,7 @@ namespace InformedProteomics.Backend.Database
     {
         private static readonly SHA1 mSha1Hasher = new SHA1Managed();
 
-        private static readonly StringBuilder mSha1StringBuilder = new StringBuilder();
+        private static readonly StringBuilder mSha1StringBuilder = new();
 
         /// <summary>
         /// Number of times this protein name has been encountered in the source FASTA file

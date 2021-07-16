@@ -42,8 +42,8 @@ namespace InformedProteomics.Backend.MassSpecData
         private bool _reduceMemoryUsage;
         //private long _artificialScanNum = 1;
         private long _numSpectra = -1;
-        private readonly IndexList _spectrumOffsets = new IndexList() { IndexType = IndexList.IndexListType.Spectrum };
-        private readonly IndexList _chromatogramOffsets = new IndexList() { IndexType = IndexList.IndexListType.Chromatogram };
+        private readonly IndexList _spectrumOffsets = new() { IndexType = IndexList.IndexListType.Spectrum };
+        private readonly IndexList _chromatogramOffsets = new() { IndexType = IndexList.IndexListType.Chromatogram };
         private long _indexListOffset;
         private bool _haveIndex;
         private bool _haveMetaData;
@@ -51,9 +51,9 @@ namespace InformedProteomics.Backend.MassSpecData
         private string _unzippedFilePath;
         private bool _randomAccess;
         private bool _allRead;
-        private readonly XmlReaderSettings _xSettings = new XmlReaderSettings { IgnoreWhitespace = true };
+        private readonly XmlReaderSettings _xSettings = new() { IgnoreWhitespace = true };
         private Encoding _encoding;
-        private readonly List<Spectrum> _spectra = new List<Spectrum>();
+        private readonly List<Spectrum> _spectra = new();
 
         #endregion
 
@@ -291,7 +291,7 @@ namespace InformedProteomics.Backend.MassSpecData
             /// Keys in this dictionary are artificial scan number
             /// Values are file offsets, in bytes
             /// </summary>
-            public readonly Dictionary<long, long> OffsetsMapInt = new Dictionary<long, long>();
+            public readonly Dictionary<long, long> OffsetsMapInt = new();
 
             // Unused
             // private readonly Dictionary<long, string> IdToNativeMap = new Dictionary<long, string>();
@@ -300,7 +300,7 @@ namespace InformedProteomics.Backend.MassSpecData
             /// Keys are NativeID
             /// Values are artificial scan number
             /// </summary>
-            private readonly Dictionary<string, long> NativeToIdMap = new Dictionary<string, long>();
+            private readonly Dictionary<string, long> NativeToIdMap = new();
 
             // Unused
             // private readonly Dictionary<long, long> ActualScanToIdMap = new Dictionary<long, long>();
@@ -536,7 +536,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //}
         }
 
-        private readonly Dictionary<string, List<Param>> _referenceableParamGroups = new Dictionary<string, List<Param>>();
+        private readonly Dictionary<string, List<Param>> _referenceableParamGroups = new();
 
         /// <summary>
         /// Selected Ion m/z

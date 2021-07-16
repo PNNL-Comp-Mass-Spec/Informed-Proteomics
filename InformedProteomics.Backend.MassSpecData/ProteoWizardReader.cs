@@ -190,7 +190,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// All files that ProteoWizard supports, either directly, or as part of a folder dataset
         /// </summary>
-        public static List<string> SupportedFilesFilterList => new List<string>()
+        public static List<string> SupportedFilesFilterList => new()
         {
             // ReSharper disable StringLiteralTypo
             ".raw", // Thermo (file) or Waters (folder)
@@ -221,12 +221,12 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <remarks>
         /// This does not include all folder type datasets - some require directory listings
         /// </remarks>
-        public static List<string> SupportedDirectoryTypes => new List<string> { ".d", ".raw" };
+        public static List<string> SupportedDirectoryTypes => new() { ".d", ".raw" };
 
         /// <summary>
         /// List of files that are produced by Bruker instruments that ProteoWizard can read
         /// </summary>
-        public static List<string> BrukerFiles => new List<string>()
+        public static List<string> BrukerFiles => new()
         {
             ".d",
             "analysis.yep",
@@ -237,7 +237,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <summary>
         /// All file extensions that ProteoWizard directly reads - i.e., we don't need to back out of a folder
         /// </summary>
-        private static List<string> DirectlySupportedFilesFilterList => new List<string>()
+        private static List<string> DirectlySupportedFilesFilterList => new()
         {
             // ReSharper disable StringLiteralTypo
             ".raw", // Thermo (file) or Waters (folder)
@@ -344,12 +344,12 @@ namespace InformedProteomics.Backend.MassSpecData
         private bool _loaded;
         private int _numSpectra;
 
-        private readonly MSData _dataFile = new MSData();
+        private readonly MSData _dataFile = new();
         // Uses the centroiding/peak picking algorithm that the vendor libraries provide, if available; otherwise uses a low-quality centroiding algorithm
         private readonly string _vendorCentroiding = "peakPicking true 1-";
         // Continuous Wavelet Transform peak picker - high-quality peak picking, may be slow with some high-res data.
         private readonly string _cwtCentroiding = "peakPicking cwt snr=1.0 peakSpace=0.1 msLevel=1-";
-        private readonly List<string> _filters = new List<string>();
+        private readonly List<string> _filters = new();
         private string _fileFormatVersion = string.Empty;
         private string _srcFileChecksum = string.Empty;
         private MethodInfo _binaryDataArrayGetData;

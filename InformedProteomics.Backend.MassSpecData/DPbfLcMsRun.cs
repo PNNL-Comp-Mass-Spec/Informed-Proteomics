@@ -288,7 +288,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             PeakIndexCannotBeStored
         }
-        private readonly List<WriteWarnings> warningTracker = new List<WriteWarnings>();
+        private readonly List<WriteWarnings> warningTracker = new();
 
         private void WarnOnce(WriteWarnings code, string message)
         {

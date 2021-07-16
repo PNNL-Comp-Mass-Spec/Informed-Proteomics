@@ -16,8 +16,8 @@ namespace InformedProteomics.Backend.SearchResults
         private const int UNDEFINED_QVALUE = 10;
 
         private readonly bool _multiplePeptidesPerScan;
-        private List<DatabaseSearchResultData> searchResults = new List<DatabaseSearchResultData>();
-        private readonly List<DatabaseSearchResultData> filteredResults = new List<DatabaseSearchResultData>();
+        private List<DatabaseSearchResultData> searchResults = new();
+        private readonly List<DatabaseSearchResultData> filteredResults = new();
 
         /// <summary>
         /// Number of PSMs with a QValue &lt; 0.01
@@ -37,7 +37,7 @@ namespace InformedProteomics.Backend.SearchResults
         /// <summary>
         /// The full list of filtered results, with FDR scores added
         /// </summary>
-        public List<DatabaseSearchResultData> FilteredResults => new List<DatabaseSearchResultData>(filteredResults);
+        public List<DatabaseSearchResultData> FilteredResults => new(filteredResults);
 
         /// <summary>
         /// Instantiate the FDR calculator

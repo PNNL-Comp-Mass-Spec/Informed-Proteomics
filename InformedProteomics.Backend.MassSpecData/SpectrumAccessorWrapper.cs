@@ -10,7 +10,7 @@ namespace InformedProteomics.Backend.MassSpecData
     {
         private readonly IMassSpecDataReader reader;
         // TODO: If we're going to allow loading IMS/SLIM data (for outside API support), then a single dictionary might not be wise
-        private readonly Dictionary<int, ScanMetadata> scanMetadata = new Dictionary<int, ScanMetadata>();
+        private readonly Dictionary<int, ScanMetadata> scanMetadata = new();
 
         public SpectrumAccessorWrapper(IMassSpecDataReader msReader, IProgress<ProgressData> progress = null)
         {

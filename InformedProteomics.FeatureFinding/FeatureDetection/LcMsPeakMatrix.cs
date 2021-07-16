@@ -460,7 +460,7 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
         public readonly MzComparerWithBinning Comparer;
         public const double RelativeIsotopePeakIntensityThreshold = 0.1d;
 
-        private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(9, 2);
+        private static readonly SavitzkyGolaySmoother Smoother = new(9, 2);
 
         private readonly int _maxThreadCount;
         private static List<Ms1Peak> _ms1PeakList;

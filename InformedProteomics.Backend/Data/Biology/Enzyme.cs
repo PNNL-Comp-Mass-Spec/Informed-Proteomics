@@ -62,52 +62,52 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// Unspecific cleavage
         /// </summary>
-        public static readonly Enzyme UnspecificCleavage = new Enzyme("UnspecificCleavage", string.Empty, false, "unspecific cleavage", "MS:1001956");
+        public static readonly Enzyme UnspecificCleavage = new("UnspecificCleavage", string.Empty, false, "unspecific cleavage", "MS:1001956");
 
         /// <summary>
         /// Trypsin enzyme
         /// </summary>
-        public static readonly Enzyme Trypsin = new Enzyme("Trypsin", "KR", false, "Trypsin", "MS:1001251");
+        public static readonly Enzyme Trypsin = new("Trypsin", "KR", false, "Trypsin", "MS:1001251");
 
         /// <summary>
         /// Chymotrypsin enzyme
         /// </summary>
         // ReSharper disable once StringLiteralTypo
-        public static readonly Enzyme Chymotrypsin = new Enzyme("Chymotrypsin", "FYWL", false, "Chymotrypsin", "MS:1001306");
+        public static readonly Enzyme Chymotrypsin = new("Chymotrypsin", "FYWL", false, "Chymotrypsin", "MS:1001306");
 
         /// <summary>
         /// LysC enzyme
         /// </summary>
-        public static readonly Enzyme LysC = new Enzyme("LysC", "K", false, "Lys-C", "MS:1001309");
+        public static readonly Enzyme LysC = new("LysC", "K", false, "Lys-C", "MS:1001309");
 
         /// <summary>
         /// LysN enzyme
         /// </summary>
-        public static readonly Enzyme LysN = new Enzyme("LysN", "K", true, "Lys-N", null);
+        public static readonly Enzyme LysN = new("LysN", "K", true, "Lys-N", null);
 
         /// <summary>
         /// GluC enzyme
         /// </summary>
-        public static readonly Enzyme GluC = new Enzyme("GluC", "E", false, "Glu-C", "MS:1001917");
+        public static readonly Enzyme GluC = new("GluC", "E", false, "Glu-C", "MS:1001917");
 
         /// <summary>
         /// ArgC enzyme
         /// </summary>
-        public static readonly Enzyme ArgC = new Enzyme("ArgC", "R", false, "Arg-C", "MS:1001303");
+        public static readonly Enzyme ArgC = new("ArgC", "R", false, "Arg-C", "MS:1001303");
 
         /// <summary>
         /// AspN enzyme
         /// </summary>
-        public static readonly Enzyme AspN = new Enzyme("AspN", "D", true, "Asp-N", "MS:1001304");
+        public static readonly Enzyme AspN = new("AspN", "D", true, "Asp-N", "MS:1001304");
 
         /// <summary>
         /// Alp enzyme
         /// </summary>
-        public static readonly Enzyme Alp = new Enzyme("aLP", string.Empty, false, "alphaLP", null);
+        public static readonly Enzyme Alp = new("aLP", string.Empty, false, "alphaLP", null);
 
         /// <summary>
         /// No cleavage enzyme
         /// </summary>
-        public static readonly Enzyme NoCleavage = new Enzyme("NoCleavage", string.Empty, false, "no cleavage", "MS:1001955");
+        public static readonly Enzyme NoCleavage = new("NoCleavage", string.Empty, false, "no cleavage", "MS:1001955");
     }
 }

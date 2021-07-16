@@ -32,7 +32,7 @@ namespace InformedProteomics.Backend.MathAndStats
             return num / denominator;
         }
 
-        private static readonly Dictionary<Tuple<int, int>, double> LogCombinations = new Dictionary<Tuple<int, int>, double>();
+        private static readonly Dictionary<Tuple<int, int>, double> LogCombinations = new();
 
         /// <summary>
         /// Get the combination for n and k

@@ -622,7 +622,7 @@ namespace InformedProteomics.FeatureFinding.Clustering
 
         public double BestCorrelationScore => Math.Max(BestCorrelationScoreAcrossCharge.Max(), EnvelopeCorrelationScoreAcrossCharge.Max());
         public readonly TheoreticalIsotopeEnvelope TheoreticalEnvelope;
-        private static readonly SavitzkyGolaySmoother Smoother = new SavitzkyGolaySmoother(9, 2);
+        private static readonly SavitzkyGolaySmoother Smoother = new(9, 2);
         public byte Flag;
 
         private readonly LcMsRun _run;

@@ -34,7 +34,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Scoring
             return score;
         }
 
-        private readonly Tolerance _tolerance = new Tolerance(10, ToleranceUnit.Ppm);
+        private readonly Tolerance _tolerance = new(10, ToleranceUnit.Ppm);
         private readonly RankScore _rankScore;
     }
 }

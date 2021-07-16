@@ -16,7 +16,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// Constant tolerance object for 1 ppm
         /// </summary>
-        public static readonly Tolerance OnePpm = new Tolerance(1);
+        public static readonly Tolerance OnePpm = new(1);
 
         /// <summary>
         /// Instantiate a tolerance with the supplied value and ppm units

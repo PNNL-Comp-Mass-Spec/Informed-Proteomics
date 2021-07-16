@@ -49,7 +49,7 @@ namespace InformedProteomics.Backend.Database
         /// <summary>
         /// Encoding used in the backing files
         /// </summary>
-        public static readonly ASCIIEncoding Encoding = new ASCIIEncoding();
+        public static readonly ASCIIEncoding Encoding = new();
 
         /// <summary>
         /// True if this instance is tied to the decoy database

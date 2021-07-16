@@ -178,7 +178,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// No modification
         /// </summary>
-        public static readonly Modification NoModification = new Modification(0, new Composition.Composition(0, 0, 0, 0, 0), "No modification");
+        public static readonly Modification NoModification = new(0, new Composition.Composition(0, 0, 0, 0, 0), "No modification");
 
         // ReSharper disable IdentifierTypo
         // ReSharper disable CommentTypo
@@ -193,142 +193,142 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Acetylation
         /// </summary>
-        public static readonly Modification Acetylation = new Modification(1, new Composition.Composition(2, 2, 0, 1, 0), "Acetyl");
+        public static readonly Modification Acetylation = new(1, new Composition.Composition(2, 2, 0, 1, 0), "Acetyl");
 
         /// <summary>
         /// Carbamidomethylation
         /// </summary>
-        public static readonly Modification Carbamidomethylation = new Modification(4, new Composition.Composition(2, 3, 1, 1, 0), "Carbamidomethyl");
+        public static readonly Modification Carbamidomethylation = new(4, new Composition.Composition(2, 3, 1, 1, 0), "Carbamidomethyl");
 
         /// <summary>
         /// Carbamylation
         /// </summary>
-        public static readonly Modification Carbamylation = new Modification(5, new Composition.Composition(1, 1, 1, 1, 0), "Carbamyl");
+        public static readonly Modification Carbamylation = new(5, new Composition.Composition(1, 1, 1, 1, 0), "Carbamyl");
 
         /// <summary>
         /// Carboxymethylation
         /// </summary>
-        public static readonly Modification Carboxymethylation = new Modification(6, new Composition.Composition(2, 2, 2, 0, 0), "Carboxymethyl");
+        public static readonly Modification Carboxymethylation = new(6, new Composition.Composition(2, 2, 2, 0, 0), "Carboxymethyl");
 
         /// <summary>
         /// Deamidation
         /// </summary>
-        public static readonly Modification Deamidation = new Modification(7, new Composition.Composition(0, -1, -1, 1, 0), "Deamidated");
+        public static readonly Modification Deamidation = new(7, new Composition.Composition(0, -1, -1, 1, 0), "Deamidated");
 
         /// <summary>
         /// NipCam
         /// </summary>
-        public static readonly Modification NipCam = new Modification(17, new Composition.Composition(5, 9, 1, 1, 0), "NIPCAM");
+        public static readonly Modification NipCam = new(17, new Composition.Composition(5, 9, 1, 1, 0), "NIPCAM");
 
         /// <summary>
         /// Phosphorylation
         /// </summary>
-        public static readonly Modification Phosphorylation = new Modification(21, new Composition.Composition(0, 1, 0, 3, 0, 1), "Phospho");
+        public static readonly Modification Phosphorylation = new(21, new Composition.Composition(0, 1, 0, 3, 0, 1), "Phospho");
 
         /// <summary>
         /// PyroCarbamidomethyl
         /// </summary>
-        public static readonly Modification PyroCarbamidomethyl = new Modification(26, new Composition.Composition(0, -3, -1, 0, 0), "Pyro-carbamidomethyl");
+        public static readonly Modification PyroCarbamidomethyl = new(26, new Composition.Composition(0, -3, -1, 0, 0), "Pyro-carbamidomethyl");
 
         /// <summary>
         /// PyroGluE
         /// </summary>
-        public static readonly Modification PyroGluE = new Modification(27, new Composition.Composition(0, -2, 0, -1, 0), "Glu->pyro-Glu");
+        public static readonly Modification PyroGluE = new(27, new Composition.Composition(0, -2, 0, -1, 0), "Glu->pyro-Glu");
 
         /// <summary>
         /// PyroGluQ
         /// </summary>
-        public static readonly Modification PyroGluQ = new Modification(28, new Composition.Composition(0, -3, -1, 0, 0), "Gln->pyro-Glu");
+        public static readonly Modification PyroGluQ = new(28, new Composition.Composition(0, -3, -1, 0, 0), "Gln->pyro-Glu");
 
         /// <summary>
         /// Methylation
         /// </summary>
-        public static readonly Modification Methylation = new Modification(34, new Composition.Composition(1, 2, 0, 0, 0), "Methyl");
+        public static readonly Modification Methylation = new(34, new Composition.Composition(1, 2, 0, 0, 0), "Methyl");
 
         /// <summary>
         /// Oxidation
         /// </summary>
-        public static readonly Modification Oxidation = new Modification(35, new Composition.Composition(0, 0, 0, 1, 0), "Oxidation");
+        public static readonly Modification Oxidation = new(35, new Composition.Composition(0, 0, 0, 1, 0), "Oxidation");
 
         /// <summary>
         /// TriOxidation
         /// </summary>
-        public static readonly Modification TriOxidation = new Modification(400, new Composition.Composition(0, 0, 0, 3, 0), "TriOxidation");
+        public static readonly Modification TriOxidation = new(400, new Composition.Composition(0, 0, 0, 3, 0), "TriOxidation");
 
         /// <summary>
         /// DiMethylation
         /// </summary>
-        public static readonly Modification DiMethylation = new Modification(36, new Composition.Composition(2, 4, 0, 0, 0), "Dimethyl");
+        public static readonly Modification DiMethylation = new(36, new Composition.Composition(2, 4, 0, 0, 0), "Dimethyl");
 
         /// <summary>
         /// TriMethylation
         /// </summary>
-        public static readonly Modification TriMethylation = new Modification(37, new Composition.Composition(3, 6, 0, 0, 0), "Trimethyl");
+        public static readonly Modification TriMethylation = new(37, new Composition.Composition(3, 6, 0, 0, 0), "Trimethyl");
 
         /// <summary>
         /// Glutathione
         /// </summary>
-        public static readonly Modification Glutathione = new Modification(55, new Composition.Composition(10, 15, 3, 6, 1), "Glutathione");
+        public static readonly Modification Glutathione = new(55, new Composition.Composition(10, 15, 3, 6, 1), "Glutathione");
 
         /// <summary>
         /// Cysteinyl
         /// </summary>
-        public static readonly Modification Cysteinyl = new Modification(312, new Composition.Composition(3, 5, 1, 2, 1), "Cysteinyl");
+        public static readonly Modification Cysteinyl = new(312, new Composition.Composition(3, 5, 1, 2, 1), "Cysteinyl");
 
         /// <summary>
         /// Dehydro
         /// </summary>
-        public static readonly Modification Dehydro = new Modification(374, new Composition.Composition(0, -1, 0, 0, 0), "Dehydro");
+        public static readonly Modification Dehydro = new(374, new Composition.Composition(0, -1, 0, 0, 0), "Dehydro");
 
         /// <summary>
         /// Itraq4Plex
         /// </summary>
-        public static readonly Modification Itraq4Plex = new Modification(214, Data.Composition.Composition.Parse("H(12) C(4) 13C(3) N 15N O"), "iTRAQ4plex");
+        public static readonly Modification Itraq4Plex = new(214, Data.Composition.Composition.Parse("H(12) C(4) 13C(3) N 15N O"), "iTRAQ4plex");
 
         /// <summary>
         /// Tmt6Plex
         /// </summary>
-        public static readonly Modification Tmt6Plex = new Modification(737, Data.Composition.Composition.Parse("H(20) C(8) 13C(4) N 15N O(2)"), "TMT6plex");
+        public static readonly Modification Tmt6Plex = new(737, Data.Composition.Composition.Parse("H(20) C(8) 13C(4) N 15N O(2)"), "TMT6plex");
 
         /// <summary>
         /// Nethylmaleimide
         /// </summary>
-        public static readonly Modification Nethylmaleimide = new Modification(108, Data.Composition.Composition.Parse("H(7) C(6) N O(2)"), "Nethylmaleimide");
+        public static readonly Modification Nethylmaleimide = new(108, Data.Composition.Composition.Parse("H(7) C(6) N O(2)"), "Nethylmaleimide");
 
         /// <summary>
         /// Nitrosyl
         /// </summary>
-        public static readonly Modification Nitrosyl = new Modification(275, Data.Composition.Composition.Parse("H(-1) N O"), "Nitrosyl");
+        public static readonly Modification Nitrosyl = new(275, Data.Composition.Composition.Parse("H(-1) N O"), "Nitrosyl");
 
         /// <summary>
         /// ThrToAla
         /// </summary>
-        public static readonly Modification ThrToAla = new Modification(659, Data.Composition.Composition.Parse("H(-2) C(-1) O(-1)"), "Thr->Ala");
+        public static readonly Modification ThrToAla = new(659, Data.Composition.Composition.Parse("H(-2) C(-1) O(-1)"), "Thr->Ala");
 
         /// <summary>
         /// Dethiomethyl
         /// </summary>
-        public static readonly Modification Dethiomethyl = new Modification(526, Data.Composition.Composition.Parse("H(-4) C(-1) S(-1)"), "Dethiomethyl");
+        public static readonly Modification Dethiomethyl = new(526, Data.Composition.Composition.Parse("H(-4) C(-1) S(-1)"), "Dethiomethyl");
 
         /// <summary>
         /// DelC2H2
         /// </summary>
-        public static readonly Modification DelC2H2 = new Modification(254, Data.Composition.Composition.Parse("H(2) C(2)"), "Delta:H(2)C(2)");
+        public static readonly Modification DelC2H2 = new(254, Data.Composition.Composition.Parse("H(2) C(2)"), "Delta:H(2)C(2)");
 
         /// <summary>
         /// SerToXle
         /// </summary>
-        public static readonly Modification SerToXle = new Modification(656, Data.Composition.Composition.Parse("H(6) C(3) O(-1)"), "Ser->Xle");
+        public static readonly Modification SerToXle = new(656, Data.Composition.Composition.Parse("H(6) C(3) O(-1)"), "Ser->Xle");
 
         /// <summary>
         /// SerToAsn
         /// </summary>
-        public static readonly Modification SerToAsn = new Modification(651, Data.Composition.Composition.Parse("H C N"), "Ser->Asn");
+        public static readonly Modification SerToAsn = new(651, Data.Composition.Composition.Parse("H C N"), "Ser->Asn");
 
         /// <summary>
         /// SerToAsp
         /// </summary>
-        public static readonly Modification SerToAsp = new Modification(1196, Data.Composition.Composition.Parse("C O"), "Ser->Asp");
+        public static readonly Modification SerToAsp = new(1196, Data.Composition.Composition.Parse("C O"), "Ser->Asp");
 
         /// <summary>
         /// Common modifications
@@ -366,17 +366,17 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <summary>
         /// Heavy peptide
         /// </summary>
-        public static readonly Modification LysToHeavyLys = new Modification(259, Data.Composition.Composition.Parse("C(-6) 13C(6) N(-2) 15N(2)"), "Label:13C(6)15N(2)");
+        public static readonly Modification LysToHeavyLys = new(259, Data.Composition.Composition.Parse("C(-6) 13C(6) N(-2) 15N(2)"), "Label:13C(6)15N(2)");
 
         /// <summary>
         /// Heavy peptide
         /// </summary>
-        public static readonly Modification ArgToHeavyArg = new Modification(267, Data.Composition.Composition.Parse("C(-6) 13C(6) N(-4) 15N(4)"), "Label:13C(6)15N(4)");
+        public static readonly Modification ArgToHeavyArg = new(267, Data.Composition.Composition.Parse("C(-6) 13C(6) N(-4) 15N(4)"), "Label:13C(6)15N(4)");
 
         /// <summary>
         /// Protein Probe
         /// </summary>
-        public static readonly Modification TevFp2 = new Modification(-1, new Composition.Composition(26, 48, 7, 9, 0, 1), "TEV-FP2");
+        public static readonly Modification TevFp2 = new(-1, new Composition.Composition(26, 48, 7, 9, 0, 1), "TEV-FP2");
 
         private static readonly Dictionary<string, Modification> NameToModMap;
 

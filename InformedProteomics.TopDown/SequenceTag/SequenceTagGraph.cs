@@ -174,7 +174,7 @@ namespace InformedProteomics.TopDown.SequenceTag
         }*/
 
         protected bool StopFindPath;
-        protected readonly Stack<T> EdgeList = new Stack<T>();
+        protected readonly Stack<T> EdgeList = new();
 
         protected bool[] NodeVisitFlag;
         protected int MaxTagLen;
