@@ -6,6 +6,7 @@ pause
 
 if not exist PbfGen mkdir PbfGen
 if not exist PbfGen mkdir ProMex
+if not exist PbfGen mkdir ProMexAlign
 if not exist PbfGen mkdir MSPathFinder
 
 echo.
@@ -23,6 +24,14 @@ xcopy ..\ProMex\bin\Release\*.dll                                   ProMex\ /D /
 xcopy ..\ProMex\bin\Release\*.pdb                                   ProMex\ /D /Y
 xcopy ..\ProMex\bin\Release\InformedProteomics.Backend.xml          ProMex\ /D /Y  
 xcopy ..\ProMex\bin\Release\ProMex.exe.config                       ProMex\ /D /Y  
+
+echo.
+echo Copying ProMexAlign files
+xcopy ..\PromexAlign\bin\Release\*.exe                              ProMexAlign\ /D /Y
+xcopy ..\PromexAlign\bin\Release\*.dll                              ProMexAlign\ /D /Y
+xcopy ..\PromexAlign\bin\Release\*.pdb                              ProMexAlign\ /D /Y
+xcopy ..\PromexAlign\bin\Release\InformedProteomics.Backend.xml     ProMexAlign\ /D /Y  
+xcopy ..\PromexAlign\bin\Release\ProMexAlign.exe.config             ProMexAlign\ /D /Y  
 
 echo.
 echo Copying MSPathFinderT files
