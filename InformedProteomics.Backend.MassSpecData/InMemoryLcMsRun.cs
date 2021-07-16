@@ -110,7 +110,7 @@ namespace InformedProteomics.Backend.MassSpecData
         {
             return
                 new InMemoryLcMsRun(
-                    new PbfLcMsRun(specFilePath, specReader, "", precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress),
+                    new PbfLcMsRun(specFilePath, specReader, string.Empty, precursorSignalToNoiseRatioThreshold, productSignalToNoiseRatioThreshold, progress),
                     precursorSignalToNoiseRatioThreshold,
                     productSignalToNoiseRatioThreshold,
                     progress,

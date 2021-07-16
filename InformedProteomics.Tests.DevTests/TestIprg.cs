@@ -69,7 +69,7 @@ namespace InformedProteomics.Tests.DevTests
             {
                 for (var j = 0; j < headers.Count; j++)
                 {
-                    if (headers[j].Contains("" + jobs[i]))
+                    if (headers[j].Contains(jobs[i].ToString()))
                     {
                         jobColNum[i] = j;
                         break;

@@ -231,7 +231,7 @@ namespace InformedProteomics.Test
             if (matchingMods == null || matchingMods.Count == 0)
             {
                 Console.WriteLine("Mod mass of {0} does not resolve to any mods", modMassText);
-                Assert.AreEqual("", expectedModName, "Expected mod to resolve to {0} but did not resolve", expectedModName);
+                Assert.AreEqual(string.Empty, expectedModName, "Expected mod to resolve to {0} but did not resolve", expectedModName);
                 return;
             }
 
@@ -357,7 +357,7 @@ namespace InformedProteomics.Test
             Assert.AreEqual(expectedEmpiricalFormula, composition.ToString());
 
             // Remove parentheses and spaces from the expected empirical formula, then compare to composition.ToPlainString
-            var expectedPlainString = Regex.Replace(expectedEmpiricalFormula, "[() ]", "");
+            var expectedPlainString = Regex.Replace(expectedEmpiricalFormula, "[() ]", string.Empty);
             Assert.AreEqual(expectedPlainString, composition.ToPlainString());
 
             Assert.AreEqual(expectedMass, composition.Mass, 0.00001, "Monoisotopic mass mismatch");

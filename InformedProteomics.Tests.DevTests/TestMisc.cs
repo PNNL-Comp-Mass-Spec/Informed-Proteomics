@@ -118,7 +118,7 @@ namespace InformedProteomics.Tests.DevTests
             using (var writer = new StreamWriter(outputFilePath))
             {
                 var peptides = skylineTable.GetData("Peptide Sequence").ToArray();
-                var samples = skylineTable.GetData("Replicate Name").Select(s => "" + s[0] + s[2]).ToArray();
+                var samples = skylineTable.GetData("Replicate Name").Select(s => s[0] + s[2]).ToArray();
                 var charges = skylineTable.GetData("Precursor Charge").Select(c => Convert.ToInt32(c)).ToArray();
                 var precursorMzs = skylineTable.GetData("Precursor Mz").Select(Convert.ToDouble).ToArray();
 
@@ -151,7 +151,7 @@ namespace InformedProteomics.Tests.DevTests
                         }
                         else
                         {
-                            writer.Write("" + skylineData[j][0] + skylineData[j][2] + "\t");
+                            writer.Write(skylineData[j][0] + skylineData[j][2] + "\t");
                         }
                     }
                     writer.WriteLine("{0}\t{1}",

@@ -195,7 +195,7 @@ namespace InformedProteomics.Test
             var tolerance = new Tolerance(10);
             //            var modsFilePath = @"H:\Research\QCShew_TopDown\Production\Mods_Methyl.txt";
             const string modsFilePath = @"D:\MassSpecFiles\60k\Mods.txt";
-            //            var modsFilePath = "";
+            //            var modsFilePath = string.Empty;
 
             if (!File.Exists(modsFilePath))
             {

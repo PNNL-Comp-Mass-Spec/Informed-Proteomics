@@ -56,10 +56,10 @@ namespace InformedProteomics.FeatureFinding.Clustering
                     f1.ApexIntensity / f1.BoundaryIntensity > 3.0d &&
                     f2.ApexIntensity / f2.BoundaryIntensity > 3.0d)
                 {
-                    //Console.WriteLine("");
+                    //Console.WriteLine();
                     //Console.WriteLine("{0:0.00}\t{1:0.00}\t{2:0.00}\t{3:0.00}\t{4:0.00}\t{5:0.00}", f1.MinElutionTime, f1.MaxElutionTime, f1.ApexElutionTime, f1.ApexIntensity, f1.BoundaryIntensity, f1.Abundance);
                     //Console.WriteLine("{0:0.00}\t{1:0.00}\t{2:0.00}\t{3:0.00}\t{4:0.00}\t{5:0.00}", f2.MinElutionTime, f2.MaxElutionTime, f2.ApexElutionTime, f2.ApexIntensity, f2.BoundaryIntensity, f2.Abundance);
-                    //Console.WriteLine("");
+                    //Console.WriteLine();
                     return false;
                 }
 

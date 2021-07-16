@@ -144,7 +144,7 @@ namespace InformedProteomics.TopDown.Execution
                         {
                             bestScore[ms2ScanNum] = scoreArr[ms2ScanNum];
                             var proteinName = fastaDb.GetProteinName(offset);
-                            bestProtein[ms2ScanNum] = proteinName + (numNTermCleavage == 1 ? "'" : "");
+                            bestProtein[ms2ScanNum] = proteinName + (numNTermCleavage == 1 ? "'" : string.Empty);
                         }
                     }
                 }
@@ -154,7 +154,7 @@ namespace InformedProteomics.TopDown.Execution
             Console.WriteLine("ScanNum\tBestProtein\tScore");
             foreach (var ms2ScanNum in ms2ScanNumArr)
             {
-                Console.WriteLine("{0}\t{1}\t{2}", ms2ScanNum, bestScore[ms2ScanNum], bestProtein[ms2ScanNum] ?? "");
+                Console.WriteLine("{0}\t{1}\t{2}", ms2ScanNum, bestScore[ms2ScanNum], bestProtein[ms2ScanNum] ?? string.Empty);
             }
         }
     }

@@ -352,7 +352,7 @@ namespace InformedProteomics.Tests.DevTests
 
                         if (alignedFeatureList[j][i].ProteinSpectrumMatches == null)
                         {
-                            writer.Write("");
+                            writer.Write(string.Empty);
                         }
                         else
                         {

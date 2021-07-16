@@ -120,7 +120,7 @@ namespace InformedProteomics.Test
                     var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceStr);
                     var decoySeq = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceStr);
                     decoySeq.Reverse();
-                    var decoyStr = decoySeq.Aggregate("", (current, aa) => current + aa);
+                    var decoyStr = decoySeq.Aggregate(string.Empty, (current, aa) => current + aa);
                     decoyStr = SimpleStringProcessing.Mutate(decoyStr, sequence.Count / 2);
                     decoySeq = Sequence.GetSequenceFromMsGfPlusPeptideStr(decoyStr);
 

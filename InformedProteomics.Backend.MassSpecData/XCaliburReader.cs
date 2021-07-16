@@ -321,7 +321,7 @@ namespace InformedProteomics.Backend.MassSpecData
             using (var sha1 = new SHA1Managed())
             {
                 var hash = sha1.ComputeHash(fs);
-                _checkSum = BitConverter.ToString(hash).ToLower().Replace("-", "");
+                _checkSum = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
             }
         }
 

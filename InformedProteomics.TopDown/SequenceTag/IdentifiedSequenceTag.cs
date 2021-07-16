@@ -78,7 +78,7 @@ namespace InformedProteomics.TopDown.SequenceTag
         private static readonly AminoAcidSet aaSet = new AminoAcidSet();
         public static Sequence GenerateSequence(string seqStr, string modStr)
         {
-            if (modStr == null || modStr.Equals(""))
+            if (modStr == null || modStr.Equals(string.Empty))
             {
                 return new Sequence(seqStr, aaSet);
             }

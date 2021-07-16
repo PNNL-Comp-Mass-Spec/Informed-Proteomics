@@ -403,7 +403,6 @@ namespace InformedProteomics.FeatureFinding
             sb.AppendFormat("\t{0:0.0}", feature.ElutionLength);
 
             sb.Append("\t");
-            sb.Append("");
             sb.AppendFormat("\t{0:0.0}", feature.Score);
             return sb.ToString();
         }

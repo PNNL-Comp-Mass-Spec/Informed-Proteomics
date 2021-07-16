@@ -62,7 +62,7 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// Unspecific cleavage
         /// </summary>
-        public static readonly Enzyme UnspecificCleavage = new Enzyme("UnspecificCleavage", "", false, "unspecific cleavage", "MS:1001956");
+        public static readonly Enzyme UnspecificCleavage = new Enzyme("UnspecificCleavage", string.Empty, false, "unspecific cleavage", "MS:1001956");
 
         /// <summary>
         /// Trypsin enzyme
@@ -103,11 +103,11 @@ namespace InformedProteomics.Backend.Data.Biology
         /// <summary>
         /// Alp enzyme
         /// </summary>
-        public static readonly Enzyme Alp = new Enzyme("aLP", "", false, "alphaLP", null);
+        public static readonly Enzyme Alp = new Enzyme("aLP", string.Empty, false, "alphaLP", null);
 
         /// <summary>
         /// No cleavage enzyme
         /// </summary>
-        public static readonly Enzyme NoCleavage = new Enzyme("NoCleavage", "", false, "no cleavage", "MS:1001955");
+        public static readonly Enzyme NoCleavage = new Enzyme("NoCleavage", string.Empty, false, "no cleavage", "MS:1001955");
     }
 }

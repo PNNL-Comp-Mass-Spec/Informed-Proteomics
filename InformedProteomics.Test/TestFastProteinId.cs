@@ -127,6 +127,7 @@ namespace InformedProteomics.Test
 
                 for (var numNTermCleavage = 0; numNTermCleavage <= 0; numNTermCleavage++)
                 {
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     if (numNTermCleavage > 0)
                     {
                         seqGraph.CleaveNTerm();
@@ -160,7 +161,9 @@ namespace InformedProteomics.Test
                         {
                             bestScore[ms2ScanNum] = scoreArr[ms2ScanNum];
                             var proteinName = fastaDb.GetProteinName(offset);
-                            bestProtein[ms2ScanNum] = proteinName + (numNTermCleavage == 1 ? "'" : "");
+
+                            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                            bestProtein[ms2ScanNum] = proteinName + (numNTermCleavage == 1 ? "'" : string.Empty);
                         }
                     }
                 }
@@ -192,7 +195,7 @@ namespace InformedProteomics.Test
                 //        {
                 //            bestScore[ms2ScanNum] = scoreArr[ms2ScanNum];
                 //            var proteinName = fastaDb.GetProteinName(offset);
-                //            bestProtein[ms2ScanNum] = proteinName + (numNTermCleavage == 1 ? "'" : "");
+                //            bestProtein[ms2ScanNum] = proteinName + (numNTermCleavage == 1 ? "'" : string.Empty);
                 //        }
                 //    }
                 //}
@@ -201,7 +204,7 @@ namespace InformedProteomics.Test
             Console.WriteLine("ScanNum\tBestProtein\tScore");
             foreach (var ms2ScanNum in ms2ScanNumArr)
             {
-                Console.WriteLine("{0}\t{1}\t{2}", ms2ScanNum, bestProtein[ms2ScanNum] ?? "", bestScore[ms2ScanNum]);
+                Console.WriteLine("{0}\t{1}\t{2}", ms2ScanNum, bestProtein[ms2ScanNum] ?? string.Empty, bestScore[ms2ScanNum]);
             }
             //sw.Stop();
             //Console.WriteLine(@"Scoring: {0:f4} sec.", sw.Elapsed.TotalSeconds);

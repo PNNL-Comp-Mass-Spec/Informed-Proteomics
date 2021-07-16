@@ -469,7 +469,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 //    case MS_Thermo_nativeID_format:
                 //        // conversion from Thermo nativeIDs assumes default controller information
                 //        if (id.find("controllerType=0 controllerNumber=1") != 0)
-                //            return "";
+                //            return string.Empty;
                 //
                 //        // fall through to get scan
                 //
@@ -481,7 +481,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 //    default:
                 //        if (bal::starts_with(id, "scan=")) return value(id, "scan");
                 //        else if (bal::starts_with(id, "index=")) return value(id, "index");
-                //        return "";
+                //        return string.Empty;
                 //}
                 if (nativeId.Contains("="))
                 {
@@ -531,7 +531,7 @@ namespace InformedProteomics.Backend.MassSpecData
             //            return "scan=" + scanNumber;
             //
             //        default:
-            //            return "";
+            //            return string.Empty;
             //    }
             //}
         }
@@ -1525,7 +1525,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 using (var sha1 = new SHA1Managed())
                 {
                     var hash = sha1.ComputeHash(fs);
-                    _srcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", "");
+                    _srcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
                 }
             }
             var schemaName = reader.GetAttribute("xsi:schemaLocation");

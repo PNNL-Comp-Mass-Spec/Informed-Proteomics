@@ -391,7 +391,7 @@ namespace InformedProteomics.Backend.MassSpecData
             RawFilePath = specFileName;
             NativeIdFormat = msDataReader.NativeIdFormat;
             NativeFormat = msDataReader.NativeFormat;
-            SrcFileChecksum = msDataReader.SrcFileChecksum.ToLower().Replace("-", "");
+            SrcFileChecksum = msDataReader.SrcFileChecksum.ToLower().Replace("-", string.Empty);
 
             try
             {
@@ -560,7 +560,7 @@ namespace InformedProteomics.Backend.MassSpecData
                     using (var sha1 = new SHA1Managed())
                     {
                         var hash = sha1.ComputeHash(fs);
-                        _pbfFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", "");
+                        _pbfFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
                     }
                 }
                 return _pbfFileChecksum;
@@ -1900,7 +1900,7 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             // Checksum: 40 bytes (could store in 20 bytes, but conversion from hex string to bytes isn't simple)
-            SrcFileChecksum = msDataReader.SrcFileChecksum.ToLower().Replace("-", "");
+            SrcFileChecksum = msDataReader.SrcFileChecksum.ToLower().Replace("-", string.Empty);
             writer.Write(SrcFileChecksum.PadRight(FileChecksumLength).ToCharArray(0, FileChecksumLength), 0, FileChecksumLength);
 
             // RawFilePath: 200

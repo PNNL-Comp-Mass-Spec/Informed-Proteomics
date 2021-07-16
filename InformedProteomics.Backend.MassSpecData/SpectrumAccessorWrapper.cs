@@ -51,7 +51,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>Native ID string</returns>
         public string GetNativeId(int scanNum)
         {
-            return scanMetadata.TryGetValue(scanNum, out var metadata) ? metadata.NativeId : "";
+            return scanMetadata.TryGetValue(scanNum, out var metadata) ? metadata.NativeId : string.Empty;
         }
 
         public double GetElutionTime(int scanNum)

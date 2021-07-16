@@ -36,7 +36,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             for (int i = 0; i < prefixes.Count; i++)
             {
                 var segment = spectrumMatch.Sequence.GetRange(0, i + 1);
-                var segmentStr = segment.Aggregate("", (current, aa) => current + aa.Residue);
+                var segmentStr = segment.Aggregate(string.Empty, (current, aa) => current + aa.Residue);
                 foreach (var ionType in prefixIonTypes)
                 {
                     if (!probabilities.ContainsKey(ionType))
@@ -63,7 +63,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             for (int i = 0; i < suffixes.Count; i++)
             {
                 var segment = spectrumMatch.Sequence.GetRange(i + 1, sequence.Count - (i + 1));
-                var segmentStr = segment.Aggregate("", (current, aa) => current + aa.Residue);
+                var segmentStr = segment.Aggregate(string.Empty, (current, aa) => current + aa.Residue);
                 foreach (var ionType in suffixIonTypes)
                 {
                     if (!probabilities.ContainsKey(ionType))

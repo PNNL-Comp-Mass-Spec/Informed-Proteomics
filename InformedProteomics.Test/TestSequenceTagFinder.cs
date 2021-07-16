@@ -106,7 +106,7 @@ namespace InformedProteomics.Test
                         Console.Write(seqTagStr.Sequence);
                         Console.Write("\t");
                         Console.Write(seqTagStr.IsPrefix);
-                        Console.WriteLine("");
+                        Console.WriteLine();
                         */
                         if (seqStr.Contains(seqTagStr.Sequence))
                         {

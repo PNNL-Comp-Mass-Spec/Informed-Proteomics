@@ -34,7 +34,7 @@ namespace InformedProteomics.Tests.Base
 
             if (fileNameOrPath.StartsWith(@"TEST_FOLDER\"))
             {
-                filePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, fileNameOrPath.Replace(@"TEST_FOLDER\", ""));
+                filePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, fileNameOrPath.Replace(@"TEST_FOLDER\", string.Empty));
             }
             else
             {

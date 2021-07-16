@@ -38,7 +38,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <summary>
         /// No neutral loss
         /// </summary>
-        public static readonly NeutralLoss NoLoss = new NeutralLoss("", "NoLoss", Data.Composition.Composition.Zero);
+        public static readonly NeutralLoss NoLoss = new NeutralLoss(string.Empty, "NoLoss", Data.Composition.Composition.Zero);
 
         /// <summary>
         /// Neutral water loss

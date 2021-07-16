@@ -60,7 +60,7 @@ namespace InformedProteomics.Backend.MassSpecData
 #endif
             if (!args.Name.StartsWith("pwiz_bindings_cli", StringComparison.OrdinalIgnoreCase))
             {
-                return Assembly.LoadFrom(""); // We are not interested in searching for anything else - resolving pwiz_bindings_cli provides the hint for all of its dependencies.
+                return Assembly.LoadFrom(string.Empty); // We are not interested in searching for anything else - resolving pwiz_bindings_cli provides the hint for all of its dependencies.
                 // This will actually trigger an exception, which is handled in the system code, and the DLL search goes on down the chain.
                 // returning null results in this code being called multiple times, for the same dependency.
             }

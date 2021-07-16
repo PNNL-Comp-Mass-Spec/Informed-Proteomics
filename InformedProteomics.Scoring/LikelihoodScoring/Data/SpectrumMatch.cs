@@ -184,7 +184,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         private void CreateDecoy()
         {
             Sequence.Reverse();
-            var sequence = Sequence.Aggregate("", (current, aa) => current + aa.Residue);
+            var sequence = Sequence.Aggregate(string.Empty, (current, aa) => current + aa.Residue);
             sequence = SimpleStringProcessing.Mutate(sequence, sequence.Length / 2);
             Peptide = sequence;
             Sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequence);
