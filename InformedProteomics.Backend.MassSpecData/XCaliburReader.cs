@@ -453,27 +453,16 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 var activationTypeCode = scanFilter.GetActivation(index);
 
-                switch (activationTypeCode)
+                return activationTypeCode switch
                 {
-                    case ActivationType.CollisionInducedDissociation:
-                        return ActivationMethod.CID;
-
-                    case ActivationType.ElectronCaptureDissociation:
-                        return ActivationMethod.ECD;
-
-                    case ActivationType.PQD:
-                        return ActivationMethod.PQD;
-
-                    case ActivationType.ElectronTransferDissociation:
-                        return ActivationMethod.ETD;
-
-                    case ActivationType.HigherEnergyCollisionalDissociation:
-                        return ActivationMethod.HCD;
-                    case ActivationType.UltraVioletPhotoDissociation:
-                        return ActivationMethod.UVPD;
-                    default:
-                        return ActivationMethod.Unknown;
-                }
+                    ActivationType.CollisionInducedDissociation => ActivationMethod.CID,
+                    ActivationType.ElectronCaptureDissociation => ActivationMethod.ECD,
+                    ActivationType.PQD => ActivationMethod.PQD,
+                    ActivationType.ElectronTransferDissociation => ActivationMethod.ETD,
+                    ActivationType.HigherEnergyCollisionalDissociation => ActivationMethod.HCD,
+                    ActivationType.UltraVioletPhotoDissociation => ActivationMethod.UVPD,
+                    _ => ActivationMethod.Unknown
+                };
             }
             catch (Exception)
             {
