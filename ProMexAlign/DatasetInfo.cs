@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using System.IO;
+using PRISM;
 
 namespace PromexAlign
 {
@@ -42,24 +44,45 @@ namespace PromexAlign
         /// </remarks>
         public static List<DatasetInfo> ParseDatasetInfoFile(string filePath)
         {
+            var fileNameShown = false;
+
             var datasets = new List<DatasetInfo>();
             var datasetNumber = 0;
+            var rowNumber = 0;
 
-            foreach (var line in File.ReadLines(filePath))
+            using var reader = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+            while (!reader.EndOfStream)
             {
-                var parts = line.Split('\t');
+                var dataLine = reader.ReadLine();
+                rowNumber++;
+
+                if (string.IsNullOrWhiteSpace(dataLine))
+                    continue;
+
+                var parts = dataLine.Split('\t');
                 if (parts.Length < 3)
                 {
+                    if (!fileNameShown)
+                    {
+                        Console.WriteLine("Loading filenames from file " + filePath);
+                        fileNameShown = true;
+                    }
+
+                    ConsoleMsgUtils.ShowWarning("Skipping row {0} since it has fewer than 3 columns", rowNumber);
+                    continue;
+                }
+
+                if (parts[0].Equals("Label", StringComparison.OrdinalIgnoreCase) &&
+                    parts[1].Equals("RawFilePath", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Header line; skip it
                     continue;
                 }
 
                 datasetNumber++;
 
-                var msPathFinderIdFilePath = string.Empty;
-                if (parts.Length > 3)
-                {
-                    msPathFinderIdFilePath = parts[3];
-                }
+                var msPathFinderIdFilePath = parts.Length > 3 ? parts[3] : string.Empty;
 
                 var datasetInfo = new DatasetInfo
                 {
