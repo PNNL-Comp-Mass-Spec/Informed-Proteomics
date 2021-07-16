@@ -9,11 +9,11 @@ namespace PbfGen
 {
     public class PbfGenInputParameters
     {
-        [Option("i", "s", ArgPosition = 1, Required = true, HelpShowsDefault = false,
+        [Option("i", "s", "InputFile", ArgPosition = 1, Required = true, HelpShowsDefault = false,
             HelpText = "Input file path: .raw or a directory with .raw files (also supports other input formats, see documentation)")]
         public string SourcePath { get; set; }
 
-        [Option("o", HelpShowsDefault = false,
+        [Option("o", "OutputDirectory", HelpShowsDefault = false,
             HelpText = "Output directory. Defaults to directory containing input file.")]
         public string OutputDir { get; set; }
 
