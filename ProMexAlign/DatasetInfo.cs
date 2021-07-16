@@ -31,6 +31,15 @@ namespace PromexAlign
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns>List of dataset info objects</returns>
+        /// <remarks>
+        /// <para>
+        /// The input file should be a tab-delimited file with 3 or 4 columns. The header line (with column names) is optional.
+        /// </para>
+        /// <para>
+        /// Expected columns:
+        /// Label  RawFilePath  Ms1FtFilePath  MsPathfinderIdFilePath
+        /// </para>
+        /// </remarks>
         public static List<DatasetInfo> ParseDatasetInfoFile(string filePath)
         {
             var datasets = new List<DatasetInfo>();

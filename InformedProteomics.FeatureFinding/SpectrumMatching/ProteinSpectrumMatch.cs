@@ -73,6 +73,10 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
             ProteinDesc = protDesc;
         }
 
+        /// <summary>
+        /// Spec E-value
+        /// </summary>
+        /// <remarks>Values closer to 0 are better</remarks>
         public double SpectralEValue { get; internal set; }
 
         public string Sequence { get; }
@@ -90,7 +94,20 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
         public int FirstResidue { get; }
         public int LastResidue { get; }
+
+        /// <summary>
+        /// Identification score
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When reading MSAlign or MSPathFinder results, the ProteinSpectrumMatchReader stores the number of matched fragments in this field
+        /// </para>
+        /// <para>
+        /// When reading MS-GF+ results, the ProteinSpectrumMatchReader stores MSGFScore in this field
+        /// </para>
+        /// </remarks>
         public double Score { get; }
+
         public string SequenceText { get; internal set; }
 
         public string Modifications { get; internal set; }

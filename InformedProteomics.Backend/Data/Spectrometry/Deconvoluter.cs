@@ -14,7 +14,6 @@ namespace InformedProteomics.Backend.Data.Spectrometry
     {
         // Ignore Spelling: deconvoluted, deconvoluter
 
-
         /// <summary>
         /// Largest mass that will be deconvoluted
         /// </summary>
