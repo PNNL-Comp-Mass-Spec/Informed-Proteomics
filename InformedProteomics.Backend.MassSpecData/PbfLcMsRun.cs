@@ -520,7 +520,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 fs.Seek(-1 * sizeof(int), SeekOrigin.End);
 
                 var fileFormatId = reader.ReadInt32();
-                if (fileFormatId > FileFormatId && fileFormatId < EarliestSupportedFileFormatId)
+                if (fileFormatId > FileFormatId || fileFormatId < EarliestSupportedFileFormatId)
                 {
                     return false;
                 }
