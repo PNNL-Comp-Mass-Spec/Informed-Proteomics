@@ -1115,21 +1115,24 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
 
                     var found = stringBuffer.IndexOf("<indexListOffset", StringComparison.OrdinalIgnoreCase);
-                    if (found >= 0)
+                    if (found < 0)
                     {
-                        var pos = bufStart + _encoding.GetByteCount(stringBuffer.Substring(0, found));
-                        streamReader.DiscardBufferedData();
-                        streamReader.BaseStream.Position = pos;
-                        using (var reader = XmlReader.Create(streamReader, _xSettings))
-                        {
-                            reader.MoveToContent();
-                            var reader2 = reader.ReadSubtree(); // Get past root element problems
-                            reader2.MoveToContent();
-                            _indexListOffset = reader2.ReadElementContentAsLong();
-                            reader2.Dispose();
-                        }
-                        haveOffset = true;
+                        continue;
                     }
+
+                    var pos = bufStart + _encoding.GetByteCount(stringBuffer.Substring(0, found));
+                    streamReader.DiscardBufferedData();
+                    streamReader.BaseStream.Position = pos;
+
+                    using (var reader = XmlReader.Create(streamReader, _xSettings))
+                    {
+                        reader.MoveToContent();
+                        var reader2 = reader.ReadSubtree(); // Get past root element problems
+                        reader2.MoveToContent();
+                        _indexListOffset = reader2.ReadElementContentAsLong();
+                        reader2.Dispose();
+                    }
+                    haveOffset = true;
                 }
             }
             if (_indexListOffset < stream.Length / 2) // Probably invalid, now we must search...
