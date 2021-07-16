@@ -12,6 +12,8 @@ namespace PromexAlign
 {
     public static class Program
     {
+        // Ignore Spelling: pre
+
         public static void Main(string[] args)
         {
             if (args.Length == 0)
