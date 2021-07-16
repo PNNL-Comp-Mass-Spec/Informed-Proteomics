@@ -33,7 +33,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             debugFile.WriteLine("Prefixes");
             debugFile.WriteLine("Segment\tIon\tM/Z\tFound");
 
-            for (int i = 0; i < prefixes.Count; i++)
+            for (var i = 0; i < prefixes.Count; i++)
             {
                 var segment = spectrumMatch.Sequence.GetRange(0, i + 1);
                 var segmentStr = segment.Aggregate(string.Empty, (current, aa) => current + aa.Residue);
@@ -45,7 +45,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                     }
 
                     var ion = ionType.GetIon(prefixes[i]);
-                    double mz = ion.GetMonoIsotopicMz();
+                    var mz = ion.GetMonoIsotopicMz();
                     var present = spectrum.ContainsIon(ion, _tolerance, RelativeIntensityThreshold);
                     probabilities[ionType].Total++;
                     if (present)
@@ -60,7 +60,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             debugFile.WriteLine("Suffixes");
             debugFile.WriteLine("Segment\tIon\tM/Z\tFound");
 
-            for (int i = 0; i < suffixes.Count; i++)
+            for (var i = 0; i < suffixes.Count; i++)
             {
                 var segment = spectrumMatch.Sequence.GetRange(i + 1, sequence.Count - (i + 1));
                 var segmentStr = segment.Aggregate(string.Empty, (current, aa) => current + aa.Residue);
@@ -72,7 +72,7 @@ namespace InformedProteomics.Tests.FunctionalTests
                     }
 
                     var ion = ionType.GetIon(suffixes[i]);
-                    double mz = ion.GetMonoIsotopicMz();
+                    var mz = ion.GetMonoIsotopicMz();
                     var present = spectrum.ContainsIon(ion, _tolerance, RelativeIntensityThreshold);
                     probabilities[ionType].Total++;
                     if (present)
@@ -104,11 +104,11 @@ namespace InformedProteomics.Tests.FunctionalTests
             var spectrumMatchList = InitTest();
 
             var ionProbabilityTable = new Dictionary<IonType, Probability<IonType>>[MaxPrecCharge];
-            for (int i = 0; i < ionProbabilityTable.Length; i++)
+            for (var i = 0; i < ionProbabilityTable.Length; i++)
             {
                 ionProbabilityTable[i] = new Dictionary<IonType, Probability<IonType>>();
             }
-            StreamWriter outputFile = File.AppendText(OutputFileName);
+            var outputFile = File.AppendText(OutputFileName);
             foreach (var spectrumMatch in spectrumMatchList)
             {
                 var charge = spectrumMatch.PrecursorCharge - 1;
@@ -125,12 +125,12 @@ namespace InformedProteomics.Tests.FunctionalTests
 
                 outputFile.WriteLine("Scan:\t{0}\tPeptide:\t{1}\tCharge:\t{2}", spectrumMatch.Spectrum.ScanNum, spectrumMatch.Peptide, spectrumMatch.PrecursorCharge);
                 outputFile.WriteLine("Ion\tFound\tTotal\tTestFound\tTestTotal\tEqual?");
-                for (int i = 0; i < probabilities.Length; i++)
+                for (var i = 0; i < probabilities.Length; i++)
                 {
                     Assert.True(probabilities[i].Label.Name == testProbabilities[i].Label.Name);
 
-                    bool foundEqual = probabilities[i].Found.Equals(testProbabilities[i].Found);
-                    bool totalEqual = probabilities[i].Total.Equals(testProbabilities[i].Total);
+                    var foundEqual = probabilities[i].Found.Equals(testProbabilities[i].Found);
+                    var totalEqual = probabilities[i].Total.Equals(testProbabilities[i].Total);
 
                     var ion = testProbabilities[i].Label;
                     if (!ionProbabilityTable[charge].ContainsKey(ion))
@@ -148,16 +148,16 @@ namespace InformedProteomics.Tests.FunctionalTests
                 outputFile.WriteLine();
             }
             outputFile.Close();
-            for (int i = 0; i < MaxPrecCharge; i++)
+            for (var i = 0; i < MaxPrecCharge; i++)
             {
                 var chargeOutName = IonProbabilityFileName + "_Charge" + (i + 1) + ".txt";
-                using (var ionProbOut = new StreamWriter(chargeOutName))
+                
+                using var ionProbOut = new StreamWriter(chargeOutName);
+
+                ionProbOut.WriteLine("Ion\tProbability");
+                foreach (var key in ionProbabilityTable[i].Keys)
                 {
-                    ionProbOut.WriteLine("Ion\tProbability");
-                    foreach (var key in ionProbabilityTable[i].Keys)
-                    {
-                        ionProbOut.WriteLine(ionProbabilityTable[i][key].Label.Name + "\t" + ionProbabilityTable[i][key].Prob);
-                    }
+                    ionProbOut.WriteLine(ionProbabilityTable[i][key].Label.Name + "\t" + ionProbabilityTable[i][key].Prob);
                 }
             }
         }

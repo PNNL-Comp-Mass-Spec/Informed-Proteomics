@@ -52,14 +52,14 @@ namespace InformedProteomics.Test
 
                 Assert.True(rawFiles.Count == txtFiles.Count);
 
-                int tableCount = 1;
+                var tableCount = 1;
                 if (_precursorCharge > 0)
                 {
                     tableCount = _precursorCharge;
                 }
 
                 var offsetFrequencyTables = new PrecursorOffsetFrequencyTable[tableCount];
-                for (int i = 0; i < tableCount; i++)
+                for (var i = 0; i < tableCount; i++)
                 {
                     if (_precursorCharge > 0)
                     {
@@ -71,15 +71,15 @@ namespace InformedProteomics.Test
                     }
                 }
 
-                for (int i = 0; i < txtFiles.Count; i++)
+                for (var i = 0; i < txtFiles.Count; i++)
                 {
-                    string textFile = txtFiles[i];
-                    string rawFile = rawFiles[i];
+                    var textFile = txtFiles[i];
+                    var rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
                     var lcms = new LazyLcMsRun(rawFile, _noiseFiltration, _noiseFiltration);
                     var matchList = new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcBottomUp);
 
-                    for (int j = 0; j < tableCount; j++)
+                    for (var j = 0; j < tableCount; j++)
                     {
                         offsetFrequencyTables[j].AddMatches(
                             _precursorCharge > 0 ? matchList.GetCharge(j + 1) : matchList);
@@ -87,13 +87,13 @@ namespace InformedProteomics.Test
                 }
 
                 var offsetFrequencies = new List<Probability<double>>[tableCount];
-                for (int i = 0; i < tableCount; i++)
+                for (var i = 0; i < tableCount; i++)
                 {
                     offsetFrequencies[i] = offsetFrequencyTables[i].GetProbabilities().ToList();
                 }
 
                 var outFileName = _outFileName.Replace("@", name);
-                for (int i = 0; i < tableCount; i++)
+                for (var i = 0; i < tableCount; i++)
                 {
                     var chargeOutFileName = outFileName.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
 
@@ -136,24 +136,24 @@ namespace InformedProteomics.Test
 
                 var offsetFrequencyTables = new List<PrecursorOffsetFrequencyTable>[_precursorCharge];
 
-                for (int i = 0; i < _precursorCharge; i++)
+                for (var i = 0; i < _precursorCharge; i++)
                 {
                     offsetFrequencyTables[i] = new List<PrecursorOffsetFrequencyTable>();
-                    for (int j = 1; j <= (i + 1); j++)
+                    for (var j = 1; j <= (i + 1); j++)
                     {
                         offsetFrequencyTables[i].Add(new PrecursorOffsetFrequencyTable(_searchWidth / j, j, _binWidth / j));
                     }
                 }
 
-                for (int i = 0; i < txtFiles.Count; i++)
+                for (var i = 0; i < txtFiles.Count; i++)
                 {
-                    string textFile = txtFiles[i];
-                    string rawFile = rawFiles[i];
+                    var textFile = txtFiles[i];
+                    var rawFile = rawFiles[i];
                     Console.WriteLine("{0}\t{1}", Path.GetFileName(textFile), Path.GetFileName(rawFile));
                     var lcms = new LazyLcMsRun(rawFile, _noiseFiltration, _noiseFiltration);
                     var matchList = new SpectrumMatchList(lcms, txtFiles[i], DataFileFormat.IcBottomUp);
 
-                    for (int j = 0; j < _precursorCharge; j++)
+                    for (var j = 0; j < _precursorCharge; j++)
                     {
                         var chargeMatches = matchList.GetCharge(j + 1);
 
@@ -165,7 +165,7 @@ namespace InformedProteomics.Test
                 }
 
                 var outFileName = _outFileName.Replace("@", name);
-                for (int i = 0; i < _precursorCharge; i++)
+                for (var i = 0; i < _precursorCharge; i++)
                 {
                     var chargeOutFileName = outFileName.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
 
@@ -173,7 +173,7 @@ namespace InformedProteomics.Test
 
                     outFile.Write("Offset\t");
                     var offsetFrequencyList = new List<List<Probability<double>>>();
-                    for (int j = offsetFrequencyTables[i].Count - 1; j >= 0; j--)
+                    for (var j = offsetFrequencyTables[i].Count - 1; j >= 0; j--)
                     {
                         offsetFrequencyList.Add(offsetFrequencyTables[i][j].GetProbabilities().ToList());
                         outFile.Write("{0}", j + 1);
@@ -183,12 +183,12 @@ namespace InformedProteomics.Test
                         }
                     }
                     outFile.WriteLine();
-                    for (int j = 0; j < offsetFrequencyList.First().Count; j++)
+                    for (var j = 0; j < offsetFrequencyList.First().Count; j++)
                     {
                         var offset = offsetFrequencyList.First()[j].Label;
                         var integerOffset = Math.Round(offset * (1 / _binWidth), 2);
                         outFile.Write(integerOffset + "\t");
-                        for (int k = 0; k < offsetFrequencyList.Count; k++)
+                        for (var k = 0; k < offsetFrequencyList.Count; k++)
                         {
                             outFile.Write(offsetFrequencyList[k][j].Prob);
                             if (k != offsetFrequencyList.Count - 1)

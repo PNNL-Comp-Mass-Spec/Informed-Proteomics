@@ -70,7 +70,7 @@ namespace InformedProteomics.Test
 
                 var spectrum = run.GetSpectrum(scanNum) as ProductSpectrum;
 
-                int tsvIndex = ms2ScanNumbers.FindIndex(x => int.Parse(x) == scanNum);
+                var tsvIndex = ms2ScanNumbers.FindIndex(x => int.Parse(x) == scanNum);
                 var qValue = double.Parse(tsvData["QValue"].ElementAt(tsvIndex));
                 if (qValue > 0.01)
                 {
@@ -130,7 +130,7 @@ namespace InformedProteomics.Test
 
         public static string Reverse(string s)
         {
-            char[] charArray = s.ToCharArray();
+            var charArray = s.ToCharArray();
             Array.Reverse(charArray);
             return new string(charArray);
         }

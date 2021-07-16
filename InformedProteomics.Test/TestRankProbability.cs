@@ -55,7 +55,7 @@ namespace InformedProteomics.Test
                 }
 
                 // Read Data files
-                for (int i = 0; i < dataFiles.Count; i++)
+                for (var i = 0; i < dataFiles.Count; i++)
                 {
                     SpectrumMatchList targets;
 
@@ -66,8 +66,8 @@ namespace InformedProteomics.Test
                     }
                     else
                     {
-                        string textFile = txtFiles[i];
-                        string rawFile = dataFiles[i];
+                        var textFile = txtFiles[i];
+                        var rawFile = dataFiles[i];
                         Console.WriteLine("{0}\t{1}", textFile, rawFile);
                         var lcms = new LazyLcMsRun(rawFile, 0, 0);
                         targets = new SpectrumMatchList(lcms, txtFiles[i], config.DataFormat, config.PrecursorCharge);
