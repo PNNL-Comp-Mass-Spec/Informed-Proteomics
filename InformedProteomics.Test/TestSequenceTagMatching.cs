@@ -523,9 +523,8 @@ namespace InformedProteomics.Test
             };
             const string fastaFilePath = folderPath + "ID_003836_DA9CC1E4.fasta";
 
-            for (var i = 0; i < fileSet.Length; i++)
+            foreach (var datasetName in fileSet)
             {
-                var datasetName = fileSet[i];
                 var tagFilePath = folderPath + datasetName + ".seqtag";
                 //var outputFilePath = folderPath + datasetName + ".matchedtag";
                 var outputFilePath = folderPath + datasetName + ".dmass";
