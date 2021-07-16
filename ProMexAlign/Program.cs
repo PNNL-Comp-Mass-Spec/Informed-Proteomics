@@ -360,10 +360,19 @@ namespace PromexAlign
         {
             Console.WriteLine();
             Console.WriteLine("Syntax:");
-            Console.WriteLine("PromexAlign.exe DatasetInfoFile");
+            Console.WriteLine("ProMexAlign.exe DatasetInfoFile");
             Console.WriteLine();
-            Console.WriteLine("The dataset info file is a tab delimited text file with the following columns of info");
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "The dataset info file is a tab-delimited text file with either 3 or 4 columns of information."));
+
+            Console.WriteLine();
+            Console.WriteLine("Expected columns:");
             Console.WriteLine("Label  RawFilePath  Ms1FtFilePath  MsPathfinderIdFilePath");
+            Console.WriteLine();
+            Console.WriteLine(ConsoleMsgUtils.WrapParagraph(
+                "If data in the Label column is an empty string, dataset labels will be auto-assigned as Dataset_1, Dataset_2, etc."));
+            Console.WriteLine();
+            Console.WriteLine("The raw files are either Thermo .raw files or .pbf files created by PbfGen");
             Console.WriteLine();
             Console.WriteLine("The MsPathfinderIdFilePath column is optional");
         }
