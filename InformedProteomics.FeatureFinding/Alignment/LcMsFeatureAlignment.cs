@@ -543,6 +543,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
                         }
                     }
                 }
+
                 if (minScoreNode < 0)
                 {
                     break;

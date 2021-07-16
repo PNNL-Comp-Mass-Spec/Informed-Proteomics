@@ -191,10 +191,7 @@ namespace InformedProteomics.Tests.DevTests
                             continue;
                         }
 
-                        var charge =
-                            (int)
-                                Math.Round(sequenceMass /
-                                           (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
+                        var charge = (int)Math.Round(sequenceMass / (spec.IsolationWindow.IsolationWindowTargetMz - Constants.Proton));
                         var scorer = ms2ScorerFactory.GetMs2Scorer(ms2ScanNum);
                         var score = seqGraph.GetFragmentScore(scorer);
                         if (score <= 3)
