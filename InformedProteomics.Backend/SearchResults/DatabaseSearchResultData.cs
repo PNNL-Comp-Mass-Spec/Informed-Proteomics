@@ -194,6 +194,8 @@ namespace InformedProteomics.Backend.SearchResults
         public static void WriteResultsToFile(string filePath, IEnumerable<DatabaseSearchResultData> resultData, bool includeTdaScores = false)
         {
             var outputFile = new FileInfo(filePath);
+
+            // ReSharper disable once MergeIntoPattern
             if (outputFile.Directory != null && !outputFile.Directory.Exists)
             {
                 outputFile.Directory.Create();

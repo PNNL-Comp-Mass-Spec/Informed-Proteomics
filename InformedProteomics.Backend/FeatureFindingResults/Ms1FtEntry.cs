@@ -113,6 +113,8 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         public static void WriteToFile(string filePath, IEnumerable<Ms1FtEntry> features, bool writeExtendedData = false)
         {
             var outputFile = new FileInfo(filePath);
+
+            // ReSharper disable once MergeIntoPattern
             if (outputFile.Directory != null && !outputFile.Directory.Exists)
             {
                 outputFile.Directory.Create();
