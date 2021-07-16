@@ -997,12 +997,12 @@ namespace InformedProteomics.Backend.MassSpecData
 
             _fileReader.DiscardBufferedData();
             _fileReader.BaseStream.Position = _spectrumOffsets.OffsetsMapInt[index];
+
             // Not allowed for a GZipStream.....
-            using (var reader = XmlReader.Create(_fileReader, _xSettings))
-            {
-                reader.MoveToContent();
-                return ReadSpectrum(reader.ReadSubtree(), includePeaks);
-            }
+            using var reader = XmlReader.Create(_fileReader, _xSettings);
+
+            reader.MoveToContent();
+            return ReadSpectrum(reader.ReadSubtree(), includePeaks);
         }
 
         #endregion
@@ -1180,6 +1180,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 reader.MoveToContent();
                 ReadIndexList(reader.ReadSubtree());
             }
+
             var isValid = true;
             // Validate the index - if there are duplicate offsets, it is probably invalid
             var collisions = new Dictionary<long, int>();
@@ -1203,32 +1204,31 @@ namespace InformedProteomics.Backend.MassSpecData
         /// </summary>
         private void ReadChecksum()
         {
-            using (var stream = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 1))
-            using (var streamReader = new StreamReader(stream, Encoding.UTF8, true, 65536))
+            using var stream = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 1);
+            using var streamReader = new StreamReader(stream, Encoding.UTF8, true, 65536);
+
+            try
             {
-                try
+                stream.Position = stream.Length - 500;
+                streamReader.DiscardBufferedData();
+                var data = streamReader.ReadToEnd();
+                var pos = data.IndexOf("<fileChecksum", StringComparison.OrdinalIgnoreCase);
+                if (pos >= 0)
                 {
-                    stream.Position = stream.Length - 500;
-                    streamReader.DiscardBufferedData();
-                    var data = streamReader.ReadToEnd();
-                    var pos = data.IndexOf("<fileChecksum", StringComparison.OrdinalIgnoreCase);
-                    if (pos >= 0)
+                    data = data.Substring(pos);
+                    pos = data.IndexOf('>') + 1;
+                    data = data.Substring(pos);
+                    pos = data.IndexOf('<');
+                    data = data.Substring(0, pos);
+                    if (data.Length == 40)
                     {
-                        data = data.Substring(pos);
-                        pos = data.IndexOf('>') + 1;
-                        data = data.Substring(pos);
-                        pos = data.IndexOf('<');
-                        data = data.Substring(0, pos);
-                        if (data.Length == 40)
-                        {
-                            _srcFileChecksum = data;
-                        }
+                        _srcFileChecksum = data;
                     }
                 }
-                catch
-                {
-                    // Dropping errors - if this doesn't work, we'll just checksum the whole file.
-                }
+            }
+            catch
+            {
+                // Dropping errors - if this doesn't work, we'll just checksum the whole file.
             }
         }
 
@@ -1521,12 +1521,11 @@ namespace InformedProteomics.Backend.MassSpecData
             }
             if (string.IsNullOrWhiteSpace(_srcFileChecksum))
             {
-                using (var fs = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                using (var sha1 = new SHA1Managed())
-                {
-                    var hash = sha1.ComputeHash(fs);
-                    _srcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
-                }
+                using var fs = new FileStream(_unzippedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var sha1 = new SHA1Managed();
+
+                var hash = sha1.ComputeHash(fs);
+                _srcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
             }
             var schemaName = reader.GetAttribute("xsi:schemaLocation");
             // We automatically assume it uses the mzML_1.1.0 schema. Check for the old version.
@@ -3326,25 +3325,25 @@ namespace InformedProteomics.Backend.MassSpecData
             //var msInflated = new MemoryStream((int)(msCompressed.Length * 2));
             //var newBytes = new byte[msCompressed.Length * 2];
             var newBytes = new byte[expectedBytes];
+
             // The last 32 bits (4 bytes) are supposed to be an Adler-32 checksum. Might need to remove them as well.
-            using (var inflater = new DeflateStream(msCompressed, CompressionMode.Decompress))
+            using var inflater = new DeflateStream(msCompressed, CompressionMode.Decompress);
+
+            var bytesRead = inflater.Read(newBytes, 0, expectedBytes);
+            if (bytesRead != expectedBytes)
             {
-                var bytesRead = inflater.Read(newBytes, 0, expectedBytes);
-                if (bytesRead != expectedBytes)
-                {
-                    throw new XmlException("Fail decompressing data...");
-                }
-                //while (inflater.CanRead)
-                //{
-                //  var readBytes = new byte[4095];
-                //  // Should be able to change to just this.
-                //  var bytesRead = inflater.Read(readBytes, 0, readBytes.Length);
-                //  if (bytesRead != 0)
-                //  {
-                //      msInflated.Write(readBytes, 0, bytesRead);
-                //  }
-                //}
+                throw new XmlException("Fail decompressing data...");
             }
+            //while (inflater.CanRead)
+            //{
+            //  var readBytes = new byte[4095];
+            //  // Should be able to change to just this.
+            //  var bytesRead = inflater.Read(readBytes, 0, readBytes.Length);
+            //  if (bytesRead != 0)
+            //  {
+            //      msInflated.Write(readBytes, 0, bytesRead);
+            //  }
+            //}
             //newBytes = new byte[msInflated.Length];
             //msInflated.Read(newBytes, 0, (int)msInflated.Length);
             return newBytes;

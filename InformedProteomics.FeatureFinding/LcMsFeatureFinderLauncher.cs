@@ -274,39 +274,37 @@ namespace InformedProteomics.FeatureFinding
                 csvStream = new FileStream(outCsvFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             }
 
-            using (var csvWriter = new StreamWriter(csvStream))
+            using var csvWriter = new StreamWriter(csvStream);
+
+            if (Parameters.CsvOutput)
             {
+                csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
+            }
+
+            foreach (var feature in container.GetFilteredFeatures(featureFinder))
+            {
+                featureCounter[0]++;
+
                 if (Parameters.CsvOutput)
                 {
-                    csvWriter.WriteLine("scan_num,charge,abundance,mz,fit,monoisotopic_mw,FeatureID");
-                }
+                    var mostAbuIdx = feature.TheoreticalEnvelope.IndexOrderByRanking[0];
 
-                var filteredFeatures = container.GetFilteredFeatures(featureFinder);
-                foreach (var feature in filteredFeatures)
-                {
-                    featureCounter[0]++;
-
-                    if (Parameters.CsvOutput)
+                    foreach (var envelope in feature.EnumerateEnvelopes())
                     {
-                        var mostAbuIdx = feature.TheoreticalEnvelope.IndexOrderByRanking[0];
-
-                        foreach (var envelope in feature.EnumerateEnvelopes())
+                        //var mostAbundantIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
+                        var mostAbuPeak = envelope.Peaks[mostAbuIdx];
+                        if (mostAbuPeak == null || !mostAbuPeak.Active)
                         {
-                            //var mostAbundantIsotopeInternalIndex = cluster.IsotopeList.SortedIndexByIntensity[0];
-                            var mostAbuPeak = envelope.Peaks[mostAbuIdx];
-                            if (mostAbuPeak == null || !mostAbuPeak.Active)
-                            {
-                                continue;
-                            }
-
-                            var fitScore = 1.0 - feature.BestCorrelationScore;
-                            csvWriter.WriteLine("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
-                                mostAbuPeak.Mz, fitScore, envelope.MonoMass, featureCounter);
+                            continue;
                         }
-                    }
 
-                    yield return feature.ToMs1FtEntry(featureCounter[0]);
+                        var fitScore = 1.0 - feature.BestCorrelationScore;
+                        csvWriter.WriteLine("{0},{1},{2},{3},{4},{5},{6}", envelope.ScanNum, envelope.Charge, envelope.Abundance,
+                            mostAbuPeak.Mz, fitScore, envelope.MonoMass, featureCounter);
+                    }
                 }
+
+                yield return feature.ToMs1FtEntry(featureCounter[0]);
             }
         }
 

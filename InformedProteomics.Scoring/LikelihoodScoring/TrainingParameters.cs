@@ -133,42 +133,42 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
         public void WriteToFile(string fileName)
         {
             Compute();
-            using (var file = new StreamWriter(fileName))
-            {
-                foreach (var charge in _charges)
-                {
-                    file.WriteLine("Charge\t" + charge);
-                    file.Write("BinSize\t");
-                    var massBins = _massSorter[charge].Bins;
-                    for (var i = 0; i < _massBins[charge]; i++)
-                    {
-                        file.Write(massBins[i].Count);
-                        if (i < _massBins[charge] - 1)
-                        {
-                            file.Write("\t");
-                        }
-                    }
-                    file.WriteLine();
-                    for (var i = 0; i < _massBins[charge]; i++)
-                    {
-                        file.Write("BinEdges\t{0}", _massSorter[charge].BinEdges[i]);
-                        var max = double.PositiveInfinity;
-                        if (i < _massBins[charge] - 1)
-                        {
-                            max = _massSorter[charge].BinEdges[i + 1];
-                        }
 
-                        file.Write("\t" + max);
-                        file.WriteLine();
-                        var ionTypes = _ionProbabilities[charge][i].SelectIonTypes(Config.SelectedIonThreshold);
-                        file.WriteLine("RankProbabilities");
-                        _rankTables[charge][i].Smooth(Config.SmoothingRanks, Config.SmoothingWindowSize);
-                        _rankTables[charge][i].WriteToFile(file, ionTypes);
-                        _drankTables[charge][i].Smooth(Config.SmoothingRanks, Config.SmoothingWindowSize);
-                        _drankTables[charge][i].WriteToFile(file, ionTypes);
-                        file.WriteLine("IonProbabilities");
-                        _ionProbabilities[charge][i].WriteToFile(file);
+            using var file = new StreamWriter(fileName);
+
+            foreach (var charge in _charges)
+            {
+                file.WriteLine("Charge\t" + charge);
+                file.Write("BinSize\t");
+                var massBins = _massSorter[charge].Bins;
+                for (var i = 0; i < _massBins[charge]; i++)
+                {
+                    file.Write(massBins[i].Count);
+                    if (i < _massBins[charge] - 1)
+                    {
+                        file.Write("\t");
                     }
+                }
+                file.WriteLine();
+                for (var i = 0; i < _massBins[charge]; i++)
+                {
+                    file.Write("BinEdges\t{0}", _massSorter[charge].BinEdges[i]);
+                    var max = double.PositiveInfinity;
+                    if (i < _massBins[charge] - 1)
+                    {
+                        max = _massSorter[charge].BinEdges[i + 1];
+                    }
+
+                    file.Write("\t" + max);
+                    file.WriteLine();
+                    var ionTypes = _ionProbabilities[charge][i].SelectIonTypes(Config.SelectedIonThreshold);
+                    file.WriteLine("RankProbabilities");
+                    _rankTables[charge][i].Smooth(Config.SmoothingRanks, Config.SmoothingWindowSize);
+                    _rankTables[charge][i].WriteToFile(file, ionTypes);
+                    _drankTables[charge][i].Smooth(Config.SmoothingRanks, Config.SmoothingWindowSize);
+                    _drankTables[charge][i].WriteToFile(file, ionTypes);
+                    file.WriteLine("IonProbabilities");
+                    _ionProbabilities[charge][i].WriteToFile(file);
                 }
             }
         }
@@ -182,6 +182,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
             var binEdges = new List<double>();
             var charge = 0;
             var line = file.ReadLine();
+
             while (line != null)
             {
                 var parts = line.Split('\t').ToList();
@@ -230,18 +231,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring
 
         private void ReadFromResourceFile(Stream resourceFile)
         {
-            using (var fileStreamReader = new StreamReader(resourceFile))
-            {
-                Read(fileStreamReader);
-            }
+            using var fileStreamReader = new StreamReader(resourceFile);
+            Read(fileStreamReader);
         }
 
         private void ReadFromFile(string fileName)
         {
-            using (var fileStreamReader = new StreamReader(fileName))
-            {
-                Read(fileStreamReader);
-            }
+            using var fileStreamReader = new StreamReader(fileName);
+            Read(fileStreamReader);
         }
 
         private void Compute()

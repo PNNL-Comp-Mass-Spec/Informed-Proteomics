@@ -118,20 +118,20 @@ namespace InformedProteomics.Backend.FeatureFindingResults
                 outputFile.Directory.Create();
             }
 
-            using (var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)), CultureInfo.InvariantCulture))
+            using var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)), CultureInfo.InvariantCulture);
+
+            SetCsvWriterConfig(tsv.Configuration);
+            if (writeExtendedData)
             {
-                SetCsvWriterConfig(tsv.Configuration);
-                if (writeExtendedData)
-                {
-                    tsv.Configuration.RegisterClassMap<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>();
-                    tsv.Configuration.RegisterClassMap<Ms1FtExtendedEntryMap>();
-                }
-                else
-                {
-                    tsv.Configuration.RegisterClassMap<Ms1FtEntryMap>();
-                }
-                tsv.WriteRecords(features);
+                tsv.Configuration.RegisterClassMap<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>();
+                tsv.Configuration.RegisterClassMap<Ms1FtExtendedEntryMap>();
             }
+            else
+            {
+                tsv.Configuration.RegisterClassMap<Ms1FtEntryMap>();
+            }
+
+            tsv.WriteRecords(features);
         }
 
         /// <summary>
@@ -142,37 +142,37 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         /// <returns>List of features</returns>
         public static IEnumerable<Ms1FtEntry> ReadFromFile(string filePath, bool readExtendedData = false)
         {
-            using (var stream = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using var stream = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+            var hasExtended = false;
+            var line = stream.ReadLine();
+            if (!string.IsNullOrWhiteSpace(line) && line.IndexOf("BestEvenCharge", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                var hasExtended = false;
-                var line = stream.ReadLine();
-                if (!string.IsNullOrWhiteSpace(line) && line.IndexOf("BestEvenCharge", StringComparison.OrdinalIgnoreCase) >= 0)
+                hasExtended = true;
+            }
+
+            stream.BaseStream.Seek(0, SeekOrigin.Begin);
+            stream.DiscardBufferedData();
+
+            using var tsv = new CsvReader(stream, CultureInfo.InvariantCulture);
+
+            SetCsvReaderConfig(tsv.Configuration);
+            if (readExtendedData && hasExtended)
+            {
+                tsv.Configuration.RegisterClassMap<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>();
+                tsv.Configuration.RegisterClassMap<Ms1FtExtendedEntryMap>();
+            }
+            else
+            {
+                tsv.Configuration.RegisterClassMap<Ms1FtEntryMap>();
+            }
+            foreach (var record in tsv.GetRecords<Ms1FtEntry>())
+            {
+                if (readExtendedData && !hasExtended)
                 {
-                    hasExtended = true;
+                    record.ExtendedData = new Ms1FtEntryExtendedData();
                 }
-                stream.BaseStream.Seek(0, SeekOrigin.Begin);
-                stream.DiscardBufferedData();
-                using (var tsv = new CsvReader(stream, CultureInfo.InvariantCulture))
-                {
-                    SetCsvReaderConfig(tsv.Configuration);
-                    if (readExtendedData && hasExtended)
-                    {
-                        tsv.Configuration.RegisterClassMap<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>();
-                        tsv.Configuration.RegisterClassMap<Ms1FtExtendedEntryMap>();
-                    }
-                    else
-                    {
-                        tsv.Configuration.RegisterClassMap<Ms1FtEntryMap>();
-                    }
-                    foreach (var record in tsv.GetRecords<Ms1FtEntry>())
-                    {
-                        if (readExtendedData && !hasExtended)
-                        {
-                            record.ExtendedData = new Ms1FtEntryExtendedData();
-                        }
-                        yield return record;
-                    }
-                }
+                yield return record;
             }
         }
 

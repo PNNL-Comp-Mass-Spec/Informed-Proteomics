@@ -82,53 +82,52 @@ namespace InformedProteomics.Tests.DevTests
                 Console.WriteLine("{0}\t{1}\t{2}", jobs[i], jobColNum[i], experiments[i]);
             }
 
-            using (var writer = new StreamWriter(outputFilePath))
+            using var writer = new StreamWriter(outputFilePath);
+
+            var peptides = parser.GetData("Peptide");   // Peptides
+            var proteins = parser.GetData("Reference"); // Proteins
+            var abundances = new string[jobs.Length][];
+            for (var i = 0; i < jobs.Length; i++)
             {
-                var peptides = parser.GetData("Peptide");   // Peptides
-                var proteins = parser.GetData("Reference");     // Proteins
-                var abundances = new string[jobs.Length][];
-                for (var i = 0; i < jobs.Length; i++)
+                abundances[i] = parser.GetData(headers[jobColNum[i]]).ToArray();
+            }
+
+            if (peptides != null)
+            {
+                writer.Write("Peptide\t");
+            }
+
+            writer.Write("Protein\tLength");
+            for (var i = 0; i < jobs.Length; i++)
+            {
+                writer.Write("\t" + experiments[i]);
+            }
+            writer.WriteLine("\tSpikeIn");
+            for (var i = 0; i < proteins.Count; i++)
+            {
+                var protein = proteins[i];
+                if (protein.StartsWith("XXX") || protein.StartsWith("Contaminant"))
                 {
-                    abundances[i] = parser.GetData(headers[jobColNum[i]]).ToArray();
+                    continue;
                 }
 
+                var length = database.GetProteinLength(protein);
+                //if (length <= 0)
+                //{
+                //    Console.WriteLine("Shit!");
+                //    return;
+                //}
                 if (peptides != null)
                 {
-                    writer.Write("Peptide\t");
+                    writer.Write(peptides[i] + "\t");
                 }
 
-                writer.Write("Protein\tLength");
-                for (var i = 0; i < jobs.Length; i++)
+                writer.Write(protein + "\t" + length);
+                for (var j = 0; j < jobs.Length; j++)
                 {
-                    writer.Write("\t" + experiments[i]);
+                    writer.Write("\t" + abundances[j][i]);
                 }
-                writer.WriteLine("\tSpikeIn");
-                for (var i = 0; i < proteins.Count; i++)
-                {
-                    var protein = proteins[i];
-                    if (protein.StartsWith("XXX") || protein.StartsWith("Contaminant"))
-                    {
-                        continue;
-                    }
-
-                    var length = database.GetProteinLength(protein);
-                    //if (length <= 0)
-                    //{
-                    //    Console.WriteLine("Shit!");
-                    //    return;
-                    //}
-                    if (peptides != null)
-                    {
-                        writer.Write(peptides[i] + "\t");
-                    }
-
-                    writer.Write(protein + "\t" + length);
-                    for (var j = 0; j < jobs.Length; j++)
-                    {
-                        writer.Write("\t" + abundances[j][i]);
-                    }
-                    writer.WriteLine("\t" + (protein.StartsWith("STANDARD") ? 1 : 0));
-                }
+                writer.WriteLine("\t" + (protein.StartsWith("STANDARD") ? 1 : 0));
             }
         }
 
@@ -148,13 +147,13 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             const string outputFilePath = dir + @"\AMT_Peptides_NA.tsv";
-            using (var writer = new StreamWriter(outputFilePath))
+
+            using var writer = new StreamWriter(outputFilePath);
+
+            foreach (var line in File.ReadLines(resultFilePath))
             {
-                foreach (var line in File.ReadLines(resultFilePath))
-                {
-                    var token = line.Split('\t');
-                    writer.WriteLine(string.Join("\t", token.Select(t => t.Length == 0 ? "NA" : (Double.TryParse(t, out var result) ? (result * 1E6).ToString() : t))));
-                }
+                var token = line.Split('\t');
+                writer.WriteLine(string.Join("\t", token.Select(t => t.Length == 0 ? "NA" : (Double.TryParse(t, out var result) ? (result * 1E6).ToString() : t))));
             }
         }
 
@@ -181,26 +180,26 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             const string outputFilePath = @"H:\Research\IPRG2015\AMT_Peptides.tsv";
-            using (var writer = new StreamWriter(outputFilePath))
-            {
-                foreach (var line in File.ReadLines(resultPath))
-                {
-                    var data = line.Split(null);
-                    if (data.Length != 14)
-                    {
-                        continue;
-                    }
 
-                    var peptide = data[0];
-                    if (peptide.Equals("Peptide"))
-                    {
-                        writer.WriteLine("Peptide\tProtein\tLength\t{0}", string.Join("\t", data.Skip(2)));
-                        continue;
-                    }
-                    var protein = data[1];
-                    var length = database.GetProteinLength(protein);
-                    writer.WriteLine("{0}\t{1}\t{2}\t{3}", peptide, protein, length, string.Join("\t", data.Skip(2)));
+            using var writer = new StreamWriter(outputFilePath);
+
+            foreach (var line in File.ReadLines(resultPath))
+            {
+                var data = line.Split(null);
+                if (data.Length != 14)
+                {
+                    continue;
                 }
+
+                var peptide = data[0];
+                if (peptide.Equals("Peptide"))
+                {
+                    writer.WriteLine("Peptide\tProtein\tLength\t{0}", string.Join("\t", data.Skip(2)));
+                    continue;
+                }
+                var protein = data[1];
+                var length = database.GetProteinLength(protein);
+                writer.WriteLine("{0}\t{1}\t{2}\t{3}", peptide, protein, length, string.Join("\t", data.Skip(2)));
             }
         }
 

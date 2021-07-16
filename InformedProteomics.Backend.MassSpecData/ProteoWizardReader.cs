@@ -408,12 +408,12 @@ namespace InformedProteomics.Backend.MassSpecData
                     }
                     fileForChecksum = files[0].FullName;
                 }
-                using (var fs = new FileStream(fileForChecksum, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (var sha1 = new SHA1Managed())
-                {
-                    var hash = sha1.ComputeHash(fs);
-                    _srcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
-                }
+
+                using var fs = new FileStream(fileForChecksum, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var sha1 = new SHA1Managed();
+
+                var hash = sha1.ComputeHash(fs);
+                _srcFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
             }
 
             foreach (var software in _dataFile.softwareList)

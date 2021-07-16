@@ -96,14 +96,14 @@ namespace InformedProteomics.Test
                 for (int i = 0; i < tableCount; i++)
                 {
                     var chargeOutFileName = outFileName.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
-                    using (var outFile = new StreamWriter(chargeOutFileName))
+
+                    using var outFile = new StreamWriter(chargeOutFileName);
+
+                    outFile.WriteLine("Offset\tFound");
+                    foreach (var offsetFrequency in offsetFrequencies[i])
                     {
-                        outFile.WriteLine("Offset\tFound");
-                        foreach (var offsetFrequency in offsetFrequencies[i])
-                        {
-                            //                            int integerOffset = (int) Math.Round(offsetFrequency.Offset*_binWidth*(i + 1));
-                            outFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Prob);
-                        }
+                        //                            int integerOffset = (int) Math.Round(offsetFrequency.Offset*_binWidth*(i + 1));
+                        outFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Prob);
                     }
                 }
             }
@@ -168,35 +168,35 @@ namespace InformedProteomics.Test
                 for (int i = 0; i < _precursorCharge; i++)
                 {
                     var chargeOutFileName = outFileName.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
-                    using (var outFile = new StreamWriter(chargeOutFileName))
+
+                    using var outFile = new StreamWriter(chargeOutFileName);
+
+                    outFile.Write("Offset\t");
+                    var offsetFrequencyList = new List<List<Probability<double>>>();
+                    for (int j = offsetFrequencyTables[i].Count - 1; j >= 0; j--)
                     {
-                        outFile.Write("Offset\t");
-                        var offsetFrequencyList = new List<List<Probability<double>>>();
-                        for (int j = offsetFrequencyTables[i].Count - 1; j >= 0; j--)
+                        offsetFrequencyList.Add(offsetFrequencyTables[i][j].GetProbabilities().ToList());
+                        outFile.Write("{0}", j + 1);
+                        if (j != 0)
                         {
-                            offsetFrequencyList.Add(offsetFrequencyTables[i][j].GetProbabilities().ToList());
-                            outFile.Write("{0}", j + 1);
-                            if (j != 0)
+                            outFile.Write("\t");
+                        }
+                    }
+                    outFile.WriteLine();
+                    for (int j = 0; j < offsetFrequencyList.First().Count; j++)
+                    {
+                        var offset = offsetFrequencyList.First()[j].Label;
+                        var integerOffset = Math.Round(offset * (1 / _binWidth), 2);
+                        outFile.Write(integerOffset + "\t");
+                        for (int k = 0; k < offsetFrequencyList.Count; k++)
+                        {
+                            outFile.Write(offsetFrequencyList[k][j].Prob);
+                            if (k != offsetFrequencyList.Count - 1)
                             {
                                 outFile.Write("\t");
                             }
                         }
                         outFile.WriteLine();
-                        for (int j = 0; j < offsetFrequencyList.First().Count; j++)
-                        {
-                            var offset = offsetFrequencyList.First()[j].Label;
-                            var integerOffset = Math.Round(offset * (1 / _binWidth), 2);
-                            outFile.Write(integerOffset + "\t");
-                            for (int k = 0; k < offsetFrequencyList.Count; k++)
-                            {
-                                outFile.Write(offsetFrequencyList[k][j].Prob);
-                                if (k != offsetFrequencyList.Count - 1)
-                                {
-                                    outFile.Write("\t");
-                                }
-                            }
-                            outFile.WriteLine();
-                        }
                     }
                 }
             }

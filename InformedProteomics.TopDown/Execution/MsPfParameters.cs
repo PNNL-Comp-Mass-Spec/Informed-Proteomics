@@ -357,30 +357,30 @@ namespace InformedProteomics.TopDown.Execution
         {
             var outputFilePath = Path.Combine(OutputDir, Path.GetFileNameWithoutExtension(SpecFilePath) + ParameterFileExtension);
 
-            using (var writer = new StreamWriter(outputFilePath))
+            using var writer = new StreamWriter(outputFilePath);
+
+            writer.WriteLine("SpecFile\t" + Path.GetFileName(SpecFilePath));
+            writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
+            writer.WriteLine("FeatureFile\t{0}", !string.IsNullOrWhiteSpace(FeatureFilePath) ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(MassSpecDataReaderFactory.ChangeExtension(SpecFilePath, ".ms1ft")));
+            writer.WriteLine("InternalCleavageMode\t" + InternalCleavageMode);
+            writer.WriteLine("Tag-based search\t" + TagBasedSearch);
+            writer.WriteLine("Tda\t" + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
+            writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
+            writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
+            writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
+            writer.WriteLine("MaxSequenceLength\t" + MaxSequenceLength);
+            writer.WriteLine("MinPrecursorIonCharge\t" + MinPrecursorIonCharge);
+            writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
+            writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
+            writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
+            writer.WriteLine("MinSequenceMass\t" + MinSequenceMass);
+            writer.WriteLine("MaxSequenceMass\t" + MaxSequenceMass);
+            writer.WriteLine("ActivationMethod\t" + ActivationMethod);
+            writer.WriteLine("MaxDynamicModificationsPerSequence\t" + MaxDynamicModificationsPerSequence);
+
+            foreach (var searchMod in Modifications)
             {
-                writer.WriteLine("SpecFile\t" + Path.GetFileName(SpecFilePath));
-                writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
-                writer.WriteLine("FeatureFile\t{0}", !string.IsNullOrWhiteSpace(FeatureFilePath) ? Path.GetFileName(FeatureFilePath) : Path.GetFileName(MassSpecDataReaderFactory.ChangeExtension(SpecFilePath, ".ms1ft")));
-                writer.WriteLine("InternalCleavageMode\t" + InternalCleavageMode);
-                writer.WriteLine("Tag-based search\t" + TagBasedSearch);
-                writer.WriteLine("Tda\t" + (TargetDecoySearchMode == DatabaseSearchMode.Both ? "Target+Decoy" : TargetDecoySearchMode.ToString()));
-                writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
-                writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
-                writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
-                writer.WriteLine("MaxSequenceLength\t" + MaxSequenceLength);
-                writer.WriteLine("MinPrecursorIonCharge\t" + MinPrecursorIonCharge);
-                writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
-                writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
-                writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
-                writer.WriteLine("MinSequenceMass\t" + MinSequenceMass);
-                writer.WriteLine("MaxSequenceMass\t" + MaxSequenceMass);
-                writer.WriteLine("ActivationMethod\t" + ActivationMethod);
-                writer.WriteLine("MaxDynamicModificationsPerSequence\t" + MaxDynamicModificationsPerSequence);
-                foreach (var searchMod in Modifications)
-                {
-                    writer.WriteLine("Modification\t" + searchMod);
-                }
+                writer.WriteLine("Modification\t" + searchMod);
             }
         }
 

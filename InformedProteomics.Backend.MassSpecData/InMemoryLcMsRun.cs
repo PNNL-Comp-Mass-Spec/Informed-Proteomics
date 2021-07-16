@@ -577,10 +577,8 @@ namespace InformedProteomics.Backend.MassSpecData
         [Obsolete("Use PbfLcMsRun.WriteAsPbf(InMemoryLcMsRun, string, IProgress<ProgressData> = null)", true)]
         public void WriteAsPbf(string outputFilePath, IProgress<ProgressData> progress = null)
         {
-            using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
-            {
-                PbfLcMsRun.WriteAsPbf(this, writer, progress);
-            }
+            using var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create));
+            PbfLcMsRun.WriteAsPbf(this, writer, progress);
         }
 
         private static Xic GetXicPointsWithin(double minMz, double maxMz, List<LcMsPeak> peakList)

@@ -86,13 +86,13 @@ namespace InformedProteomics.Tests.DevTests
 
             // Writing
             var newResultFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143_IcTdaWithIntensities.tsv");
-            using (var writer = new StreamWriter(newResultFilePath))
+
+            using var writer = new StreamWriter(newResultFilePath);
+            
+            writer.WriteLine(string.Join("\t", parser.GetHeaders()) + "\tPrecursorIntensity");
+            for (var i = 0; i < parser.NumData; i++)
             {
-                writer.WriteLine(string.Join("\t", parser.GetHeaders()) + "\tPrecursorIntensity");
-                for (var i = 0; i < parser.NumData; i++)
-                {
-                    writer.WriteLine(parser.GetRows()[i] + "\t" + precursorIntensities[i]);
-                }
+                writer.WriteLine(parser.GetRows()[i] + "\t" + precursorIntensities[i]);
             }
 
             sw.Stop();

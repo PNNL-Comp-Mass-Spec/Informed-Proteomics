@@ -108,26 +108,25 @@ namespace InformedProteomics.Test
             var lcms = InMemoryLcMsRun.GetLcMsRun(dataFile, 0, 0);
             var rankScorer = new DiaRankScore(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QExactive_Tryp.txt");
 
-            using (var outFile = new StreamWriter(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QCShew_Score_2.txt"))
+            using var outFile = new StreamWriter(@"C:\Users\wilk011\Documents\DataFiles\TestFolder\HCD_QCShew_Score_2.txt");
+
+            outFile.WriteLine("Target\tDecoy");
+            for (var i = 0; i < sequences.Count; i++)
             {
-                outFile.WriteLine("Target\tDecoy");
-                for (var i = 0; i < sequences.Count; i++)
-                {
-                    var sequenceStr = sequences[i];
-                    var charge = Convert.ToInt32(charges[i]);
-                    var scan = Convert.ToInt32(scans[i]);
+                var sequenceStr = sequences[i];
+                var charge = Convert.ToInt32(charges[i]);
+                var scan = Convert.ToInt32(scans[i]);
 
-                    var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceStr);
-                    var decoySeq = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceStr);
-                    decoySeq.Reverse();
-                    var decoyStr = decoySeq.Aggregate(string.Empty, (current, aa) => current + aa);
-                    decoyStr = SimpleStringProcessing.Mutate(decoyStr, sequence.Count / 2);
-                    decoySeq = Sequence.GetSequenceFromMsGfPlusPeptideStr(decoyStr);
+                var sequence = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceStr);
+                var decoySeq = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequenceStr);
+                decoySeq.Reverse();
+                var decoyStr = decoySeq.Aggregate(string.Empty, (current, aa) => current + aa);
+                decoyStr = SimpleStringProcessing.Mutate(decoyStr, sequence.Count / 2);
+                decoySeq = Sequence.GetSequenceFromMsGfPlusPeptideStr(decoyStr);
 
-                    var sequenceScore = rankScorer.GetScore(sequence, charge, scan, lcms);
-                    var decoyScore = rankScorer.GetScore(decoySeq, charge, scan, lcms);
-                    outFile.WriteLine("{0}\t{1}", sequenceScore, decoyScore);
-                }
+                var sequenceScore = rankScorer.GetScore(sequence, charge, scan, lcms);
+                var decoyScore = rankScorer.GetScore(decoySeq, charge, scan, lcms);
+                outFile.WriteLine("{0}\t{1}", sequenceScore, decoyScore);
             }
         }
     }

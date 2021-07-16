@@ -28,30 +28,29 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             var spectrumMatches = InitTest();
 
-            using (var debugFile = new StreamWriter(OutputFileName))
+            using var debugFile = new StreamWriter(OutputFileName);
+
+            foreach (var spectrumMatch in spectrumMatches)
             {
-                foreach (var spectrumMatch in spectrumMatches)
+                var offsetFrequencyTable = new PrecursorOffsetFrequencyTable(100, spectrumMatch.PrecursorCharge,
+                    1.005 / spectrumMatch.PrecursorCharge);
+
+                var ionType = _ionTypes[spectrumMatch.PrecursorCharge - 1];
+                var ion = ionType.GetIon(spectrumMatch.PeptideComposition);
+                var mz = ion.GetMonoIsotopicMz();
+
+                offsetFrequencyTable.AddMatches(new List<SpectrumMatch> { spectrumMatch });
+                var offsetFrequencies = offsetFrequencyTable.GetProbabilities();
+
+                debugFile.WriteLine("ScanNum\tM/Z\tPrecursor Charge\tIon Type\tPeptide");
+                debugFile.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
+                    spectrumMatch.Spectrum.ScanNum, mz, spectrumMatch.PrecursorCharge, ionType.Name, spectrumMatch.Peptide);
+                debugFile.WriteLine("Offset\tM/Z");
+                foreach (var offsetFrequency in offsetFrequencies)
                 {
-                    var offsetFrequencyTable = new PrecursorOffsetFrequencyTable(100, spectrumMatch.PrecursorCharge,
-                        1.005 / spectrumMatch.PrecursorCharge);
-
-                    var ionType = _ionTypes[spectrumMatch.PrecursorCharge - 1];
-                    var ion = ionType.GetIon(spectrumMatch.PeptideComposition);
-                    var mz = ion.GetMonoIsotopicMz();
-
-                    offsetFrequencyTable.AddMatches(new List<SpectrumMatch> { spectrumMatch });
-                    var offsetFrequencies = offsetFrequencyTable.GetProbabilities();
-
-                    debugFile.WriteLine("ScanNum\tM/Z\tPrecursor Charge\tIon Type\tPeptide");
-                    debugFile.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}",
-                        spectrumMatch.Spectrum.ScanNum, mz, spectrumMatch.PrecursorCharge, ionType.Name, spectrumMatch.Peptide);
-                    debugFile.WriteLine("Offset\tM/Z");
-                    foreach (var offsetFrequency in offsetFrequencies)
+                    if (offsetFrequency.Found > 0)
                     {
-                        if (offsetFrequency.Found > 0)
-                        {
-                            debugFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Label + mz);
-                        }
+                        debugFile.WriteLine("{0}\t{1}", offsetFrequency.Label, offsetFrequency.Label + mz);
                     }
                 }
             }

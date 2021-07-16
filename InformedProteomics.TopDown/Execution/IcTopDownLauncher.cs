@@ -1212,32 +1212,31 @@ namespace InformedProteomics.TopDown.Execution
                     return false;
                 }
 
-                using (var reader = new StreamReader(new FileStream(outputFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+                using var reader = new StreamReader(new FileStream(outputFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+                var resultCount = 0;
+                while (!reader.EndOfStream)
                 {
-                    var resultCount = 0;
-                    while (!reader.EndOfStream)
+                    var dataLine = reader.ReadLine();
+                    if (string.IsNullOrWhiteSpace(dataLine))
                     {
-                        var dataLine = reader.ReadLine();
-                        if (string.IsNullOrWhiteSpace(dataLine))
-                        {
-                            continue;
-                        }
-
-                        resultCount++;
+                        continue;
                     }
 
-                    if (resultCount > 1)
-                    {
-                        return true;
-                    }
-
-                    if (resultCount == 1)
-                    {
-                        ReportWarning("Results file only has a header line; will re-generate " + targetOutputFilePath);
-                    }
-
-                    ReportWarning("Results file is empty: " + targetOutputFilePath);
+                    resultCount++;
                 }
+
+                if (resultCount > 1)
+                {
+                    return true;
+                }
+
+                if (resultCount == 1)
+                {
+                    ReportWarning("Results file only has a header line; will re-generate " + targetOutputFilePath);
+                }
+
+                ReportWarning("Results file is empty: " + targetOutputFilePath);
 
                 return false;
             }

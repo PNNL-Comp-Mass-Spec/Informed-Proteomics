@@ -156,10 +156,8 @@ namespace InformedProteomics.Tests.Base
 
         private static void CreateLockFile(FileSystemInfo lockFile)
         {
-            using (var writer = new StreamWriter(new FileStream(lockFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
-            {
-                writer.WriteLine("Creating PBF file: " + DateTime.Now.ToString(DATE_TIME_FORMAT));
-            }
+            using var writer = new StreamWriter(new FileStream(lockFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite));
+            writer.WriteLine("Creating PBF file: " + DateTime.Now.ToString(DATE_TIME_FORMAT));
         }
 
         private static void DeleteLockFile(FileSystemInfo lockFile)

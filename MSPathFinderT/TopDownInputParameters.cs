@@ -739,28 +739,26 @@ namespace MSPathFinderT
 
             var delimiters = new[] { ' ', '\t', ',' };
 
-            using (var reader = new StreamReader(new FileStream(scansFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using var reader = new StreamReader(new FileStream(scansFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+            while (!reader.EndOfStream)
             {
-                while (!reader.EndOfStream)
+                var dataLine = reader.ReadLine();
+                if (string.IsNullOrWhiteSpace(dataLine))
                 {
-                    var dataLine = reader.ReadLine();
-                    if (string.IsNullOrWhiteSpace(dataLine))
+                    continue;
+                }
+
+                foreach (var value in dataLine.Split(delimiters))
+                {
+                    if (!int.TryParse(value, out var scanNumber))
                     {
                         continue;
                     }
 
-                    var dataValues = dataLine.Split(delimiters);
-                    foreach (var value in dataValues)
+                    if (!scanNumbers.Contains(scanNumber))
                     {
-                        if (!int.TryParse(value, out var scanNumber))
-                        {
-                            continue;
-                        }
-
-                        if (!scanNumbers.Contains(scanNumber))
-                        {
-                            scanNumbers.Add(scanNumber);
-                        }
+                        scanNumbers.Add(scanNumber);
                     }
                 }
             }

@@ -38,90 +38,90 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             fdrCalculator.WriteTo(tdaResultPath);
 
-            using (var reader = new StreamReader(new FileStream(tdaResultPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using var reader = new StreamReader(new FileStream(tdaResultPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+            if (reader.EndOfStream)
             {
-                if (reader.EndOfStream)
-                {
-                    Assert.Fail("Result file is empty: " + tdaResultPath);
-                }
-
-                var headerLine = reader.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(headerLine))
-                {
-                    Assert.Fail("Header line is empty: " + tdaResultPath);
-                }
-
-                var headerColumns = headerLine.Split('\t');
-
-                if (headerColumns.Length < 21)
-                {
-                    Assert.Fail("Header line col count is less than 21: " + tdaResultPath);
-                }
-
-                var headerMap = new Dictionary<string, int>(StringComparer.InvariantCultureIgnoreCase);
-
-                for (var i = 0; i < headerColumns.Length; i++)
-                {
-                    headerMap.Add(headerColumns[i], i);
-                }
-
-                Console.WriteLine("Headers: " + string.Join("  ", headerColumns));
-
-                if (!headerMap.TryGetValue("QValue", out var qvalueColIndex))
-                {
-                    Assert.Fail("QValue not found in header line: " + tdaResultPath);
-                }
-
-                if (reader.EndOfStream)
-                {
-                    Assert.Fail("Result file has a header line but no results: " + tdaResultPath);
-                }
-
-                var qValueByScan = new Dictionary<int, string>();
-
-                while (!reader.EndOfStream)
-                {
-                    var result = reader.ReadLine();
-                    if (string.IsNullOrWhiteSpace(result))
-                    {
-                        continue;
-                    }
-
-                    var dataColumns = result.Split('\t');
-
-                    if (dataColumns.Length < headerMap.Count)
-                    {
-                        Assert.Fail("Incomplete result line: " + result);
-                    }
-
-                    if (!int.TryParse(dataColumns[0], out var scanNumber))
-                    {
-                        Assert.Fail("Scan number is non-numeric: " + dataColumns[0]);
-                    }
-
-                    qValueByScan.Add(scanNumber, dataColumns[qvalueColIndex]);
-                }
-
-                Console.WriteLine("Result count: " + qValueByScan.Count);
-
-                Assert.AreEqual(2655, qValueByScan.Count, "Result count {0} does not match expected count", qValueByScan.Count);
-
-                // Validate the scores for selected results
-                VerifyQValue(tdaResultPath, qValueByScan, 1808, 0);
-                VerifyQValue(tdaResultPath, qValueByScan, 2565, 0);
-                VerifyQValue(tdaResultPath, qValueByScan, 2753, 0.00046598);
-                VerifyQValue(tdaResultPath, qValueByScan, 1682, 0);
-                VerifyQValue(tdaResultPath, qValueByScan, 3045, 0.01168830);
-                VerifyQValue(tdaResultPath, qValueByScan, 2668, 0.02279440);
-
-                // FLIP-based scores:
-                // VerifyQValue(tdaResultPath, qValueByScan, 1808, 9.99e-308);
-                // VerifyQValue(tdaResultPath, qValueByScan, 2565, 1.323038e-38);
-                // VerifyQValue(tdaResultPath, qValueByScan, 1682, 1.912647e-12);
-                // VerifyQValue(tdaResultPath, qValueByScan, 3045, 0.010666);
-                // VerifyQValue(tdaResultPath, qValueByScan, 2668, 0.113394);
+                Assert.Fail("Result file is empty: " + tdaResultPath);
             }
+
+            var headerLine = reader.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(headerLine))
+            {
+                Assert.Fail("Header line is empty: " + tdaResultPath);
+            }
+
+            var headerColumns = headerLine.Split('\t');
+
+            if (headerColumns.Length < 21)
+            {
+                Assert.Fail("Header line col count is less than 21: " + tdaResultPath);
+            }
+
+            var headerMap = new Dictionary<string, int>(StringComparer.InvariantCultureIgnoreCase);
+
+            for (var i = 0; i < headerColumns.Length; i++)
+            {
+                headerMap.Add(headerColumns[i], i);
+            }
+
+            Console.WriteLine("Headers: " + string.Join("  ", headerColumns));
+
+            if (!headerMap.TryGetValue("QValue", out var qvalueColIndex))
+            {
+                Assert.Fail("QValue not found in header line: " + tdaResultPath);
+            }
+
+            if (reader.EndOfStream)
+            {
+                Assert.Fail("Result file has a header line but no results: " + tdaResultPath);
+            }
+
+            var qValueByScan = new Dictionary<int, string>();
+
+            while (!reader.EndOfStream)
+            {
+                var result = reader.ReadLine();
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    continue;
+                }
+
+                var dataColumns = result.Split('\t');
+
+                if (dataColumns.Length < headerMap.Count)
+                {
+                    Assert.Fail("Incomplete result line: " + result);
+                }
+
+                if (!int.TryParse(dataColumns[0], out var scanNumber))
+                {
+                    Assert.Fail("Scan number is non-numeric: " + dataColumns[0]);
+                }
+
+                qValueByScan.Add(scanNumber, dataColumns[qvalueColIndex]);
+            }
+
+            Console.WriteLine("Result count: " + qValueByScan.Count);
+
+            Assert.AreEqual(2655, qValueByScan.Count, "Result count {0} does not match expected count", qValueByScan.Count);
+
+            // Validate the scores for selected results
+            VerifyQValue(tdaResultPath, qValueByScan, 1808, 0);
+            VerifyQValue(tdaResultPath, qValueByScan, 2565, 0);
+            VerifyQValue(tdaResultPath, qValueByScan, 2753, 0.00046598);
+            VerifyQValue(tdaResultPath, qValueByScan, 1682, 0);
+            VerifyQValue(tdaResultPath, qValueByScan, 3045, 0.01168830);
+            VerifyQValue(tdaResultPath, qValueByScan, 2668, 0.02279440);
+
+            // FLIP-based scores:
+            // VerifyQValue(tdaResultPath, qValueByScan, 1808, 9.99e-308);
+            // VerifyQValue(tdaResultPath, qValueByScan, 2565, 1.323038e-38);
+            // VerifyQValue(tdaResultPath, qValueByScan, 1682, 1.912647e-12);
+            // VerifyQValue(tdaResultPath, qValueByScan, 3045, 0.010666);
+            // VerifyQValue(tdaResultPath, qValueByScan, 2668, 0.113394);
+
             Console.WriteLine("Done, see " + tdaResultPath);
         }
 

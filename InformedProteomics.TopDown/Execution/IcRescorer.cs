@@ -35,33 +35,32 @@ namespace InformedProteomics.TopDown.Execution
             var rows = parser.GetRows();
             var headers = parser.GetHeaders();
 
-            using (var writer = new StreamWriter(outputFilePath))
+            using var writer = new StreamWriter(outputFilePath);
+
+            writer.WriteLine("{0}\t{1}", string.Join("\t", headers), IcScores.GetScoreNames());
+            for (var i = 0; i < parser.NumData; i++)
             {
-                writer.WriteLine("{0}\t{1}", string.Join("\t", headers), IcScores.GetScoreNames());
-                for (var i = 0; i < parser.NumData; i++)
+                var row = rows[i];
+                var seqStr = sequences[i];
+                var charge = charges[i];
+                var scanNum = scanNums[i];
+                var composition = compositions[i];
+
+                var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm, composition, charge, scanNum);
+
+                var token = row.Split('\t');
+                for (var j = 0; j < token.Length; j++)
                 {
-                    var row = rows[i];
-                    var seqStr = sequences[i];
-                    var charge = charges[i];
-                    var scanNum = scanNums[i];
-                    var composition = compositions[i];
-
-                    var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm, composition, charge, scanNum);
-
-                    var token = row.Split('\t');
-                    for (var j = 0; j < token.Length; j++)
+                    if (j != modIndex)
                     {
-                        if (j != modIndex)
-                        {
-                            writer.Write(token[j] + "\t");
-                        }
-                        else
-                        {
-                            writer.Write("[" + scores.Modifications + "]\t");
-                        }
+                        writer.Write(token[j] + "\t");
                     }
-                    writer.WriteLine(scores);
+                    else
+                    {
+                        writer.Write("[" + scores.Modifications + "]\t");
+                    }
                 }
+                writer.WriteLine(scores);
             }
         }
     }

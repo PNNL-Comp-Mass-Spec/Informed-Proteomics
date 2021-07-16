@@ -444,68 +444,68 @@ namespace InformedProteomics.BottomUp.Execution
 
         private void WriteResultsToFile(IReadOnlyList<SortedSet<DatabaseSequenceSpectrumMatch>> matches, string outputFilePath, FastaDatabase database)
         {
-            using (var writer = new StreamWriter(outputFilePath))
-            {
-                writer.WriteLine("Scan\tPre\tSequence\tPost\tModifications\tComposition\tProteinName\tProteinDesc" +
+            using var writer = new StreamWriter(outputFilePath);
+
+            writer.WriteLine("Scan\tPre\tSequence\tPost\tModifications\tComposition\tProteinName\tProteinDesc" +
                              "\tProteinLength\tStart\tEnd\tCharge\tMostAbundantIsotopeMz\tMass\t#MatchedFragments\tIcScore"
-                             );
-                for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
+            );
+
+            for (var scanNum = _run.MinLcScan; scanNum <= _run.MaxLcScan; scanNum++)
+            {
+                if (matches[scanNum] == null)
                 {
-                    if (matches[scanNum] == null)
+                    continue;
+                }
+
+                foreach (var match in matches[scanNum].Reverse())
+                {
+                    var sequence = match.Sequence;
+                    var offset = match.Offset;
+                    var start = database.GetOneBasedPositionInProtein(offset) + 1 + match.NumNTermCleavages;
+                    var end = start + sequence.Length - 1;
+                    var proteinName = database.GetProteinName(match.Offset);
+                    var protLength = database.GetProteinLength(proteinName);
+                    var ion = match.Ion;
+
+                    var scores = _bottomUpScorer.GetScores(match, ion.Composition, ion.Charge, scanNum);
+
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                    // ReSharper disable HeuristicUnreachableCode
+                    if (ion == null)
                     {
+                        ConsoleMsgUtils.ShowWarning("Null ion in WriteResultsToFile");
+                        continue;
+                    }
+                    // ReSharper restore HeuristicUnreachableCode
+
+                    if (scores == null)
+                    {
+                        ConsoleMsgUtils.ShowWarning("Null scores in WriteResultsToFile");
                         continue;
                     }
 
-                    foreach (var match in matches[scanNum].Reverse())
-                    {
-                        var sequence = match.Sequence;
-                        var offset = match.Offset;
-                        var start = database.GetOneBasedPositionInProtein(offset) + 1 + match.NumNTermCleavages;
-                        var end = start + sequence.Length - 1;
-                        var proteinName = database.GetProteinName(match.Offset);
-                        var protLength = database.GetProteinLength(proteinName);
-                        var ion = match.Ion;
+                    // Note for DblToString(value, 9, true), by having "9" and "true",
+                    // values between 100 and 999 Da will have 7 digits after the decimal place, and
+                    // values between 1000 and 9999 will have 6 digits after the decimal place
 
-                        var scores = _bottomUpScorer.GetScores(match, ion.Composition, ion.Charge, scanNum);
-
-                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                        // ReSharper disable HeuristicUnreachableCode
-                        if (ion == null)
-                        {
-                            ConsoleMsgUtils.ShowWarning("Null ion in WriteResultsToFile");
-                            continue;
-                        }
-                        // ReSharper restore HeuristicUnreachableCode
-
-                        if (scores == null)
-                        {
-                            ConsoleMsgUtils.ShowWarning("Null scores in WriteResultsToFile");
-                            continue;
-                        }
-
-                        // Note for DblToString(value, 9, true), by having "9" and "true",
-                        // values between 100 and 999 Da will have 7 digits after the decimal place, and
-                        // values between 1000 and 9999 will have 6 digits after the decimal place
-
-                        writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
-                            scanNum,
-                            match.Pre,
-                            sequence, // Sequence
-                            match.Post,
-                            scores.Modifications, // Modifications
-                            ion.Composition, // Composition
-                            proteinName, // ProteinName
-                            database.GetProteinDescription(match.Offset), // ProteinDescription
-                            protLength, // ProteinLength
-                            start, // Start
-                            end, // End
-                            ion.Charge, // precursorCharge
-                            StringUtilities.DblToString(ion.GetMostAbundantIsotopeMz(), 9, true), // MostAbundantIsotopeMz
-                            StringUtilities.DblToString(ion.Composition.Mass, 9, true),           // Mass
-                            match.Score,
-                            scores.Score    // Score (re-scored)
-                            );
-                    }
+                    writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
+                        scanNum,
+                        match.Pre,
+                        sequence, // Sequence
+                        match.Post,
+                        scores.Modifications,                                                 // Modifications
+                        ion.Composition,                                                      // Composition
+                        proteinName,                                                          // ProteinName
+                        database.GetProteinDescription(match.Offset),                         // ProteinDescription
+                        protLength,                                                           // ProteinLength
+                        start,                                                                // Start
+                        end,                                                                  // End
+                        ion.Charge,                                                           // precursorCharge
+                        StringUtilities.DblToString(ion.GetMostAbundantIsotopeMz(), 9, true), // MostAbundantIsotopeMz
+                        StringUtilities.DblToString(ion.Composition.Mass, 9, true),           // Mass
+                        match.Score,
+                        scores.Score // Score (re-scored)
+                    );
                 }
             }
         }

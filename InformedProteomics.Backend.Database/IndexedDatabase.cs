@@ -70,11 +70,10 @@ namespace InformedProteomics.Backend.Database
         /// </summary>
         public void Read()
         {
-            using (var fileStream = new FileStream(_pLcpFilePath, FileMode.Open, FileAccess.Read))
-            {
-                PLcp = new byte[fileStream.Length - sizeof(int)];
-                fileStream.Read(PLcp, 0, PLcp.Length);
-            }
+            using var fileStream = new FileStream(_pLcpFilePath, FileMode.Open, FileAccess.Read);
+
+            PLcp = new byte[fileStream.Length - sizeof(int)];
+            fileStream.Read(PLcp, 0, PLcp.Length);
         }
 
         /// <summary>
@@ -280,16 +279,15 @@ namespace InformedProteomics.Backend.Database
                 var count = bufferSize;
                 var numBytesRead = 0;
 
-                using (var fileStream = new FileStream(_pLcpFilePath, FileMode.Open, FileAccess.Read))
+                using var fileStream = new FileStream(_pLcpFilePath, FileMode.Open, FileAccess.Read);
+
+                var numBytesToRead = fileStream.Length - sizeof(int);
+                while (count > 0)
                 {
-                    var numBytesToRead = fileStream.Length - sizeof(int);
-                    while (count > 0)
+                    count = fileStream.Read(buffer, 0, bufferSize);
+                    for (var i = 0; i < count && numBytesRead++ < numBytesToRead; i++)
                     {
-                        count = fileStream.Read(buffer, 0, bufferSize);
-                        for (var i = 0; i < count && numBytesRead++ < numBytesToRead; i++)
-                        {
-                            yield return buffer[i];
-                        }
+                        yield return buffer[i];
                     }
                 }
             }
@@ -885,16 +883,15 @@ namespace InformedProteomics.Backend.Database
                 prevIndex = index;
             }
 
-            using (var fs = new FileStream(_pLcpFilePath, FileMode.OpenOrCreate, FileAccess.Write))
+            using var fs = new FileStream(_pLcpFilePath, FileMode.OpenOrCreate, FileAccess.Write);
+
+            foreach (var lcp in pLcp)
             {
-                foreach (var lcp in pLcp)
-                {
-                    //Console.WriteLine("LCP: {0}", lcp);
-                    fs.WriteByte(lcp);
-                }
-                fs.Write(BitConverter.GetBytes(FastaDatabase.FileFormatId), 0, sizeof(int));
-                fs.Write(BitConverter.GetBytes(FastaDatabase.GetLastWriteTimeHash()), 0, sizeof(int));
+                //Console.WriteLine("LCP: {0}", lcp);
+                fs.WriteByte(lcp);
             }
+            fs.Write(BitConverter.GetBytes(FastaDatabase.FileFormatId), 0, sizeof(int));
+            fs.Write(BitConverter.GetBytes(FastaDatabase.GetLastWriteTimeHash()), 0, sizeof(int));
         }
 
         /// <summary>

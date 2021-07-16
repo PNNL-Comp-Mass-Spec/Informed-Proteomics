@@ -403,20 +403,14 @@ namespace InformedProteomics.Backend.MassSpecData
 
                 PbfFilePath = pbfFile.FullName;
 
-                using (var writer =
-                    new BinaryWriter(File.Open(pbfFile.FullName, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
-                {
-                    WriteToPbf(msDataReader, writer, scanStart, scanEnd, progress);
-                }
+                using var writer = new BinaryWriter(File.Open(pbfFile.FullName, FileMode.Create, FileAccess.ReadWrite, FileShare.Read));
+                WriteToPbf(msDataReader, writer, scanStart, scanEnd, progress);
             }
             catch (UnauthorizedAccessException)
             {
                 PbfFilePath = tempPath;
-                using (var writer =
-                    new BinaryWriter(File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)))
-                {
-                    WriteToPbf(msDataReader, writer, scanStart, scanEnd, progress);
-                }
+                using var writer = new BinaryWriter(File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read));
+                WriteToPbf(msDataReader, writer, scanStart, scanEnd, progress);
             }
             finally
             {
@@ -515,21 +509,24 @@ namespace InformedProteomics.Backend.MassSpecData
             }
 
             var fs = new FileStream(pbfFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using (var reader = new BinaryReader(fs))
+
+            using var reader = new BinaryReader(fs);
+
+            fs.Seek(-1 * sizeof(int), SeekOrigin.End);
+
+            var fileFormatId = reader.ReadInt32();
+
+            // ReSharper disable once MergeIntoLogicalPattern
+            if (fileFormatId > FileFormatId || fileFormatId < EarliestSupportedFileFormatId)
             {
-                fs.Seek(-1 * sizeof(int), SeekOrigin.End);
-
-                var fileFormatId = reader.ReadInt32();
-                if (fileFormatId > FileFormatId || fileFormatId < EarliestSupportedFileFormatId)
-                {
-                    return false;
-                }
-
-                if (fileFormatId == FileFormatId)
-                {
-                    isCurrent = true;
-                }
+                return false;
             }
+
+            if (fileFormatId == FileFormatId)
+            {
+                isCurrent = true;
+            }
+
             return true;
         }
 
@@ -556,12 +553,11 @@ namespace InformedProteomics.Backend.MassSpecData
             {
                 if (string.IsNullOrWhiteSpace(_pbfFileChecksum))
                 {
-                    using (var fs = new FileStream(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                    using (var sha1 = new SHA1Managed())
-                    {
-                        var hash = sha1.ComputeHash(fs);
-                        _pbfFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
-                    }
+                    using var fs = new FileStream(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var sha1 = new SHA1Managed();
+
+                    var hash = sha1.ComputeHash(fs);
+                    _pbfFileChecksum = BitConverter.ToString(hash).ToLower().Replace("-", string.Empty);
                 }
                 return _pbfFileChecksum;
             }
@@ -1370,10 +1366,8 @@ namespace InformedProteomics.Backend.MassSpecData
         [Obsolete("Use PbfLcMsRun(string, IMassSpecDataReader, ...) for an optimized pbf creation process", true)]
         public static void WriteAsPbf(InMemoryLcMsRun lcmsRun, string outputFilePath, IProgress<ProgressData> progress = null)
         {
-            using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
-            {
-                WriteAsPbf(lcmsRun, writer, progress);
-            }
+            using var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create));
+            WriteAsPbf(lcmsRun, writer, progress);
         }
 
         /// <summary>

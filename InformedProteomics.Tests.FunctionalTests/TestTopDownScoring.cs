@@ -299,58 +299,58 @@ namespace InformedProteomics.Tests.FunctionalTests
 
                 var outputFileName = Path.Combine(pbfFile.DirectoryName, Path.GetFileNameWithoutExtension(pbfFile.Name)) + string.Format("_{0}_Rescored.tsv", ext);
 
-                using (var writer = new StreamWriter(outputFileName))
+                using var writer = new StreamWriter(outputFileName);
+
+                writer.WriteLine(string.Join("\t", parser.GetHeaders().ToArray(), 0, 15) + "\tScore\tEValue");
+
+                var lines = new string[parser.NumData];
+
+                //for (var i = 0; i < parser.NumData; i++)
+                Parallel.For(0, 30, i =>
                 {
-                    writer.WriteLine(string.Join("\t", parser.GetHeaders().ToArray(), 0, 15) + "\tScore\tEValue");
+                    var scan = scans[i];
+                    var charge = charges[i];
+                    var protSequence = protSequences[i];
+                    var modStr = modStrs[i];
+                    var sequence = Sequence.CreateSequence(protSequence, modStr, aminoAcidSet);
+                    // Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
 
-                    var lines = new string[parser.NumData];
-
-                    //for (var i = 0; i < parser.NumData; i++)
-                    Parallel.For(0, 30, i =>
+                    if (!(run.GetSpectrum(scan) is ProductSpectrum ms2Spec))
                     {
-                        var scan = scans[i];
-                        var charge = charges[i];
-                        var protSequence = protSequences[i];
-                        var modStr = modStrs[i];
-                        var sequence = Sequence.CreateSequence(protSequence, modStr, aminoAcidSet);
-                        // Assert.True(sequence.Composition.Equals(compositions[i] - Composition.H2O));
-
-                        if (!(run.GetSpectrum(scan) is ProductSpectrum ms2Spec))
-                        {
-                            Console.WriteLine("Could not get the spectrum datafor scan {0}", scan);
-                        }
-                        else
-                        {
-                            Assert.True(ms2Spec != null);
-                            var scores = scorer.GetScores(sequence, charge, scan);
-
-                            var deconvSpec = Deconvoluter.GetDeconvolutedSpectrum(ms2Spec, minCharge, maxCharge,
-                                                                                  isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
-
-                            var deconvScorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, ms2Spec, tolerance,
-                                                                                              comparer);
-                            var graph = graphFactory.CreateScoringGraph(deconvScorer, protMass[i]);
-
-                            var gf = new GeneratingFunction(graph);
-                            gf.ComputeGeneratingFunction();
-
-                            var specEvalue = gf.GetSpectralEValue(scores.Score);
-
-                            var rowStr = parser.GetRows()[i];
-                            var items = rowStr.Split('\t').ToArray();
-                            var newRowStr = string.Join("\t", items, 0, 15);
-
-                            //writer.WriteLine("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
-                            lines[i] = string.Format("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
-                            //Console.WriteLine("{0}\t{1}\t{2}", items[0], scores.Score, specEvalue);
-                        }
-                    });
-
-                    foreach (var line in (from item in lines where !string.IsNullOrWhiteSpace(item) select item).Take(20))
-                    {
-                        Console.WriteLine(line);
+                        Console.WriteLine("Could not get the spectrum datafor scan {0}", scan);
                     }
+                    else
+                    {
+                        Assert.True(ms2Spec != null);
+                        var scores = scorer.GetScores(sequence, charge, scan);
+
+                        var deconvSpec = Deconvoluter.GetDeconvolutedSpectrum(ms2Spec, minCharge, maxCharge,
+                            isotopeOffsetTolerance, filteringWindowSize, tolerance, 0.7);
+
+                        var deconvScorer = new CompositeScorerBasedOnDeconvolutedSpectrum(deconvSpec, ms2Spec, tolerance,
+                            comparer);
+                        var graph = graphFactory.CreateScoringGraph(deconvScorer, protMass[i]);
+
+                        var gf = new GeneratingFunction(graph);
+                        gf.ComputeGeneratingFunction();
+
+                        var specEvalue = gf.GetSpectralEValue(scores.Score);
+
+                        var rowStr = parser.GetRows()[i];
+                        var items = rowStr.Split('\t').ToArray();
+                        var newRowStr = string.Join("\t", items, 0, 15);
+
+                        //writer.WriteLine("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
+                        lines[i] = string.Format("{0}\t{1}\t{2}", newRowStr, scores.Score, specEvalue);
+                        //Console.WriteLine("{0}\t{1}\t{2}", items[0], scores.Score, specEvalue);
+                    }
+                });
+
+                foreach (var line in (from item in lines where !string.IsNullOrWhiteSpace(item) select item).Take(20))
+                {
+                    Console.WriteLine(line);
                 }
+
                 Console.WriteLine("Done");
             }
         }

@@ -32,36 +32,35 @@ namespace InformedProteomics.TopDown.Execution
             var rows = parser.GetRows();
             var headers = parser.GetHeaders();
 
-            using (var writer = new StreamWriter(outputFilePath))
+            using var writer = new StreamWriter(outputFilePath);
+
+            writer.WriteLine("{0}\t{1}", string.Join("\t", headers), IcScores.GetScoreNames());
+            for (var i = 0; i < parser.NumData; i++)
             {
-                writer.WriteLine("{0}\t{1}", string.Join("\t", headers), IcScores.GetScoreNames());
-                for (var i = 0; i < parser.NumData; i++)
+                var row = rows[i];
+                var seqStr = SimpleStringProcessing.GetStringBetweenDots(sequences[i]);
+                if (seqStr == null || seqStr.Contains("("))
                 {
-                    var row = rows[i];
-                    var seqStr = SimpleStringProcessing.GetStringBetweenDots(sequences[i]);
-                    if (seqStr == null || seqStr.Contains("("))
-                    {
-                        continue; //TODO: currently ignore ids with modifications
-                    }
-
-                    var composition = AASet.GetComposition(seqStr);
-                    //var sequence = new Sequence(seqStr, AASet);
-                    //if (sequence == null)
-                    //{
-                    //    Console.WriteLine("Ignore illegal sequence: {0}", seqStr);
-                    //    continue;
-                    //}
-                    var charge = charges[i];
-                    var scanNum = scanNums[i];
-
-                    var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm, composition, charge, scanNum);
-                    if (scores == null)
-                    {
-                        continue;
-                    }
-
-                    writer.WriteLine("{0}\t{1}", row, scores);
+                    continue; //TODO: currently ignore ids with modifications
                 }
+
+                var composition = AASet.GetComposition(seqStr);
+                //var sequence = new Sequence(seqStr, AASet);
+                //if (sequence == null)
+                //{
+                //    Console.WriteLine("Ignore illegal sequence: {0}", seqStr);
+                //    continue;
+                //}
+                var charge = charges[i];
+                var scanNum = scanNums[i];
+
+                var scores = _topDownScorer.GetScores(AminoAcid.ProteinNTerm, seqStr, AminoAcid.ProteinCTerm, composition, charge, scanNum);
+                if (scores == null)
+                {
+                    continue;
+                }
+
+                writer.WriteLine("{0}\t{1}", row, scores);
             }
         }
 

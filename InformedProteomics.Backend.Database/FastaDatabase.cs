@@ -159,45 +159,44 @@ namespace InformedProteomics.Backend.Database
 
             SimpleStringProcessing.DefineRandomNumberGeneratorSeed((int)seed);
 
-            using (var decoyWriter = new StreamWriter(decoyDatabaseFileName))
+            using var decoyWriter = new StreamWriter(decoyDatabaseFileName);
+
+            while (reader.ReadNextProteinEntry())
             {
-                while (reader.ReadNextProteinEntry())
+                var name = reader.ProteinName;
+                var description = reader.ProteinDescription;
+                var sequence = reader.ProteinSequence;
+
+                decoyWriter.WriteLine(">{0}_{1} {2}", FastaDatabaseConstants.DecoyProteinPrefix, name, description);
+
+                if (!shuffle)
                 {
-                    var name = reader.ProteinName;
-                    var description = reader.ProteinDescription;
-                    var sequence = reader.ProteinSequence;
-
-                    decoyWriter.WriteLine(">{0}_{1} {2}", FastaDatabaseConstants.DecoyProteinPrefix, name, description);
-
-                    if (!shuffle)
+                    // Reversed protein sequence
+                    var decoySequence = new StringBuilder();
+                    for (var i = sequence.Length - 1; i >= 0; i--)
                     {
-                        // Reversed protein sequence
-                        var decoySequence = new StringBuilder();
-                        for (var i = sequence.Length - 1; i >= 0; i--)
+                        var residue = sequence[i];
+                        if (enzyme?.Residues.Length > 0 && enzyme.IsCleavable(residue) && decoySequence.Length > 0)
                         {
-                            var residue = sequence[i];
-                            if (enzyme?.Residues.Length > 0 && enzyme.IsCleavable(residue) && decoySequence.Length > 0)
-                            {
-                                var residueToBeReplaced = decoySequence[decoySequence.Length - 1];
-                                decoySequence.Remove(decoySequence.Length - 1, 1);
-                                decoySequence.Append(residue);
-                                decoySequence.Append(residueToBeReplaced);
-                            }
-                            else
-                            {
-                                decoySequence.Append(residue);
-                            }
+                            var residueToBeReplaced = decoySequence[decoySequence.Length - 1];
+                            decoySequence.Remove(decoySequence.Length - 1, 1);
+                            decoySequence.Append(residue);
+                            decoySequence.Append(residueToBeReplaced);
                         }
-                        decoyWriter.WriteLine(decoySequence);
+                        else
+                        {
+                            decoySequence.Append(residue);
+                        }
                     }
-                    else
-                    {
-                        // Shuffled protein sequences
-                        decoyWriter.WriteLine(SimpleStringProcessing.Mutate(SimpleStringProcessing.Shuffle(sequence), NumMutations));
-                    }
+                    decoyWriter.WriteLine(decoySequence);
                 }
-                reader.CloseFile();
+                else
+                {
+                    // Shuffled protein sequences
+                    decoyWriter.WriteLine(SimpleStringProcessing.Mutate(SimpleStringProcessing.Shuffle(sequence), NumMutations));
+                }
             }
+            reader.CloseFile();
         }
 
         /// <summary>
@@ -220,16 +219,15 @@ namespace InformedProteomics.Backend.Database
                 var count = bufferSize;
                 var numBytesRead = 0;
 
-                using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
+                using var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read);
+
+                var numBytesToRead = fileStream.Length - sizeof(int);
+                while (count > 0)
                 {
-                    var numBytesToRead = fileStream.Length - sizeof(int);
-                    while (count > 0)
+                    count = fileStream.Read(buffer, 0, bufferSize);
+                    for (var i = 0; i < count && numBytesRead++ < numBytesToRead; i++)
                     {
-                        count = fileStream.Read(buffer, 0, bufferSize);
-                        for (var i = 0; i < count && numBytesRead++ < numBytesToRead; i++)
-                        {
-                            yield return buffer[i];
-                        }
+                        yield return buffer[i];
                     }
                 }
             }
@@ -491,22 +489,21 @@ namespace InformedProteomics.Backend.Database
                 return false;
             }
 
-            using (var fs = new FileStream(dataFile.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var reader = new BinaryReader(fs))
+            using var fs = new FileStream(dataFile.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var reader = new BinaryReader(fs);
+
+            fs.Seek(-2 * sizeof(int), SeekOrigin.End);
+
+            var fileFormatId = reader.ReadInt32();
+            if (fileFormatId != FileFormatId)
             {
-                fs.Seek(-2 * sizeof(int), SeekOrigin.End);
+                return false;
+            }
 
-                var fileFormatId = reader.ReadInt32();
-                if (fileFormatId != FileFormatId)
-                {
-                    return false;
-                }
-
-                var lastWriteTimeHash = reader.ReadInt32();
-                if (lastWriteTimeHash == code)
-                {
-                    return true;
-                }
+            var lastWriteTimeHash = reader.ReadInt32();
+            if (lastWriteTimeHash == code)
+            {
+                return true;
             }
 
             return false;
@@ -634,76 +631,74 @@ namespace InformedProteomics.Backend.Database
             // Values track the number of times the name has been encountered, the number of residues, and a SHA1 hash of the residues
             var proteinNamesAndStats = new Dictionary<string, ProteinHashInfo>(StringComparer.InvariantCultureIgnoreCase);
 
-            using (var seqWriter = new BinaryWriter(File.Open(_seqFilePath, FileMode.CreateNew)))
-            using (var annoWriter = new StreamWriter(_annoFilePath))
+            using var seqWriter = new BinaryWriter(File.Open(_seqFilePath, FileMode.CreateNew));
+            using var annoWriter = new StreamWriter(_annoFilePath);
+
+            // Read
+            var reader = new FastaFileReader();
+            if (!reader.OpenFile(_databaseFilePath))
             {
-                // Read
-                var reader = new FastaFileReader();
-                if (!reader.OpenFile(_databaseFilePath))
+                return;
+            }
+
+            long offset = 0;
+            while (reader.ReadNextProteinEntry())
+            {
+                var name = reader.ProteinName;
+                var description = reader.ProteinDescription;
+                var sequence = (char)FastaDatabaseConstants.Delimiter + reader.ProteinSequence;
+                var length = sequence.Length;
+
+                var proteinInfoCurrent = new ProteinHashInfo(sequence);
+
+                if (proteinNamesAndStats.TryGetValue(name, out var proteinInfoCached))
                 {
-                    return;
-                }
-
-                long offset = 0;
-                while (reader.ReadNextProteinEntry())
-                {
-                    var name = reader.ProteinName;
-                    var description = reader.ProteinDescription;
-                    var sequence = (char)FastaDatabaseConstants.Delimiter + reader.ProteinSequence;
-                    var length = sequence.Length;
-
-                    var proteinInfoCurrent = new ProteinHashInfo(sequence);
-
-                    if (proteinNamesAndStats.TryGetValue(name, out var proteinInfoCached))
+                    // Duplicate name; either skip this protein or rename it
+                    if (proteinInfoCached.SequenceLength == proteinInfoCurrent.SequenceLength &&
+                        string.Equals(proteinInfoCached.SequenceHash, proteinInfoCurrent.SequenceHash))
                     {
-                        // Duplicate name; either skip this protein or rename it
-                        if (proteinInfoCached.SequenceLength == proteinInfoCurrent.SequenceLength &&
-                            string.Equals(proteinInfoCached.SequenceHash, proteinInfoCurrent.SequenceHash))
-                        {
-                            // Duplicate protein; skip it
-                            continue;
-                        }
-
-                        name += "_Duplicate" + proteinInfoCached.ObservationCount.ToString("00");
-                        proteinInfoCached.ObservationCount++;
+                        // Duplicate protein; skip it
+                        continue;
                     }
 
-                    proteinNamesAndStats.Add(name, proteinInfoCurrent);
-
-                    seqWriter.Write(Encoding.GetBytes(sequence));
-
-                    annoWriter.WriteLine("{0}{1}{2}{3}{4}{5}{6}",
-                        offset, FastaDatabaseConstants.AnnotationDelimiter,
-                        length, FastaDatabaseConstants.AnnotationDelimiter,
-                        name.Replace(FastaDatabaseConstants.AnnotationDelimiter, '-'), FastaDatabaseConstants.AnnotationDelimiter,
-                        description);
-
-                    offset += sequence.Length;
+                    name += "_Duplicate" + proteinInfoCached.ObservationCount.ToString("00");
+                    proteinInfoCached.ObservationCount++;
                 }
 
-                seqWriter.Write((char)FastaDatabaseConstants.Delimiter);
+                proteinNamesAndStats.Add(name, proteinInfoCurrent);
 
-                // write file format Id
-                seqWriter.Write(FileFormatId);
+                seqWriter.Write(Encoding.GetBytes(sequence));
 
-                // writer last write time hash
-                var hashCode = File.GetLastWriteTimeUtc(_databaseFilePath).GetHashCode();
+                annoWriter.WriteLine("{0}{1}{2}{3}{4}{5}{6}",
+                    offset, FastaDatabaseConstants.AnnotationDelimiter,
+                    length, FastaDatabaseConstants.AnnotationDelimiter,
+                    name.Replace(FastaDatabaseConstants.AnnotationDelimiter, '-'), FastaDatabaseConstants.AnnotationDelimiter,
+                    description);
 
-                seqWriter.Write(hashCode);
-                annoWriter.Write("{0}{1}{2}", FileFormatId, FastaDatabaseConstants.AnnotationDelimiter, hashCode);
-
-                reader.CloseFile();
+                offset += sequence.Length;
             }
+
+            seqWriter.Write((char)FastaDatabaseConstants.Delimiter);
+
+            // write file format Id
+            seqWriter.Write(FileFormatId);
+
+            // writer last write time hash
+            var hashCode = File.GetLastWriteTimeUtc(_databaseFilePath).GetHashCode();
+
+            seqWriter.Write(hashCode);
+            annoWriter.Write("{0}{1}{2}", FileFormatId, FastaDatabaseConstants.AnnotationDelimiter, hashCode);
+
+            reader.CloseFile();
         }
 
         private bool ReadSeqFile()
         {
-            using (var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read))
-            {
-                _sequence = new byte[fileStream.Length - 2 * sizeof(int) + 1];
-                fileStream.Read(_sequence, 0, _sequence.Length);
-                _sequence[_sequence.Length - 1] = FastaDatabaseConstants.LastCharacter;
-            }
+            using var fileStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read);
+
+            _sequence = new byte[fileStream.Length - 2 * sizeof(int) + 1];
+            fileStream.Read(_sequence, 0, _sequence.Length);
+            _sequence[_sequence.Length - 1] = FastaDatabaseConstants.LastCharacter;
 
             return true;
         }
@@ -718,46 +713,45 @@ namespace InformedProteomics.Backend.Database
 
             _duplicateNameCounts = new Dictionary<string, int>();
 
-            using (var reader = new StreamReader(_annoFilePath))
+            using var reader = new StreamReader(_annoFilePath);
+
+            string s;
+            while ((s = reader.ReadLine()) != null)
             {
-                string s;
-                while ((s = reader.ReadLine()) != null)
+                var token = s.Split(FastaDatabaseConstants.AnnotationDelimiter);
+                if (token.Length < 4)
                 {
-                    var token = s.Split(FastaDatabaseConstants.AnnotationDelimiter);
-                    if (token.Length < 4)
-                    {
-                        break;
-                    }
-
-                    var offset = long.Parse(token[0]);
-                    _offsetList.Add(offset);
-                    var length = int.Parse(token[1]);
-                    var name = token[2];
-
-                    if (_nameToLength.TryGetValue(name, out _))
-                    {
-                        ConsoleMsgUtils.ShowWarning(string.Format(
-                            "Duplicate protein name, renaming {0} at offset {1} in {2} to avoid collisions",
-                            name, offset, Path.GetFileName(_annoFilePath)));
-
-                        if (_duplicateNameCounts.TryGetValue(name, out var duplicateSuffix))
-                        {
-                            duplicateSuffix++;
-                            _duplicateNameCounts[name] = duplicateSuffix;
-                        }
-                        else
-                        {
-                            duplicateSuffix = 1;
-                            _duplicateNameCounts.Add(name, duplicateSuffix);
-                        }
-                        name += "_Duplicate" + duplicateSuffix.ToString("00");
-                    }
-
-                    _nameToLength.Add(name, length);
-                    _names.Add(offset, name);
-                    _nameToOffset.Add(name, offset);
-                    _descriptions.Add(offset, token[3]);
+                    break;
                 }
+
+                var offset = long.Parse(token[0]);
+                _offsetList.Add(offset);
+                var length = int.Parse(token[1]);
+                var name = token[2];
+
+                if (_nameToLength.TryGetValue(name, out _))
+                {
+                    ConsoleMsgUtils.ShowWarning(string.Format(
+                        "Duplicate protein name, renaming {0} at offset {1} in {2} to avoid collisions",
+                        name, offset, Path.GetFileName(_annoFilePath)));
+
+                    if (_duplicateNameCounts.TryGetValue(name, out var duplicateSuffix))
+                    {
+                        duplicateSuffix++;
+                        _duplicateNameCounts[name] = duplicateSuffix;
+                    }
+                    else
+                    {
+                        duplicateSuffix = 1;
+                        _duplicateNameCounts.Add(name, duplicateSuffix);
+                    }
+                    name += "_Duplicate" + duplicateSuffix.ToString("00");
+                }
+
+                _nameToLength.Add(name, length);
+                _names.Add(offset, name);
+                _nameToOffset.Add(name, offset);
+                _descriptions.Add(offset, token[3]);
             }
 
             return true;

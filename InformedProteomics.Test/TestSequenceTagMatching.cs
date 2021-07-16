@@ -239,34 +239,35 @@ namespace InformedProteomics.Test
             }
 
             const string outputFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3_matchedtag.tsv";
-            using (var writer = new StreamWriter(outputFilePath))
+
+            using var writer = new StreamWriter(outputFilePath);
+
+            var isHeader = true;
+            foreach (var line in File.ReadAllLines(tagFilePath))
             {
-                var isHeader = true;
-                foreach (var line in File.ReadAllLines(tagFilePath))
+                if (isHeader)
                 {
-                    if (isHeader)
-                    {
-                        isHeader = false;
-                        writer.WriteLine(line + "\tProteins");
-                        continue;
-                    }
-
-                    var token = line.Split('\t');
-                    if (token.Length != 3)
-                    {
-                        continue;
-                    }
-
-                    var tag = token[1];
-
-                    var matchedProteins =
-                        searchableDb.FindAllMatchedSequenceIndices(tag)
-                            .Select(index => fastaDb.GetProteinName(index))
-                            .Distinct().ToArray();
-                    var matchedProteinStr = string.Join(",", matchedProteins);
-                    writer.WriteLine("{0}\t{1}\t{2}", line, matchedProteins.Length, matchedProteinStr);
+                    isHeader = false;
+                    writer.WriteLine(line + "\tProteins");
+                    continue;
                 }
+
+                var token = line.Split('\t');
+                if (token.Length != 3)
+                {
+                    continue;
+                }
+
+                var tag = token[1];
+
+                var matchedProteins =
+                    searchableDb.FindAllMatchedSequenceIndices(tag)
+                        .Select(index => fastaDb.GetProteinName(index))
+                        .Distinct().ToArray();
+                var matchedProteinStr = string.Join(",", matchedProteins);
+                writer.WriteLine("{0}\t{1}\t{2}", line, matchedProteins.Length, matchedProteinStr);
             }
+
             Console.WriteLine("Done");
         }
 
@@ -531,112 +532,111 @@ namespace InformedProteomics.Test
                 var fastaDb = new FastaDatabase(fastaFilePath);
                 var searchableDb = new SearchableDatabase(fastaDb);
 
-                using (var writer = new StreamWriter(outputFilePath))
+                using var writer = new StreamWriter(outputFilePath);
+
+                var isHeader = true;
+                var nReadSeqTag = 0;
+
+                var headerNames = new List<string>() {
+                    "Protein",
+                    "DetectedFlankingMass",
+                    "ExpectedFlankingMass",
+                    "DeltaMass"
+                };
+
+                Console.WriteLine("Reading {0} file", tagFilePath);
+
+                var nColumn = 0;
+                foreach (var line in File.ReadAllLines(tagFilePath))
                 {
-                    var isHeader = true;
-                    var nReadSeqTag = 0;
-
-                    var headerNames = new List<string>() {
-                        "Protein",
-                        "DetectedFlankingMass",
-                        "ExpectedFlankingMass",
-                        "DeltaMass"
-                    };
-
-                    Console.WriteLine("Reading {0} file", tagFilePath);
-
-                    var nColumn = 0;
-                    foreach (var line in File.ReadAllLines(tagFilePath))
+                    if (isHeader)
                     {
-                        if (isHeader)
-                        {
-                            isHeader = false;
-                            nColumn = line.Split('\t').Length;
-                            writer.WriteLine(line + "\t" + string.Join("\t", headerNames));
-                            continue;
-                        }
-
-                        var token = line.Split('\t');
-                        if (token.Length != nColumn)
-                        {
-                            continue;
-                        }
-
-                        var tag = token[1];
-                        //var scan = Convert.ToInt32(token[0]);
-
-                        if (tag.Length < 6)
-                        {
-                            continue;
-                        }
-
-                        var nTerminal = token[2].Equals("1");
-                        var detectedFlankingMass = Double.Parse(token[3]);
-
-                        if (!nTerminal)
-                        {
-                            detectedFlankingMass -= Composition.H2O.Mass;
-                        }
-
-                        nReadSeqTag++;
-
-                        var matchedProteins =
-                            searchableDb.FindAllMatchedSequenceIndices(tag)
-                                .Select(index => fastaDb.GetProteinName(index))
-                                .Distinct().ToArray();
-
-                        if (matchedProteins.Length < 1)
-                        {
-                            continue;
-                        }
-
-                        foreach (var protName in matchedProteins)
-                        {
-                            var seqStr = fastaDb.GetProteinSequence(protName);
-                            var oriSeq = new Sequence(seqStr, AminoAcidSet.GetStandardAminoAcidSet());
-
-                            var startIdx = 0;
-                            while (true)
-                            {
-                                var idx = seqStr.IndexOf(tag, startIdx);
-
-                                if (idx < 0)
-                                {
-                                    break; //no matching
-                                }
-
-                                //var nClv = (nTerminal) ? idx : seqStr.Length - idx - tag.Length;
-                                var nClv = (nTerminal) ? 2 : 1;
-
-                                for (var j = 0; j < nClv; j++)
-                                {
-                                    var flankComposition = (nTerminal)
-                                        ? oriSeq.GetComposition(j, idx)
-                                        : oriSeq.GetComposition(idx + tag.Length, oriSeq.Count - j);
-
-                                    var massDiff = (detectedFlankingMass - flankComposition.Mass);
-                                    if (massDiff > -500 && massDiff < 2000)
-                                    {
-                                        //writer.WriteLine(massDiff);
-                                        writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", line, protName, detectedFlankingMass, flankComposition.Mass, massDiff);
-                                    }
-
-                                    if (massDiff > 2000)
-                                    {
-                                        break;
-                                    }
-                                }
-
-                                startIdx = idx + tag.Length;
-                            }
-                        }
-                        //var matchedProteinStr = string.Join(",", matchedProteins);
-                        //var massDiffStr = string.Join(",", massDiffList);
-                        //writer.WriteLine("{0}\t{1}\t{2}\t{3}", line, matchedProteins.Length, matchedProteinStr, massDiffStr);
+                        isHeader = false;
+                        nColumn = line.Split('\t').Length;
+                        writer.WriteLine(line + "\t" + string.Join("\t", headerNames));
+                        continue;
                     }
 
-                    Console.WriteLine("{0} seq tags are processed", nReadSeqTag);
+                    var token = line.Split('\t');
+                    if (token.Length != nColumn)
+                    {
+                        continue;
+                    }
+
+                    var tag = token[1];
+                    //var scan = Convert.ToInt32(token[0]);
+
+                    if (tag.Length < 6)
+                    {
+                        continue;
+                    }
+
+                    var nTerminal = token[2].Equals("1");
+                    var detectedFlankingMass = Double.Parse(token[3]);
+
+                    if (!nTerminal)
+                    {
+                        detectedFlankingMass -= Composition.H2O.Mass;
+                    }
+
+                    nReadSeqTag++;
+
+                    var matchedProteins =
+                        searchableDb.FindAllMatchedSequenceIndices(tag)
+                            .Select(index => fastaDb.GetProteinName(index))
+                            .Distinct().ToArray();
+
+                    if (matchedProteins.Length < 1)
+                    {
+                        continue;
+                    }
+
+                    foreach (var protName in matchedProteins)
+                    {
+                        var seqStr = fastaDb.GetProteinSequence(protName);
+                        var oriSeq = new Sequence(seqStr, AminoAcidSet.GetStandardAminoAcidSet());
+
+                        var startIdx = 0;
+                        while (true)
+                        {
+                            var idx = seqStr.IndexOf(tag, startIdx);
+
+                            if (idx < 0)
+                            {
+                                break; //no matching
+                            }
+
+                            //var nClv = (nTerminal) ? idx : seqStr.Length - idx - tag.Length;
+                            var nClv = (nTerminal) ? 2 : 1;
+
+                            for (var j = 0; j < nClv; j++)
+                            {
+                                var flankComposition = (nTerminal)
+                                    ? oriSeq.GetComposition(j, idx)
+                                    : oriSeq.GetComposition(idx + tag.Length, oriSeq.Count - j);
+
+                                var massDiff = (detectedFlankingMass - flankComposition.Mass);
+                                if (massDiff > -500 && massDiff < 2000)
+                                {
+                                    //writer.WriteLine(massDiff);
+                                    writer.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", line, protName, detectedFlankingMass, flankComposition.Mass, massDiff);
+                                }
+
+                                if (massDiff > 2000)
+                                {
+                                    break;
+                                }
+                            }
+
+                            startIdx = idx + tag.Length;
+                        }
+                    }
+                    //var matchedProteinStr = string.Join(",", matchedProteins);
+                    //var massDiffStr = string.Join(",", massDiffList);
+                    //writer.WriteLine("{0}\t{1}\t{2}\t{3}", line, matchedProteins.Length, matchedProteinStr, massDiffStr);
                 }
+
+                Console.WriteLine("{0} seq tags are processed", nReadSeqTag);
                 Console.WriteLine("Done");
             }
         }

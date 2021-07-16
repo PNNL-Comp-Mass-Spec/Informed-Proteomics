@@ -110,25 +110,25 @@ namespace InformedProteomics.Test
                 {
                     var outFileName = outFile.Replace("*", (i + 1).ToString(CultureInfo.InvariantCulture));
                     var ionFrequencies = ionFrequencyFunctions[i].GetProbabilities();
-                    var decoyionFrequencies = decoyionFrequencyFunctions[i].GetProbabilities();
-                    using (var finalOutputFile = new StreamWriter(outFileName))
+                    var decoyIonFrequencies = decoyionFrequencyFunctions[i].GetProbabilities();
+
+                    using var finalOutputFile = new StreamWriter(outFileName);
+
+                    finalOutputFile.Write("Ion\tTarget");
+                    if (_useDecoy)
                     {
-                        finalOutputFile.Write("Ion\tTarget");
+                        finalOutputFile.Write("\tDecoy");
+                    }
+
+                    finalOutputFile.WriteLine();
+                    for (var j = 0; j < ionFrequencies.Length; j++)
+                    {
+                        finalOutputFile.Write("{0}\t{1}", ionFrequencies[j].Label.Name, ionFrequencies[j].Prob);
                         if (_useDecoy)
                         {
-                            finalOutputFile.Write("\tDecoy");
+                            finalOutputFile.Write("\t{0}", decoyIonFrequencies[j]);
                         }
-
                         finalOutputFile.WriteLine();
-                        for (var j = 0; j < ionFrequencies.Length; j++)
-                        {
-                            finalOutputFile.Write("{0}\t{1}", ionFrequencies[j].Label.Name, ionFrequencies[j].Prob);
-                            if (_useDecoy)
-                            {
-                                finalOutputFile.Write("\t{0}", decoyionFrequencies[j]);
-                            }
-                            finalOutputFile.WriteLine();
-                        }
                     }
                 }
             }

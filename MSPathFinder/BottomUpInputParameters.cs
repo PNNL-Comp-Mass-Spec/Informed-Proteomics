@@ -100,26 +100,26 @@ namespace MSPathFinder
             {
                 var outputFilePath = Path.Combine(OutputDir, Path.GetFileNameWithoutExtension(specFilePath) + ParameterFileExtension);
 
-                using (var writer = new StreamWriter(outputFilePath))
+                using var writer = new StreamWriter(outputFilePath);
+
+                writer.WriteLine("SpecFile\t" + Path.GetFileName(specFilePath));
+                writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
+                writer.WriteLine("Enzyme\t" + Enzyme.Name);
+                writer.WriteLine("NumTolerableTermini\t" + NumTolerableTermini);
+                writer.WriteLine("Tda\t" + TdaBool);
+                writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
+                writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
+                writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
+                writer.WriteLine("MaxSequenceLength\t" + MaxSequenceLength);
+                writer.WriteLine("MinPrecursorIonCharge\t" + MinPrecursorIonCharge);
+                writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
+                writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
+                writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
+                writer.WriteLine("MaxDynamicModificationsPerSequence\t" + _maxNumDynModsPerSequence);
+
+                foreach (var searchMod in _searchModifications)
                 {
-                    writer.WriteLine("SpecFile\t" + Path.GetFileName(specFilePath));
-                    writer.WriteLine("DatabaseFile\t" + Path.GetFileName(DatabaseFilePath));
-                    writer.WriteLine("Enzyme\t" + Enzyme.Name);
-                    writer.WriteLine("NumTolerableTermini\t" + NumTolerableTermini);
-                    writer.WriteLine("Tda\t" + TdaBool);
-                    writer.WriteLine("PrecursorIonTolerancePpm\t" + PrecursorIonTolerancePpm);
-                    writer.WriteLine("ProductIonTolerancePpm\t" + ProductIonTolerancePpm);
-                    writer.WriteLine("MinSequenceLength\t" + MinSequenceLength);
-                    writer.WriteLine("MaxSequenceLength\t" + MaxSequenceLength);
-                    writer.WriteLine("MinPrecursorIonCharge\t" + MinPrecursorIonCharge);
-                    writer.WriteLine("MaxPrecursorIonCharge\t" + MaxPrecursorIonCharge);
-                    writer.WriteLine("MinProductIonCharge\t" + MinProductIonCharge);
-                    writer.WriteLine("MaxProductIonCharge\t" + MaxProductIonCharge);
-                    writer.WriteLine("MaxDynamicModificationsPerSequence\t" + _maxNumDynModsPerSequence);
-                    foreach (var searchMod in _searchModifications)
-                    {
-                        writer.WriteLine("Modification\t" + searchMod);
-                    }
+                    writer.WriteLine("Modification\t" + searchMod);
                 }
             }
         }

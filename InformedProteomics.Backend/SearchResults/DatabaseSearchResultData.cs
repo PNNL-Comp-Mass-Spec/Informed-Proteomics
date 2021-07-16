@@ -199,19 +199,18 @@ namespace InformedProteomics.Backend.SearchResults
                 outputFile.Directory.Create();
             }
 
-            using (var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read)), CultureInfo.InvariantCulture))
+            using var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read)), CultureInfo.InvariantCulture);
+
+            SetCsvWriterConfig(tsv.Configuration);
+            if (includeTdaScores)
             {
-                SetCsvWriterConfig(tsv.Configuration);
-                if (includeTdaScores)
-                {
-                    tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
-                }
-                else
-                {
-                    tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataMap>();
-                }
-                tsv.WriteRecords(resultData);
+                tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
             }
+            else
+            {
+                tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataMap>();
+            }
+            tsv.WriteRecords(resultData);
         }
 
         /// <summary>
@@ -222,36 +221,34 @@ namespace InformedProteomics.Backend.SearchResults
         public static List<DatabaseSearchResultData> ReadResultsFromFile(string filePath)
         {
             List<DatabaseSearchResultData> results;
-            using (var stream = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)))
+
+            using var stream = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+            // check for QValue header, to determine the mapping used for reading
+            var hasTda = false;
+            var line = stream.ReadLine();
+            if (!string.IsNullOrWhiteSpace(line) && line.IndexOf("QValue", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                // check for QValue header, to determine the mapping used for reading
-                var hasTda = false;
-                var line = stream.ReadLine();
-                if (!string.IsNullOrWhiteSpace(line) && line.IndexOf("QValue", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    hasTda = true;
-                }
-                stream.BaseStream.Seek(0, SeekOrigin.Begin);
-                stream.DiscardBufferedData();
-                using (var tsv = new CsvReader(stream, CultureInfo.InvariantCulture))
-                {
-                    SetCsvReaderConfig(tsv.Configuration);
-                    if (hasTda)
-                    {
-                        tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
-                    }
-                    else
-                    {
-                        tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataMap>();
-                    }
-                    results = tsv.GetRecords<DatabaseSearchResultData>().ToList();
-                }
+                hasTda = true;
             }
-            if (results.Count == 0)
+            
+            stream.BaseStream.Seek(0, SeekOrigin.Begin);
+            stream.DiscardBufferedData();
+
+            using var tsv = new CsvReader(stream, CultureInfo.InvariantCulture);
+
+            SetCsvReaderConfig(tsv.Configuration);
+            if (hasTda)
             {
-                return null;
+                tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
             }
-            return results;
+            else
+            {
+                tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataMap>();
+            }
+            results = tsv.GetRecords<DatabaseSearchResultData>().ToList();
+
+            return results.Count == 0 ? null : results;
         }
 
         private static void SetCsvReaderConfig(IReaderConfiguration config)

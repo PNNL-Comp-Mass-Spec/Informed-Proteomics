@@ -222,49 +222,48 @@ namespace InformedProteomics.Backend.Utils
 
             var headerParsed = false;
 
-            using (var reader = new StreamReader(new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+            using var reader = new StreamReader(new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+            while (!reader.EndOfStream)
             {
-                while (!reader.EndOfStream)
+                var line = reader.ReadLine();
+                if (string.IsNullOrWhiteSpace(line))
                 {
-                    var line = reader.ReadLine();
-                    if (string.IsNullOrWhiteSpace(line))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var token = line.Split(_delimiter);
-                    if (!headerParsed)
-                    {
-                        for (var i = 0; i < token.Length; i++)
-                        {
-                            if (_data.ContainsKey(token[i]))
-                            {
-                                ConsoleMsgUtils.ShowWarning("Warning: header line has duplicate column names; ignoring duplicate " + token[i]);
-                                continue;
-                            }
-                            _header.Add(i, token[i]);
-                            _data[token[i]] = new List<string>();
-                        }
-                        headerParsed = true;
-                        continue;
-                    }
-
-                    if (token.Length > _header.Count)
-                    {
-                        continue;
-                    }
-
+                var token = line.Split(_delimiter);
+                if (!headerParsed)
+                {
                     for (var i = 0; i < token.Length; i++)
                     {
-                        if (!_header.ContainsKey(i))
+                        if (_data.ContainsKey(token[i]))
                         {
+                            ConsoleMsgUtils.ShowWarning("Warning: header line has duplicate column names; ignoring duplicate " + token[i]);
                             continue;
                         }
-
-                        _data[_header[i]].Add(token[i]);
+                        _header.Add(i, token[i]);
+                        _data[token[i]] = new List<string>();
                     }
-                    _rows.Add(line);
+                    headerParsed = true;
+                    continue;
                 }
+
+                if (token.Length > _header.Count)
+                {
+                    continue;
+                }
+
+                for (var i = 0; i < token.Length; i++)
+                {
+                    if (!_header.ContainsKey(i))
+                    {
+                        continue;
+                    }
+
+                    _data[_header[i]].Add(token[i]);
+                }
+                _rows.Add(line);
             }
         }
     }

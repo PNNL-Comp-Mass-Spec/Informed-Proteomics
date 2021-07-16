@@ -217,11 +217,10 @@ namespace InformedProteomics.TopDown.Scoring
 
         public void WriteToFile(string outputFilePath)
         {
-            using (var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create)))
-            {
-                writer.Write(_minProductCharge);
-                writer.Write(_maxProductCharge);
-            }
+            using var writer = new BinaryWriter(File.Open(outputFilePath, FileMode.Create));
+
+            writer.Write(_minProductCharge);
+            writer.Write(_maxProductCharge);
         }
 
         private readonly ConcurrentDictionary<int, IScorer> _ms2Scorer;    // scan number -> scorer
