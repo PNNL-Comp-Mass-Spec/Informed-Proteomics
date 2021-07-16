@@ -128,8 +128,7 @@ namespace InformedProteomics.Tests.DevTests
             {
                 var precursorMz = precursorMzs[i];
                 var charge = charges[i];
-                var nominalMass = (int)Math.Round(((precursorMz - Constants.Proton) * charge - Composition.H2O.Mass) *
-                                                  Constants.RescalingConstant);
+                var nominalMass = (int)Math.Round(((precursorMz - Constants.Proton) * charge - Composition.H2O.Mass) * Constants.RescalingConstant);
 
                 var pepKey = peptides2[i] + ":" + nominalMass;
                 if (!pepKeySet.Contains(pepKey))

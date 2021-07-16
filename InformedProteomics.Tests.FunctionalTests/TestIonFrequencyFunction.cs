@@ -151,7 +151,7 @@ namespace InformedProteomics.Tests.FunctionalTests
             for (var i = 0; i < MaxPrecCharge; i++)
             {
                 var chargeOutName = IonProbabilityFileName + "_Charge" + (i + 1) + ".txt";
-                
+
                 using var ionProbOut = new StreamWriter(chargeOutName);
 
                 ionProbOut.WriteLine("Ion\tProbability");

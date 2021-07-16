@@ -231,7 +231,7 @@ namespace InformedProteomics.Backend.SearchResults
             {
                 hasTda = true;
             }
-            
+
             stream.BaseStream.Seek(0, SeekOrigin.Begin);
             stream.DiscardBufferedData();
 
