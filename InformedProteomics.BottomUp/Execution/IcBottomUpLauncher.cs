@@ -329,18 +329,13 @@ namespace InformedProteomics.BottomUp.Execution
         private IEnumerable<AnnotationAndOffset> GetAnnotationsAndOffsets(FastaDatabase database)
         {
             var indexedDbTarget = new IndexedDatabase(database);
-            IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
+
             if (NumTolerableTermini == 0)
             {
-                annotationsAndOffsets = indexedDbTarget.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
-            }
-            else
-            {
-                annotationsAndOffsets = indexedDbTarget.AnnotationsAndOffsets(MinSequenceLength, MaxSequenceLength,
-                    NumTolerableTermini, 2, Enzyme);
+                return indexedDbTarget.AnnotationsAndOffsetsNoEnzyme(MinSequenceLength, MaxSequenceLength);
             }
 
-            return annotationsAndOffsets;
+            return indexedDbTarget.AnnotationsAndOffsets(MinSequenceLength, MaxSequenceLength, NumTolerableTermini, 2, Enzyme);
         }
 
         private SortedSet<DatabaseSequenceSpectrumMatch>[] RunSearch(IEnumerable<AnnotationAndOffset> annotationsAndOffsets, ISequenceFilter ms1Filter, bool isDecoy)

@@ -507,24 +507,18 @@ namespace InformedProteomics.TopDown.Execution
                 Options.MinSequenceLength, Options.MaxSequenceLength,
                 Options.MaxNumNTermCleavages, Options.MaxNumCTermCleavages);
 
-            IEnumerable<AnnotationAndOffset> annotationsAndOffsets;
-            if (Options.InternalCleavageMode == InternalCleavageType.MultipleInternalCleavages)
+            return Options.InternalCleavageMode switch
             {
-                annotationsAndOffsets = indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(
-                    Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumThreads, cancellationToken);
-            }
-            else if (Options.InternalCleavageMode == InternalCleavageType.NoInternalCleavage)
-            {
-                annotationsAndOffsets = indexedDb.IntactSequenceAnnotationsAndOffsets(
-                    Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumCTermCleavages);
-            }
-            else
-            {
-                annotationsAndOffsets = indexedDb.SequenceAnnotationsAndOffsetsWithNTermOrCTermCleavageNoLargerThan(
-                    Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumNTermCleavages, Options.MaxNumCTermCleavages);
-            }
-
-            return annotationsAndOffsets;
+                InternalCleavageType.MultipleInternalCleavages =>
+                    indexedDb.AnnotationsAndOffsetsNoEnzymeParallel(
+                        Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumThreads, cancellationToken),
+                InternalCleavageType.NoInternalCleavage =>
+                    indexedDb.IntactSequenceAnnotationsAndOffsets(
+                        Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumCTermCleavages),
+                _ =>
+                    indexedDb.SequenceAnnotationsAndOffsetsWithNTermOrCTermCleavageNoLargerThan(
+                        Options.MinSequenceLength, Options.MaxSequenceLength, Options.MaxNumNTermCleavages, Options.MaxNumCTermCleavages)
+            };
         }
 
         private void RunTagBasedSearch(

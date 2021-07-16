@@ -23,8 +23,6 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
         public List<ProteinSpectrumMatch> LoadIdentificationResult(string path, ProteinSpectrumMatch.SearchTool tool = ProteinSpectrumMatch.SearchTool.Unknown, int maxPrsm = int.MaxValue)
         {
-            List<ProteinSpectrumMatch> prsmList = null;
-
             if (tool == ProteinSpectrumMatch.SearchTool.Unknown)
             {
                 if (path.EndsWith("IcTda.tsv", StringComparison.OrdinalIgnoreCase))
@@ -46,20 +44,13 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
                 // ReSharper restore StringLiteralTypo
             }
 
-            if (tool == ProteinSpectrumMatch.SearchTool.MsAlign)
+            return tool switch
             {
-                prsmList = ReadMsAlignResult(path, maxPrsm);
-            }
-            else if (tool == ProteinSpectrumMatch.SearchTool.MsPathFinder)
-            {
-                prsmList = ReadMsPathFinderResult(path, maxPrsm);
-            }
-            else if (tool == ProteinSpectrumMatch.SearchTool.MsGfPlus)
-            {
-                prsmList = ReadMsGfPlusResult(path, maxPrsm);
-            }
-
-            return prsmList;
+                ProteinSpectrumMatch.SearchTool.MsAlign => ReadMsAlignResult(path, maxPrsm),
+                ProteinSpectrumMatch.SearchTool.MsPathFinder => ReadMsPathFinderResult(path, maxPrsm),
+                ProteinSpectrumMatch.SearchTool.MsGfPlus => ReadMsGfPlusResult(path, maxPrsm),
+                _ => null
+            };
         }
 
         public List<ProteinSpectrumMatch> ReadMsAlignResult(string msAlignResultTablePath, int maxPrsm)

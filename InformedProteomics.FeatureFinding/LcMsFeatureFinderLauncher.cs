@@ -56,25 +56,20 @@ namespace InformedProteomics.FeatureFinding
             }
 
             var attr = File.GetAttributes(Parameters.InputPath ?? string.Empty);
-            int errorCode;
 
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory &&
                 !MassSpecDataReaderFactory.IsADirectoryDataset(Parameters.InputPath))
             {
-                errorCode = ProcessDirectory(Parameters.InputPath);
+                return ProcessDirectory(Parameters.InputPath);
             }
-            else
+
+            if (!MsPbfFile(Parameters.InputPath) && !MsRawFile(Parameters.InputPath))
             {
-                if (!MsPbfFile(Parameters.InputPath) && !MsRawFile(Parameters.InputPath))
-                {
-                    ShowErrorMessage("File extension not supported, " + Parameters.InputPath);
-                    return -1;
-                }
-
-                errorCode = ProcessFile(Parameters.InputPath);
+                ShowErrorMessage("File extension not supported, " + Parameters.InputPath);
+                return -1;
             }
 
-            return errorCode;
+            return ProcessFile(Parameters.InputPath);
         }
 
         public static string GetHeaderString(bool scoreReport = false)
