@@ -90,6 +90,7 @@ Source: ProMexAlign\bin\Release\ProMexAlign.exe.config                          
 
 Source: README.md                                                                            ; DestDir: {app}; DestName: "Readme.md"
 
+Source: Example_Files\Example_CommandLineArguments.txt                                       ; DestDir: {app}
 Source: Example_Files\Mod_Examples.txt                                                       ; DestDir: {app}
 Source: Example_Files\MSPathFinder_Mods.txt                                                  ; DestDir: {app}
 Source: Example_Files\MSPathFinder_Mods_Phospho.txt                                          ; DestDir: {app}
@@ -100,7 +101,6 @@ Source: Example_Files\MSPF_MetOx_STYPhos_LysMethDiMethTriMeth_NTermAcet_CysTriOx
 Source: Example_Files\MSPF_STYPhos_CysDehydro_NTermAcet_SingleInternalCleavage_ReportTop2.txt                     ; DestDir: {app}
 Source: Example_Files\MSPF_STYPhos_CysDehydro_NTermAcet_SingleInternalCleavage_ReportTop3.txt                     ; DestDir: {app}
 Source: Example_Files\MSPF_CysDehydro_LysMethDiMethTriMeth_NTermAcet_SingleInternalCleavage.txt                   ; DestDir: {app}
-
 
 [Dirs]
 Name: {commonappdata}\Informed-Proteomics; Flags: uninsalwaysuninstall
