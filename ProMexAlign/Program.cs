@@ -123,7 +123,7 @@ namespace PromexAlign
 
                 var outputFilePath = Path.Combine(workingDirectoryPath, string.Format("{0}_crosstab.tsv", baseName));
 
-                var nDataset = datasets.Count;
+                var datasetsWithoutSpectraData = new List<DatasetInfo>();
                 var prsmReader = new ProteinSpectrumMatchReader();
                 var tolerance = new Tolerance(100);
                 var alignment = new LcMsFeatureAlignment(new CompRefFeatureComparer(tolerance));
@@ -185,7 +185,7 @@ namespace PromexAlign
                 Console.WriteLine("{0} alignments ", alignment.CountAlignedFeatures);
 
                 var validResults = 0;
-                for (var datasetIndex = 0; datasetIndex < nDataset; datasetIndex++)
+                for (var datasetIndex = 0; datasetIndex < datasetCount; datasetIndex++)
                 {
                     if (datasetIndex >= alignment.CountDatasets)
                     {
