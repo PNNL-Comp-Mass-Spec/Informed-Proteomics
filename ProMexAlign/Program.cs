@@ -9,6 +9,7 @@ using InformedProteomics.FeatureFinding.Data;
 using InformedProteomics.FeatureFinding.SpectrumMatching;
 using MathNet.Numerics.Statistics;
 using PRISM;
+using ProMexAlign;
 
 namespace PromexAlign
 {
@@ -124,6 +125,10 @@ namespace PromexAlign
                 var outputFilePath = Path.Combine(workingDirectoryPath, string.Format("{0}_crosstab.tsv", baseName));
 
                 var datasetsWithoutSpectraData = new List<DatasetInfo>();
+                var featureCountByDataset = new Dictionary<DatasetInfo, int>();
+
+                var datasetCount = datasets.Count;
+
                 var prsmReader = new ProteinSpectrumMatchReader();
                 var tolerance = new Tolerance(100);
                 var alignment = new LcMsFeatureAlignment(new CompRefFeatureComparer(tolerance));
@@ -135,9 +140,7 @@ namespace PromexAlign
                 {
                     Console.WriteLine();
 
-                    var datasetFile = FindInputFile(workingDirectoryPath, dataset.RawFilePath, "Instrument file");
-                    if (datasetFile == null)
-                        continue;
+                    var datasetFile = FindInputFile(workingDirectoryPath, dataset.RawFilePath, "Instrument file", true);
 
                     var featuresFile = FindInputFile(workingDirectoryPath, dataset.Ms1FtFilePath, "ProMex results file");
                     if (featuresFile == null)
@@ -145,8 +148,19 @@ namespace PromexAlign
 
                     var prsmFile = FindInputFile(workingDirectoryPath, dataset.MsPfIdFilePath, "MSPathFinder results file", true);
 
-                    Console.WriteLine("Opening {0}", PathUtils.CompactPathString(datasetFile.FullName, 80));
-                    var run = PbfLcMsRun.GetLcMsRun(datasetFile.FullName, 0, 0);
+                    LcMsRun run;
+                    if (datasetFile == null)
+                    {
+                        ConsoleMsgUtils.ShowWarning("Instrument file not found: {0}\nWill align ProMex features but cannot add missing features found in other datasets", dataset.RawFilePath);
+
+                        run = new VirtualLcMsRun(Path.GetFileName(dataset.RawFilePath));
+                        datasetsWithoutSpectraData.Add(dataset);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Opening {0}", PathUtils.CompactPathString(datasetFile.FullName, 80));
+                        run = PbfLcMsRun.GetLcMsRun(datasetFile.FullName, 0, 0);
+                    }
 
                     Console.WriteLine("Opening {0}", PathUtils.CompactPathString(featuresFile.FullName, 80));
                     var features = LcMsFeatureAlignment.LoadProMexResult(dataId++, featuresFile.FullName, run);
@@ -177,6 +191,8 @@ namespace PromexAlign
                     }
 
                     alignment.AddDataSet(dataId, features, run);
+
+                    featureCountByDataset.Add(dataset, features.Count);
                 }
 
                 alignment.AlignFeatures();
@@ -187,14 +203,25 @@ namespace PromexAlign
                 var validResults = 0;
                 for (var datasetIndex = 0; datasetIndex < datasetCount; datasetIndex++)
                 {
+                    var dataset = datasets[datasetIndex];
+
                     if (datasetIndex >= alignment.CountDatasets)
                     {
-                        ConsoleMsgUtils.ShowWarning("Could not align {0}; features not found", datasets[datasetIndex].Label);
+                        ConsoleMsgUtils.ShowWarning("Could not align {0}; features not found", dataset.Label);
+                        continue;
+                    }
+
+                    if (datasetsWithoutSpectraData.Contains(dataset))
+                    {
+                        var featureCount = featureCountByDataset[dataset];
+                        if (featureCount > 0)
+                            validResults++;
+
                         continue;
                     }
 
                     Console.WriteLine();
-                    Console.WriteLine("Processing {0}", datasets[datasetIndex].Label);
+                    Console.WriteLine("Processing {0}", dataset.Label);
 
                     alignment.FillMissingFeatures(datasetIndex);
                     validResults++;
