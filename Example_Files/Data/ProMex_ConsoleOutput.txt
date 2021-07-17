@@ -1,0 +1,176 @@
+ProMex.exe -i F:\DMS_WorkDir6\QC_SHEW_Intact_100ng_Elite_Run8_190502121701.pbf  -minCharge 2 -maxCharge 60 -minMass 2000 -maxMass 50000 -score n -csv n -maxThreads 0
+--------------------------------------------------------------------------------
+************ ProMex version 1.0.7030 (April 1, 2019) ************
+InputPath    F:\DMS_WorkDir6\QC_SHEW_Intact_100ng_Elite_Run8_190502121701.pbf
+OutputPath   
+MinMass       2,000 Da
+MaxMass      50,000 Da
+MinCharge     2
+MaxCharge    60
+FeatureMap   True
+ScoreReport  False
+LikelihoodRatioThreshold -10
+MaxThreads   8
+Start loading MS1 data from F:\DMS_WorkDir6\QC_SHEW_Intact_100ng_Elite_Run8_190502121701.pbf
+Caching peaks in MS1 spectra: 500 scans
+Sorting MS1 peaks: 1,782,228 peaks
+Complete loading MS1 data. Elapsed Time = 3.034 sec
+Start MS1 feature extraction.
+Processing 0.7% of mass bins (2031.3 Da); elapsed time = 3.136 sec; # of features = 0
+Processing 1.3% of mass bins (2077.1 Da); elapsed time = 3.423 sec; # of features = 1
+Processing 2.0% of mass bins (2139.6 Da); elapsed time = 3.715 sec; # of features = 3
+Processing 2.7% of mass bins (2202.1 Da); elapsed time = 4.005 sec; # of features = 4
+Processing 3.3% of mass bins (2264.6 Da); elapsed time = 4.304 sec; # of features = 6
+Processing 4.0% of mass bins (2327.1 Da); elapsed time = 4.590 sec; # of features = 11
+Processing 4.7% of mass bins (2389.6 Da); elapsed time = 4.883 sec; # of features = 18
+Processing 5.3% of mass bins (2452.1 Da); elapsed time = 5.167 sec; # of features = 22
+Processing 6.0% of mass bins (2514.6 Da); elapsed time = 5.441 sec; # of features = 23
+Processing 6.7% of mass bins (2577.1 Da); elapsed time = 5.728 sec; # of features = 39
+Processing 7.3% of mass bins (2639.6 Da); elapsed time = 6.014 sec; # of features = 43
+Processing 8.0% of mass bins (2702.1 Da); elapsed time = 6.292 sec; # of features = 54
+Processing 8.7% of mass bins (2764.6 Da); elapsed time = 6.569 sec; # of features = 63
+Processing 9.3% of mass bins (2827.1 Da); elapsed time = 6.851 sec; # of features = 67
+Processing 10.0% of mass bins (2889.6 Da); elapsed time = 7.139 sec; # of features = 78
+Processing 10.7% of mass bins (2952.1 Da); elapsed time = 7.433 sec; # of features = 83
+Processing 11.3% of mass bins (3014.6 Da); elapsed time = 7.739 sec; # of features = 85
+Processing 12.0% of mass bins (3077.1 Da); elapsed time = 8.043 sec; # of features = 106
+Processing 12.7% of mass bins (3139.6 Da); elapsed time = 8.346 sec; # of features = 124
+Processing 13.3% of mass bins (3202.1 Da); elapsed time = 8.664 sec; # of features = 157
+Processing 14.0% of mass bins (3264.6 Da); elapsed time = 8.947 sec; # of features = 165
+Processing 14.7% of mass bins (3327.1 Da); elapsed time = 9.232 sec; # of features = 172
+Processing 15.3% of mass bins (3389.6 Da); elapsed time = 9.518 sec; # of features = 176
+Processing 16.0% of mass bins (3452.1 Da); elapsed time = 9.821 sec; # of features = 192
+Processing 16.7% of mass bins (3514.6 Da); elapsed time = 10.106 sec; # of features = 196
+Processing 17.4% of mass bins (3577.1 Da); elapsed time = 10.390 sec; # of features = 214
+Processing 18.0% of mass bins (3639.6 Da); elapsed time = 10.660 sec; # of features = 223
+Processing 18.7% of mass bins (3702.1 Da); elapsed time = 10.928 sec; # of features = 241
+Processing 19.4% of mass bins (3764.6 Da); elapsed time = 11.195 sec; # of features = 249
+Processing 20.0% of mass bins (3827.1 Da); elapsed time = 11.487 sec; # of features = 263
+Processing 20.7% of mass bins (3889.6 Da); elapsed time = 11.787 sec; # of features = 280
+Processing 21.4% of mass bins (3952.1 Da); elapsed time = 12.095 sec; # of features = 304
+Processing 22.0% of mass bins (4014.6 Da); elapsed time = 12.384 sec; # of features = 311
+Processing 22.7% of mass bins (4077.1 Da); elapsed time = 12.646 sec; # of features = 318
+Processing 23.4% of mass bins (4183.1 Da); elapsed time = 12.964 sec; # of features = 360
+Processing 24.0% of mass bins (4308.1 Da); elapsed time = 13.300 sec; # of features = 397
+Processing 24.7% of mass bins (4433.1 Da); elapsed time = 13.641 sec; # of features = 408
+Processing 25.4% of mass bins (4558.1 Da); elapsed time = 13.972 sec; # of features = 426
+Processing 26.0% of mass bins (4683.1 Da); elapsed time = 14.307 sec; # of features = 459
+Processing 26.7% of mass bins (4808.1 Da); elapsed time = 14.687 sec; # of features = 532
+Processing 27.4% of mass bins (4933.1 Da); elapsed time = 15.034 sec; # of features = 574
+Processing 28.0% of mass bins (5058.1 Da); elapsed time = 15.370 sec; # of features = 592
+Processing 28.7% of mass bins (5183.1 Da); elapsed time = 15.729 sec; # of features = 628
+Processing 29.4% of mass bins (5308.1 Da); elapsed time = 16.128 sec; # of features = 644
+Processing 30.0% of mass bins (5433.1 Da); elapsed time = 16.491 sec; # of features = 680
+Processing 30.7% of mass bins (5558.1 Da); elapsed time = 16.882 sec; # of features = 711
+Processing 31.4% of mass bins (5683.1 Da); elapsed time = 17.319 sec; # of features = 734
+Processing 32.0% of mass bins (5808.1 Da); elapsed time = 17.710 sec; # of features = 756
+Processing 32.7% of mass bins (5933.1 Da); elapsed time = 18.155 sec; # of features = 790
+Processing 33.4% of mass bins (6058.1 Da); elapsed time = 18.561 sec; # of features = 810
+Processing 34.0% of mass bins (6183.1 Da); elapsed time = 18.977 sec; # of features = 820
+Processing 34.7% of mass bins (6308.1 Da); elapsed time = 19.416 sec; # of features = 851
+Processing 35.4% of mass bins (6433.1 Da); elapsed time = 19.822 sec; # of features = 886
+Processing 36.0% of mass bins (6558.1 Da); elapsed time = 20.263 sec; # of features = 917
+Processing 36.7% of mass bins (6683.1 Da); elapsed time = 20.679 sec; # of features = 931
+Processing 37.4% of mass bins (6808.1 Da); elapsed time = 21.131 sec; # of features = 938
+Processing 38.0% of mass bins (6933.1 Da); elapsed time = 21.568 sec; # of features = 953
+Processing 38.7% of mass bins (7058.1 Da); elapsed time = 22.029 sec; # of features = 961
+Processing 39.4% of mass bins (7183.1 Da); elapsed time = 22.516 sec; # of features = 979
+Processing 40.0% of mass bins (7308.1 Da); elapsed time = 22.999 sec; # of features = 991
+Processing 40.7% of mass bins (7433.1 Da); elapsed time = 23.485 sec; # of features = 1027
+Processing 41.4% of mass bins (7558.1 Da); elapsed time = 23.982 sec; # of features = 1039
+Processing 42.0% of mass bins (7683.1 Da); elapsed time = 24.516 sec; # of features = 1069
+Processing 42.7% of mass bins (7808.1 Da); elapsed time = 25.071 sec; # of features = 1102
+Processing 43.4% of mass bins (7933.1 Da); elapsed time = 25.553 sec; # of features = 1108
+Processing 44.0% of mass bins (8058.1 Da); elapsed time = 26.017 sec; # of features = 1116
+Processing 44.7% of mass bins (8183.1 Da); elapsed time = 26.455 sec; # of features = 1127
+Processing 45.4% of mass bins (8424.3 Da); elapsed time = 27.052 sec; # of features = 1212
+Processing 46.0% of mass bins (8674.3 Da); elapsed time = 27.626 sec; # of features = 1247
+Processing 46.7% of mass bins (8924.3 Da); elapsed time = 28.220 sec; # of features = 1262
+Processing 47.4% of mass bins (9174.3 Da); elapsed time = 28.782 sec; # of features = 1279
+Processing 48.1% of mass bins (9424.3 Da); elapsed time = 29.395 sec; # of features = 1309
+Processing 48.7% of mass bins (9674.3 Da); elapsed time = 30.113 sec; # of features = 1391
+Processing 49.4% of mass bins (9924.3 Da); elapsed time = 30.747 sec; # of features = 1457
+Processing 50.1% of mass bins (10174.3 Da); elapsed time = 31.396 sec; # of features = 1485
+Processing 50.7% of mass bins (10424.3 Da); elapsed time = 32.019 sec; # of features = 1509
+Processing 51.4% of mass bins (10674.3 Da); elapsed time = 32.653 sec; # of features = 1520
+Processing 52.1% of mass bins (10924.3 Da); elapsed time = 33.395 sec; # of features = 1533
+Processing 52.7% of mass bins (11174.3 Da); elapsed time = 34.113 sec; # of features = 1534
+Processing 53.4% of mass bins (11424.3 Da); elapsed time = 34.780 sec; # of features = 1545
+Processing 54.1% of mass bins (11674.3 Da); elapsed time = 35.581 sec; # of features = 1563
+Processing 54.7% of mass bins (11924.3 Da); elapsed time = 36.447 sec; # of features = 1633
+Processing 55.4% of mass bins (12174.3 Da); elapsed time = 37.286 sec; # of features = 1683
+Processing 56.1% of mass bins (12424.3 Da); elapsed time = 38.151 sec; # of features = 1720
+Processing 56.7% of mass bins (12674.3 Da); elapsed time = 38.986 sec; # of features = 1737
+Processing 57.4% of mass bins (12924.3 Da); elapsed time = 39.889 sec; # of features = 1760
+Processing 58.1% of mass bins (13174.3 Da); elapsed time = 40.770 sec; # of features = 1794
+Processing 58.7% of mass bins (13424.3 Da); elapsed time = 41.685 sec; # of features = 1828
+Processing 59.4% of mass bins (13674.3 Da); elapsed time = 42.595 sec; # of features = 1853
+Processing 60.1% of mass bins (13924.3 Da); elapsed time = 43.503 sec; # of features = 1884
+Processing 60.7% of mass bins (14174.3 Da); elapsed time = 44.384 sec; # of features = 1886
+Processing 61.4% of mass bins (14424.3 Da); elapsed time = 45.285 sec; # of features = 1889
+Processing 62.1% of mass bins (14674.3 Da); elapsed time = 46.243 sec; # of features = 1889
+Processing 62.7% of mass bins (14924.3 Da); elapsed time = 47.189 sec; # of features = 1889
+Processing 63.4% of mass bins (15174.3 Da); elapsed time = 48.120 sec; # of features = 1891
+Processing 64.1% of mass bins (15424.3 Da); elapsed time = 49.071 sec; # of features = 1892
+Processing 64.7% of mass bins (15674.3 Da); elapsed time = 50.147 sec; # of features = 1901
+Processing 65.4% of mass bins (15924.3 Da); elapsed time = 51.174 sec; # of features = 1905
+Processing 66.1% of mass bins (16174.3 Da); elapsed time = 52.209 sec; # of features = 1911
+Processing 66.7% of mass bins (16464.5 Da); elapsed time = 53.238 sec; # of features = 1915
+Processing 67.4% of mass bins (16964.5 Da); elapsed time = 54.586 sec; # of features = 1950
+Processing 68.1% of mass bins (17464.5 Da); elapsed time = 55.914 sec; # of features = 1959
+Processing 68.7% of mass bins (17964.5 Da); elapsed time = 57.419 sec; # of features = 1963
+Processing 69.4% of mass bins (18464.5 Da); elapsed time = 58.945 sec; # of features = 1968
+Processing 70.1% of mass bins (18964.5 Da); elapsed time = 60.485 sec; # of features = 1968
+Processing 70.7% of mass bins (19464.5 Da); elapsed time = 62.067 sec; # of features = 1969
+Processing 71.4% of mass bins (19964.5 Da); elapsed time = 63.849 sec; # of features = 1983
+Processing 72.1% of mass bins (20464.5 Da); elapsed time = 65.660 sec; # of features = 1989
+Processing 72.7% of mass bins (20964.5 Da); elapsed time = 67.365 sec; # of features = 1989
+Processing 73.4% of mass bins (21464.5 Da); elapsed time = 69.115 sec; # of features = 1992
+Processing 74.1% of mass bins (21964.5 Da); elapsed time = 70.902 sec; # of features = 1997
+Processing 74.7% of mass bins (22464.5 Da); elapsed time = 72.842 sec; # of features = 2003
+Processing 75.4% of mass bins (22964.5 Da); elapsed time = 74.837 sec; # of features = 2003
+Processing 76.1% of mass bins (23464.5 Da); elapsed time = 76.903 sec; # of features = 2024
+Processing 76.7% of mass bins (23964.5 Da); elapsed time = 79.230 sec; # of features = 2024
+Processing 77.4% of mass bins (24464.5 Da); elapsed time = 81.546 sec; # of features = 2041
+Processing 78.1% of mass bins (24964.5 Da); elapsed time = 84.065 sec; # of features = 2043
+Processing 78.8% of mass bins (25464.5 Da); elapsed time = 85.922 sec; # of features = 2045
+Processing 79.4% of mass bins (25964.5 Da); elapsed time = 87.746 sec; # of features = 2046
+Processing 80.1% of mass bins (26464.5 Da); elapsed time = 89.669 sec; # of features = 2048
+Processing 80.8% of mass bins (26964.5 Da); elapsed time = 91.722 sec; # of features = 2048
+Processing 81.4% of mass bins (27464.5 Da); elapsed time = 93.813 sec; # of features = 2051
+Processing 82.1% of mass bins (27964.5 Da); elapsed time = 95.956 sec; # of features = 2051
+Processing 82.8% of mass bins (28464.5 Da); elapsed time = 98.182 sec; # of features = 2052
+Processing 83.4% of mass bins (28964.5 Da); elapsed time = 100.480 sec; # of features = 2053
+Processing 84.1% of mass bins (29464.5 Da); elapsed time = 103.021 sec; # of features = 2053
+Processing 84.8% of mass bins (29964.5 Da); elapsed time = 105.352 sec; # of features = 2054
+Processing 85.4% of mass bins (30464.5 Da); elapsed time = 107.747 sec; # of features = 2054
+Processing 86.1% of mass bins (30964.5 Da); elapsed time = 110.309 sec; # of features = 2054
+Processing 86.8% of mass bins (31464.5 Da); elapsed time = 112.750 sec; # of features = 2054
+Processing 87.4% of mass bins (31964.5 Da); elapsed time = 115.626 sec; # of features = 2054
+Processing 88.1% of mass bins (32464.5 Da); elapsed time = 118.397 sec; # of features = 2054
+Processing 88.8% of mass bins (33161.0 Da); elapsed time = 121.645 sec; # of features = 2054
+Processing 89.4% of mass bins (34161.0 Da); elapsed time = 125.368 sec; # of features = 2054
+Processing 90.1% of mass bins (35161.0 Da); elapsed time = 129.224 sec; # of features = 2054
+Processing 90.8% of mass bins (36161.0 Da); elapsed time = 133.702 sec; # of features = 2054
+Processing 91.4% of mass bins (37161.0 Da); elapsed time = 138.336 sec; # of features = 2054
+Processing 92.1% of mass bins (38161.0 Da); elapsed time = 143.275 sec; # of features = 2054
+Processing 92.8% of mass bins (39161.0 Da); elapsed time = 148.207 sec; # of features = 2054
+Processing 93.4% of mass bins (40161.0 Da); elapsed time = 153.434 sec; # of features = 2054
+Processing 94.1% of mass bins (41161.0 Da); elapsed time = 158.625 sec; # of features = 2054
+Processing 94.8% of mass bins (42161.0 Da); elapsed time = 164.198 sec; # of features = 2054
+Processing 95.4% of mass bins (43161.0 Da); elapsed time = 169.716 sec; # of features = 2054
+Processing 96.1% of mass bins (44161.0 Da); elapsed time = 175.625 sec; # of features = 2054
+Processing 96.8% of mass bins (45161.0 Da); elapsed time = 181.651 sec; # of features = 2054
+Processing 97.4% of mass bins (46161.0 Da); elapsed time = 188.415 sec; # of features = 2054
+Processing 98.1% of mass bins (47161.0 Da); elapsed time = 194.894 sec; # of features = 2054
+Processing 98.8% of mass bins (48161.0 Da); elapsed time = 201.348 sec; # of features = 2054
+Processing 99.4% of mass bins (49161.0 Da); elapsed time = 207.826 sec; # of features = 2054
+Complete MS1 feature extraction.
+ - Elapsed time = 213.562 sec
+ - Number of extracted features = 2054
+Start selecting mutually independent features from feature network graph
+Complete feature filtration
+ - Elapsed time = 0.706 sec
+ - Number of filtered features = 1438
+ - ProMex output: F:\DMS_WorkDir6\QC_SHEW_Intact_100ng_Elite_Run8_190502121701.ms1ft
+ - Feature map image output: F:\DMS_WorkDir6\QC_SHEW_Intact_100ng_Elite_Run8_190502121701_ms1ft.png

@@ -1,0 +1,17 @@
+# Charge range to consider
+MinCharge=2
+MaxCharge=60
+
+# Mass range to consider
+MinMass=2000
+MaxMass=50000
+
+# Score option
+# Set to "y" to include additional scores in the result file
+Score=n
+
+# Option to create a DeconTools compatible CSV file
+Csv=n
+
+# Maximum number of threads (0 means use all)
+MaxThreads=0
