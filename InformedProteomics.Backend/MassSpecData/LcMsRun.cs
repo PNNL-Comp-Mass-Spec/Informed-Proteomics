@@ -674,7 +674,7 @@ namespace InformedProteomics.Backend.MassSpecData
         public int[] GetFragmentationSpectraScanNums(double mostAbundantIsotopeMz)
         {
             var targetIsoBin = (int)Math.Round(mostAbundantIsotopeMz * IsolationWindowBinningFactor);
-            return IsolationMzBinToScanNums.TryGetValue(targetIsoBin, out var scanNums) ? scanNums : new int[0];
+            return IsolationMzBinToScanNums.TryGetValue(targetIsoBin, out var scanNums) ? scanNums : Array.Empty<int>();
         }
 
         //public IEnumerable<int> GetMs2ScansForPrecursorMz(double precursorMz)

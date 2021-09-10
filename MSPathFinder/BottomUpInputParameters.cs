@@ -173,7 +173,7 @@ namespace MSPathFinder
             else
             {
                 AminoAcidSet = new AminoAcidSet();
-                _searchModifications = new SearchModification[0];
+                _searchModifications = Array.Empty<SearchModification>();
             }
 
             var enzymeId = Convert.ToInt32(parameters["-e"]);
