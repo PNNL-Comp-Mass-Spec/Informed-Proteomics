@@ -10,6 +10,8 @@ namespace MSPathFinder
 {
     internal static class Program
     {
+        // Ignore Spelling: Arg, Chymotrypsin, Glu, Lys, ntt, tda
+
         public const string Name = "MSPathFinder";
         public static string Version
         {

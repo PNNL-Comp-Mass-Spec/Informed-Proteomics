@@ -24,7 +24,7 @@ namespace InformedProteomics.TopDown.Execution
     /// </summary>
     public class MzidResultsWriter
     {
-        // Ignore Spelling: Cvid, mzIdentML
+        // Ignore Spelling: Cvid, mzid, mzIdentML
 
         private readonly FastaDatabase database;
         private readonly LcMsRun lcmsRun;

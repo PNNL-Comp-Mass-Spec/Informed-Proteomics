@@ -13,6 +13,8 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class CompositeScorerFactory : IFragmentScorerFactory
     {
+        // Ignore Spelling: deconvoluted, deconvoluting, readonly
+
         public CompositeScorerFactory(
             ILcMsRun run,
             IMassBinning comparer,
@@ -263,7 +265,7 @@ namespace InformedProteomics.TopDown.Scoring
                 //_ionMassChkBins = new BitArray(comparer.NumberOfBins);
                 _massBinToPeakMap = new Dictionary<int, DeconvolutedPeak>();
 
-                foreach (var p in deconvolutedSpectrum.Peaks)
+                for each (var p in deconvolutedSpectrum.Peaks)
                 {
                     var mass = p.Mz;
                     var deltaMass = productTolerance.GetToleranceAsDa(mass, 1);

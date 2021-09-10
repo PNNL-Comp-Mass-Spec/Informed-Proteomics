@@ -15,6 +15,8 @@ namespace InformedProteomics.FeatureFinding.Alignment
 {
     public class LcMsFeatureAlignment
     {
+        // Ignore Spelling: readonly
+
         public LcMsFeatureAlignment(INodeComparer<LcMsFeature> featureCompare)
         {
             // _featureSetList = new Dictionary<int, List<LcMsFeature>>();
@@ -235,7 +237,7 @@ namespace InformedProteomics.FeatureFinding.Alignment
         public void TryFillMissingFeature(List<LcMsFeature[]> alignedFeatures)
         {
             var featureInfoList = new List<LcMsFeature>();
-            foreach (var features in alignedFeatures)
+            for each (var features in alignedFeatures)
             {
                 var featureInfo = GetRepresentativeFeature(features);
                 featureInfoList.Add(featureInfo);

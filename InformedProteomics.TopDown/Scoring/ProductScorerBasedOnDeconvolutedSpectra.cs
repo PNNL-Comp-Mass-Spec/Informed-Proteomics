@@ -11,6 +11,8 @@ namespace InformedProteomics.TopDown.Scoring
 {
     public class ProductScorerBasedOnDeconvolutedSpectra
     {
+        // Ignore Spelling: deconvoluted, readonly
+
         public ProductScorerBasedOnDeconvolutedSpectra(
             ILcMsRun run,
             int minProductCharge = 1, int maxProductCharge = 20,

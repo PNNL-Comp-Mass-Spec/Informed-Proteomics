@@ -12,7 +12,7 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
     public class ProteinSpectrumMatchReader
     {
         // ReSharper disable once CommentTypo
-        // Ignore Spelling: Desc, msgfdb
+        // Ignore Spelling: Desc, msgfdb, Pre
 
         public readonly double FdrCutoff;
 

@@ -167,7 +167,7 @@ namespace InformedProteomics.TopDown.Execution
             sw.Stop();
             OnStatusEvent(string.Format("Elapsed Time: {0:f1} sec", sw.Elapsed.TotalSeconds));
 
-            progData.StepRange(progData.MaxPercentage + 2, "Reading Fasta File");
+            progData.StepRange(progData.MaxPercentage + 2, "Reading FASTA File");
             OnStatusEvent(progData.Status);
 
             // Target database

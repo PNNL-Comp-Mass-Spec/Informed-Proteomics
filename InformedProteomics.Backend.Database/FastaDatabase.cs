@@ -12,7 +12,7 @@ using PRISM;
 namespace InformedProteomics.Backend.Database
 {
     /// <summary>
-    /// Facilitates working with a Fasta sequence database, using suffix arrays
+    /// Facilitates working with a FASTA sequence database, using suffix arrays
     /// </summary>
     public class FastaDatabase
     {
@@ -75,7 +75,7 @@ namespace InformedProteomics.Backend.Database
 
             if (!FastaDatabaseConstants.ValidFASTAExtension(databaseFilePath))
             {
-                throw new FormatException("Not a fasta file: " + databaseFilePath);
+                throw new FormatException("Not a FASTA file: " + databaseFilePath);
             }
 
             _databaseFilePath = databaseFilePath;
@@ -235,7 +235,7 @@ namespace InformedProteomics.Backend.Database
 
         //public IEnumerable<byte> Characters(int index, int numCharacters)
         //{
-        //    if (_sequence == null) throw new SystemException("Fasta sequence must be loaded!");
+        //    if (_sequence == null) throw new SystemException("FASTA sequence must be loaded!");
         //    for (var i = index; i < index+numCharacters && i < _sequence.Length - 1; i++)
         //    {
         //        yield return _sequence[i];
@@ -259,7 +259,7 @@ namespace InformedProteomics.Backend.Database
         }
 
         /// <summary>
-        /// Path to the Fasta file
+        /// Path to the FASTA file
         /// </summary>
         /// <returns>File path</returns>
         public string GetFastaFilePath()

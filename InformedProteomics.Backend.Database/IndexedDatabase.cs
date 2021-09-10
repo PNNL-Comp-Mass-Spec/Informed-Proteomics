@@ -14,7 +14,7 @@ using SuffixArray;
 namespace InformedProteomics.Backend.Database
 {
     /// <summary>
-    /// Provide fast, indexed access to Fasta database information using Permuted Longest Common Prefix data
+    /// Provide fast, indexed access to FASTA database information using Permuted Longest Common Prefix data
     /// </summary>
     public class IndexedDatabase
     {
@@ -35,7 +35,7 @@ namespace InformedProteomics.Backend.Database
         private readonly string _pLcpFilePath;
 
         /// <summary>
-        /// The Fasta database that will be indexed
+        /// The FASTA database that will be indexed
         /// </summary>
         protected readonly FastaDatabase FastaDatabase;
 
