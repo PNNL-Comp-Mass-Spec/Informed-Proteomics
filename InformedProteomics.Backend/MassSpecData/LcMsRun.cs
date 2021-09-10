@@ -298,7 +298,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// <returns>MS1 scan numbers</returns>
         public int[] GetMs1ScanVector()
         {
-            return _ms1ScanVector ?? (_ms1ScanVector = GetScanNumbers(1).ToArray());
+            return _ms1ScanVector ??= GetScanNumbers(1).ToArray();
         }
 
         private int[] _ms1ScanNumToIndex;
