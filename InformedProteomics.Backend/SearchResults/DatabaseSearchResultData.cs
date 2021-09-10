@@ -222,8 +222,6 @@ namespace InformedProteomics.Backend.SearchResults
         /// <returns>List of database search results</returns>
         public static List<DatabaseSearchResultData> ReadResultsFromFile(string filePath)
         {
-            List<DatabaseSearchResultData> results;
-
             using var stream = new StreamReader(new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 
             // check for QValue header, to determine the mapping used for reading
@@ -248,7 +246,7 @@ namespace InformedProteomics.Backend.SearchResults
             {
                 tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataMap>();
             }
-            results = tsv.GetRecords<DatabaseSearchResultData>().ToList();
+            var results = tsv.GetRecords<DatabaseSearchResultData>().ToList();
 
             return results.Count == 0 ? null : results;
         }
