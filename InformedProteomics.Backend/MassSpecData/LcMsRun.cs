@@ -5,6 +5,8 @@ using InformedProteomics.Backend.Data.Biology;
 using InformedProteomics.Backend.Data.Spectrometry;
 using PSI_Interface.CV;
 
+// ReSharper disable UnusedMember.Global
+
 namespace InformedProteomics.Backend.MassSpecData
 {
     /// <summary>
