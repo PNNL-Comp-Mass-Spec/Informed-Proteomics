@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>InformedProteomics.TopDown</RootNamespace>
+    <AssemblyName>InformedProteomics.TopDown</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <LangVersion>latest</LangVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="TopDownTrainer">
+      <HintPath>..\lib\TopDownTrainer\TopDownTrainer.exe</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Properties\AssemblyInfoShared.cs">
+      <Link>Properties\AssemblyInfoShared.cs</Link>
+    </Compile>
+    <Compile Include="Execution\DatabaseSequenceSpectrumMatch.cs" />
+    <Compile Include="Execution\IcRescorer.cs" />
+    <Compile Include="Execution\IcTopDownLauncher.cs" />
+    <Compile Include="Execution\MSAlignRescorer.cs" />
+    <Compile Include="Execution\MsPfParameters.cs" />
+    <Compile Include="Execution\MzidResultsWriter.cs" />
+    <Compile Include="Execution\ProteoformSpectrumMatchContainer.cs" />
+    <Compile Include="Execution\QuickProteinId.cs" />
+    <Compile Include="Execution\SelectedMsMsFilter.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="PostProcessing\MatchedTagSet.cs" />
+    <Compile Include="PostProcessing\MSPathFinderId.cs" />
+    <Compile Include="PostProcessing\MSPathFinderParser.cs" />
+    <Compile Include="PostProcessing\SequenceTagParser.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Quantification\MSDeconvClusterer.cs" />
+    <Compile Include="Quantification\MSDeconvNode.cs" />
+    <Compile Include="Quantification\MSDeconvReader.cs" />
+    <Compile Include="Quantification\UnidentifiedFeatureAnalysis.cs" />
+    <Compile Include="Scoring\CompositeScorer.cs" />
+    <Compile Include="Scoring\CompositeScorerBasedOnDeconvolutedSpectrum.cs" />
+    <Compile Include="Scoring\CompositeScorerFactory.cs" />
+    <Compile Include="Scoring\CorrMatchedPeakCounter.cs" />
+    <Compile Include="Scoring\FlipScoringGraphEdge.cs" />
+    <Compile Include="Scoring\FlipScoring\FeatureWeights.cs" />
+    <Compile Include="Scoring\FlipScoring\FlipScorer.cs" />
+    <Compile Include="Scoring\FlipScoring\FlipScorerFactory.cs" />
+    <Compile Include="Scoring\FlipScoring\FlipScoringGraph.cs" />
+    <Compile Include="Scoring\FlipScoring\FlipScoringGraphFactory.cs" />
+    <Compile Include="Scoring\FlipScoring\IonWeights.cs" />
+    <Compile Include="Scoring\FlipScoring\PrecursorPeakFilter.cs" />
+    <Compile Include="Scoring\FlipScoring\ScoringParameterDescription.cs" />
+    <Compile Include="Scoring\FlipScoring\ScoringParameters.cs" />
+    <Compile Include="Scoring\FlipScoring\ScoringParameterSet.cs" />
+    <Compile Include="Scoring\InformedTopDownScorer.cs" />
+    <Compile Include="Scoring\IsosFilter.cs" />
+    <Compile Include="Scoring\LikelihoodScoringModel.cs" />
+    <Compile Include="Scoring\LikelihoodScorer.cs" />
+    <Compile Include="Scoring\MatchedPeakCounter.cs" />
+    <Compile Include="Scoring\MatchedPeakPostScorer.cs" />
+    <Compile Include="Scoring\Ms1ContainsIonFilter.cs" />
+    <Compile Include="Scoring\Ms1FtFilter.cs" />
+    <Compile Include="Scoring\Ms1FtParser.cs" />
+    <Compile Include="Scoring\Ms1IsotopeAndChargeCorrFilter.cs" />
+    <Compile Include="Scoring\Ms1IsotopeMostAbundantPlusOneFilter.cs" />
+    <Compile Include="Scoring\MsDeconvFilter.cs" />
+    <Compile Include="Scoring\ProductScorerBasedOnDeconvolutedSpectra.cs" />
+    <Compile Include="Scoring\ProteinScoringGraphFactory.cs" />
+    <Compile Include="Scoring\ScoringGraphFactory.cs" />
+    <Compile Include="Scoring\SubScoreFactory.cs" />
+    <Compile Include="Scoring\TopDownScorer.cs" />
+    <Compile Include="Scoring\TopDownTrainer.cs" />
+    <Compile Include="SequenceTag\GraphEdge.cs" />
+    <Compile Include="SequenceTag\IdentifiedSequenceTag.cs" />
+    <Compile Include="SequenceTag\SequenceTag.cs" />
+    <Compile Include="SequenceTag\SequenceTagFinder.cs" />
+    <Compile Include="SequenceTag\SequenceTagGraph.cs" />
+    <Compile Include="SequenceTag\SequenceTagGraphEdge.cs" />
+    <Compile Include="SequenceTag\SequenceTagIndexFinder.cs" />
+    <Compile Include="TagBasedSearch\FeatureBasedTagSearchEngine.cs" />
+    <Compile Include="TagBasedSearch\ISequenceTagFinder.cs" />
+    <Compile Include="TagBasedSearch\ScanBasedTagSearchEngine.cs" />
+    <Compile Include="TagBasedSearch\SequenceTagGenerator.cs" />
+    <Compile Include="TagBasedSearch\TagMatch.cs" />
+    <Compile Include="TagBasedSearch\TagMatchFinder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\DataMining\DMS_Managers\PRISM_Class_Library\PRISM\PRISM.csproj">
+      <Project>{a3515e62-ad0d-4ddf-a5e4-58543408354b}</Project>
+      <Name>PRISM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Backend.Database\InformedProteomicsWithPRISM.Backend.Database.csproj">
+      <Project>{451d1ce9-97d2-4898-9f59-4d058223637a}</Project>
+      <Name>InformedProteomicsWithPRISM.Backend.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Backend.MassSpecData\InformedProteomicsWithPRISM.Backend.MassSpecData.csproj">
+      <Project>{05b37516-2b5c-4c60-bfe2-d6854a19478a}</Project>
+      <Name>InformedProteomicsWithPRISM.Backend.MassSpecData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomicsWithPRISM.Backend.csproj">
+      <Project>{70a129ac-217a-4086-9ecb-63ff22289d90}</Project>
+      <Name>InformedProteomicsWithPRISM.Backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.FeatureFinding\InformedProteomicsWithPRISM.FeatureFinding.csproj">
+      <Project>{cc6e5e66-bffc-4cf1-89c2-75620a165e1a}</Project>
+      <Name>InformedProteomicsWithPRISM.FeatureFinding</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InformedProteomics.Scoring\InformedProteomicsWithPRISM.Scoring.csproj">
+      <Project>{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}</Project>
+      <Name>InformedProteomicsWithPRISM.Scoring</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scoring\Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics">
+      <Version>4.15.0</Version>
+    </PackageReference>
+    <PackageReference Include="PSI_Interface">
+      <Version>2.4.3</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

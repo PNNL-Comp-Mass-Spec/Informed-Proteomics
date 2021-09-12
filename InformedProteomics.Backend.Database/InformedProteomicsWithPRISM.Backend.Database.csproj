@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net462;net472;netstandard2.0</TargetFrameworks>
+    <RootNamespace>InformedProteomics.Backend.Database</RootNamespace>
+    <AssemblyName>InformedProteomics.Backend.Database</AssemblyName>
+    <Version>1.1.3</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+    <Description>Protein database parsing and preprocessing for performing database searches</Description>
+    <Company>Pacific Northwest National Laboratory</Company>
+    <Product>InformedProteomics.Backend.Database</Product>
+    <Authors>PNNL-Comp-Mass-Spec</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RepositoryUrl>https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/PNNL-Comp-Mass-Spec/Informed-Proteomics</PackageProjectUrl>
+    <Copyright>Copyright @ PNNL 2017</Copyright>
+    <Title>InformedProteomics.Backend.Database</Title>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\DataMining\DMS_Managers\PRISM_Class_Library\PRISM\PRISM.csproj" />
+    <ProjectReference Include="..\InformedProteomics.Backend\InformedProteomicsWithPRISM.Backend.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ProteinFileReader" Version="2.0.6" />
+    <PackageReference Include="SAIS-CSharp" Version="1.0.1" />
+  </ItemGroup>
+</Project>

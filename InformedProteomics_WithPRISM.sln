@@ -1,0 +1,75 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InformedProteomicsWithPRISM.Backend", "InformedProteomics.Backend\InformedProteomicsWithPRISM.Backend.csproj", "{70A129AC-217A-4086-9ECB-63FF22289D90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomicsWithPRISM.TopDown", "InformedProteomics.TopDown\InformedProteomicsWithPRISM.TopDown.csproj", "{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSPathFinderT_withPRISM", "MSPathFinderT\MSPathFinderT_withPRISM.csproj", "{DFBECBAC-7FDA-4C78-9F4E-CC21C79A6DB6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC} = {97B9F853-1B2A-4101-AF09-68E0B4CF19EC}
+		{70A129AC-217A-4086-9ECB-63FF22289D90} = {70A129AC-217A-4086-9ECB-63FF22289D90}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{166A038F-C6E6-429B-8FE0-9F7D84785851}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InformedProteomicsWithPRISM.Backend.Database", "InformedProteomics.Backend.Database\InformedProteomicsWithPRISM.Backend.Database.csproj", "{451D1CE9-97D2-4898-9F59-4D058223637A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomicsWithPRISM.Backend.MassSpecData", "InformedProteomics.Backend.MassSpecData\InformedProteomicsWithPRISM.Backend.MassSpecData.csproj", "{05B37516-2B5C-4C60-BFE2-D6854A19478A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomicsWithPRISM.Scoring", "InformedProteomics.Scoring\InformedProteomicsWithPRISM.Scoring.csproj", "{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InformedProteomicsWithPRISM.FeatureFinding", "InformedProteomics.FeatureFinding\InformedProteomicsWithPRISM.FeatureFinding.csproj", "{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PRISM", "..\..\DataMining\DMS_Managers\PRISM_Class_Library\PRISM\PRISM.csproj", "{A3515E62-AD0D-4DDF-A5E4-58543408354B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70A129AC-217A-4086-9ECB-63FF22289D90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97B9F853-1B2A-4101-AF09-68E0B4CF19EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFBECBAC-7FDA-4C78-9F4E-CC21C79A6DB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFBECBAC-7FDA-4C78-9F4E-CC21C79A6DB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFBECBAC-7FDA-4C78-9F4E-CC21C79A6DB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFBECBAC-7FDA-4C78-9F4E-CC21C79A6DB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{451D1CE9-97D2-4898-9F59-4D058223637A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{451D1CE9-97D2-4898-9F59-4D058223637A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{451D1CE9-97D2-4898-9F59-4D058223637A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{451D1CE9-97D2-4898-9F59-4D058223637A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05B37516-2B5C-4C60-BFE2-D6854A19478A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05B37516-2B5C-4C60-BFE2-D6854A19478A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05B37516-2B5C-4C60-BFE2-D6854A19478A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05B37516-2B5C-4C60-BFE2-D6854A19478A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF6A61B6-06E4-47D4-BE2C-0A4D8C4E018B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC6E5E66-BFFC-4CF1-89C2-75620A165E1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3515E62-AD0D-4DDF-A5E4-58543408354B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3515E62-AD0D-4DDF-A5E4-58543408354B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3515E62-AD0D-4DDF-A5E4-58543408354B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3515E62-AD0D-4DDF-A5E4-58543408354B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DFBECBAC-7FDA-4C78-9F4E-CC21C79A6DB6} = {166A038F-C6E6-429B-8FE0-9F7D84785851}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {50912C29-E918-4FF6-AFAF-1F3F6782D01A}
+	EndGlobalSection
+EndGlobal
