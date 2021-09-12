@@ -349,6 +349,11 @@ namespace InformedProteomics.TopDown.Execution
         }
 
         /// <summary>
+        /// When true, show additional status messages at the console
+        /// </summary>
+        public virtual bool TraceMode { get; set; }
+
+        /// <summary>
         /// Gets or sets a list containing the post-translational modifications used for database search.
         /// </summary>
         public List<SearchModification> Modifications { get; set; }
