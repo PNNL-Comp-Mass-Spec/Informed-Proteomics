@@ -3,6 +3,7 @@ image: Visual Studio 2019
 before_build:
 - cmd: nuget.exe restore InformedProteomics.sln
 build:
+  project: InformedProteomics.sln
   verbosity: minimal
 test:
   categories:
