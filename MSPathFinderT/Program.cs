@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 using InformedProteomics.Backend.Utils;
 using InformedProteomics.TopDown.Execution;
