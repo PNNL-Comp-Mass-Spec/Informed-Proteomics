@@ -384,7 +384,7 @@ For versions released after February 1, 2019:
 For versions released prior to February 1, 2019: 
 * If Thermo's MSFileReader is installed, PbfGen and ProMex also support reading from Thermo .raw files ([Download here](https://thermo.flexnetoperations.com/control/thmo/download?element=6306677), requires registration to download).
 
-On Windows, several other formats are supported if an appropriate version of ProteoWizard is installed ([Download here](http://proteowizard.sourceforge.net/downloads.shtml), make sure the version downloaded matches system architecture)
+On Windows, several other formats are supported if an appropriate version of ProteoWizard is installed ([Download here](https://proteowizard.sourceforge.io/), make sure the version downloaded matches system architecture)
 
 On Linux, supported input file formats are .raw, .mzML, and .mzML.gz
 
@@ -416,8 +416,7 @@ Written by Sangtae Kim, Junkap Park, and Chris Wilkins for the Department of Ene
 Copyright 2015, Battelle Memorial Institute.  All Rights Reserved.\
 \
 E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov\
-Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/\
-
+Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics\
 -------------------------------------------------------------------------------
 
 Licensed under the Apache License, Version 2.0; you may not use this program except
