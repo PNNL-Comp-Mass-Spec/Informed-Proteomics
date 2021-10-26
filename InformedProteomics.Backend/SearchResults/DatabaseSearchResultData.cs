@@ -201,9 +201,12 @@ namespace InformedProteomics.Backend.SearchResults
                 outputFile.Directory.Create();
             }
 
-            using var tsv = new CsvWriter(new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read)), CultureInfo.InvariantCulture);
+            var configuration = GetCsvWriterConfig(CultureInfo.InvariantCulture);
 
-            SetCsvWriterConfig(tsv.Configuration);
+            using var writer = new StreamWriter(new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read));
+
+            var tsv = new CsvWriter(writer, configuration);
+
             if (includeTdaScores)
             {
                 tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
@@ -235,9 +238,10 @@ namespace InformedProteomics.Backend.SearchResults
             stream.BaseStream.Seek(0, SeekOrigin.Begin);
             stream.DiscardBufferedData();
 
-            using var tsv = new CsvReader(stream, CultureInfo.InvariantCulture);
+            var configuration = GetCsvReaderConfig(CultureInfo.InvariantCulture);
 
-            SetCsvReaderConfig(tsv.Configuration);
+            var tsv = new CsvReader(stream, configuration);
+
             if (hasTda)
             {
                 tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
@@ -251,24 +255,27 @@ namespace InformedProteomics.Backend.SearchResults
             return results.Count == 0 ? null : results;
         }
 
-        private static void SetCsvReaderConfig(IReaderConfiguration config)
+        private static CsvConfiguration GetCsvReaderConfig(CultureInfo cultureInfo)
         {
-            config.Delimiter = "\t";
-
-            config.PrepareHeaderForMatch = (header, _) => header?.Trim().ToLower();
-
-            config.HeaderValidated = null;
-            config.MissingFieldFound = null;
-            //config.BadDataFound = null;
-            config.Comment = '#';
-            config.AllowComments = true;
+            return new CsvConfiguration(cultureInfo)
+            {
+                Delimiter = "\t",
+                PrepareHeaderForMatch = args => args.Header?.Trim().ToLower(),
+                HeaderValidated = null,
+                MissingFieldFound = null,
+                Comment = '#',
+                AllowComments = true
+            };
         }
 
-        private static void SetCsvWriterConfig(IWriterConfiguration config)
+        private static CsvConfiguration GetCsvWriterConfig(CultureInfo cultureInfo)
         {
-            config.Delimiter = "\t";
-            config.Comment = '#';
-            config.AllowComments = true;
+            return new CsvConfiguration(cultureInfo)
+            {
+                Delimiter = "\t",
+                Comment = '#',
+                AllowComments = true
+            };
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
