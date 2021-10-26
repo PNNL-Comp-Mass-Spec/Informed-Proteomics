@@ -416,7 +416,7 @@ Minimum recommended:
 Written by Sangtae Kim, Junkap Park, and Chris Wilkins for the Department of Energy (PNNL, Richland, WA)\
 Copyright 2015, Battelle Memorial Institute.  All Rights Reserved.\
 E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov\
-Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics\
+Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics/
 
 ## License
 
