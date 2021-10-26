@@ -129,12 +129,8 @@ namespace InformedProteomics.FeatureFinding.SpectrumMatching
 
             var massDiff = Math.Abs(Mass - other.Mass);
             var tol = new Tolerance(10);
-            if (massDiff < tol.GetToleranceAsMz(Mass) && FirstResidue == other.FirstResidue && LastResidue == other.LastResidue)
-            {
-                return true;
-            }
 
-            return false;
+            return massDiff < tol.GetToleranceAsMz(Mass) && FirstResidue == other.FirstResidue && LastResidue == other.LastResidue;
         }
 
         public enum SearchTool

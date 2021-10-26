@@ -20,13 +20,8 @@ namespace InformedProteomics.FeatureFinding.Clustering
                 return false;
             }
 
-            // close in elution time
-            if (f1.CoElutedByNet(f2, 0.01))
-            {
-                return true;
-            }
-
-            return false;
+            // Features are close in elution time
+            return f1.CoElutedByNet(f2, 0.01);
         }
         private readonly Tolerance _tolerance;
     }

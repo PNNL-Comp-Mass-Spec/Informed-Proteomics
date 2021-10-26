@@ -394,15 +394,11 @@ namespace InformedProteomics.Tests.DevTests
 
                 if (!f1.CoElutedByNet(f2, 0.004))
                 {
-                    return false; //e.g) 200*0.001 = 0.2 min = 30 sec
+                    //e.g. 200 * 0.001 = 0.2 min = 30 sec
+                    return false;
                 }
 
-                if (f1.ProteinSpectrumMatches.ShareProteinId(f2.ProteinSpectrumMatches))
-                {
-                    return true;
-                }
-
-                return false;
+                return f1.ProteinSpectrumMatches.ShareProteinId(f2.ProteinSpectrumMatches);
             }
 
             private readonly Tolerance _tolerance;

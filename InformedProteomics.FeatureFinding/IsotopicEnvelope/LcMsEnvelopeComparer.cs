@@ -22,12 +22,8 @@ namespace InformedProteomics.FeatureFinding.IsotopicEnvelope
             }
 
             var chargeDiff = Math.Abs(e2.Charge - e1.Charge);
-            if (chargeDiff > 3)
-            {
-                return false;
-            }
 
-            return true;
+            return chargeDiff <= 3;
         }
     }
 }

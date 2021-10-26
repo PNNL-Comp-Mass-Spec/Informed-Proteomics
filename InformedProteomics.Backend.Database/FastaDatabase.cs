@@ -501,12 +501,8 @@ namespace InformedProteomics.Backend.Database
             }
 
             var lastWriteTimeHash = reader.ReadInt32();
-            if (lastWriteTimeHash == code)
-            {
-                return true;
-            }
 
-            return false;
+            return lastWriteTimeHash == code;
         }
 
         internal static bool CheckHashCodeTextFile(string filePath, int code)
@@ -546,12 +542,8 @@ namespace InformedProteomics.Backend.Database
             }
 
             var lastWriteTimeHash = Convert.ToInt32(token[1]);
-            if (lastWriteTimeHash == code)
-            {
-                return true;
-            }
 
-            return false;
+            return lastWriteTimeHash == code;
         }
 
         private readonly string _databaseFilePath;

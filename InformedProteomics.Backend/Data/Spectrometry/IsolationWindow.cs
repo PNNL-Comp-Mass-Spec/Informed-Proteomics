@@ -104,12 +104,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>True if the items match</returns>
         protected bool Equals(IsolationWindow other)
         {
-            if (Math.Abs(MinMz - other.MinMz) < 0.01 && Math.Abs(MaxMz - other.MaxMz) < 0.01)
-            {
-                return true;
-            }
-
-            return false;
+            return Math.Abs(MinMz - other.MinMz) < 0.01 && Math.Abs(MaxMz - other.MaxMz) < 0.01;
         }
 
         /// <summary>
@@ -135,12 +130,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 return true;
             }
 
-            if (obj.GetType() != GetType())
-            {
-                return false;
-            }
-
-            return Equals((IsolationWindow)obj);
+            return obj.GetType() == GetType() && Equals((IsolationWindow)obj);
         }
 
         /// <inheritdoc />

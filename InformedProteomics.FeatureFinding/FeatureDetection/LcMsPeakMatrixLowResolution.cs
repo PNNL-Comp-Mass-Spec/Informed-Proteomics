@@ -136,12 +136,8 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
                 }
 
                 var etDiff = Math.Abs(_run.GetElutionTime(node1.ScanNum) - _run.GetElutionTime(node2.ScanNum));
-                if (etDiff > ElutionTimeWindowSize)
-                {
-                    return false;
-                }
 
-                return true;
+                return etDiff <= ElutionTimeWindowSize;
             }
 
             private const double ElutionTimeWindowSize = 0.4;
