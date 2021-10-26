@@ -368,7 +368,7 @@ namespace PromexAlign
                     dataColumns.Add(firstPrsm.FirstResidue.ToString());
                     dataColumns.Add(firstPrsm.LastResidue.ToString());
 
-                    var bestEvalue = matchingPrsms.Select(prsm => prsm.SpectralEValue).Min();
+                    var bestEvalue = matchingPrsms.Min(prsm => prsm.SpectralEValue);
 
                     dataColumns.Add(StringUtilities.ValueToString(bestEvalue, 5));
                 }
