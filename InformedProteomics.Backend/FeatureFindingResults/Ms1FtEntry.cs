@@ -250,7 +250,7 @@ namespace InformedProteomics.Backend.FeatureFindingResults
         /// <summary>
         /// Class mapping <see cref="Ms1FtEntry"/> with <see cref="Ms1FtEntryExtendedData"/> properties to text file columns
         /// </summary>
-        public class Ms1FtExtendedEntryMap : Ms1FtEntryMap
+        public sealed class Ms1FtExtendedEntryMap : Ms1FtEntryMap
         {
             /// <summary>
             /// Constructor: Create the mapping, inheriting the base mapping
