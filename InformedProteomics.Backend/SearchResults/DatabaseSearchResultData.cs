@@ -209,13 +209,16 @@ namespace InformedProteomics.Backend.SearchResults
 
             if (includeTdaScores)
             {
-                tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
+                tsv.Context.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
             }
             else
             {
-                tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataMap>();
+                tsv.Context.RegisterClassMap<DatabaseSearchResultDataMap>();
             }
+
             tsv.WriteRecords(resultData);
+
+            tsv.Flush();
         }
 
         /// <summary>
@@ -244,11 +247,11 @@ namespace InformedProteomics.Backend.SearchResults
 
             if (hasTda)
             {
-                tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
+                tsv.Context.RegisterClassMap<DatabaseSearchResultDataTdaMap>();
             }
             else
             {
-                tsv.Configuration.RegisterClassMap<DatabaseSearchResultDataMap>();
+                tsv.Context.RegisterClassMap<DatabaseSearchResultDataMap>();
             }
             var results = tsv.GetRecords<DatabaseSearchResultData>().ToList();
 
@@ -300,13 +303,13 @@ namespace InformedProteomics.Backend.SearchResults
                 Map(x => x.Start).Index(ColumnCount++).Name("Start");                                                                                                                      // Start position in protein
                 Map(x => x.End).Index(ColumnCount++).Name("End");                                                                                                                          // End position in protein
                 Map(x => x.Charge).Index(ColumnCount++).Name("Charge");                                                                                                                    // precursorCharge
-                Map(x => x.MostAbundantIsotopeMz).Index(ColumnCount++).Name("MostAbundantIsotopeMz").ConvertUsing(x => StringUtilities.DblToString(x.MostAbundantIsotopeMz, 9, true));     // MostAbundantIsotopeMz
-                Map(x => x.Mass).Index(ColumnCount++).Name("Mass").ConvertUsing(x => StringUtilities.DblToString(x.Mass, 9, true));                                                        // Mass
+                Map(x => x.MostAbundantIsotopeMz).Index(ColumnCount++).Name("MostAbundantIsotopeMz").Convert(x => StringUtilities.DblToString(x.Value.MostAbundantIsotopeMz, 9, true));     // MostAbundantIsotopeMz
+                Map(x => x.Mass).Index(ColumnCount++).Name("Mass").Convert(x => StringUtilities.DblToString(x.Value.Mass, 9, true));                                                        // Mass
                 Map(x => x.Ms1Feature).Index(ColumnCount++).Name("Ms1Features");
                 Map(x => x.NumMatchedFragments).Index(ColumnCount++).Name("#MatchedFragments", "Score");                                                                                   // (Number of matched fragments)
-                Map(x => x.Probability).Index(ColumnCount++).Name("Probability").ConvertUsing(x => StringUtilities.DblToString(x.Probability, 4));                                         // Probability
-                Map(x => x.SpecEValue).Index(ColumnCount++).Name("SpecEValue").ConvertUsing(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.SpecEValue), 6, true, 0.001)); // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
-                Map(x => x.EValue).Index(ColumnCount++).Name("EValue").ConvertUsing(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.EValue), 6, true, 0.001));             // EValue; will be displayed using scientific notation if the value is less than 0.001
+                Map(x => x.Probability).Index(ColumnCount++).Name("Probability").Convert(x => StringUtilities.DblToString(x.Value.Probability, 4));                                         // Probability
+                Map(x => x.SpecEValue).Index(ColumnCount++).Name("SpecEValue").Convert(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.Value.SpecEValue), 6, true, 0.001)); // SpecEValue; will be displayed using scientific notation if the value is less than 0.001
+                Map(x => x.EValue).Index(ColumnCount++).Name("EValue").Convert(x => StringUtilities.DblToString(Math.Max(SmallestValueExcel, x.Value.EValue), 6, true, 0.001));             // EValue; will be displayed using scientific notation if the value is less than 0.001
                 // ReSharper restore VirtualMemberCallInConstructor
             }
         }
@@ -317,8 +320,8 @@ namespace InformedProteomics.Backend.SearchResults
             // Adds in the columns expected for TDA results
             public DatabaseSearchResultDataTdaMap()
             {
-                Map(x => x.QValue).Index(ColumnCount++).Name("QValue").ConvertUsing(x => StringUtilities.DblToString(x.QValue, 7));
-                Map(x => x.PepQValue).Index(ColumnCount++).Name("PepQValue").ConvertUsing(x => StringUtilities.DblToString(x.PepQValue, 7));
+                Map(x => x.QValue).Index(ColumnCount++).Name("QValue").Convert(x => StringUtilities.DblToString(x.Value.QValue, 7));
+                Map(x => x.PepQValue).Index(ColumnCount++).Name("PepQValue").Convert(x => StringUtilities.DblToString(x.Value.PepQValue, 7));
             }
         }
 

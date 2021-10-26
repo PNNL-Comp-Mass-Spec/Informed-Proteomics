@@ -128,15 +128,17 @@ namespace InformedProteomics.Backend.FeatureFindingResults
 
             if (writeExtendedData)
             {
-                tsv.Configuration.RegisterClassMap<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>();
-                tsv.Configuration.RegisterClassMap<Ms1FtExtendedEntryMap>();
+                tsv.Context.RegisterClassMap<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>();
+                tsv.Context.RegisterClassMap<Ms1FtExtendedEntryMap>();
             }
             else
             {
-                tsv.Configuration.RegisterClassMap<Ms1FtEntryMap>();
+                tsv.Context.RegisterClassMap<Ms1FtEntryMap>();
             }
 
             tsv.WriteRecords(features);
+
+            tsv.Flush();
         }
 
         /// <summary>
@@ -165,12 +167,12 @@ namespace InformedProteomics.Backend.FeatureFindingResults
 
             if (readExtendedData && hasExtended)
             {
-                tsv.Configuration.RegisterClassMap<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>();
-                tsv.Configuration.RegisterClassMap<Ms1FtExtendedEntryMap>();
+                tsv.Context.RegisterClassMap<Ms1FtEntryExtendedData.Ms1FtEntryExtendedDataMap>();
+                tsv.Context.RegisterClassMap<Ms1FtExtendedEntryMap>();
             }
             else
             {
-                tsv.Configuration.RegisterClassMap<Ms1FtEntryMap>();
+                tsv.Context.RegisterClassMap<Ms1FtEntryMap>();
             }
             foreach (var record in tsv.GetRecords<Ms1FtEntry>())
             {
