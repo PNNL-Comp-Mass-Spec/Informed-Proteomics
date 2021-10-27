@@ -2,3 +2,6 @@
 name: Informed-Proteomics
 description: MSPathFinder is a database search engine for top-down proteomics, part of the Informed Proteomics package.
 url: https://pnnl-comp-mass-spec.github.io/Informed-Proteomics/
+
+# Google Analytics
+google_analytics: G-LXXKP1N66C
