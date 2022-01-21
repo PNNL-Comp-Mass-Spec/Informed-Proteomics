@@ -10,7 +10,7 @@ if not exist PbfGen mkdir ProMexAlign
 if not exist PbfGen mkdir MSPathFinder
 
 echo.
-echo Copying PbgGen files
+echo Copying PbfGen files
 xcopy ..\PbfGen\bin\Release\*.exe                                   PbfGen\ /D /Y
 xcopy ..\PbfGen\bin\Release\*.dll                                   PbfGen\ /D /Y
 xcopy ..\PbfGen\bin\Release\*.pdb                                   PbfGen\ /D /Y
