@@ -1016,10 +1016,7 @@ namespace InformedProteomics.TopDown.Execution
                         match.NumMatchedFragments = scores.NumMatchedFrags;
                         if (match.Score > CompositeScorer.ScoreParam.Cutoff)
                         {
-                            if (matches[scanNum] == null)
-                            {
-                                matches[scanNum] = new LinkedList<DatabaseSequenceSpectrumMatch>();
-                            }
+                            matches[scanNum] ??= new LinkedList<DatabaseSequenceSpectrumMatch>();
 
                             matches[scanNum].AddLast(match);
                         }
