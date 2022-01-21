@@ -32,16 +32,25 @@ namespace InformedProteomics.Scoring.GeneratingFunction
         {
             return _scoreDistribution;
         }
+
         //private int _targetScore;
         //private readonly int[] _maxAchievableScore;
 
-        public void ComputeGeneratingFunction()//int targetScore = 0)
+        public void ComputeGeneratingFunction()
         {
             //_targetScore = targetScore;
             var gfTable = new ScoreDistribution[_graph.GetNumNodes()];
+
             // Source
             var sourceDist = new ScoreDistribution(0, 1);
             sourceDist.SetEValue(0, 1);
+
+            if (gfTable.Length == 0)
+            {
+                _scoreDistribution = sourceDist;
+                return;
+            }
+
             gfTable[0] = sourceDist;
 
             // All the other nodes
