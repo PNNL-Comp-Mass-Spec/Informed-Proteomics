@@ -177,9 +177,9 @@ namespace PromexAlign
                         {
                             if (!prsmFile.Extension.Equals(".tsv", StringComparison.OrdinalIgnoreCase))
                             {
-                                ConsoleMsgUtils.ShowWarning(string.Format(
+                                ConsoleMsgUtils.ShowWarning(
                                     "The MSPathFinder results file should be a .tsv file with columns Scan, Pre, Sequence, etc. (typically the _IcTda.tsv file);\n" +
-                                    "suffix {0} indicates this may not be a compatible file:\n{1}", prsmFile.Extension, prsmFile.Name));
+                                    "suffix {0} indicates this may not be a compatible file:\n{1}", prsmFile.Extension, prsmFile.Name);
                             }
 
                             var prsmsFound = AddPrsms(prsmReader, prsmFile, features, tolerance);

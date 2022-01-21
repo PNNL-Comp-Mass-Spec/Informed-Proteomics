@@ -1500,9 +1500,8 @@ namespace InformedProteomics.Backend.MassSpecData
                         if (!warnedInvalidScanNum)
                         {
                             Console.WriteLine();
-                            ConsoleMsgUtils.ShowWarning(string.Format(
-                                "WriteAsPbf encountered an invalid scan number: {0}; " +
-                                "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown", scanNum));
+                            ConsoleMsgUtils.ShowWarning("WriteAsPbf encountered an invalid scan number: {0}; " +
+                                                        "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown", scanNum);
                             warnedInvalidScanNum = true;
                         }
                     }
@@ -1513,9 +1512,8 @@ namespace InformedProteomics.Backend.MassSpecData
                             if (!warnedNullScanToIsolationWindow)
                             {
                                 Console.WriteLine();
-                                ConsoleMsgUtils.ShowWarning(string.Format(
-                                    "WriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan {0}; " +
-                                    "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown", scanNum));
+                                ConsoleMsgUtils.ShowWarning("WriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan {0}; " +
+                                                            "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown", scanNum);
                                 warnedNullScanToIsolationWindow = true;
                             }
                         }
@@ -1802,9 +1800,8 @@ namespace InformedProteomics.Backend.MassSpecData
                         if (!warnedInvalidScanNum)
                         {
                             Console.WriteLine();
-                            ConsoleMsgUtils.ShowWarning(string.Format(
-                                "WriteAsPbf encountered an invalid scan number: {0}; " +
-                                "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown", scan.ScanNum));
+                            ConsoleMsgUtils.ShowWarning("WriteAsPbf encountered an invalid scan number: {0}; " +
+                                                        "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown", scan.ScanNum);
                             warnedInvalidScanNum = true;
                         }
                     }
@@ -1815,9 +1812,8 @@ namespace InformedProteomics.Backend.MassSpecData
                             if (!warnedNullScanToIsolationWindow)
                             {
                                 Console.WriteLine();
-                                ConsoleMsgUtils.ShowWarning(string.Format(
-                                    "WriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan {0}; " +
-                                    "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown", scan.ScanNum));
+                                ConsoleMsgUtils.ShowWarning("WriteAsPbf encountered a Null entry in scanNumToIsolationWindow for scan {0}; " +
+                                                            "MinMz and MaxMz will be 0 for this scan; subsequent warnings of this type will not be shown", scan.ScanNum);
                                 warnedNullScanToIsolationWindow = true;
                             }
                         }

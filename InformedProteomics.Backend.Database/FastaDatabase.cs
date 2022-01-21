@@ -723,9 +723,7 @@ namespace InformedProteomics.Backend.Database
 
                 if (_nameToLength.TryGetValue(name, out _))
                 {
-                    ConsoleMsgUtils.ShowWarning(string.Format(
-                        "Duplicate protein name, renaming {0} at offset {1} in {2} to avoid collisions",
-                        name, offset, Path.GetFileName(_annoFilePath)));
+                    ConsoleMsgUtils.ShowWarning("Duplicate protein name, renaming {0} at offset {1} in {2} to avoid collisions", name, offset, Path.GetFileName(_annoFilePath));
 
                     if (_duplicateNameCounts.TryGetValue(name, out var duplicateSuffix))
                     {
