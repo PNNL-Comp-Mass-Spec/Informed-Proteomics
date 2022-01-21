@@ -166,7 +166,7 @@ namespace MSPathFinderT
             catch (Exception ex)
             {
                 // NOTE: The DMS Analysis Manager looks for this text; do not change it
-                ConsoleMsgUtils.ShowError("Exception while processing", ex);
+                ConsoleMsgUtils.ShowError("Exception while processing", ex, true);
 
                 var errorCode = -Math.Abs(ex.Message.GetHashCode());
                 return errorCode == 0 ? -1 : errorCode;
@@ -186,7 +186,7 @@ namespace MSPathFinderT
 
         private static void TopDownLauncher_ErrorEvent(string message, Exception ex)
         {
-            ConsoleMsgUtils.ShowError(message, ex);
+            ConsoleMsgUtils.ShowError(message, ex, true);
         }
 
         private static void TopDownLauncher_WarningEvent(string message)
