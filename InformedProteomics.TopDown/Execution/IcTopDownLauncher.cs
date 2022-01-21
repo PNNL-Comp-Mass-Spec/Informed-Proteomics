@@ -633,7 +633,7 @@ namespace InformedProteomics.TopDown.Execution
             }
             else
             {
-                foreach(var annotationAndOffset in annotationsAndOffsets)
+                foreach (var annotationAndOffset in annotationsAndOffsets)
                 {
                     if (cancellationToken?.IsCancellationRequested == true)
                     {

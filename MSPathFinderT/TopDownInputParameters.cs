@@ -410,6 +410,7 @@ namespace MSPathFinderT
                 ShowError("Scans File not found: " + ScansFilePath);
                 return false;
             }
+
             try
             {
                 var errorMessage = LoadScansFile(ScansFilePath);
