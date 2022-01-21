@@ -1055,57 +1055,23 @@ namespace InformedProteomics.TopDown.Execution
                 CancellationToken = cancellationToken ?? CancellationToken.None
             };
 
-            Parallel.ForEach(scanNums, pfeOptions, scanNum =>
+            if (USE_PARALLEL_FOREACH)
             {
-                currentTask = "Inside Parallel.ForEach";
-                try
+                Parallel.ForEach(scanNums, pfeOptions, scanNum =>
                 {
-                    var scoreDistributions = _cachedScoreDistributions[scanNum];
-                    foreach (var match in matches[scanNum])
-                    {
-                        var currentIteration = "for scan " + scanNum + " and mass " + match.Ion.Composition.Mass;
-                        currentTask = "Calling GetMs2ScoringGraph " + currentIteration;
-
-                        var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
-                        if (graph == null)
-                        {
-                            continue;
-                        }
-
-                        currentTask = "Calling ComputeGeneratingFunction " + currentIteration;
-
-                        var scoreDist = (from distribution in scoreDistributions
-                                         where Math.Abs(distribution.Item1 - match.Ion.Composition.Mass) < Options.PrecursorIonTolerance.GetToleranceAsMz(match.Ion.Composition.Mass)
-                                         select distribution.Item2).FirstOrDefault();
-                        if (scoreDist == null)
-                        {
-                            var gf = new GeneratingFunction(graph);
-                            gf.ComputeGeneratingFunction();
-                            scoreDist = gf.GetScoreDistribution();
-                            scoreDistributions.AddLast(new Tuple<double, ScoreDistribution>(match.Ion.Composition.Mass, scoreDist));
-                        }
-
-                        currentTask = "Calling GetSpectralEValue " + currentIteration + " and score " + (int)match.Score;
-                        match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score);
-
-                        currentTask = "Reporting progress " + currentIteration;
-                        SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData, null);
-
-                        if (DEBUG_MODE && numProteins > DEBUG_MODE_PROTEINS_TO_SEARCH)
-                        {
-                            ConsoleMsgUtils.ShowWarning("Debug mode");
-                            ConsoleMsgUtils.ShowWarning(string.Format(
-                                "Exiting Parallel.ForEach since {0} proteins have been searched", DEBUG_MODE_PROTEINS_TO_SEARCH));
-                            Console.WriteLine();
-                            break;
-                        }
-                    }
-                }
-                catch (Exception ex)
+                    currentTask = "Inside Parallel.ForEach";
+                    RunGeneratingFunctionWork(currentTask, scanNum, matches, ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
+                });
+            }
+            else
+            {
+                foreach (var scanNum in scanNums)
                 {
-                    ReportError(string.Format("Exception while {0} in RunGeneratingFunction: {1}", currentTask, ex.Message), ex);
+                    currentTask = "Inside ForEach";
+                    RunGeneratingFunctionWork(currentTask, scanNum, matches, ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
                 }
-            });
+
+            }
 
             // Values in this SortedSet are Sequence_Modification_ProteinName
             var storedSequences = new SortedSet<string>();
@@ -1184,6 +1150,67 @@ namespace InformedProteomics.TopDown.Execution
             progData.StatusInternal = string.Empty;
             progData.Report(100.0);
             return finalMatches;
+        }
+
+        private void RunGeneratingFunctionWork(
+            string currentTask,
+            int scanNum,
+            IReadOnlyList<LinkedList<DatabaseSequenceSpectrumMatch>> matches,
+            ref int numProteins,
+            ref DateTime lastUpdate,
+            long estimatedSequences,
+            Stopwatch sw,
+            ProgressData progData)
+        {
+            try
+            {
+                var scoreDistributions = _cachedScoreDistributions[scanNum];
+                foreach (var match in matches[scanNum])
+                {
+                    var currentIteration = "for scan " + scanNum + " and mass " + match.Ion.Composition.Mass;
+                    currentTask = "Calling GetMs2ScoringGraph " + currentIteration;
+
+                    var graph = _ms2ScorerFactory2.GetMs2ScoringGraph(scanNum, match.Ion.Composition.Mass);
+                    if (graph == null)
+                    {
+                        continue;
+                    }
+
+                    currentTask = "Calling ComputeGeneratingFunction " + currentIteration;
+
+                    var scoreDist = (from distribution in scoreDistributions
+                                     where Math.Abs(distribution.Item1 - match.Ion.Composition.Mass) <
+                                           Options.PrecursorIonTolerance.GetToleranceAsMz(match.Ion.Composition.Mass)
+                                     select distribution.Item2).FirstOrDefault();
+
+                    if (scoreDist == null)
+                    {
+                        var gf = new GeneratingFunction(graph);
+                        gf.ComputeGeneratingFunction();
+                        scoreDist = gf.GetScoreDistribution();
+                        scoreDistributions.AddLast(new Tuple<double, ScoreDistribution>(match.Ion.Composition.Mass, scoreDist));
+                    }
+
+                    currentTask = "Calling GetSpectralEValue " + currentIteration + " and score " + (int)match.Score;
+                    match.SpecEvalue = scoreDist.GetSpectralEValue(match.Score);
+
+                    currentTask = "Reporting progress " + currentIteration;
+                    SearchProgressReport(ref numProteins, ref lastUpdate, estimatedSequences, sw, progData, null);
+
+                    if (DEBUG_MODE && numProteins > DEBUG_MODE_PROTEINS_TO_SEARCH)
+                    {
+                        ConsoleMsgUtils.ShowWarning("Debug mode");
+                        ConsoleMsgUtils.ShowWarning("Exiting Parallel.ForEach since {0} proteins have been searched", DEBUG_MODE_PROTEINS_TO_SEARCH);
+
+                        Console.WriteLine();
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ReportError(string.Format("Exception while {0} in RunGeneratingFunctionWork: {1}", currentTask, ex.Message), ex);
+            }
         }
 
         private int GetNumberOfMatches(SortedSet<DatabaseSequenceSpectrumMatch>[] matches)
