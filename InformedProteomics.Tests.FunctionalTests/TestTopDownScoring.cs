@@ -50,6 +50,8 @@ namespace InformedProteomics.Tests.FunctionalTests
 
             const string filePath = @"H:\Research\QCShew_TopDown\Production\MsDeconvPlus\QC_Shew_Intact_26Sep14_Bane_C2Column3_msdeconv_plus.msalign";
             var parser = new MsDeconvFilter(run, new Tolerance(10), filePath);
+
+            Console.WriteLine(parser.GetMatchingMs2ScanNums(1200).ToList().Count);
         }
 
         /*
