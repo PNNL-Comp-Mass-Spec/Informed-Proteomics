@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Performance", "RCS1096:Convert 'HasFlag' call to bitwise operation (or vice versa).", Justification = "Leave as-is for readability", Scope = "member", Target = "~M:MSPathFinder.BottomUpInputParameters.Parse(System.Collections.Generic.Dictionary{System.String,System.String})~System.String")]
+[assembly: SuppressMessage("Roslynator", "RCS1123:Add parentheses when necessary.", Justification = "Parentheses not needed", Scope = "member", Target = "~M:MSPathFinder.Program.Main(System.String[])")]
