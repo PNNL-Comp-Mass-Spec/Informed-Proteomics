@@ -90,18 +90,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             }
 
             var acqStr = config.Contents["acquisitionmethod"].ToLower();
-            switch (acqStr)
-            {
-                case "dia":
-                    AcquisitionMethod = AcquisitionMethod.Dia;
-                    break;
-                case "dda":
-                    AcquisitionMethod = AcquisitionMethod.Dda;
-                    break;
-                default:
-                    throw new FormatException("Invalid Acquisition Method.");
-            }
 
+            AcquisitionMethod = acqStr switch
+            {
+                "dia" => AcquisitionMethod.Dia,
+                "dda" => AcquisitionMethod.Dda,
+                _ => throw new FormatException("Invalid Acquisition Method."),
+            };
             MassErrorTolerance = _defaultToleranceMz;
 
             MaxRanks = Convert.ToInt32(config.Contents["maxranks"]);
@@ -191,20 +186,14 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Config
             var fileInfo = reader.GetNodes("fileinfo").First();
             DataSets = fileInfo.Contents["name"].Split(',');
             var dataFormat = fileInfo.Contents["format"];
-            switch (dataFormat)
+
+            DataFormat = dataFormat switch
             {
-                case "mgf":
-                    DataFormat = DataFileFormat.Mgf;
-                    break;
-                case "icbottomup":
-                    DataFormat = DataFileFormat.IcBottomUp;
-                    break;
-                case "dia":
-                    DataFormat = DataFileFormat.Dia;
-                    break;
-                default:
-                    throw new FormatException("Invalid Acquisition Method.");
-            }
+                "mgf" => DataFileFormat.Mgf,
+                "icbottomup" => DataFileFormat.IcBottomUp,
+                "dia" => DataFileFormat.Dia,
+                _ => throw new FormatException("Invalid Acquisition Method.")
+            };
 
             TsvPath = fileInfo.Contents["tsvpath"];
             DataPath = fileInfo.Contents["datapath"];

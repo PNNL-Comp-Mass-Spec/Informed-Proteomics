@@ -233,30 +233,15 @@ namespace InformedProteomics.Backend.Utils
         /// <returns>An array where each index is the </returns>
         private double[] GetDefaultProportions(Atom element)
         {
-            double[] proportions = null;
-
-            if (element.Code == "C")
+            return element.Code switch
             {
-                proportions = IsoProfilePredictor.DefaultProbC;
-            }
-            else if (element.Code == "H")
-            {
-                proportions = IsoProfilePredictor.DefaultProbH;
-            }
-            else if (element.Code == "N")
-            {
-                proportions = IsoProfilePredictor.DefaultProbN;
-            }
-            else if (element.Code == "O")
-            {
-                proportions = IsoProfilePredictor.DefaultProbO;
-            }
-            else if (element.Code == "S")
-            {
-                proportions = IsoProfilePredictor.DefaultProbS;
-            }
-
-            return proportions;
+                "C" => IsoProfilePredictor.DefaultProbC,
+                "H" => IsoProfilePredictor.DefaultProbH,
+                "N" => IsoProfilePredictor.DefaultProbN,
+                "O" => IsoProfilePredictor.DefaultProbO,
+                "S" => IsoProfilePredictor.DefaultProbS,
+                _ => null
+            };
         }
 
         /// <summary>

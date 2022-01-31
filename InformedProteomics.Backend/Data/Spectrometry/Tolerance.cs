@@ -152,22 +152,12 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                 return null;
             }
 
-            ToleranceUnit tolUnit;
-            switch (unitStr)
+            var tolUnit = unitStr switch
             {
-                case "da":
-                    tolUnit = ToleranceUnit.Da;
-                    break;
-                case "th":
-                case "mz":
-                case "m/z":
-                    tolUnit = ToleranceUnit.Mz;
-                    break;
-                case "ppm":
-                default:
-                    tolUnit = ToleranceUnit.Ppm;
-                    break;
-            }
+                "da" => ToleranceUnit.Da,
+                "th" or "mz" or "m/z" => ToleranceUnit.Mz,
+                _ => ToleranceUnit.Ppm,
+            };
 
             return new Tolerance(Convert.ToDouble(valueStr), tolUnit);
         }

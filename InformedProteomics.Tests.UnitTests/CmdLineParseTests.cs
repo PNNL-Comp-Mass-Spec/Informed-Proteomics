@@ -337,23 +337,13 @@ namespace InformedProteomics.Tests.UnitTests
 
             for (var i = 1; i <= 3; i++)
             {
-                char residue;
-                switch (i)
+                var residue = i switch
                 {
-                    case 1:
-                        residue = 'S';
-                        break;
-                    case 2:
-                        residue = 'T';
-                        break;
-                    case 3:
-                        residue = 'Y';
-                        break;
-
-                    default:
-                        residue = '.';
-                        break;
-                }
+                    1 => 'S',
+                    2 => 'T',
+                    3 => 'Y',
+                    _ => '.',
+                };
 
                 modIndex = i;
                 Console.WriteLine("Validate that mod index {0} is {1}", modIndex, "Phospho");
