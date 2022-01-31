@@ -27,7 +27,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestFeatureId()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";
@@ -158,7 +158,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestGetProteinsWithTagMatchingSingleSpec()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int minNumTagMatches = 1;
@@ -243,7 +243,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestTagMatchingSingleSpec()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string dataSet = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3";
@@ -284,7 +284,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestFeatureIdMatching()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string resultFilePath = @"H:\Research\QCShew_TopDown\Production\M1_V092\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTda.tsv";
@@ -513,7 +513,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestTagMatching()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Parse sequence tags

@@ -18,7 +18,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void PrintOffsetFrequency()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TsvFile))

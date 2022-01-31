@@ -27,7 +27,7 @@ namespace InformedProteomics.Tests.Base
         [TestCase(@"\\proto-2\UnitTest_Files\E_coli_iscU_60_mock.raw", 0)]
         public void TestFiles(string fileNameOrPath, long expectedSizeBytes)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             string filePath;

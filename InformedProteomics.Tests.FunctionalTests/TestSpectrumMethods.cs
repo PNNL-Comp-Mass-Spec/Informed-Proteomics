@@ -18,7 +18,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void TestGetAllIsotopePeaks()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFilePath = @"H:\Research\GlycoTopDown\raw\User_sample_test_02252015.raw";

@@ -14,7 +14,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestIcTopDownFdr()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var targetFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"IdFiles\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget.tsv");

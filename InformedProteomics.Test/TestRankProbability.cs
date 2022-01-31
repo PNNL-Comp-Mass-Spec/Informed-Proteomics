@@ -19,7 +19,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void RankProbability()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string configurationFile = @"\\protoapps\UserData\Wilkins\BottomUp\RankProbabilityConfig.ini";

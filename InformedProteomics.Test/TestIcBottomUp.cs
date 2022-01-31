@@ -18,7 +18,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestChaoChaoWhim()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFileDir = @"D:\Research\Data\ChaoChao\WHIM\raw";
@@ -36,7 +36,7 @@ namespace InformedProteomics.Test
 
         public void TestChaoChao(string specFilePath)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(specFilePath))
@@ -107,7 +107,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestEdrn()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFileDir = @"H:\Research\EDRN\RawFiles\DIA";
@@ -125,7 +125,7 @@ namespace InformedProteomics.Test
 
         private void TestEdrn(string specFilePath)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(specFilePath))
@@ -167,7 +167,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestMaccossDia()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFileDir = @"D:\Research\Data\UW\QExactive\";
@@ -187,7 +187,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestMaccossDda()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFileDir = @"D:\Research\Data\UW\QExactive\";
@@ -205,7 +205,7 @@ namespace InformedProteomics.Test
 
         public void TestMaccoss(string specFilePath)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(specFilePath))
@@ -247,7 +247,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestQcShewQExactive()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // QC_Shew QE
@@ -291,7 +291,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestDdaPlus()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // QC_Shew QE
@@ -333,7 +333,7 @@ namespace InformedProteomics.Test
 
         public void TestBottomUpSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet, bool? tda, int ntt, double corrThreshold = 0.3)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Search parameters

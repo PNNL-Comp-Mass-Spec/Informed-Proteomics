@@ -18,7 +18,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestBuildingReverseGraph()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string annotation = "_.MARTKQTARK._";
@@ -49,7 +49,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestBuildingSequenceGraphLongProtein()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Configure amino acid set
@@ -106,7 +106,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestGraphWithModifications()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string annotation = "_.MIALNKTPQTIVFYKPYGVLCQFTDNSAHPRPTLKDYINLPDLYPVGRLDQDSEGLLLLTSNGKLQHRLAHREFAHQRTYFAQVEGSPTDEDLEPLRRGITFADYPTRPAIAKIITEPDFPPRNPPIRYRASIPTSWLSITLTEGRNRQVRRMTAAVGFPTLRLVRVQIQVTGRSPQQGKGKSAATWCLTLEGLSPGQWRPLTPWEENFCQQLLTGNPNGPWQKKFGDRR._";
@@ -169,7 +169,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestCreatingAminoAcidSet()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Configure amino acid set
@@ -195,7 +195,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestNTermMods()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string annotation = "_.QARTKQTARK._";
@@ -234,7 +234,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestReadingModFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var modFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\ProductionQCShew\Mods.txt");
@@ -253,7 +253,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestParsingCompositions()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string compStr = "CH-1N-3O23S";
@@ -264,7 +264,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestNumberOfProteoforms()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //const string annotation = "_.AMCMC._";
@@ -316,7 +316,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestGettingSequence()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //const string annotation = "_.AMCMC._";
@@ -364,7 +364,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestCreatingHistoneGraph()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int numMaxModsPerProtein = 11;

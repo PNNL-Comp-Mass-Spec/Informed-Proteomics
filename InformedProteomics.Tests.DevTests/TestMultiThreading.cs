@@ -16,7 +16,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         public void TestSequenceEnumerationParallel2()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new Stopwatch();
@@ -59,7 +59,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         public void TestSumParallel()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //var array = Enumerable.Range(0, short.MaxValue).ToArray();
@@ -129,7 +129,7 @@ namespace InformedProteomics.Tests.DevTests
 
         private void TestSequenceEnumerationWork(string dbFile, int expectedPeptideCount)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName, dbFile);
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
@@ -209,7 +209,7 @@ namespace InformedProteomics.Tests.DevTests
         //[TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 6334)]  // 15MB
         public void TestSequenceEnumerationIntact(string dbFile, int expected)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName, dbFile);
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
@@ -266,7 +266,7 @@ namespace InformedProteomics.Tests.DevTests
         [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 14862126)]  // 15MB
         public void TestSequenceEnumerationNCTerm(string dbFile, int expected)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName, dbFile);
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
@@ -328,7 +328,7 @@ namespace InformedProteomics.Tests.DevTests
         //[TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004208_295531A4.fasta", 1882434687)]  // 15MB
         public void TestSequenceEnumerationSerial(string dbFile, int expected)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName, dbFile);
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
@@ -384,7 +384,7 @@ namespace InformedProteomics.Tests.DevTests
         [TestCase(10000000, 664578, 0)]
         public void TestPrimesParallel(int ceiling, int primeCountExpected, int resultsToPreview)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new Stopwatch();
@@ -429,7 +429,7 @@ namespace InformedProteomics.Tests.DevTests
         [TestCase(10000000, 664578, 0)]
         public void TestPrimesSerial(int ceiling, int primeCountExpected, int resultsToPreview)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new Stopwatch();

@@ -17,7 +17,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void TestMs1Filter()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // QC_Shew

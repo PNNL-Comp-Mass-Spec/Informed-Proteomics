@@ -15,7 +15,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestSearching()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new System.Diagnostics.Stopwatch();
@@ -40,7 +40,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestEnumeratingPeptides()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new System.Diagnostics.Stopwatch();
@@ -70,7 +70,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestEnumeratingProteins()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new System.Diagnostics.Stopwatch();
@@ -101,7 +101,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestCountingPeptides()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new System.Diagnostics.Stopwatch();
@@ -145,7 +145,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestCountingProteoformsCloseToNTermOrCTerm()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int minSequenceLength = 21;   // 21
@@ -246,7 +246,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestGettingProteinLengthAndPosition()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var fastaFile = Utils.GetTestFile(methodName, Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"MSPathFinderT\Short.fasta"));

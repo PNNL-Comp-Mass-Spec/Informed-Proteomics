@@ -93,7 +93,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void IonPresent()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(RawFile))

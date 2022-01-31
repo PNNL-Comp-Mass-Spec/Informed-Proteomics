@@ -17,7 +17,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestLoadingProteoWizardWrapper()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //try

@@ -29,7 +29,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void TestQuantifyIdentifiedProteoforms()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
@@ -231,7 +231,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void TestAlignFeatures()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
@@ -498,7 +498,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         public void TestQuantifyMsAlignResult()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             TestUtils.ShowStarting(methodName);
 
             const string rawFolder = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2";
@@ -563,7 +563,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("PNL_Domain")]
         public void TestTagAlignedFeatures()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var featureDir = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "Output");
@@ -737,7 +737,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("PNL_Domain")]
         public void CopyUTEX()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var featureDir = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "Output");

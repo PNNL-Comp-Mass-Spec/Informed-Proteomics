@@ -209,7 +209,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                             }
 
                             observedPeakCount += observedPeak != null ? 1 : 0;
-                            observedIntensities[i] = observedPeak != null ? observedPeak.Item1.Intensity : 0.0;
+                            observedIntensities[i] = observedPeak?.Item1.Intensity ?? 0.0;
                         }
 
                         var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelope, observedIntensities);
@@ -513,7 +513,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 for (var i = 0; i < observedPeaks.Length; i++)
                                 {
                                     var observedPeak = observedPeaks[i];
-                                    observedIntensities[i] = observedPeak != null ? observedPeak.Intensity : 0.0;
+                                    observedIntensities[i] = observedPeak?.Intensity ?? 0.0;
                                 }
 
                                 var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelope, observedIntensities);
@@ -563,7 +563,7 @@ namespace InformedProteomics.Backend.Data.Spectrometry
                                 for (var i = 0; i < observedPeaks.Length; i++)
                                 {
                                     var observedPeak = observedPeaks[i];
-                                    observedIntensities[i] = observedPeak != null ? observedPeak.Intensity : 0.0;
+                                    observedIntensities[i] = observedPeak?.Intensity ?? 0.0;
                                 }
 
                                 var sim = FitScoreCalculator.GetDistanceAndCorrelation(envelope, observedIntensities);

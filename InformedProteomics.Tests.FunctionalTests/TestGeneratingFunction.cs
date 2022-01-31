@@ -34,7 +34,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [TestCase(446, "MKTFTATPETVTRDWFVVDADGKTLGRIATEIALRLRGKHKPEYTPHVDTGDYIIVINAEKVTVTGNKAQGKTYYSHSGFPGGIKQISFEKLQAHKPEMIIEKAVKGMLPKGPLGRAMFRKLKVYAGAEHNHAAQQPQVLDI")]
         public void TestGetScoreDistribution(int scanNum, string protSequence)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var pbfFilePath = Utils.GetPbfTestFilePath(false);

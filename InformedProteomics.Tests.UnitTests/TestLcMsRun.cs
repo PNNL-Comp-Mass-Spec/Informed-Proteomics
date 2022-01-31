@@ -16,7 +16,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestReadingIsolationWindows()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(FilePaths.TestRawFilePath))
@@ -39,7 +39,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestReadingScanNums()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(FilePaths.TestRawFilePath))
@@ -100,7 +100,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestParsingSpectrumFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new System.Diagnostics.Stopwatch();
@@ -138,7 +138,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestXCaliburReader()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var xcaliburReader = new XcaliburReader(FilePaths.TestTopDownRawFilePathCid);
@@ -163,7 +163,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestReadingDiaRawFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var rawFilePath = FilePaths.TestRawFilePath;
@@ -196,7 +196,7 @@ namespace InformedProteomics.Tests.UnitTests
         //[Test]
         //public void TestGeneratingProductXic()
         //{
-        //    var methodName = MethodBase.GetCurrentMethod().Name;
+        //    var methodName = MethodBase.GetCurrentMethod()?.Name;
         //    TestUtils.ShowStarting(methodName);
 
         //    const string rawFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raw";
@@ -225,7 +225,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestGeneratingProductManyXics()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var rawFilePath = FilePaths.TestRawFilePath;
@@ -288,7 +288,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestNoiseFiltration()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(FilePaths.TestQExactiveRawFilePath))
@@ -310,7 +310,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("Local_Testing")]
         public void TestReadingCorruptedRawFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var rawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"Corrupted\YS_Shew_testHCD_CID.raw");
@@ -337,7 +337,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("Local_Testing")]
         public void TestReadingSingleSpecMzMlFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string filePath = @"D:\Research\Data\TRex\VNVADCGAEALAR.mzML";
@@ -354,7 +354,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("Local_Testing")]
         public void TestReadingBrukerDaltonDataSet()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFilePath = @"D:\MassSpecFiles\ICR\20141212FGWT1_F5_1_01_3230.mzML";
@@ -382,7 +382,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestReadingRawFileWithSingleMs2Spectrum()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "2015-05-06_Carbonic_HCD_854_50AVG.raw");

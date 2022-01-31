@@ -31,7 +31,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void OffsetFrequencyFunction()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string configFilePath = @"C:\Users\wilk011\Documents\DataFiles\OffsetFreqConfig.ini";
@@ -113,7 +113,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void PrecursorOffsetFrequencyFunction()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string configFilePath = @"C:\Users\wilk011\Documents\DataFiles\PrecursorOffsetFreqConfig.ini";

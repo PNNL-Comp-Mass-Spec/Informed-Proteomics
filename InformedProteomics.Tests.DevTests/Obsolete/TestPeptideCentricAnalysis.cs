@@ -22,7 +22,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void CompareRt()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Q-Exactive
@@ -92,7 +92,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void CompareRtFusion()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Fusion
@@ -144,7 +144,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void GenerateVennDiagrams()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Fusion
@@ -182,7 +182,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void GenerateVennDiagramsPeMmr()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // No PE-MMR
@@ -235,7 +235,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void TestXicGen()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFilePath = @"D:\Research\Data\UW\Fusion\WT_D_DDA_130412065618.raw";
@@ -283,7 +283,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void TestFusionDdaData()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Parameters
@@ -418,7 +418,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void AnalyizeFusionDdaData()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Parameters

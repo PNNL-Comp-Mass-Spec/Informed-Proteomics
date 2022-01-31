@@ -20,7 +20,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void SummarizeAnilResults()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string resultFolder = @"H:\Research\Anil\Oct28";
@@ -85,7 +85,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void CountIdentifiedPeptides()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //const string targetResultPath = @"H:\Research\Jarret\10fmol_10mz\NoMod_NTT2\Q_2014_0523_50_10_fmol_uL_10mz_IcTarget.tsv";
@@ -126,7 +126,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void GenerateVennDiagrams()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // DIA
@@ -167,7 +167,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestIcrTools()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string icrToolsPath = @"H:\Research\Yufeng\TopDownYufeng\ICRTools\yufeng_column_test2_Isos.csv";

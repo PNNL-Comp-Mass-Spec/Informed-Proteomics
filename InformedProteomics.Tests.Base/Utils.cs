@@ -53,7 +53,7 @@ namespace InformedProteomics.Tests.Base
         /// <returns>Path to the file if found, otherwise the default path on Proto-2</returns>
         public static string GetPbfTestFilePath(bool createIfMissing)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
 
             var pbfFilePath = Path.Combine(DEFAULT_SPEC_FILES_FOLDER, PBF_TEST_FILE);
 

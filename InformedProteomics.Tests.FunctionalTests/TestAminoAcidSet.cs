@@ -15,7 +15,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [TestCase(@"TEST_FOLDER\TopDown\Lewy_ManyMods\Lewy_DB_Mods2.txt")]
         public void TestParsingManyMods(string modDefsFile)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
 
             var modFile = Utils.GetTestFile(methodName, modDefsFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
 

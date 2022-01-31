@@ -16,7 +16,7 @@ namespace InformedProteomics.Tests.UnitTests
         [TestCase(@"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML", 1001)]
         public void TestReadMzMLStd(string filePath, int expectedSpectra)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             var mzMLFile = Utils.GetTestFile(methodName, filePath.Replace("TEST_FOLDER", Utils.DEFAULT_SPEC_FILES_FOLDER));
 
             TestReadMzML(mzMLFile, expectedSpectra);
@@ -34,7 +34,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Category("PNL_Domain")]
         public void TestReadMzMLAddnl(string filePath, int expectedSpectra)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             var mzMLFile = Utils.GetTestFile(methodName, filePath.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
 
             TestReadMzML(mzMLFile, expectedSpectra);
@@ -42,7 +42,7 @@ namespace InformedProteomics.Tests.UnitTests
 
         private void TestReadMzML(FileSystemInfo mzMLFile, int expectedSpectra)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName, mzMLFile.Name);
 
             var timer = new Stopwatch();

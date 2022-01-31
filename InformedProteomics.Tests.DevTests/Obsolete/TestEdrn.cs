@@ -20,7 +20,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void GenerateVennDiagrams()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // DIA
@@ -53,7 +53,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void SummarizeDda()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string spikedInPeptideFile = @"D:\Research\Data\EDRN\SpikedPeptides.txt";
@@ -105,7 +105,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void ComputeSpikedInPeptideMzHist()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string pepListFile = @"C:\cygwin\home\kims336\Data\DIA\SpikedPeptides.txt";

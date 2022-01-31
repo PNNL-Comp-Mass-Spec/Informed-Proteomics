@@ -34,7 +34,7 @@ namespace InformedProteomics.Tests.DevTests
         [TestCase(0.05, 130)]
         public void TestClusterCentricSearch(double qValueThreshold, int expectedNumCompositions)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var resultFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv");
@@ -74,7 +74,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("PNL_Domain")]
         public void TestIsosFilter()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var isosFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_isos.csv");
@@ -99,7 +99,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void FilteringEfficiencyQcShew()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new System.Diagnostics.Stopwatch();
@@ -238,7 +238,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void FilteringEfficiency()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var sw = new System.Diagnostics.Stopwatch();
@@ -420,7 +420,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         public void TestFloatingPointRounding()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int numShifts = 36;
@@ -439,7 +439,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void TestPossibleSequenceMasses()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
@@ -473,7 +473,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void TestMs1Filtering()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string resultFilePath =
@@ -584,7 +584,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void TestMs2Caching()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles\SBEP_STM_001_02272012_Aragon.raw";
@@ -612,7 +612,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         public void TestAveragine()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //for (var nominalMass = 1000; nominalMass <= 1000; nominalMass++)
@@ -630,7 +630,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void TestMs1Signature()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDown\raw\DataFiles";
@@ -658,7 +658,7 @@ namespace InformedProteomics.Tests.DevTests
         {
             const int MAX_RUNTIME_SECONDS = 60;
 
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int minLength = 300;

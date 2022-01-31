@@ -432,7 +432,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Category("Local_Testing")]
         public void TestFindLowAbundanceFeature()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             TestUtils.ShowStarting(methodName);
             var i = 27;
             var rawFile = string.Format(@"{0}\{1}.pbf", PbfPath, GetDataSetNames(i));

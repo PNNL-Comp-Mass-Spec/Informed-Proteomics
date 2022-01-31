@@ -25,7 +25,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestSearchWithTagGeneration()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFilePath = @"D:\MassSpecFiles\training\raw\QC_Shew_Intact_26Sep14_Bane_C2Column3.pbf";
@@ -69,7 +69,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestTagBasedSearchForLewy()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFilePath = @"D:\MassSpecFiles\Lewy\Lewy_AT_AD1_21May15_Bane_14-09-01RZ.pbf";
@@ -108,7 +108,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestTagBasedSearchCompRef()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string dataSetPath = @"D:\MassSpecFiles\CompRef";
@@ -161,7 +161,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestTagBasedSearch()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //            const string rawFilePath = @"H:\Research\Lewy\raw\Lewy_intact_01.raw";
@@ -220,7 +220,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void FindProteins()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string fastaFilePath = @"H:\Research\QCShew_TopDown\Production\ID_002216_235ACCEA.fasta";
@@ -275,7 +275,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void CountMatchedProteins()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int minTagLength = 3;
@@ -432,7 +432,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void CountMatchedScansPerProtein()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int minTagLength = 6;
@@ -507,7 +507,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void FindProteinDeltaMass()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string folderPath = @"D:\MassSpecFiles\Glyco\";

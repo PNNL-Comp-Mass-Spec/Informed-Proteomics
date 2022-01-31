@@ -27,7 +27,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [TestCase(266, 15, "ALRLKDLVKKTERQLSDYQRQLSMVKTTESVQKATATITDSFASSNSKLLNAKDSLERIKARQQQFDDRLKAAETLAEEGSDKSLQAKLAEAGIGEQKSNANAVLERIKARKS", 63.5591347)]
         public void TestRescoring(int scanNum, int charge, string sequence, double expectedScore)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var pbfFilePath = Utils.GetPbfTestFilePath(false);

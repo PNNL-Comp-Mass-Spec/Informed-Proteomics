@@ -21,7 +21,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestSequenceTag()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //const string TestRawFile = @"D:\Vlad_TopDown\raw\yufeng_column_test2.raw";

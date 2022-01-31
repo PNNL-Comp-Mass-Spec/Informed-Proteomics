@@ -19,7 +19,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("PNL_Domain")]
         public void TestFitScoreCalculationCid()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(FilePaths.TestTopDownRawFilePathCid))
@@ -72,7 +72,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Ignore("Fit score no longer less than 0.15")]
         public void TestFitScoreCalculationEtd()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(FilePaths.TestTopDownRawFilePathEtd))
@@ -102,7 +102,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestFitScoreComputationTime()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int numTrials = 1000000;

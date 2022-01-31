@@ -14,7 +14,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestCompositions()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var comp1 = Modification.Oxidation.Composition;

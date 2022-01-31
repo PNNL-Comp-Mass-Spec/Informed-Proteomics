@@ -28,7 +28,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
         [Ignore("Local files")]
         public void TestGenerateFrequencyData()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string idFileFolder = @"D:\MassSpecFiles\training\IdScoring\MSPF_trainset";

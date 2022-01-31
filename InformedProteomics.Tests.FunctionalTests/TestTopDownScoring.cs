@@ -36,7 +36,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("PNL_Domain")]
         public void TestReadingMsDeconvFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFilePath = @"H:\Research\QCShew_TopDown\Production\QC_Shew_Intact_26Sep14_Bane_C2Column3.raw";
@@ -59,7 +59,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void PrintAllScorers()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             TestUtils.ShowStarting(methodName);
 
             //            Console.WriteLine(Convert.ToDouble("0"));
@@ -77,7 +77,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void TestLikelihoodScorer()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             TestUtils.ShowStarting(methodName);
 
 //            Console.WriteLine(Convert.ToDouble("0"));
@@ -96,7 +96,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("PNL_Domain")]
         public void TestMatchedPeakCounter()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Parameters
@@ -155,7 +155,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("PNL_Domain")]
         public void TestCorrMatchedPeakCounter()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Parameters
@@ -215,7 +215,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("PNL_Domain")]
         public void TestMatchedPeakPostScorer()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Parameters
@@ -250,7 +250,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestCompositeScoring()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var pbfFilePath = Utils.GetPbfTestFilePath(false);
@@ -361,7 +361,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void RecomputeFdr()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string targetResultPath = @"D:\MassSpecFiles\training\Rescoring\QC_Shew_Intact_26Sep14_Bane_C2Column3_IcTarget_Rescored.tsv";

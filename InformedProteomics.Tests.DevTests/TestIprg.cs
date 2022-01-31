@@ -22,7 +22,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void TestReadingExcelFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //const string resultFile = @"H:\Research\IPRG2015\Submissions\Submission_32080.xlsx";
@@ -32,7 +32,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void ProcessIprg2015PreStudy()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string dir = @"H:\Research\IPRG2015";
@@ -135,7 +135,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void AddNaToTable()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string dir = @"H:\Research\IPRG2015";
@@ -161,7 +161,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void AddProteinLengths()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string databaseFilePath = @"H:\Research\IPRG2015\database\yeast6proteaprotein.fasta";
@@ -207,7 +207,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void GetProteinAccessions()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string uniprotAccession = "[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}";
@@ -276,7 +276,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void CreateTargetList()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string databaseFilePath = @"D:\Research\Data\IPRG2014\database\SpikedInPeptides.fasta";

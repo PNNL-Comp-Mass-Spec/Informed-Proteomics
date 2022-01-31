@@ -26,7 +26,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [TestCase(10189.5639, "764,773,774,776,784,788,790,798,868,878,886,893,939,943,944,946")]
         public void TestReadingProMexFile(double massToFind, string expectedScanNumbers)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var pbfFilePath = Utils.GetPbfTestFilePath(false);

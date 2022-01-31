@@ -13,7 +13,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Ignore("Long running")]
         public void TestManyModSearch()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var rawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\Lewy_intact_01.raw");

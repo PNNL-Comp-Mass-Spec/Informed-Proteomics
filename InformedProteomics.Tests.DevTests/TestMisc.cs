@@ -21,7 +21,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void RemovePepFdrFromFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string henryResultPath = @"H:\Research\IPRG2015\Henry_results\tsv";
@@ -57,7 +57,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void CreatePeptideAbundanceTableWithSkyline()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Reading Henry's results
@@ -212,7 +212,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("Local_Testing")]
         public void TestPathUtils()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFilePath = @"C:\cygwin\home\kims336\Data\TopDownJia\raw\Synocho_D1_1.raw";

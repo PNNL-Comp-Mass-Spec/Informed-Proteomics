@@ -63,7 +63,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("PNL_Domain")]
         public void TestLcMsFeatureXic()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep2_15Jan15_Bane_C2-14-08-02RZ.pbf";
@@ -130,7 +130,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         public void TestLcMsFeatureFinder()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var pbfFilePath = Utils.GetPbfTestFilePath(false);

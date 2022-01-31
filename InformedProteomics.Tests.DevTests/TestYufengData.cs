@@ -31,7 +31,7 @@ namespace InformedProteomics.Tests.DevTests
         {
             const int MAX_RUNTIME_SECONDS = 12;
 
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var rawFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\QC_ShewIntact_40K_LongSeparation_1_141016155143.raw");
@@ -106,7 +106,7 @@ namespace InformedProteomics.Tests.DevTests
         [Ignore("Slow")]
         public void Test43KProtein()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Configure amino acid set
@@ -226,7 +226,7 @@ namespace InformedProteomics.Tests.DevTests
         [Ignore("Slow")]
         public void TestDeconvolution()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))
@@ -255,7 +255,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("PNL_Domain")]
         public void TestSumMs1Spectra()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath2))
@@ -281,7 +281,7 @@ namespace InformedProteomics.Tests.DevTests
         [Category("PNL_Domain")]
         public void TestRunningTimeSummingSpectra()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath2))
@@ -312,7 +312,7 @@ namespace InformedProteomics.Tests.DevTests
         [Ignore("Slow")]
         public void TestSumIsoProfilesAcrossDifferentCharges()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))
@@ -371,7 +371,7 @@ namespace InformedProteomics.Tests.DevTests
         [Ignore("Slow")]
         public void TestSmartIsoWindowSumming()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))
@@ -407,7 +407,7 @@ namespace InformedProteomics.Tests.DevTests
 
         public void TestCorrelation()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             Console.WriteLine("Test not implemented: " + methodName);
@@ -416,7 +416,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         public void GetIsoProfile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string protSequence =
@@ -449,7 +449,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         public void TestGetNumBins()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var comparer = new MzComparerWithBinning(26);
@@ -469,7 +469,7 @@ namespace InformedProteomics.Tests.DevTests
         [Ignore("Slow")]
         public void TestGeneratingXicsOfAllCharges()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))
@@ -550,7 +550,7 @@ namespace InformedProteomics.Tests.DevTests
         [Ignore("Slow")]
         public void TestAbpSumMs1Spectra()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var specFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw");
@@ -580,7 +580,7 @@ namespace InformedProteomics.Tests.DevTests
         [Test]
         public void TestIsoProfile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string sequence = "MWYMISAQDVENSLEKRLAARPAHLARLQELADEGRLLVAGPHPAIDSENPGDAGFSGSLVVADFDSLATAQAWADADPYFAAGVYQSVVVKPFKRVLP";
@@ -599,7 +599,7 @@ namespace InformedProteomics.Tests.DevTests
         [Ignore("Slow")]
         public void TestSumMs2Spectra()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var specFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TestYufengData\NewQC_LongSep_29Sep14_141001104925.raw");

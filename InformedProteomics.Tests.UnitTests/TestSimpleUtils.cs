@@ -17,7 +17,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestStringShuffling()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string str = "MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG";  // Histone H4
@@ -31,7 +31,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestStringMutation()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string str = "MSGRGKGGKGLGKGGAKRHRKVLRDNIQGITKPAIRRLARRGGVKRISGLIYEETRGVLKVFLENVIRDAVTYTEHAKRKTVTAMDVVYALKRQGRTLYGFGG";  // Histone H4
@@ -63,7 +63,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestCompositionOperations()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var comp = new Composition(1, 2, 3, 4, 5);
@@ -76,7 +76,7 @@ namespace InformedProteomics.Tests.UnitTests
         [Test]
         public void TestDblToString()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             TestValue(0, 0, "0");

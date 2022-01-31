@@ -23,7 +23,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void TestTopDownScoringForAllXics()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Search parameters
@@ -137,7 +137,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void TestMsAlignPlusResults()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             TopDownScorer.MaxCharge = 25;
@@ -201,7 +201,7 @@ namespace InformedProteomics.Tests.DevTests.Obsolete
         [Category("Local_Testing")]
         public void TestTopDownScoring()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             TopDownScorer.MaxCharge = 25;

@@ -37,7 +37,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void IonFrequencyFunction()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string configFilePath = @"C:\Users\wilk011\Documents\DataFiles\IonFreqConfig.ini";

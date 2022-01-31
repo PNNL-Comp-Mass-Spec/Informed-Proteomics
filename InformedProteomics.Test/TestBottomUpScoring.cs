@@ -24,7 +24,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestPsm()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
@@ -62,7 +62,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestVennDiagram()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string result1Path = @"C:\cygwin\home\kims336\Data\QCShewQE\NoMod_NTT1.tsv";
@@ -94,7 +94,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestLogLikelihoodScoring()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";
@@ -121,7 +121,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestPeptideLevelStats()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int topK = 10;
@@ -222,7 +222,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void CompareIpaIc()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string resultDir = @"D:\Research\Data\UW\QExactive\Ic_NTT2_03";

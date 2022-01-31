@@ -14,7 +14,7 @@ namespace InformedProteomics.Tests.DevTests
         [Ignore("Missing files")]
         public void TestUnidentifiedFeatureAnalysis()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string crossTabFile = @"C:\Users\mend645\Desktop\TopDown_Analyis\CPTAC_Intact_CompRef_Analysis.txt";

@@ -16,7 +16,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void TestReadingTmtResultFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var filePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, "MSGFPlusResultTMT10.tsv");

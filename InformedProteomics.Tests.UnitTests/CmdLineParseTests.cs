@@ -22,7 +22,7 @@ namespace InformedProteomics.Tests.UnitTests
         [TestCase(@"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML")]
         public void TestPbfGenParse(string filePath)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             var mzMLFile = Utils.GetTestFile(methodName, filePath.Replace("TEST_FOLDER", Utils.DEFAULT_SPEC_FILES_FOLDER));
             var mzMLFilePath = mzMLFile.FullName;
 
@@ -49,7 +49,7 @@ namespace InformedProteomics.Tests.UnitTests
         [TestCase(@"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML")]
         public void TestProMexParse(string filePath)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             var mzMLFile = Utils.GetTestFile(methodName, filePath.Replace("TEST_FOLDER", Utils.DEFAULT_SPEC_FILES_FOLDER));
             var mzMLFilePath = mzMLFile.FullName;
 
@@ -80,7 +80,7 @@ namespace InformedProteomics.Tests.UnitTests
         [TestCase(@"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML", @"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.ms1ft", @"TEST_FOLDER\MSPathFinderT\ID_003962_71E1A1D4.fasta", @"TEST_FOLDER\Databases\Mods.txt")]
         public void TestMSPathFinderTParse(string filePath, string featurePath, string dbPath, string modsPath)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             var mzMLFile = Utils.GetTestFile(methodName, filePath.Replace("TEST_FOLDER", Utils.DEFAULT_SPEC_FILES_FOLDER));
             var mzMLFilePath = mzMLFile.FullName;
             var fastaFile = Utils.GetTestFile(methodName, dbPath.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
@@ -131,7 +131,7 @@ namespace InformedProteomics.Tests.UnitTests
         [TestCase(@"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML", @"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.ms1ft", @"TEST_FOLDER\MSPathFinderT\ID_003962_71E1A1D4.fasta", @"TEST_FOLDER\Databases\Mods.txt")]
         public void TestMSPathFinderTParseOldSearchMode(string filePath, string featurePath, string dbPath, string modsPath)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             var mzMLFile = Utils.GetTestFile(methodName, filePath.Replace("TEST_FOLDER", Utils.DEFAULT_SPEC_FILES_FOLDER));
             var mzMLFilePath = mzMLFile.FullName;
             var fastaFile = Utils.GetTestFile(methodName, dbPath.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
@@ -182,7 +182,7 @@ namespace InformedProteomics.Tests.UnitTests
         [TestCase(@"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML", @"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.ms1ft", @"TEST_FOLDER\MSPathFinderT\ID_003962_71E1A1D4.fasta", @"TEST_FOLDER\MSPathFinderT\MSPF_MetOx_CysDehydro_NTermAcet_SingleInternalCleavage.txt")]
         public void TestMSPathFinderTParseParamFile(string filePath, string featurePath, string dbPath, string paramsPath)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             var mzMLFile = Utils.GetTestFile(methodName, filePath.Replace("TEST_FOLDER", Utils.DEFAULT_SPEC_FILES_FOLDER));
             var mzMLFilePath = mzMLFile.FullName;
             var fastaFile = Utils.GetTestFile(methodName, dbPath.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
@@ -267,7 +267,7 @@ namespace InformedProteomics.Tests.UnitTests
         [TestCase(@"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.mzML", @"TEST_FOLDER\QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt.ms1ft", @"TEST_FOLDER\MSPathFinderT\ID_003962_71E1A1D4.fasta", @"TEST_FOLDER\MSPathFinderT\MSPF_UVPD_MetOx_STYPhos_LysMethDiMethTriMeth_NTermAcet_Formyl_Hydroxyl_Biotin_Crotonyl_NoInternalCleavage_10ppm.txt")]
         public void TestMSPathFinderTParseParamFileSTY(string filePath, string featurePath, string dbPath, string paramsPath)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             var mzMLFile = Utils.GetTestFile(methodName, filePath.Replace("TEST_FOLDER", Utils.DEFAULT_SPEC_FILES_FOLDER));
             var mzMLFilePath = mzMLFile.FullName;
             var fastaFile = Utils.GetTestFile(methodName, dbPath.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));

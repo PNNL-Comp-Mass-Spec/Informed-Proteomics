@@ -19,7 +19,7 @@ namespace InformedProteomics.Test
         [Test]
         public void RankScoreParamResources()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int ranks = 20;
@@ -53,7 +53,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void RankScore()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int ranks = 20;
@@ -84,7 +84,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void DiaRankScore()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string dataFile = @"\\protoapps\UserData\Wilkins\BottomUp\HCD_QCShew\raw\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raw";

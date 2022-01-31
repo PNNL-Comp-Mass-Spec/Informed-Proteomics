@@ -47,7 +47,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void CollectTrainingSet()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string idFileFolder = @"D:\MassSpecFiles\training\IdResult";
@@ -119,7 +119,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void ExtractLcMsFeaturesForTrainingSet()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string idFileFolder = @"D:\MassSpecFiles\training\FilteredIdResult";
@@ -350,7 +350,7 @@ namespace InformedProteomics.Test
         [Category("PNL_Domain")]
         public void TestMs1EvidenceScore()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var testRawFile = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\Lewy_ManyMods\Lewy_intact_01.pbf");
@@ -431,7 +431,7 @@ namespace InformedProteomics.Test
         [TestCase(0.05, 98)]
         public void TestParsePtms(double qValueThreshold, int expectedPTMListCount)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var resultFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv");
@@ -503,7 +503,7 @@ namespace InformedProteomics.Test
         [TestCase(0.02, 12, 103)]
         public void TestParseMs1Ft(double qValueThreshold, int tolerancePpm, int expectedFeaturesWithId)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var resultFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_Shew_Intact_26Sep14_Bane_C2Column3_Excerpt_IcTda.tsv");
@@ -604,7 +604,7 @@ namespace InformedProteomics.Test
         [Category("PNL_Domain")]
         public void TestGeneratingMs1FeatureFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFilePath = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_2\QC_ShewIntact_1_19Jun15_Bane_14-09-01RZ.pbf";
@@ -647,7 +647,7 @@ namespace InformedProteomics.Test
         public void TestFeatureMapGeneration()
         {
             Console.WriteLine("Testing Working");
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var pbfFilePath = Utils.GetPbfTestFilePath(false);
@@ -682,7 +682,7 @@ namespace InformedProteomics.Test
         [TestCase(17804.0293, "459,479,480,503,505")]
         public void TestProMexFilter(double massToFind, string expectedScanNumbers)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var pbfFilePath = Utils.GetPbfTestFilePath(false);
@@ -731,7 +731,7 @@ namespace InformedProteomics.Test
         [Category("PNL_Domain")]
         public void TestFeatureExampleForFigure()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rawFile = @"\\proto-11\MSXML_Cache\PBF_Gen_1_193\2015_1\CPTAC_Intact_rep6_15Jan15_Bane_C2-14-08-02RZ.pbf";

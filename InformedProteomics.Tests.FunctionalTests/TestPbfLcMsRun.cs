@@ -22,7 +22,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestWritingPbfFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))
@@ -51,7 +51,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("PNL_Domain")]
         public void TestReadingPbfFile()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var pbfFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf");
@@ -119,7 +119,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestPbf()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var jobid = new int[]
@@ -169,7 +169,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("PNL_Domain")]
         public void TestGetChrom()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var pbfFilePath = Path.Combine(Utils.DEFAULT_TEST_FILE_FOLDER, @"TopDown\ProductionQCShew\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.pbf");
@@ -196,7 +196,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void TestRunningTimeChromGen()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rafFilePath = @"C:\cygwin\home\kims336\Data\QCShewQE\QC_Shew_13_04_A_17Feb14_Samwise_13-07-28.raf";
@@ -257,7 +257,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void TestGeneratingProductXic()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))
@@ -291,7 +291,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void TestGeneratingProductXics()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))
@@ -360,7 +360,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestGeneringAllXics()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))
@@ -406,7 +406,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestGettingXicVector()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))
@@ -486,7 +486,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Category("Local_Testing")]
         public void TestSpectrumNavigation()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string rafFilePath = @"H:\Research\Jarret\10mz\raw\Q_2014_0523_50_10_fmol_uL_10mz.raf";
@@ -504,7 +504,7 @@ namespace InformedProteomics.Tests.FunctionalTests
         [Test]
         public void TestPbfGen()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             if (!File.Exists(TestRawFilePath))

@@ -24,7 +24,7 @@ namespace InformedProteomics.Test
         [TestCase(@"TEST_FOLDER\MSPathFinderT\ID_004530_B63BD900.fasta", 9146396, 10562511, 11333064)]
         public void TestForManyMods(string dbFile, int expectedMaxLen300, int expectedMaxLen400, int expectedMaxLen500)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var fastaFile = Utils.GetTestFile(methodName, dbFile.Replace("TEST_FOLDER", Utils.DEFAULT_TEST_FILE_FOLDER));
@@ -50,7 +50,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestForVlad()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFilePath = @"D:\Research\Data\Vlad\raw\Alz_RA_C1_HCD_11012013_SW_03Nov2013.raw";
@@ -121,7 +121,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestForYufeng()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // QC_Shew
@@ -192,7 +192,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestForSystemsBiologyData()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //// Salmonella
@@ -244,7 +244,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestForAaronData()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownAaron\raw\MTB_intact_1.raw";
@@ -288,7 +288,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestForJiaData()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // QC_Shew
@@ -343,7 +343,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestForQcShew()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // QC_Shew
@@ -383,7 +383,7 @@ namespace InformedProteomics.Test
         private void TestTopDownSearch(string specFilePath, string dbFilePath, string outputDir, AminoAcidSet aaSet,
             DatabaseSearchMode tda, InternalCleavageType searchMode)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             const int minSequenceLength = 21; // 7
@@ -411,7 +411,7 @@ namespace InformedProteomics.Test
             double minSequenceMass, double maxSequenceMass,
             DatabaseSearchMode tda, InternalCleavageType searchMode)
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // Search parameters
@@ -454,7 +454,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestPrSm()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             //const string specFilePath = @"C:\cygwin\home\kims336\Data\TopDownYufeng\raw\yufeng_column_test2.raw";
@@ -518,7 +518,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestMsAlignRescoring()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, "QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw");
@@ -545,7 +545,7 @@ namespace InformedProteomics.Test
         [Category("Local_Testing")]
         public void TestIcRescoring()
         {
-            var methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod()?.Name;
             Utils.ShowStarting(methodName);
 
             // var specFilePath = Path.Combine(Utils.DEFAULT_SPEC_FILES_FOLDER, @"QC_ShewIntact_2ug_3k_CID_4Apr14_Bane_PL011402.raw");
