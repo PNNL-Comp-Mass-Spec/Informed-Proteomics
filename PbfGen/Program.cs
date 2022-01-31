@@ -108,12 +108,28 @@ namespace PbfGen
                 var specFilePaths = new List<string>();
                 var scanRangeShown = false;
 
-                if (options.SourceDatasetPaths.First() is DirectoryInfo directoryBasedDataset)
+                if (options.SourceDatasetPaths[0] is DirectoryInfo { Exists: true } inputDirectory)
                 {
-                    if (directoryBasedDataset.Exists && !MassSpecDataReaderFactory.IsADirectoryDataset(directoryBasedDataset.FullName))
+                    if (MassSpecDataReaderFactory.IsADirectoryDataset(inputDirectory.FullName))
                     {
-                        // TODO: Support folders with other formats in them too...
-                        specFilePaths.AddRange(Directory.GetFiles(options.SourcePath, "*.raw"));
+                        ConsoleMsgUtils.ShowDebug("Processing directory based dataset: " + inputDirectory.FullName);
+                    }
+                    else
+                    {
+                        // Look for .raw and .mzML files
+                        ConsoleMsgUtils.ShowDebug("Looking for .raw and .mzML files in directory " + inputDirectory.FullName);
+
+                        specFilePaths.AddRange(Directory.GetFiles(inputDirectory.FullName, "*.raw"));
+                        specFilePaths.AddRange(Directory.GetFiles(inputDirectory.FullName, "*.mzML"));
+
+                        if (specFilePaths.Count == 0)
+                        {
+                            ConsoleMsgUtils.ShowWarning(
+                                "Directory {0} does not have any .raw or .mzML files, and it is not a directory based dataset; aborting",
+                                inputDirectory.FullName);
+
+                            return -7;
+                        }
                     }
                 }
 
