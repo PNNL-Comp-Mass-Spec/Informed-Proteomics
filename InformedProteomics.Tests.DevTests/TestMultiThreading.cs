@@ -73,7 +73,7 @@ namespace InformedProteomics.Tests.DevTests
             var charArray = db.Characters().Select(c => (int)c).ToList();
 
             // Test methods.
-            var defaultSum = SumAsParallel(charArray);
+            var defaultSum = SumDefault(charArray);
             var parallelSum = SumAsParallel(charArray);
 
             Console.WriteLine("Default sum {0}", defaultSum);
@@ -100,9 +100,9 @@ namespace InformedProteomics.Tests.DevTests
             Console.WriteLine("{0:F2} msec/sum, on average for parallel", s2.Elapsed.TotalMilliseconds / m);
         }
 
-        private static void SumDefault(IEnumerable<int> array)
+        private static int SumDefault(IEnumerable<int> array)
         {
-            return;
+            return array.Sum();
         }
 
         private static int SumAsParallel(IEnumerable<int> array)
