@@ -96,6 +96,11 @@ namespace InformedProteomics.Backend.Utils
             // Copy it to a new array so we can manipulate it.
             var proportions = GetDefaultProportions(Element).ToArray();
 
+            if (proportions == null)
+            {
+                throw new Exception(string.Format("GetDefaultProportions returned null; element {0} is unsupported", Element.Code));
+            }
+
             // Make sure this is an isotope we know about and that it isn't the monoisotope
             if (IsotopeIndex < 1 || IsotopeIndex >= proportions.Length)
             {
