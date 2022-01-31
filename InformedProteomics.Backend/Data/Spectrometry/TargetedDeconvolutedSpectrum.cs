@@ -49,16 +49,18 @@ namespace InformedProteomics.Backend.Data.Spectrometry
         /// <returns>The neutral monoisotopic peak</returns>
         public DeconvolutedPeak FindPeak(Composition.Composition composition, Tolerance tolerance)
         {
+            const double INTENSITY_THRESHOLD = 0.0;
+
             var mass = composition.Mass;
             DeconvolutedPeak deconvolutedPeak = null;
-            var maxIntensity = 0.0;
+
             for (var charge = minCharge; charge <= maxCharge; charge++)
             {
                 var ion = new Ion(composition, charge);
                 var isotopePeaks = spectrum.GetAllIsotopePeaks(ion, tolerance);
                 var intensity = isotopePeaks.Max(peak => peak.Intensity);
                 var corrCos = GetCorrCos(ion, isotopePeaks);
-                if (intensity > maxIntensity)
+                if (intensity > INTENSITY_THRESHOLD)
                 {
                     deconvolutedPeak = new DeconvolutedPeak(mass, intensity, charge, corrCos.Item1, corrCos.Item2, isotopePeaks);
                 }
