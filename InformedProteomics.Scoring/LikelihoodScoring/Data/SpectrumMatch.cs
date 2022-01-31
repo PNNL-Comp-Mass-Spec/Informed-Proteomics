@@ -139,7 +139,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             }
         }
 
-        public Spectrum Spectrum => _spectrum ?? (_spectrum = _lcms.GetSpectrum(ScanNum));
+        public Spectrum Spectrum => _spectrum ??= _lcms.GetSpectrum(ScanNum);
 
         public Composition PeptideComposition => Sequence.Composition;
 

@@ -17,7 +17,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
             return Lcms.GetSpectrum(scanNum);
         }
 
-        private LcMsRun Lcms => _lcms ?? (_lcms = InMemoryLcMsRun.GetLcMsRun(_rawFileName, _snr1, _snr2));
+        private LcMsRun Lcms => _lcms ??= InMemoryLcMsRun.GetLcMsRun(_rawFileName, _snr1, _snr2);
         private readonly string _rawFileName;
         private readonly double _snr1;
         private readonly double _snr2;

@@ -354,7 +354,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns>Standard amino acid set</returns>
         public static AminoAcidSet GetStandardAminoAcidSet()
         {
-            return _standardAminoAcidSet ?? (_standardAminoAcidSet = new AminoAcidSet());
+            return _standardAminoAcidSet ??= new AminoAcidSet();
         }
 
         /// <summary>
@@ -363,8 +363,7 @@ namespace InformedProteomics.Backend.Data.Sequence
         /// <returns>Standard amino acid set, with alkylated cysteines</returns>
         public static AminoAcidSet GetStandardAminoAcidSetWithCarboamidomethylCys()
         {
-            return _standardAminoAcidSetWithCarboamidomethylCys ??
-                (_standardAminoAcidSetWithCarboamidomethylCys = new AminoAcidSet(Modification.Carbamidomethylation));
+            return _standardAminoAcidSetWithCarboamidomethylCys ??= new AminoAcidSet(Modification.Carbamidomethylation);
         }
 
         private static AminoAcidSet _standardAminoAcidSet;

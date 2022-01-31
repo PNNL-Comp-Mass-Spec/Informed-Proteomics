@@ -51,8 +51,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns>Isotopomer envelope</returns>
         public IsotopomerEnvelope GetIsotopomerEnvelope()
         {
-            return _isotopomerEnvelope ??
-                   (_isotopomerEnvelope = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass));
+            return _isotopomerEnvelope ??= Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
         }
 
         /// <summary>
