@@ -148,7 +148,7 @@ namespace InformedProteomics.Backend.Data.Composition
                 numH = 1;
             }
 
-            isoProfilePredictor = isoProfilePredictor ?? IsoProfilePredictor.Predictor;
+            isoProfilePredictor ??= IsoProfilePredictor.Predictor;
             return isoProfilePredictor.GetIsotopomerEnvelope(numC, numH, numN, numO, numS);
         }
     }

@@ -193,7 +193,7 @@ namespace InformedProteomics.Backend.Utils
         /// <returns>List of peaks</returns>
         public List<Peak> AlignObservedPeaks(IList<Peak> observedPeaks, IList<Peak> theoreticalPeaks, Tolerance tolerance = null)
         {
-            tolerance = tolerance ?? new Tolerance(10, ToleranceUnit.Ppm);
+            tolerance ??= new Tolerance(10, ToleranceUnit.Ppm);
 
             // Remove empty peaks
             observedPeaks = observedPeaks.Where(peak => peak.Mz > 0.0).ToList();

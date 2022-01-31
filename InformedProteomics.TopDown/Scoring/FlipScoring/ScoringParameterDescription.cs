@@ -29,7 +29,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
         /// <returns>The path as a string.</returns>
         public string GetPath(string paramPath = null)
         {
-            paramPath = paramPath ?? "scoringParams";
+            paramPath ??= "scoringParams";
             var topDown = IsTopDown ? "topDown" : "bottomUp";
             return Path.Combine(paramPath, string.Format("{0}_{1}", ActivationMethod, topDown));
         }

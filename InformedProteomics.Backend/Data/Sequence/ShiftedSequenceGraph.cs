@@ -204,13 +204,20 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
 
             var node = _graph[seqIndex][modIndex];
-            var curNodeScore = nodeScore[seqIndex][modIndex] ??
-                               (nodeScore[seqIndex][modIndex] = _isForward
-                                   ? scorer.GetFragmentScore(GetComposition(seqIndex, modIndex),
-                                       GetComplementaryComposition(seqIndex, modIndex))
-                                   : scorer.GetFragmentScore(GetComplementaryComposition(seqIndex, modIndex),
-                                       GetComposition(seqIndex, modIndex))
-                                   );
+
+
+            // The following will use nodeScore[seqIndex][modIndex] if it is not null
+            // Otherwise, it will update nodeScore[seqIndex][modIndex] using scorer.GetFragmentScore(), then store in curNodeScore
+            var curNodeScore =
+                    nodeScore[seqIndex][modIndex] ??=
+                        _isForward
+                            ? scorer.GetFragmentScore(
+                                GetComposition(seqIndex, modIndex),
+                                GetComplementaryComposition(seqIndex, modIndex))
+                            : scorer.GetFragmentScore(
+                                GetComplementaryComposition(seqIndex, modIndex),
+                                GetComposition(seqIndex, modIndex))
+;
 
             var bestPrevNodeIndex = -1;
             var bestPrevNodeScore = double.NegativeInfinity;
@@ -339,11 +346,18 @@ namespace InformedProteomics.Backend.Data.Sequence
             }
 
             var node = _graph[seqIndex][modIndex];
-            var curNodeScore = nodeScore[seqIndex][modIndex] ??
-                (nodeScore[seqIndex][modIndex] =
-                    _isForward ? scorer.GetFragmentScore(GetComposition(seqIndex, modIndex), GetComplementaryComposition(seqIndex, modIndex))
-                    : scorer.GetFragmentScore(GetComplementaryComposition(seqIndex, modIndex), GetComposition(seqIndex, modIndex))
-                    );
+
+            // The following will use nodeScore[seqIndex][modIndex] if it is not null
+            // Otherwise, it will update nodeScore[seqIndex][modIndex] using scorer.GetFragmentScore(), then store in curNodeScore
+            var curNodeScore =
+                    nodeScore[seqIndex][modIndex] ??=
+                        _isForward
+                        ? scorer.GetFragmentScore(
+                            GetComposition(seqIndex, modIndex),
+                            GetComplementaryComposition(seqIndex, modIndex))
+                        : scorer.GetFragmentScore(
+                            GetComplementaryComposition(seqIndex, modIndex),
+                            GetComposition(seqIndex, modIndex));
 
             var prevNodeScore = 0.0;
             if (node.GetPrevNodeIndices().Any())
