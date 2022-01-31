@@ -1689,13 +1689,9 @@ namespace InformedProteomics.FeatureFinding.FeatureDetection
             var colShift = 0;
             var hitMinCol = false;
             var hitMaxCol = false;
-            while (true)
-            {
-                if (hitMinCol && hitMaxCol)
-                {
-                    break;
-                }
 
+            while (!hitMinCol || !hitMaxCol)
+            {
                 if (n > 3)
                 {
                     break;

@@ -126,12 +126,9 @@ namespace InformedProteomics.TopDown.SequenceTag
                 var component = new List<int>();
                 var neighbors = new Queue<int>();
                 neighbors.Enqueue(i);
-                while (true)
+
+                while (neighbors.Count >= 1)
                 {
-                    if (neighbors.Count < 1)
-                    {
-                        break;
-                    }
 
                     var j = neighbors.Dequeue();
                     if (visited[j])
