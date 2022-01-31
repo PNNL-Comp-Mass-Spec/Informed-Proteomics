@@ -205,7 +205,6 @@ namespace InformedProteomics.Backend.Data.Sequence
 
             var node = _graph[seqIndex][modIndex];
 
-
             // The following will use nodeScore[seqIndex][modIndex] if it is not null
             // Otherwise, it will update nodeScore[seqIndex][modIndex] using scorer.GetFragmentScore(), then store in curNodeScore
             var curNodeScore =

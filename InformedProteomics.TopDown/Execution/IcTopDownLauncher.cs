@@ -1067,7 +1067,6 @@ namespace InformedProteomics.TopDown.Execution
                     currentTask = "Inside ForEach";
                     RunGeneratingFunctionWork(currentTask, scanNum, matches, ref numProteins, ref lastUpdate, estimatedSequences, sw, progData);
                 }
-
             }
 
             // Values in this SortedSet are Sequence_Modification_ProteinName
