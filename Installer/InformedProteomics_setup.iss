@@ -17,10 +17,15 @@ Source: InformedProteomics.Backend\bin\Release\net472\InformedProteomics.Backend
 
 ; InformedProteomics.Backend Nuget libraries
 Source: InformedProteomics.Backend\bin\Release\net472\CsvHelper.dll                                     ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\InformedProteomics.Backend.dll                    ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net472\MathNet.Numerics.dll                              ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net472\Microsoft.Bcl.AsyncInterfaces.dll                 ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\Microsoft.Bcl.HashCode.dll                        ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net472\PRISM.dll                                         ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net472\PSI_Interface.dll                                 ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\System.Buffers.dll                                ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\System.Memory.dll                                 ; DestDir: {app}
+Source: InformedProteomics.Backend\bin\Release\net472\System.Numerics.Vectors.dll                       ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net472\System.Runtime.CompilerServices.Unsafe.dll        ; DestDir: {app}
 Source: InformedProteomics.Backend\bin\Release\net472\System.Threading.Tasks.Extensions.dll             ; DestDir: {app}
 
@@ -47,6 +52,7 @@ Source: InformedProteomics.BottomUp\bin\Release\InformedProteomics.BottomUp.dll 
 ; InformedProteomics.FeatureFinding Nuget libraries
 Source: InformedProteomics.FeatureFinding\bin\Release\OxyPlot.dll                            ; DestDir: {app}
 Source: InformedProteomics.FeatureFinding\bin\Release\OxyPlot.Wpf.dll                        ; DestDir: {app}
+Source: InformedProteomics.FeatureFinding\bin\Release\OxyPlot.Wpf.Shared.dll                 ; DestDir: {app}
 
 ; InformedProteomics.FeatureFinding libraries
 Source: InformedProteomics.FeatureFinding\bin\Release\InformedProteomics.FeatureFinding.dll  ; DestDir: {app};          Flags: ignoreversion
