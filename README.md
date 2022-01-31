@@ -87,7 +87,7 @@ PbfGen.exe
 
 `-i` or `-s` or `-InputFile`
 * Input file or input directory
-* Supports .pbf, .mzML, and several vendor formats (see documentation)
+* Supports .raw, .mzML, and several vendor formats (see documentation)
 
 `-o` or `-OutputDirectory`
 * Output directory.
