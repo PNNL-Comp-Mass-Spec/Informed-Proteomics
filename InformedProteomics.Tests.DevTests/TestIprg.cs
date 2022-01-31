@@ -53,7 +53,7 @@ namespace InformedProteomics.Tests.DevTests
             }
 
             var jobParser = new TsvFileParser(jobFilePath);
-            var jobs = jobParser.GetData("Jobs").Select(j => Convert.ToInt32((string)j)).ToArray();
+            var jobs = jobParser.GetData("Jobs").Select(j => Convert.ToInt32(j)).ToArray();
             var experiments = jobParser.GetData("Experiments").Select(e => e.Split('_')[2]).ToArray();
 
             //const string resultFilePath = dir + @"\AMT_Proteins_NA.tsv";

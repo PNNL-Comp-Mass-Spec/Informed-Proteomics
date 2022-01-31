@@ -611,7 +611,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 if (s.hasCVParam(CVID.MS_scan_start_time))
                 {
                     var timeCvParam = s.cvParam(CVID.MS_scan_start_time);
-                    scanTime = (double)timeCvParam.value;
+                    scanTime = timeCvParam.value;
                     // Conversion: CV dictates possible units of 'minute' and 'second'
                     if (timeCvParam.units == CVID.UO_second)
                     {
@@ -623,7 +623,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     var driftCvParam = s.cvParam(CVID.MS_ion_mobility_drift_time);
                     // No conversion: CV dictates only valid units of 'millisecond'
-                    driftTime = (double)driftCvParam.value;
+                    driftTime = driftCvParam.value;
                 }
             }
             if (msLevel > 1)
@@ -633,7 +633,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 {
                     if (up.name == "[Thermo Trailer Extra]Monoisotopic M/Z:")
                     {
-                        thermoMonoMass = (double)(up.value);
+                        thermoMonoMass = up.value;
                     }
                 }
                 var am = ActivationMethod.Unknown;
@@ -684,7 +684,7 @@ namespace InformedProteomics.Backend.MassSpecData
                         {
                             charge = (int)(si.cvParam(CVID.MS_charge_state).value);
                         }
-                        selectedIonMz = (double)(si.cvParam(CVID.MS_selected_ion_m_z).value);
+                        selectedIonMz = si.cvParam(CVID.MS_selected_ion_m_z).value;
                     }
                     if (thermoMonoMass == null || thermoMonoMass.Value.Equals(0))
                     {

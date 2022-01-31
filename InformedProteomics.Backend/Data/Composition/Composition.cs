@@ -251,12 +251,12 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <summary>
         /// Mass of the composition
         /// </summary>
-        public override double Mass => (double)(_mass ??= GetMonoIsotopicMass());
+        public override double Mass => _mass ??= GetMonoIsotopicMass();
 
         /// <summary>
         /// Nominal mass of the composition
         /// </summary>
-        public override int NominalMass => (int)(_nominalMass ??= GetNominalMass());
+        public override int NominalMass => _nominalMass ??= GetNominalMass();
 
         #endregion
 

@@ -48,7 +48,7 @@ namespace InformedProteomics.Tests.DevTests.TopDownAnalysis
                         for (var i = 0; i < observedPeaks.Length; i++)
                         {
                             var observedPeak = observedPeaks[i];
-                            observedIntensities[i] = observedPeak != null ? (float)observedPeak.Intensity : 0.0;
+                            observedIntensities[i] = observedPeak != null ? observedPeak.Intensity : 0.0;
                         }
                         var corrCoeff = FitScoreCalculator.GetPearsonCorrelation(isotopomerEnvelope, observedIntensities);
 
