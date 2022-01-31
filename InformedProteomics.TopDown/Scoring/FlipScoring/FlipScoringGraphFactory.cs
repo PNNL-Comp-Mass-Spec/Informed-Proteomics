@@ -89,7 +89,7 @@ namespace InformedProteomics.TopDown.Scoring.FlipScoring
                     var aaWeight = aminoAcidProbabilities.ContainsKey(aa.Residue) ? Math.Log10(aminoAcidProbabilities[aa.Residue]) : 0;
                     adjList[j].AddLast(new FlipScoringGraphEdge(i, j, aaWeight, aa, null));
 
-                    if (i == 0 && !(aa is ModifiedAminoAcid))
+                    if (i == 0 && aa is not ModifiedAminoAcid)
                     {
                         foreach (var terminalMod in terminalModifications)
                         {

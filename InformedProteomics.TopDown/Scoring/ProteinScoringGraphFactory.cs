@@ -36,7 +36,7 @@ namespace InformedProteomics.TopDown.Scoring
 
                     _adjList[j].AddLast(new ScoringGraphEdge(i));
 
-                    if (i == 0 && !(aa is ModifiedAminoAcid))
+                    if (i == 0 && aa is not ModifiedAminoAcid)
                     {
                         foreach (var terminalMod in terminalModifications)
                         {

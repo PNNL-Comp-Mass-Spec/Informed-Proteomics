@@ -76,7 +76,7 @@ namespace InformedProteomics.Scoring.TopDown
 
                     fineNodes[validFineNodeIndex] = true;
 
-                    if (fineBinIdx == 0 && !(aa is ModifiedAminoAcid)) // include terminal modifications
+                    if (fineBinIdx == 0 && aa is not ModifiedAminoAcid) // include terminal modifications
                     {
                         foreach (var terminalMod in terminalModifications)
                         {
