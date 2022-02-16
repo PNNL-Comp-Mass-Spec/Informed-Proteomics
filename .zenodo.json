@@ -1,0 +1,19 @@
+{
+   "description":"<p>The Informed Proteomics project includes algorithms for proteomic mass spectrometry data analysis. The primary tool is MSPathFinder, which identifies peptides in top-down LC-MS/MS datasets.</p>",
+
+   "license":"Apache-2.0",
+
+   "keywords":[
+      "Proteomics",
+      "Mass spectrometry",
+      "Top-down LC-MS/MS",
+      "ProMex",
+      "MSPathFinder"
+   ],
+
+   "communities":[
+      {
+         "identifier":"pnnl"
+      }
+   ]
+}
