@@ -340,7 +340,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Gets the list of supported file types as a pair of description and file extensions, assuming  only ThermoRawFileReaderDLL is available
         /// </summary>
         /// <remarks>
-        /// Returns the limited list of supported file types if only ThermoRawFileReaderDLL is available
+        /// Returns the delimited list of supported file types if only ThermoRawFileReaderDLL is available
         /// </remarks>
         private static List<Tuple<string, string[]>> SupportedTypesBuiltIn => new()
         {
@@ -353,7 +353,7 @@ namespace InformedProteomics.Backend.MassSpecData
         /// Gets the list of supported file types as a pair of description and file extension when no external DLLs are available
         /// </summary>
         /// <remarks>
-        /// Returns the limited list of supported file types natively supported by InformedProteomics without any external DLLs available
+        /// Returns the delimited list of supported file types natively supported by InformedProteomics without any external DLLs available
         /// </remarks>
         private static List<Tuple<string, string[]>> SupportedTypesNoExternalDll => new()
         {
