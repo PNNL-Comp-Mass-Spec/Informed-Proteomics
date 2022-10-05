@@ -12,23 +12,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.FileReaders
     {
         public static IDataFileReader Create(DataFileFormat format, string annotations, bool decoy, LazyLcMsRun lcms = null)
         {
-            IDataFileReader reader;
-            switch (format)
+            return format switch
             {
-                case DataFileFormat.Mgf:
-                    reader = new MgfReader(annotations, decoy);
-                    break;
-                case DataFileFormat.IcBottomUp:
-                    reader = new IcBottomUpTsvReader(annotations, lcms, decoy);
-                    break;
-                case DataFileFormat.Dia:
-                    reader = new DiaTsvReader(annotations, lcms, decoy);
-                    break;
-                default:
-                    reader = null;
-                    break;
-            }
-            return reader;
+                DataFileFormat.Mgf => new MgfReader(annotations, decoy),
+                DataFileFormat.IcBottomUp => new IcBottomUpTsvReader(annotations, lcms, decoy),
+                DataFileFormat.Dia => new DiaTsvReader(annotations, lcms, decoy),
+                _ => null
+            };
         }
     }
 }

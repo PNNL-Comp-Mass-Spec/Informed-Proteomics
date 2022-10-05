@@ -165,23 +165,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
 
         private double GetScore(Ion ion, Spectrum spectrum, Tolerance tolerance, double relativeIntensityThreshold)
         {
-            double score;
-            switch (_method)
+            return _method switch
             {
-                case ScoreMethod.Cosine:
-                    score = spectrum.GetCosineScore(ion, tolerance, relativeIntensityThreshold);
-                    break;
-                case ScoreMethod.FitScore:
-                    score = spectrum.GetFitScore(ion, tolerance, relativeIntensityThreshold);
-                    break;
-                case ScoreMethod.Pearson:
-                    score = spectrum.GetCorrScore(ion, tolerance, relativeIntensityThreshold);
-                    break;
-                default:
-                    score = spectrum.GetCosineScore(ion, tolerance, relativeIntensityThreshold);
-                    break;
-            }
-            return score;
+                ScoreMethod.Cosine => spectrum.GetCosineScore(ion, tolerance, relativeIntensityThreshold),
+                ScoreMethod.FitScore => spectrum.GetFitScore(ion, tolerance, relativeIntensityThreshold),
+                ScoreMethod.Pearson => spectrum.GetCorrScore(ion, tolerance, relativeIntensityThreshold),
+                _ => spectrum.GetCosineScore(ion, tolerance, relativeIntensityThreshold)
+            };
         }
 
         private readonly double[] _binEdges;
