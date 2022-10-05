@@ -261,9 +261,7 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.ProbabilityTables
                     // reached end of rank table entry
                     break;
                 }
-                else if (header == "Unexplained")
-                { }
-                else
+                else if (header != "Unexplained")
                 {
                     if (MaxRanks < 0)
                     {
