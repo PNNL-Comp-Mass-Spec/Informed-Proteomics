@@ -319,9 +319,9 @@ namespace InformedProteomics.FeatureFinding.Data
             {
                 var k = (rnd.Next(0, n) % n);
                 n--;
-                var value = list[k];
-                list[k] = list[n];
-                list[n] = value;
+
+                // Swap values
+                (list[k], list[n]) = (list[n], list[k]);
             }
         }
 
