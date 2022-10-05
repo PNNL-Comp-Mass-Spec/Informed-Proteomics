@@ -136,10 +136,7 @@ namespace InformedProteomics.TopDown.Quantification
                         break;
                     }
 
-                    foreach (var n in edges[current])
-                    {
-                        toVisit.Add(n);
-                    }
+                    toVisit.AddRange(edges[current]);
                 }
             }
             return connectedComp;
