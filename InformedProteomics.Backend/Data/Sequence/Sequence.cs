@@ -66,6 +66,7 @@ namespace InformedProteomics.Backend.Data.Sequence
 
                 sb.AppendFormat("{0} {1}", modAa.Modification.Name, i);
             }
+
             return sb.ToString();
         }
 
@@ -108,7 +109,7 @@ namespace InformedProteomics.Backend.Data.Sequence
             {
                 var residue = sequence[i];
                 var aa = aminoAcidSet.GetAminoAcid(residue);
-                if (i == 0 && indexModMap.ContainsKey(-1))  // N-term modification
+                if (i == 0 && indexModMap.ContainsKey(-1)) // N-term modification
                 {
                     var nTermMod = indexModMap[-1];
                     aa = new ModifiedAminoAcid(aa, nTermMod);
@@ -179,12 +180,13 @@ namespace InformedProteomics.Backend.Data.Sequence
             for (var index = 0; index < Count - 1; ++index)
             {
                 cleavages[index] = new Cleavage(
-                    prefixComposition += this[index].Composition,   // prefix
+                    prefixComposition += this[index].Composition, // prefix
                     this[index],
-                    suffixComposition += this[Count - 1 - index].Composition,    // suffix
+                    suffixComposition += this[Count - 1 - index].Composition, // suffix
                     this[index + 1]
-                    );
+                );
             }
+
             return cleavages;
         }
 
@@ -288,7 +290,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                     continue;
                 }
 
-                if (element.Length == 1 && char.IsLetter(element[0]))   // amino acid
+                if (element.Length == 1 && char.IsLetter(element[0])) // amino acid
                 {
                     if (aa != null)
                     {
@@ -296,6 +298,7 @@ namespace InformedProteomics.Backend.Data.Sequence
                         aaList.Add(aa);
                         mods = new List<Modification>();
                     }
+
                     aa = stdAaSet.GetAminoAcid(element[0]);
                     if (aa == null)
                     {

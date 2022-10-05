@@ -397,6 +397,7 @@ namespace InformedProteomics.TopDown.Execution
             {
                 var results = targetSearchResults;
                 var filePath = targetOutputFilePath;
+
                 if (!Options.TargetDecoySearchMode.HasFlag(DatabaseSearchMode.Target))
                 {
                     results = decoySearchResults;
