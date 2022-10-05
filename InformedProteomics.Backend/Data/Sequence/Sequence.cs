@@ -373,5 +373,14 @@ namespace InformedProteomics.Backend.Data.Sequence
 
         //    return new Sequence(aaList);
         //}
+
+        /// <summary>
+        /// Convert the list of amino acids tracked by this class to a peptide sequence
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return this.Aggregate(string.Empty, (current, item) => current + item.Residue);
+        }
     }
 }
