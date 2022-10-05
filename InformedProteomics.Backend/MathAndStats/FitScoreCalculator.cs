@@ -74,16 +74,13 @@ namespace InformedProteomics.Backend.MathAndStats
             }
 
             var pValue = Hypergeometric.CDF(n, k, n1, k1);
+
             if (upperTailProb)
             {
-                pValue = 1 - pValue;
-            }
-            else
-            {
-                pValue = Math.Min(pValue, 1 - pValue);
+                return 1 - pValue;
             }
 
-            return pValue;
+            return Math.Min(pValue, 1 - pValue);
         }
 
         /// <summary>

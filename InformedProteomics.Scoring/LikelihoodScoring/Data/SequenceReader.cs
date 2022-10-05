@@ -12,17 +12,13 @@ namespace InformedProteomics.Scoring.LikelihoodScoring.Data
         }
         public Sequence GetSequence(string sequence)
         {
-            Sequence seq;
             if (_format == DataFileFormat.Mgf)
             {
                 var sequenceReader = new MgfSequenceReader();
-                seq = sequenceReader.GetSequence(sequence);
+                return sequenceReader.GetSequence(sequence);
             }
-            else
-            {
-                seq = Sequence.GetSequenceFromMsGfPlusPeptideStr(sequence);
-            }
-            return seq;
+
+            return Sequence.GetSequenceFromMsGfPlusPeptideStr(sequence);
         }
     }
 }

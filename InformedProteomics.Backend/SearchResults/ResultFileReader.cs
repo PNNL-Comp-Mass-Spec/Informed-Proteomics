@@ -20,21 +20,20 @@ namespace InformedProteomics.Backend.SearchResults
         /// <returns>Container with database search results</returns>
         public static SimpleMZIdentMLReader.SimpleMZIdentMLData ReadResultFile(string filePath)
         {
-            SimpleMZIdentMLReader.SimpleMZIdentMLData results = null;
-
             var lowerFilePath = filePath.ToLower();
 
             if (lowerFilePath.EndsWith(".mzid") || lowerFilePath.EndsWith(".mzid.gz"))
             {
                 var mzidReader = new SimpleMZIdentMLReader();
-                results = mzidReader.Read(filePath);
-            }
-            else if (lowerFilePath.EndsWith("_ictda.tsv"))
-            {
-                results = DatabaseSearchResultData.ReadResultsFromFileToMzIdData(filePath);
+                return mzidReader.Read(filePath);
             }
 
-            return results;
+            if (lowerFilePath.EndsWith("_ictda.tsv"))
+            {
+                return DatabaseSearchResultData.ReadResultsFromFileToMzIdData(filePath);
+            }
+
+            return null;
         }
     }
 }
