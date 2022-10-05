@@ -12,10 +12,7 @@ namespace InformedProteomics.Scoring.GeneratingFunction
 
         public void AddEdge(ScoringGraphEdge edge)
         {
-            if (_edgeList == null)
-            {
-                _edgeList = new List<ScoringGraphEdge>();
-            }
+            _edgeList ??= new List<ScoringGraphEdge>();
 
             _edgeList.Add(edge);
         }

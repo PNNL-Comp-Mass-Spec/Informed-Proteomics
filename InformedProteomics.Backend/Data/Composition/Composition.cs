@@ -644,10 +644,7 @@ namespace InformedProteomics.Backend.Data.Composition
                             return null;
                         }
 
-                        if (additionalElements == null)
-                        {
-                            additionalElements = new Dictionary<Atom, short>();
-                        }
+                        additionalElements ??= new Dictionary<Atom, short>();
 
                         if (additionalElements.TryGetValue(atom, out var currentAtomCount))
                         {

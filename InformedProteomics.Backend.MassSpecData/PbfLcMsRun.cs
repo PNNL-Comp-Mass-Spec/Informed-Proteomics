@@ -382,10 +382,7 @@ namespace InformedProteomics.Backend.MassSpecData
             int scanStart = 0,
             int scanEnd = 0)
         {
-            if (msDataReader == null)
-            {
-                msDataReader = MassSpecDataReaderFactory.GetMassSpecDataReader(specFileName);
-            }
+            msDataReader ??= MassSpecDataReaderFactory.GetMassSpecDataReader(specFileName);
 
             NumSpectra = msDataReader.NumSpectra;
             RawFilePath = specFileName;
@@ -1988,10 +1985,7 @@ namespace InformedProteomics.Backend.MassSpecData
                 var peaksCount = 0;
                 var metadata = new Dictionary<int, ScanPeakMetaData>(scansForMsLevelX.Count);
 
-                if (_reader == null)
-                {
-                    _reader = new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
-                }
+                _reader ??= new BinaryReader(File.Open(PbfFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 
                 progData.StepRange(5);
                 var lastProgressTime = DateTime.MinValue;

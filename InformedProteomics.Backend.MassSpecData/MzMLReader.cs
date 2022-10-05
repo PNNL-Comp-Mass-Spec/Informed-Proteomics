@@ -1503,10 +1503,9 @@ namespace InformedProteomics.Backend.MassSpecData
             var reader = XmlReader.Create(_fileReader, _xSettings);
             // Guarantee a move to the root node
             reader.MoveToContent();
-            if (_encoding == null)
-            {
-                _encoding = _fileReader.CurrentEncoding;
-            }
+
+            _encoding ??= _fileReader.CurrentEncoding;
+
             XmlReader indexReader = null;
             if (reader.Name == "indexedmzML")
             {

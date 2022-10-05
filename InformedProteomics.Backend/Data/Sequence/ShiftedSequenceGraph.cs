@@ -266,10 +266,8 @@ namespace InformedProteomics.Backend.Data.Sequence
             var curModCombIndex = node.ModificationCombinationIndex;
             if (prevModCombIndex != curModCombIndex) // modified
             {
-                if (newMods == null)
-                {
-                    newMods = bestPrevMods == null ? new LinkedList<ModificationInstance>() : new LinkedList<ModificationInstance>(bestPrevMods);
-                }
+                newMods ??= bestPrevMods == null ? new LinkedList<ModificationInstance>() : new LinkedList<ModificationInstance>(bestPrevMods);
+
                 var modification = ModificationParams.GetModificationIndexBetween(prevModCombIndex, curModCombIndex);
                 var modIns = new ModificationInstance(modification, modPos);
                 if (_isForward)

@@ -60,10 +60,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns>Array of intensities</returns>
         public double[] GetIsotopomerEnvelopeRelativeIntensities()
         {
-            if (_isotopomerEnvelope == null)
-            {
-                _isotopomerEnvelope = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
-            }
+            _isotopomerEnvelope ??= Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
 
             return _isotopomerEnvelope.Envelope;
         }
@@ -74,10 +71,7 @@ namespace InformedProteomics.Backend.Data.Composition
         /// <returns>Index of the most abundant isotope</returns>
         public int GetMostAbundantIsotopeZeroBasedIndex()
         {
-            if (_isotopomerEnvelope == null)
-            {
-                _isotopomerEnvelope = Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
-            }
+            _isotopomerEnvelope ??= Averagine.GetIsotopomerEnvelopeFromNominalMass(NominalMass);
 
             return _isotopomerEnvelope.MostAbundantIsotopeIndex;
         }

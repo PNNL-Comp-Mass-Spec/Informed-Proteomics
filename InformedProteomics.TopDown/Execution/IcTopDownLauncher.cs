@@ -402,10 +402,8 @@ namespace InformedProteomics.TopDown.Execution
                     results = decoySearchResults;
                     filePath = decoyOutputFilePath;
                 }
-                if (results == null)
-                {
-                    results = DatabaseSearchResultData.ReadResultsFromFile(filePath);
-                }
+
+                results ??= DatabaseSearchResultData.ReadResultsFromFile(filePath);
 
                 var mzidWriter = new MzidResultsWriter(targetDb, _run, Options);
                 mzidWriter.WriteResultsToMzid(results, mzidOutputFilePath);
